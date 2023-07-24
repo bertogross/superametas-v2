@@ -29,17 +29,6 @@ return [
     ],
 
 
-    /**
-     * This is the default guard used by Laravel to authenticate users.
-     */
-    'default_guard' => 'web',
-
-    /**
-     * This is the cache key used by the package to store the roles and permissions. It's used to reduce the overhead of repetitive database queries when checking permissions.
-     */
-    'cache_key' => 'spatie.permission.cache',
-
-
     'table_names' => [
 
         /*
