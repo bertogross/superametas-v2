@@ -187,12 +187,12 @@ Overflowing text to show scroll behavior
                                                     </div>
                                                 </div><!--end col-->
                                                 <div class="col-xxl-6">
-                                                    <label for="emailInput" class="form-label">Email</label>
+                                                    <label for="emailInput" class="form-label">E-mail</label>
                                                     <input type="email" class="form-control" id="emailInput" placeholder="Enter your email">
                                                 </div><!--end col-->
                                                 <div class="col-xxl-6">
                                                     <label for="passwordInput" class="form-label">Password</label>
-                                                    <input type="password" class="form-control" id="passwordInput" value="451326546" placeholder="Enter password">
+                                                    <input type="password" class="form-control" id="passwordInput" value="451326546" placeholder="Senha aqui">
                                                 </div><!--end col-->
                                                 <div class="col-lg-12">
                                                     <div class="hstack gap-2 justify-content-end">
@@ -2015,7 +2015,7 @@ hover.&lt;/p&gt;
                                             <input type="email" class="form-control" id="fullName" placeholder="Enter your name">
                                         </div>
                                         <div class="mb-3">
-                                            <label for="emailInput" class="form-label">Email address</label>
+                                            <label for="emailInput" class="form-label">E-mail address</label>
                                             <input type="email" class="form-control" id="emailInput" placeholder="Enter your email">
                                         </div>
                                         <div class="mb-3">

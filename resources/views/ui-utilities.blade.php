@@ -712,7 +712,7 @@ Utilities
                             <input class="form-control me-auto" type="text" placeholder="Add your item here...">
                             <button type="button" class="btn btn-primary">Submit</button>
                             <div class="vr"></div>
-                            <button type="button" class="btn btn-outline-secondary">Reset</button>
+                            <button type="button" class="btn btn-outline-secondary">Enviar</button>
                         </div>
                     </div>
                 </div>

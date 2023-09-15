@@ -125,7 +125,7 @@
                                     <!--end col-->
                                     <div class="col-lg-4">
                                         <div>
-                                            <label for="emailID" class="form-label">Email ID</label>
+                                            <label for="emailID" class="form-label">E-mail ID</label>
                                             <input type="email" class="form-control" id="emailID"
                                                 placeholder="Enter your email">
                                         </div>

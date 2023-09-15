@@ -161,7 +161,7 @@
                         <a href="#!">
                             <h5>Web designer</h5>
                         </a>
-                        <p class="text-muted">Themesbrand</p>
+                        <p class="text-muted">Supera Metas</p>
 
                         <div class="d-flex gap-4 mb-3">
                             <div>
@@ -200,7 +200,7 @@
                         <a href="#!">
                             <h5>Marketing Director</h5>
                         </a>
-                        <p class="text-muted">Themesbrand</p>
+                        <p class="text-muted">Supera Metas</p>
 
                         <div class="d-flex gap-4 mb-3">
                             <div>
@@ -238,7 +238,7 @@
                         <a href="#!">
                             <h5>Product Sales Specialist</h5>
                         </a>
-                        <p class="text-muted">Themesbrand</p>
+                        <p class="text-muted">Supera Metas</p>
 
                         <div class="d-flex gap-4 mb-3">
                             <div>
@@ -276,7 +276,7 @@
                         <a href="#!">
                             <h5>Web designer</h5>
                         </a>
-                        <p class="text-muted">Themesbrand</p>
+                        <p class="text-muted">Supera Metas</p>
 
                         <div class="d-flex gap-4 mb-3">
                             <div>
@@ -315,7 +315,7 @@
                         <a href="#!">
                             <h5>Marketing Director</h5>
                         </a>
-                        <p class="text-muted">Themesbrand</p>
+                        <p class="text-muted">Supera Metas</p>
 
                         <div class="d-flex gap-4 mb-3">
                             <div>
@@ -353,7 +353,7 @@
                         <a href="#!">
                             <h5>Product Sales Specialist</h5>
                         </a>
-                        <p class="text-muted">Themesbrand</p>
+                        <p class="text-muted">Supera Metas</p>
 
                         <div class="d-flex gap-4 mb-3">
                             <div>
@@ -525,7 +525,7 @@
                         <input type="text" class="form-control" id="nameInput" placeholder="Enter your name">
                     </div>
                     <div class="mb-3">
-                        <label for="emailInput" class="form-label">Email</label>
+                        <label for="emailInput" class="form-label">E-mail</label>
                         <input type="text" class="form-control" id="emailInput" placeholder="Enter your email">
                     </div>
                     <div class="mb-3">

@@ -5,8 +5,8 @@
     <title>Rater Js Example</title>
 </head>
 <body>
- 
-<h1>Rater Js Example</h1> 
+
+<h1>Rater Js Example</h1>
 <a href="https://fredolss.github.io/rater-js/">Back to home page</a>
 <h2>Basic 5 star rater</h2>
 
@@ -18,8 +18,8 @@
         starSize:32,
         element:document.querySelector("#rater"),
         rateCallback:function rateCallback(rating, done) {
-            this.setRating(rating); 
-            done(); 
+            this.setRating(rating);
+            done();
         }
     }
 </code>
@@ -36,8 +36,8 @@
     {
         element:document.querySelector("#rater"),
         rateCallback:function rateCallback(rating, done) {
-            this.setRating(rating); 
-            done(); 
+            this.setRating(rating);
+            done();
         },
         starSize:32,
         step:0.5
@@ -55,16 +55,16 @@
 <pre>
     <code>
     {
-        max:5, 
-        rating:4, 
-        element:document.querySelector("#rater2"), 
-        disableText:"Custom disable text!", 
+        max:5,
+        rating:4,
+        element:document.querySelector("#rater2"),
+        disableText:"Custom disable text!",
         ratingText:"My custom rating text {rating}",
         showToolTip:true,
         rateCallback:function rateCallback(rating, done) {
-            starRating.setRating(rating); 
-            starRating.disable(); 
-            done(); 
+            starRating.setRating(rating);
+            starRating.disable();
+            done();
         }
     }
 </code>
@@ -80,9 +80,9 @@
 <pre>
     <code>
     {
-        max:16, 
-        readOnly:true, 
-        rating:4.4, 
+        max:16,
+        readOnly:true,
+        rating:4.4,
         element:document.querySelector("#rater3")
     }
 </code>
@@ -96,16 +96,16 @@
 
 <pre>
     <code>
-    { 
+    {
         isBusyText: "Rating in progress. Please wait...",
         element:document.querySelector("#rater4"),
         rateCallback: function rateCallback(rating, done) {
-        starRating.setRating(rating); 
+        starRating.setRating(rating);
             myDataService.rate().then(function (avgRating) {
-                starRating.setRating(avgRating); 
-                done(); 
+                starRating.setRating(avgRating);
+                done();
             });
-        }    
+        }
     }
     </code>
 </pre>
@@ -124,8 +124,8 @@
     {
         element:document.querySelector("#rater5"),
         rateCallback:function rateCallback(rating, done) {
-            this.setRating(rating); 
-            done(); 
+            this.setRating(rating);
+            done();
         },
         onHover: function(currentIndex, currentRating){
 			document.querySelector('.live-rating').textContent = currentIndex;
@@ -144,7 +144,7 @@
 <div>
     <span id="rater6"></span>
     <span class="clear-rating"></span>
-    <button id="rater6-button">Reset</button>
+    <button id="rater6-button">Enviar</button>
 </div>
 
 <pre>
@@ -152,14 +152,14 @@
     {
         element:document.querySelector("#rater6"),
         rateCallback:function rateCallback(rating, done) {
-            this.setRating(rating); 
-            done(); 
+            this.setRating(rating);
+            done();
         }
     }
 
     document.querySelector('#rater6-button').addEventListener("click", function() {
         starRating6.clear();
-    }, false); 
+    }, false);
 
 </code>
 </pre>
@@ -169,12 +169,12 @@
 <pre>
     <code>
        {
-            max:6, 
+            max:6,
             reverse:true, //this enable rtl
             element:document.querySelector("#rater7"),
             rateCallback:function rateCallback(rating, done) {
-                this.setRating(rating); 
-                done(); 
+                this.setRating(rating);
+                done();
             }
        )
     </code>

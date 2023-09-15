@@ -1917,8 +1917,8 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="dealEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="dealEmail" placeholder="Enter email" required>
+                            <label for="dealEmail" class="form-label">E-mail</label>
+                            <input type="email" class="form-control" id="dealEmail" placeholder="E-mail aqui" required>
                             <div class="invalid-feedback">
                                 Please write a email.
                             </div>

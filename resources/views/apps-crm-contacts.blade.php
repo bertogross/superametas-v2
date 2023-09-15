@@ -220,8 +220,8 @@
                                         </div>
                                         <div class="col-lg-12">
                                             <div>
-                                                <label for="email_id-field" class="form-label">Email ID</label>
-                                                <input type="text" id="email_id-field" class="form-control" placeholder="Enter email" required />
+                                                <label for="email_id-field" class="form-label">E-mail ID</label>
+                                                <input type="text" id="email_id-field" class="form-control" placeholder="E-mail aqui" required />
                                             </div>
                                         </div>
                                         <div class="col-lg-6">

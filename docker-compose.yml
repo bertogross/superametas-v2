@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:80
+    volumes:
+      - .:/var/www/html/superametas
+
+  database:
+    image: mysql:5.7
+    restart: always
+    ports:
+      - 33006:3306
+    environment:
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=smOnboard
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=secret
+    volumes:
+      - database_data:/var/lib/mysql
+      - ./.docker/mysql:/docker-entrypoint-initdb.d
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - 8080:80
+    environment:
+      - PMA_HOST=database
+      - PMA_PORT=3306
+      - MYSQL_ROOT_PASSWORD=secret
+      - UPLOAD_LIMIT=50M
+
+volumes:
+  database_data:

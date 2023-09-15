@@ -1272,7 +1272,7 @@
                             </div>
                             <!--end col-->
                             <div class="col-lg-12">
-                                <label for="emailInput" class="form-label">Email ID</label>
+                                <label for="emailInput" class="form-label">E-mail ID</label>
                                 <input type="email" class="form-control" id="emailInput"
                                     placeholder="Email">
                             </div>

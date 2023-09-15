@@ -152,7 +152,7 @@
                                     <!--end col-->
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="emailidInput" class="form-label">Email</label>
+                                            <label for="emailidInput" class="form-label">E-mail</label>
                                             <input type="email" class="form-control" id="emailidInput"
                                                 placeholder="Enter your email">
                                         </div>
@@ -264,7 +264,7 @@
                                     <!--end col-->
                                     <div class="col-lg-4">
                                         <div class="mb-3">
-                                            <label for="companyemailInput" class="form-label">Email</label>
+                                            <label for="companyemailInput" class="form-label">E-mail</label>
                                             <input type="email" class="form-control" id="companyemailInput"
                                                 placeholder="Enter your email">
                                         </div>

@@ -866,7 +866,7 @@
                                     <a href="#!">
                                         <h5>New Web designer</h5>
                                     </a>
-                                    <p class="text-muted">Themesbrand</p>
+                                    <p class="text-muted">Supera Metas</p>
 
                                     <div class="d-flex gap-4 mb-3">
                                         <div>
@@ -1175,7 +1175,7 @@
                                 <img src="{{URL::asset('build/images/logo-light.png')}}" alt="logo light" height="17" />
                             </div>
                             <div class="mt-4 fs-15">
-                                <p>Premium Multipurpose Admin & Dashboard Template</p>
+                                <p>Solution to help your team reach and exceed their sales goals</p>
                                 <p>You can build any type of web application like eCommerce, CRM, CMS, Project management apps, Admin Panels, etc using Velzon.</p>
                                 <ul class="list-inline mb-0 footer-social-link">
                                     <li class="list-inline-item">
@@ -1264,7 +1264,7 @@
                                 <script>
                                     document.write(new Date().getFullYear())
 
-                                </script> © Velzon - Themesbrand
+                                </script> © Supera Metas - Themesbrand
                             </p>
                         </div>
                     </div>

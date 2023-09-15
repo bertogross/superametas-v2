@@ -8,7 +8,7 @@
                 <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="" height="22">
             </span>
             <span class="logo-lg">
-                <img src="<?php echo e(URL::asset('build/images/logo-dark.png')); ?>" alt="" height="17">
+                <img src="<?php echo e(URL::asset('build/images/logo-dark.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="39">
             </span>
         </a>
         <!-- Light Logo-->
@@ -17,7 +17,7 @@
                 <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="" height="22">
             </span>
             <span class="logo-lg">
-                <img src="<?php echo e(URL::asset('build/images/logo-light.png')); ?>" alt="" height="17">
+                <img src="<?php echo e(URL::asset('build/images/logo-light.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="39">
             </span>
         </a>
         <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
@@ -25,7 +25,8 @@
         </button>
     </div>
 
-    <div id="scrollbar">
+    <!--
+    <div id="scrollbar" class="d-none">
         <div class="container-fluid">
 
             <div id="two-column-menu">
@@ -61,7 +62,7 @@
                             </li>
                         </ul>
                     </div>
-                </li> <!-- end Dashboard Menu -->
+                </li>
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarApps" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarApps">
                         <i class="bx bx-layer"></i> <span><?php echo app('translator')->get('translation.apps'); ?></span>
@@ -376,7 +377,7 @@
                             </li>
                         </ul>
                     </div>
-                </li> <!-- end Dashboard Menu -->
+                </li>
 
                 <li class="menu-title"><i class="ri-more-fill"></i> <span><?php echo app('translator')->get('translation.pages'); ?></span></li>
 
@@ -987,9 +988,9 @@
 
             </ul>
         </div>
-        <!-- Sidebar -->
     </div>
-    <div class="sidebar-background"></div>
+    <div class="sidebar-background d-none"></div>
+    -->
 </div>
 <!-- Left Sidebar End -->
 <!-- Vertical Overlay-->

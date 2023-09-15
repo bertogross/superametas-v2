@@ -19,7 +19,7 @@
                                             <div class="position-relative h-100 d-flex flex-column">
                                                 <div class="mb-4">
                                                     <a href="index" class="d-block">
-                                                        <img src="{{ URL::asset('build/images/logo-light.png') }}" alt="" height="18">
+                                                        <img src="{{ URL::asset('build/images/logo-light.png') }}" alt="{{ env('APP_NAME') }}" height="49">
                                                     </a>
                                                 </div>
                                                 <div class="mt-auto">
@@ -66,7 +66,7 @@
                                                 <form class="needs-validation" novalidate action="index">
 
                                                     <div class="mb-3">
-                                                        <label for="useremail" class="form-label">Email <span class="text-danger">*</span></label>
+                                                        <label for="useremail" class="form-label">E-mail <span class="text-danger">*</span></label>
                                                         <input type="email" class="form-control" id="useremail" placeholder="Enter email address" required>
                                                         <div class="invalid-feedback">
                                                             Please enter email
@@ -83,7 +83,7 @@
                                                     <div class="mb-3">
                                                         <label class="form-label" for="password-input">Password</label>
                                                         <div class="position-relative auth-pass-inputgroup">
-                                                            <input type="password" class="form-control pe-5 password-input" onpaste="return false" placeholder="Enter password" id="password-input" aria-describedby="passwordInput" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required>
+                                                            <input type="password" class="form-control pe-5 password-input" onpaste="return false" placeholder="Senha aqui" id="password-input" aria-describedby="passwordInput" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required>
                                                             <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
                                                             <div class="invalid-feedback">
                                                                 Please enter password
@@ -92,7 +92,7 @@
                                                     </div>
 
                                                     <div class="mb-4">
-                                                        <p class="mb-0 fs-12 text-muted fst-italic">By registering you agree to the Velzon <a href="#" class="text-primary text-decoration-underline fst-normal fw-medium">Terms of Use</a></p>
+                                                        <p class="mb-0 fs-12 text-muted fst-italic">Ao se cadastrar, você concorda com os  <a href="#" class="text-primary text-decoration-underline fst-normal fw-medium">Termos de Uso</a></p>
                                                     </div>
 
                                                     <div id="password-contain" class="p-3 bg-light mb-2 rounded">
@@ -123,7 +123,7 @@
                                             </div>
 
                                             <div class="mt-5 text-center">
-                                                <p class="mb-0">Already have an account ? <a href="auth-signin-cover" class="fw-semibold text-primary text-decoration-underline"> Signin</a> </p>
+                                                <p class="mb-0">Já possui cadastro? <a href="auth-signin-cover" class="fw-semibold text-theme text-decoration-underline"> Clique aqui</a> </p>
                                             </div>
                                         </div>
                                     </div>
@@ -146,7 +146,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="text-center">
-                                <p class="mb-0">&copy; <script>document.write(new Date().getFullYear())</script> Velzon. Crafted with <i class="mdi mdi-heart text-danger"></i> by Themesbrand</p>
+                                <p class="mb-0">&copy; <script>document.write(new Date().getFullYear())</script> Supera Metas</p>
                             </div>
                         </div>
                     </div>

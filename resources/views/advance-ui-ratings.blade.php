@@ -92,7 +92,7 @@
                                                 <div id="raterreset" class="align-middle"></div>
                                                 <span class="clear-rating"></span>
                                                 <button id="raterreset-button"
-                                                    class="btn btn-light btn-sm ms-2">Reset</button>
+                                                    class="btn btn-light btn-sm ms-2">Enviar</button>
                                             </div>
                                         </td>
                                         <td>

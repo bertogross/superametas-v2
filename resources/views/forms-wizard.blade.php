@@ -66,7 +66,7 @@
                                             <div class="mb-3">
                                                 <label class="form-label" for="gen-info-email-input">Email</label>
                                                 <input type="email" class="form-control" id="gen-info-email-input"
-                                                    placeholder="Enter email" required>
+                                                    placeholder="E-mail aqui" required>
                                                 <div class="invalid-feedback">Please enter an email address</div>
                                             </div>
                                         </div>
@@ -82,7 +82,7 @@
                                     <div class="mb-3">
                                         <label class="form-label" for="gen-info-password-input">Password</label>
                                         <input type="password" class="form-control" id="gen-info-password-input"
-                                            placeholder="Enter Password" required>
+                                            placeholder="Senha aqui" required>
                                         <div class="invalid-feedback">Please enter a password</div>
                                     </div>
                                 </div>
@@ -205,7 +205,7 @@
                                                 <label class="form-label"
                                                     for="steparrow-gen-info-email-input">Email</label>
                                                 <input type="email" class="form-control"
-                                                    id="steparrow-gen-info-email-input" placeholder="Enter email"
+                                                    id="steparrow-gen-info-email-input" placeholder="E-mail aqui"
                                                     required>
                                                 <div class="invalid-feedback">Please enter an email address</div>
                                             </div>
@@ -224,7 +224,7 @@
                                     <div class="mb-3">
                                         <label class="form-label" for="steparrow-gen-info-password-input">Password</label>
                                         <input type="password" class="form-control"
-                                            id="steparrow-gen-info-password-input" placeholder="Enter password" required>
+                                            id="steparrow-gen-info-password-input" placeholder="Senha aqui" required>
                                         <div class="invalid-feedback">Please enter a password</div>
                                     </div>
                                     <div>
@@ -232,7 +232,7 @@
                                             Password</label>
                                         <input type="password" class="form-control"
                                             id="steparrow-gen-info-confirm-password-input"
-                                            placeholder="Enter confirm password" required>
+                                            placeholder="Redigite a senha" required>
                                         <div class="invalid-feedback">Please enter a confirm password</div>
                                     </div>
                                 </div>
@@ -378,10 +378,10 @@
                                                     </div>
 
                                                     <div class="col-12">
-                                                        <label for="email" class="form-label">Email <span
+                                                        <label for="email" class="form-label">E-mail <span
                                                                 class="text-muted">(Optional)</span></label>
                                                         <input type="email" class="form-control" id="email"
-                                                            placeholder="Enter Email" />
+                                                            placeholder="E-mail aqui" />
                                                     </div>
                                                 </div>
                                             </div>

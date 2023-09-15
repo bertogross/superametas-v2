@@ -20,7 +20,7 @@
                                         <div class="position-relative h-100 d-flex flex-column">
                                             <div class="mb-4">
                                                 <a href="index" class="d-block">
-                                                    <img src="{{ URL::asset('build/images/logo-light.png') }}" alt="" height="18">
+                                                    <img src="{{ URL::asset('build/images/logo-light.png') }}" alt="{{ env('APP_NAME') }}" height="49">
                                                 </a>
                                             </div>
                                             <div class="mt-auto">
@@ -85,7 +85,7 @@
                                                     <label class="form-label" for="password-input">Password</label>
                                                     <div class="position-relative auth-pass-inputgroup mb-3">
                                                         <input type="password" class="form-control pe-5 password-input"
-                                                            placeholder="Enter password" id="password-input">
+                                                            placeholder="Senha aqui" id="password-input">
                                                         <button
                                                             class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon"
                                                             type="button" id="password-addon"><i
@@ -157,10 +157,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="text-center">
-                            <script>
-                                document.write(new Date().getFullYear())
-                            </script> Velzon. Crafted with <i
-                                    class="mdi mdi-heart text-danger"></i> by Themesbrand</p>
+                            <p class="mb-0 text-muted">&copy; <script>document.write(new Date().getFullYear())</script> Supera Metas</p>
                         </div>
                     </div>
                 </div>

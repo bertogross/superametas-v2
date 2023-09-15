@@ -20,7 +20,7 @@
                                             <div class="position-relative h-100 d-flex flex-column">
                                                 <div class="mb-4">
                                                     <a href="index" class="d-block">
-                                                        <img src="{{ URL::asset('build/images/logo-light.png') }}" alt="" height="18">
+                                                        <img src="{{ URL::asset('build/images/logo-light.png') }}" alt="{{ env('APP_NAME') }}" height="49">
                                                     </a>
                                                 </div>
                                                 <div class="mt-auto">
@@ -148,7 +148,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="text-center">
-                                <p class="mb-0">&copy; <script>document.write(new Date().getFullYear())</script> Velzon. Crafted with <i class="mdi mdi-heart text-danger"></i> by Themesbrand</p>
+                                <p class="mb-0">&copy; <script>document.write(new Date().getFullYear())</script> Supera Metas</p>
                             </div>
                         </div>
                     </div>

@@ -20,7 +20,7 @@
                                         <div class="position-relative h-100 d-flex flex-column">
                                             <div class="mb-4">
                                                 <a href="index" class="d-block">
-                                                    <img src="{{ URL::asset('build/images/logo-light.png') }}" alt="" height="18">
+                                                    <img src="{{ URL::asset('build/images/logo-light.png') }}" alt="{{ env('APP_NAME') }}" height="49">
                                                 </a>
                                             </div>
                                             <div class="mt-auto">
@@ -63,23 +63,22 @@
 
                                 <div class="col-lg-6">
                                     <div class="p-lg-5 p-4">
-                                        <h5 class="text-primary">Forgot Password?</h5>
-                                        <p class="text-muted">Reset password with velzon</p>
+                                        <h5 class="text-theme">Esqueceu a senha?</h5>
 
                                         <div class="mt-2 text-center">
                                             <lord-icon src="https://cdn.lordicon.com/rhvddzym.json" trigger="loop"
-                                                colors="primary:#0ab39c" class="avatar-xl">
+                                                colors="primary:#87DF01" class="avatar-xl">
                                             </lord-icon>
                                         </div>
 
                                         <div class="alert alert-borderless alert-warning text-center mb-2 mx-2"
                                             role="alert">
-                                            Enter your email and instructions will be sent to you!
+                                            Informe seu e-mail e instruções serão enviadas!
                                         </div>
                                         <div class="p-2">
                                             <form>
                                                 <div class="mb-4">
-                                                    <label class="form-label">Email</label>
+                                                    <label class="form-label">E-mail</label>
                                                     <input type="email" class="form-control" id="email"
                                                         placeholder="Enter email address">
                                                 </div>
@@ -92,9 +91,9 @@
                                         </div>
 
                                         <div class="mt-5 text-center">
-                                            <p class="mb-0">Wait, I remember my password... <a
+                                            <p class="mb-0">Espere, eu lembrei qual minha senha... <a
                                                     href="auth-signin-cover"
-                                                    class="fw-semibold text-primary text-decoration-underline"> Click here
+                                                    class="fw-semibold text-theme text-decoration-underline"> Clique aqui
                                                 </a> </p>
                                         </div>
                                     </div>
@@ -120,10 +119,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="text-center">
-                            <script>
-                                document.write(new Date().getFullYear())
-                            </script> Velzon. Crafted with <i
-                                    class="mdi mdi-heart text-danger"></i> by Themesbrand</p>
+                            <p class="mb-0 text-muted">&copy; <script>document.write(new Date().getFullYear())</script> Supera Metas</p>
                         </div>
                     </div>
                 </div>

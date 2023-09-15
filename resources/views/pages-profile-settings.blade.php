@@ -177,7 +177,7 @@
                                     <!--end col-->
                                     <div class="col-lg-6">
                                         <div class="mb-3">
-                                            <label for="emailInput" class="form-label">Email
+                                            <label for="emailInput" class="form-label">E-mail
                                                 Address</label>
                                             <input type="email" class="form-control" id="emailInput"
                                                 placeholder="Enter your email" value="daveadame@velzon.com">

@@ -50,10 +50,20 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'name' => ['required', 'string', 'max:200'],
+            'email' => ['required', 'string', 'email', 'max:200', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'avatar' => ['required', 'image' ,'mimes:jpg,jpeg,png','max:1024'],
+            //'avatar' => ['required', 'image' ,'mimes:jpg,jpeg,png','max:1024'],
+            //'subdomain' => ['required', 'string', 'max:100'],
+            'subdomain' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^\S+$/u', // To check for no white spaces
+                Rule::unique('users', 'subdomain')->where(function ($query) use ($data) {
+                    return $query->where('subdomain', strtolower($data['subdomain']));
+                }),
+            ]
         ]);
     }
 
@@ -77,7 +87,8 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'avatar' =>  $avatarName,
+            //'avatar' =>  $avatarName,
+            'subdomain' =>  strtolower($data['subdomain']),
         ]);
     }
 }

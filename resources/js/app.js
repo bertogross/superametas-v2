@@ -394,7 +394,7 @@ File: Main Js File
 			currentPath = currentPath.substring(currentPath.lastIndexOf("/") + 1);
 			if (currentPath) {
 				// navbar-nav
-				var a = document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]');
+				var a = document.getElementById("navbar-nav") ? document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]') : ''; // By Upididu
 
 				if (a) {
 					var parentCollapseDiv = a.closest(".collapse.menu-dropdown");
@@ -619,8 +619,10 @@ File: Main Js File
 		 * Two-column layout menu scroll add
 		 */
 		if (document.documentElement.getAttribute("data-layout") == "twocolumn") {
-			document.getElementById("scrollbar").removeAttribute("data-simplebar");
-			document.getElementById("scrollbar").classList.remove("h-100");
+            if(document.getElementById("scrollbar")){ // By Upididu
+                document.getElementById("scrollbar").removeAttribute("data-simplebar");
+                document.getElementById("scrollbar").classList.remove("h-100");
+            }
 		}
 
 		/**
@@ -770,7 +772,7 @@ File: Main Js File
 				document.body.classList.remove("vertical-sidebar-enable");
 				document.documentElement.getAttribute("data-sidebar-size") == "sm" ?
 					document.documentElement.setAttribute("data-sidebar-size", "") :
-					document.documentElement.setAttribute("data-sidebar-size", "sm");				
+					document.documentElement.setAttribute("data-sidebar-size", "sm");
 			} else if (windowSize > 1025) {
 				document.body.classList.remove("vertical-sidebar-enable");
 				document.documentElement.getAttribute("data-sidebar-size") == "lg" ?
@@ -884,7 +886,7 @@ File: Main Js File
 				document.getElementById("two-column-menu").querySelector('[href="' + currentPath + '"]').classList.add("active");
 			}
 			// navbar-nav
-			var a = document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]');
+			var a = document.getElementById("navbar-nav") ? document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]') : '';
 			if (a) {
 				a.classList.add("active");
 				var parentCollapseDiv = a.closest(".collapse.menu-dropdown");
@@ -920,7 +922,7 @@ File: Main Js File
 		currentPath = currentPath.substring(currentPath.lastIndexOf("/") + 1);
 		if (currentPath) {
 			// navbar-nav
-			var a = document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]');
+			var a = document.getElementById("navbar-nav") ? document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]') : '';
 			if (a) {
 				a.classList.add("active");
 				var parentCollapseDiv = a.closest(".collapse.menu-dropdown");
@@ -1134,13 +1136,21 @@ File: Main Js File
 	}
 
 	function updateHorizontalMenus() {
-		document.getElementById("two-column-menu").innerHTML = "";
+        if (document.getElementById("two-column-menu")){ // By Upididu
+            document.getElementById("two-column-menu").innerHTML = "";
+        }
 		if (document.querySelector(".navbar-menu")) {
 			document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
 		}
-		document.getElementById("scrollbar").removeAttribute("data-simplebar");
-		document.getElementById("navbar-nav").removeAttribute("data-simplebar");
-		document.getElementById("scrollbar").classList.remove("h-100");
+        if(document.getElementById("scrollbar")){ // By Upididu
+            document.getElementById("scrollbar").removeAttribute("data-simplebar");
+        }
+        if(document.getElementById("navbar-nav")){ // By Upididu
+            document.getElementById("navbar-nav").removeAttribute("data-simplebar");
+        }
+        if(document.getElementById("scrollbar")){ // By Upididu
+            document.getElementById("scrollbar").classList.remove("h-100");
+        }
 
 		var splitMenu = horizontalMenuSplit;
 		var extraMenuName = "More";
@@ -1174,7 +1184,9 @@ File: Main Js File
 
 	function hideShowLayoutOptions(dataLayout) {
 		if (dataLayout == "vertical") {
-			document.getElementById("two-column-menu").innerHTML = "";
+            if(document.getElementById("two-column-menu")){ // By Upididu
+                document.getElementById("two-column-menu").innerHTML = "";
+            }
 			if (document.querySelector(".navbar-menu")) {
 				document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
 			}
@@ -1208,8 +1220,10 @@ File: Main Js File
 			}
 			initActiveMenu();
 		} else if (dataLayout == "twocolumn") {
-			document.getElementById("scrollbar").removeAttribute("data-simplebar");
-			document.getElementById("scrollbar").classList.remove("h-100");
+            if(document.getElementById("scrollbar")){ // By Upididu
+                document.getElementById("scrollbar").removeAttribute("data-simplebar");
+                document.getElementById("scrollbar").classList.remove("h-100");
+            }
 			if (document.getElementById("theme-settings-offcanvas")) {
 				document.getElementById("sidebar-size").style.display = "none";
 				document.getElementById("sidebar-view").style.display = "none";
@@ -1675,7 +1689,7 @@ File: Main Js File
 							document.documentElement.setAttribute("data-body-image", "img-1");
 
 							if (document.getElementById("theme-settings-offcanvas")) {
-								if (document.getElementById("sidebar-img")) { 
+								if (document.getElementById("sidebar-img")) {
 									document.getElementById("sidebar-img").style.display = "none";
 									document.documentElement.removeAttribute("data-sidebar-image");
 								}

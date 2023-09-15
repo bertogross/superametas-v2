@@ -55,9 +55,19 @@ class HomeController extends Controller
     public function updateProfile(Request $request, $id)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:200'],
             'email' => ['required', 'string', 'email'],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:1024'],
+            //'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:1024'],
+            //'subdomain' => ['required', 'string', 'max:100'],
+            'subdomain' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^\S+$/u', // To check for no white spaces
+                Rule::unique('users', 'subdomain')->where(function ($query) use ($data) {
+                    return $query->where('subdomain', strtolower($data['subdomain']));
+                }),
+            ]
         ]);
 
         $user = User::find($id);

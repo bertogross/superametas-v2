@@ -1,3 +1,4 @@
-<body data-bs-theme="dark" data-topbar="light" data-sidebar="dark">
+
+<body>
 
 <!-- <body data-layout="horizontal"> -->

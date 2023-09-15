@@ -82,10 +82,10 @@
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="mb-3">
-                                                <label for="billinginfo-email" class="form-label">Email
+                                                <label for="billinginfo-email" class="form-label">E-mail
                                                     <span class="text-muted">(Optional)</span></label>
                                                 <input type="email" class="form-control" id="billinginfo-email"
-                                                    placeholder="Enter email">
+                                                    placeholder="E-mail aqui">
                                             </div>
                                         </div>
 

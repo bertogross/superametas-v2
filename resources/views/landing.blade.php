@@ -1748,7 +1748,7 @@
                                     <img src="{{ URL::asset('build/images/logo-light.png') }}" alt="logo light" height="17">
                                 </div>
                                 <div class=mt-4 fs-13">
-                                    <p>Premium Multipurpose Admin & Dashboard Template</p>
+                                    <p>Solution to help your team reach and exceed their sales goals</p>
                                     <p class="ff-secondary">You can build any type of web application like eCommerce,
                                         CRM, CMS, Project
                                         management apps, Admin Panels, etc using Velzon.</p>
@@ -1802,7 +1802,7 @@
                                 <p class="copy-rights mb-0">
                                     <script>
                                         document.write(new Date().getFullYear())
-                                    </script> © Velzon - Themesbrand
+                                    </script> © Supera Metas - Themesbrand
                                 </p>
                             </div>
                         </div>

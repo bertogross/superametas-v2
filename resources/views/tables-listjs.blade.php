@@ -602,8 +602,8 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="email-field" class="form-label">Email</label>
-                            <input type="email" id="email-field" class="form-control" placeholder="Enter Email"
+                            <label for="email-field" class="form-label">E-mail</label>
+                            <input type="email" id="email-field" class="form-control" placeholder="E-mail aqui"
                                 required />
                         </div>
 

@@ -67,7 +67,7 @@
                                 <!--end col-->
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="emailidInput" class="form-label">Email Address</label>
+                                        <label for="emailidInput" class="form-label">E-mail Address</label>
                                         <input type="email" class="form-control" placeholder="example@gamil.com"
                                             id="emailidInput">
                                     </div>
@@ -201,7 +201,7 @@
                                 <input type="text" class="form-control" id="fullnameInput" placeholder="Enter your name">
                             </div>
                             <div class="col-md-6">
-                                <label for="inputEmail4" class="form-label">Email</label>
+                                <label for="inputEmail4" class="form-label">E-mail</label>
                                 <input type="email" class="form-control" id="inputEmail4" placeholder="Email">
                             </div>
                             <div class="col-md-6">
@@ -433,7 +433,7 @@ Check me out
                             </div>
                             <div class="row mb-3">
                                 <div class="col-lg-3">
-                                    <label for="leaveemails" class="form-label">Email Id</label>
+                                    <label for="leaveemails" class="form-label">E-mail Id</label>
                                 </div>
                                 <div class="col-lg-9">
                                     <input type="email" class="form-control" id="leaveemails"

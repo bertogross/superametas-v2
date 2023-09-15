@@ -61,7 +61,7 @@
                                 <script>
                                     document.write(new Date().getFullYear())
                                 </script> Velzon. Crafted with <i
-                                        class="mdi mdi-heart text-danger"></i> by Themesbrand</p>
+                                        class="mdi mdi-heart text-danger"></i> by Supera Metas</p>
                             </div>
                         </div>
                     </div>
