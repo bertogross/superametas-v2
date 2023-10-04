@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\Rule;
 
 class HomeController extends Controller
 {
@@ -66,7 +67,7 @@ class HomeController extends Controller
                 'regex:/^\S+$/u', // To check for no white spaces
                 Rule::unique('users', 'subdomain')->where(function ($query) use ($data) {
                     return $query->where('subdomain', strtolower($data['subdomain']));
-                }),
+                }),  // RELATED TO TENANCY FOR LARAVEL
             ]
         ]);
 

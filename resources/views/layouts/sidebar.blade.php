@@ -3,7 +3,7 @@
     <!-- LOGO -->
     <div class="navbar-brand-box">
         <!-- Dark Logo-->
-        <a href="index" class="logo logo-dark">
+        <a href="{{env('APP_URL')}}" class="logo logo-dark">
             <span class="logo-sm">
                 <img src="{{ URL::asset('build/images/logo-sm.png') }}" alt="" height="22">
             </span>
@@ -12,7 +12,7 @@
             </span>
         </a>
         <!-- Light Logo-->
-        <a href="index" class="logo logo-light">
+        <a href="{{env('APP_URL')}}" class="logo logo-light">
             <span class="logo-sm">
                 <img src="{{ URL::asset('build/images/logo-sm.png') }}" alt="" height="22">
             </span>
@@ -46,7 +46,7 @@
                                 <a href="dashboard-crm" class="nav-link">@lang('translation.crm')</a>
                             </li>
                             <li class="nav-item">
-                                <a href="index" class="nav-link">@lang('translation.ecommerce')</a>
+                                <a href="{{env('APP_URL')}}" class="nav-link">@lang('translation.ecommerce')</a>
                             </li>
                             <li class="nav-item">
                                 <a href="dashboard-crypto" class="nav-link">@lang('translation.crypto')</a>

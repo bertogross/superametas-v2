@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -18,6 +19,7 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 */
 
+
 Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
@@ -27,9 +29,14 @@ Route::middleware([
         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
     });*/
 
+
     // RELATED TO TENANCY FOR LARAVEL
     Route::get('/', function () {
         dd(\App\Models\User::all());
         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
+
+
     });
+
 });
+

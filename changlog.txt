@@ -4,6 +4,11 @@ Changelog
 
 
 
+Version 2.0.3 - [2023-10-04]
+- [Removed] Tenancy
+
+
+
 Version 2.0.2 - [2023-09-15]
 -------------------
 - [Updated] Tenancy [https://tenancyforlaravel.com/]

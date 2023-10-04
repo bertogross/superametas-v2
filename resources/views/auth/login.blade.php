@@ -14,7 +14,7 @@
                 <div class="col-lg-12">
                     <div class="text-center mt-sm-5 mb-4 text-white-50">
                         <div>
-                            <a href="index" class="d-inline-block auth-logo">
+                            <a href="{{env('APP_URL')}}" class="d-inline-block auth-logo">
                                 <img src="{{ URL::asset('build/images/logo-light.png')}}" alt="{{ env('APP_NAME') }}" height="49">
                             </a>
                         </div>
@@ -33,7 +33,7 @@
                                     @csrf
                                     <div class="mb-3">
                                         <label for="username" class="form-label">E-mail <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control @error('email') is-invalid @enderror" value="" id="username" name="email" placeholder="Enter username">
+                                        <input type="text" class="form-control @error('email') is-invalid @enderror" value="" id="username" name="email" placeholder="Informe o e-mail">
                                         @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>

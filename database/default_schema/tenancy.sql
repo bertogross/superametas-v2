@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Sep 14, 2023 at 02:22 AM
+-- Generation Time: Sep 16, 2023 at 03:43 PM
 -- Server version: 10.5.19-MariaDB-0+deb11u2
 -- PHP Version: 7.4.33
 
@@ -24,10 +24,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_attachments`
+-- Table structure for table `attachments`
 --
 
-CREATE TABLE `wlsm_attachments` (
+CREATE TABLE `attachments` (
   `attachment_id` bigint(20) UNSIGNED NOT NULL,
   `post_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `attachment_author` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
@@ -44,10 +44,10 @@ CREATE TABLE `wlsm_attachments` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_commentmeta`
+-- Table structure for table `commentmeta`
 --
 
-CREATE TABLE `wlsm_commentmeta` (
+CREATE TABLE `commentmeta` (
   `meta_id` bigint(20) UNSIGNED NOT NULL,
   `comment_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `meta_key` varchar(255) DEFAULT NULL,
@@ -57,10 +57,10 @@ CREATE TABLE `wlsm_commentmeta` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_comments`
+-- Table structure for table `comments`
 --
 
-CREATE TABLE `wlsm_comments` (
+CREATE TABLE `comments` (
   `comment_ID` bigint(20) UNSIGNED NOT NULL,
   `comment_post_ID` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `comment_author` tinytext NOT NULL,
@@ -81,10 +81,10 @@ CREATE TABLE `wlsm_comments` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_companies`
+-- Table structure for table `companies`
 --
 
-CREATE TABLE `wlsm_companies` (
+CREATE TABLE `companies` (
   `id` int(11) NOT NULL,
   `company_id` bigint(10) NOT NULL,
   `company_name` varchar(200) NOT NULL,
@@ -94,10 +94,10 @@ CREATE TABLE `wlsm_companies` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_departments`
+-- Table structure for table `departments`
 --
 
-CREATE TABLE `wlsm_departments` (
+CREATE TABLE `departments` (
   `id` bigint(20) NOT NULL,
   `department_id` int(10) NOT NULL,
   `department_description` varchar(200) NOT NULL,
@@ -108,10 +108,10 @@ CREATE TABLE `wlsm_departments` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_goals_sales`
+-- Table structure for table `goals_sales`
 --
 
-CREATE TABLE `wlsm_goals_sales` (
+CREATE TABLE `goals_sales` (
   `id` bigint(200) NOT NULL,
   `company_id` bigint(20) NOT NULL DEFAULT 0,
   `department_id` bigint(20) NOT NULL DEFAULT 0,
@@ -125,10 +125,10 @@ CREATE TABLE `wlsm_goals_sales` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_links`
+-- Table structure for table `links`
 --
 
-CREATE TABLE `wlsm_links` (
+CREATE TABLE `links` (
   `link_id` bigint(20) UNSIGNED NOT NULL,
   `link_url` varchar(255) NOT NULL DEFAULT '',
   `link_name` varchar(255) NOT NULL DEFAULT '',
@@ -147,67 +147,23 @@ CREATE TABLE `wlsm_links` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_options`
+-- Table structure for table `options`
 --
 
-CREATE TABLE `wlsm_options` (
+CREATE TABLE `options` (
   `option_id` bigint(20) UNSIGNED NOT NULL,
   `option_name` varchar(191) NOT NULL DEFAULT '',
   `option_value` longtext NOT NULL,
   `autoload` varchar(20) NOT NULL DEFAULT 'yes'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `wlsm_options`
---
-
-INSERT INTO `wlsm_options` (`option_id`, `option_name`, `option_value`, `autoload`) VALUES
-(1, 'siteurl', 'https://app.superametas.com', 'yes'),
-(2, 'home', 'https://app.superametas.com', 'yes'),
-(3, 'blogname', 'Supera Metas', 'yes'),
-(4, 'blogdescription', 'Acesso Restrito', 'yes'),
-(5, 'users_can_register', '0', 'yes'),
-(6, 'admin_email', 'app@superametas.com', 'yes'),
-(7, 'start_of_week', '0', 'yes'),
-(8, 'use_balanceTags', '0', 'yes'),
-(9, 'posts_per_page', '10', 'yes'),
-(10, 'date_format', 'd-m-Y', 'yes'),
-(11, 'time_format', 'H:i', 'yes'),
-(12, 'links_updated_date_format', 'j \\d\\e F \\d\\e Y, H:i', 'yes'),
-(13, 'permalink_structure', '/%postname%/', 'yes'),
-(14, 'blog_charset', 'UTF-8', 'yes'),
-(15, 'template', 'wlsmTmplt', 'yes'),
-(16, 'stylesheet', 'wlsmTmplt', 'yes'),
-(17, 'current_theme', 'wlsmTmplt', 'yes'),
-(18, 'html_type', 'text/html', 'yes'),
-(19, 'default_role', 'subscriber', 'yes'),
-(20, 'uploads_use_yearmonth_folders', '1', 'yes'),
-(21, 'upload_path', '', 'yes'),
-(22, 'blog_public', '0', 'yes'),
-(24, 'upload_url_path', '', 'yes'),
-(25, 'thumbnail_size_w', '150', 'yes'),
-(26, 'thumbnail_size_h', '150', 'yes'),
-(27, 'thumbnail_crop', '1', 'yes'),
-(28, 'medium_size_w', '300', 'yes'),
-(29, 'medium_size_h', '300', 'yes'),
-(30, 'avatar_default', 'mystery', 'yes'),
-(31, 'large_size_w', '1024', 'yes'),
-(32, 'large_size_h', '1024', 'yes'),
-(33, 'close_comments_days_old', '14', 'yes'),
-(34, 'comments_per_page', '50', 'yes'),
-(35, 'default_comments_page', 'newest', 'yes'),
-(36, 'comment_order', 'asc', 'yes'),
-(37, 'timezone_string', 'America/Sao_Paulo', 'yes'),
-(38, 'page_for_posts', '0', 'yes'),
-(40, 'fresh_site', '0', 'yes');
-
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_postmeta`
+-- Table structure for table `postmeta`
 --
 
-CREATE TABLE `wlsm_postmeta` (
+CREATE TABLE `postmeta` (
   `meta_id` bigint(20) UNSIGNED NOT NULL,
   `post_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `meta_key` varchar(255) DEFAULT NULL,
@@ -215,19 +171,19 @@ CREATE TABLE `wlsm_postmeta` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `wlsm_postmeta`
+-- Dumping data for table `postmeta`
 --
 
-INSERT INTO `wlsm_postmeta` (`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES
+INSERT INTO `postmeta` (`meta_id`, `post_id`, `meta_key`, `meta_value`) VALUES
 (1, 1, '_wp_page_template', 'pages/home.php');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_posts`
+-- Table structure for table `posts`
 --
 
-CREATE TABLE `wlsm_posts` (
+CREATE TABLE `posts` (
   `ID` bigint(20) UNSIGNED NOT NULL,
   `post_author` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `post_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -253,20 +209,15 @@ CREATE TABLE `wlsm_posts` (
   `comment_count` bigint(20) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `wlsm_posts`
---
 
-INSERT INTO `wlsm_posts` (`ID`, `post_author`, `post_date`, `post_date_gmt`, `post_content`, `post_title`, `post_excerpt`, `post_status`, `comment_status`, `ping_status`, `post_password`, `post_name`, `to_ping`, `pinged`, `post_modified`, `post_modified_gmt`, `post_content_filtered`, `post_parent`, `guid`, `menu_order`, `post_type`, `post_mime_type`, `comment_count`) VALUES
-(1, 1, '2022-06-25 11:51:54', '2022-06-25 14:51:54', '', 'Dashboard', '', 'publish', 'closed', 'closed', '', 'home', '', '', '2022-06-25 11:51:54', '2022-06-25 14:51:54', '', 0, 'https://app.superametas.com/home/', 0, 'page', '', 0);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_sales_temporary`
+-- Table structure for table `sales_temporary`
 --
 
-CREATE TABLE `wlsm_sales_temporary` (
+CREATE TABLE `sales_temporary` (
   `id` bigint(200) NOT NULL,
   `company_id` bigint(20) NOT NULL DEFAULT 0,
   `department_id` bigint(20) NOT NULL DEFAULT 0,
@@ -281,10 +232,10 @@ CREATE TABLE `wlsm_sales_temporary` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_termmeta`
+-- Table structure for table `termmeta`
 --
 
-CREATE TABLE `wlsm_termmeta` (
+CREATE TABLE `termmeta` (
   `meta_id` bigint(20) UNSIGNED NOT NULL,
   `term_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `meta_key` varchar(255) DEFAULT NULL,
@@ -294,10 +245,10 @@ CREATE TABLE `wlsm_termmeta` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_terms`
+-- Table structure for table `terms`
 --
 
-CREATE TABLE `wlsm_terms` (
+CREATE TABLE `terms` (
   `term_id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(200) NOT NULL DEFAULT '',
   `slug` varchar(200) NOT NULL DEFAULT '',
@@ -308,10 +259,10 @@ CREATE TABLE `wlsm_terms` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_term_relationships`
+-- Table structure for table `term_relationships`
 --
 
-CREATE TABLE `wlsm_term_relationships` (
+CREATE TABLE `term_relationships` (
   `object_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `term_taxonomy_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `term_order` int(11) NOT NULL DEFAULT 0
@@ -320,10 +271,10 @@ CREATE TABLE `wlsm_term_relationships` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_term_taxonomy`
+-- Table structure for table `term_taxonomy`
 --
 
-CREATE TABLE `wlsm_term_taxonomy` (
+CREATE TABLE `term_taxonomy` (
   `term_taxonomy_id` bigint(20) UNSIGNED NOT NULL,
   `term_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `taxonomy` varchar(32) NOT NULL DEFAULT '',
@@ -336,10 +287,10 @@ CREATE TABLE `wlsm_term_taxonomy` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_usermeta`
+-- Table structure for table `usermeta`
 --
 
-CREATE TABLE `wlsm_usermeta` (
+CREATE TABLE `usermeta` (
   `umeta_id` bigint(20) UNSIGNED NOT NULL,
   `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `meta_key` varchar(255) DEFAULT NULL,
@@ -348,30 +299,14 @@ CREATE TABLE `wlsm_usermeta` (
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `wlsm_users`
---
-
-CREATE TABLE `wlsm_users` (
-  `ID` bigint(20) UNSIGNED NOT NULL,
-  `user_login` varchar(60) NOT NULL DEFAULT '',
-  `user_pass` varchar(255) NOT NULL DEFAULT '',
-  `user_nicename` varchar(50) NOT NULL DEFAULT '',
-  `user_email` varchar(100) NOT NULL DEFAULT '',
-  `user_url` varchar(100) NOT NULL DEFAULT '',
-  `user_registered` datetime NOT NULL DEFAULT current_timestamp(),
-  `user_activation_key` varchar(255) NOT NULL DEFAULT '',
-  `user_status` int(11) NOT NULL DEFAULT 1,
-  `display_name` varchar(250) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wlsm_warehouse`
+-- Table structure for table `warehouse`
 --
 
-CREATE TABLE `wlsm_warehouse` (
+CREATE TABLE `warehouse` (
   `ID` bigint(20) UNSIGNED NOT NULL,
   `wh_function` varchar(200) NOT NULL COMMENT 'Function name used in this query',
   `wh_data` longtext NOT NULL COMMENT 'Here the query result',
@@ -385,24 +320,24 @@ CREATE TABLE `wlsm_warehouse` (
 --
 
 --
--- Indexes for table `wlsm_attachments`
+-- Indexes for table `attachments`
 --
-ALTER TABLE `wlsm_attachments`
+ALTER TABLE `attachments`
   ADD PRIMARY KEY (`attachment_id`),
   ADD UNIQUE KEY `attachment_id` (`attachment_id`);
 
 --
--- Indexes for table `wlsm_commentmeta`
+-- Indexes for table `commentmeta`
 --
-ALTER TABLE `wlsm_commentmeta`
+ALTER TABLE `commentmeta`
   ADD PRIMARY KEY (`meta_id`),
   ADD KEY `comment_id` (`comment_id`),
   ADD KEY `meta_key` (`meta_key`(191));
 
 --
--- Indexes for table `wlsm_comments`
+-- Indexes for table `comments`
 --
-ALTER TABLE `wlsm_comments`
+ALTER TABLE `comments`
   ADD PRIMARY KEY (`comment_ID`),
   ADD KEY `comment_post_ID` (`comment_post_ID`),
   ADD KEY `comment_approved_date_gmt` (`comment_approved`,`comment_date_gmt`),
@@ -411,51 +346,51 @@ ALTER TABLE `wlsm_comments`
   ADD KEY `comment_author_email` (`comment_author_email`(10));
 
 --
--- Indexes for table `wlsm_companies`
+-- Indexes for table `companies`
 --
-ALTER TABLE `wlsm_companies`
+ALTER TABLE `companies`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `wlsm_departments`
+-- Indexes for table `departments`
 --
-ALTER TABLE `wlsm_departments`
+ALTER TABLE `departments`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `wlsm_goals_sales`
+-- Indexes for table `goals_sales`
 --
-ALTER TABLE `wlsm_goals_sales`
+ALTER TABLE `goals_sales`
   ADD PRIMARY KEY (`id`),
   ADD KEY `company_id` (`company_id`,`department_id`);
 
 --
--- Indexes for table `wlsm_links`
+-- Indexes for table `links`
 --
-ALTER TABLE `wlsm_links`
+ALTER TABLE `links`
   ADD PRIMARY KEY (`link_id`),
   ADD KEY `link_visible` (`link_visible`);
 
 --
--- Indexes for table `wlsm_options`
+-- Indexes for table `options`
 --
-ALTER TABLE `wlsm_options`
+ALTER TABLE `options`
   ADD PRIMARY KEY (`option_id`),
   ADD UNIQUE KEY `option_name` (`option_name`),
   ADD KEY `autoload` (`autoload`);
 
 --
--- Indexes for table `wlsm_postmeta`
+-- Indexes for table `postmeta`
 --
-ALTER TABLE `wlsm_postmeta`
+ALTER TABLE `postmeta`
   ADD PRIMARY KEY (`meta_id`),
   ADD KEY `post_id` (`post_id`),
   ADD KEY `meta_key` (`meta_key`(191));
 
 --
--- Indexes for table `wlsm_posts`
+-- Indexes for table `posts`
 --
-ALTER TABLE `wlsm_posts`
+ALTER TABLE `posts`
   ADD PRIMARY KEY (`ID`),
   ADD KEY `post_name` (`post_name`(191)),
   ADD KEY `type_status_date` (`post_type`,`post_status`,`post_date`,`ID`),
@@ -463,64 +398,56 @@ ALTER TABLE `wlsm_posts`
   ADD KEY `post_author` (`post_author`);
 
 --
--- Indexes for table `wlsm_sales_temporary`
+-- Indexes for table `sales_temporary`
 --
-ALTER TABLE `wlsm_sales_temporary`
+ALTER TABLE `sales_temporary`
   ADD PRIMARY KEY (`id`),
   ADD KEY `company_id` (`company_id`,`department_id`);
 
 --
--- Indexes for table `wlsm_termmeta`
+-- Indexes for table `termmeta`
 --
-ALTER TABLE `wlsm_termmeta`
+ALTER TABLE `termmeta`
   ADD PRIMARY KEY (`meta_id`),
   ADD KEY `term_id` (`term_id`),
   ADD KEY `meta_key` (`meta_key`(191));
 
 --
--- Indexes for table `wlsm_terms`
+-- Indexes for table `terms`
 --
-ALTER TABLE `wlsm_terms`
+ALTER TABLE `terms`
   ADD PRIMARY KEY (`term_id`),
   ADD KEY `slug` (`slug`(191)),
   ADD KEY `name` (`name`(191));
 
 --
--- Indexes for table `wlsm_term_relationships`
+-- Indexes for table `term_relationships`
 --
-ALTER TABLE `wlsm_term_relationships`
+ALTER TABLE `term_relationships`
   ADD PRIMARY KEY (`object_id`,`term_taxonomy_id`),
   ADD KEY `term_taxonomy_id` (`term_taxonomy_id`);
 
 --
--- Indexes for table `wlsm_term_taxonomy`
+-- Indexes for table `term_taxonomy`
 --
-ALTER TABLE `wlsm_term_taxonomy`
+ALTER TABLE `term_taxonomy`
   ADD PRIMARY KEY (`term_taxonomy_id`),
   ADD UNIQUE KEY `term_id_taxonomy` (`term_id`,`taxonomy`),
   ADD KEY `taxonomy` (`taxonomy`);
 
 --
--- Indexes for table `wlsm_usermeta`
+-- Indexes for table `usermeta`
 --
-ALTER TABLE `wlsm_usermeta`
+ALTER TABLE `usermeta`
   ADD PRIMARY KEY (`umeta_id`),
   ADD KEY `user_id` (`user_id`),
   ADD KEY `meta_key` (`meta_key`(191));
 
---
--- Indexes for table `wlsm_users`
---
-ALTER TABLE `wlsm_users`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `user_login_key` (`user_login`),
-  ADD KEY `user_nicename` (`user_nicename`),
-  ADD KEY `user_email` (`user_email`);
 
 --
--- Indexes for table `wlsm_warehouse`
+-- Indexes for table `warehouse`
 --
-ALTER TABLE `wlsm_warehouse`
+ALTER TABLE `warehouse`
   ADD PRIMARY KEY (`ID`),
   ADD UNIQUE KEY `ID` (`ID`);
 
@@ -529,105 +456,99 @@ ALTER TABLE `wlsm_warehouse`
 --
 
 --
--- AUTO_INCREMENT for table `wlsm_attachments`
+-- AUTO_INCREMENT for table `attachments`
 --
-ALTER TABLE `wlsm_attachments`
+ALTER TABLE `attachments`
   MODIFY `attachment_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `wlsm_commentmeta`
+-- AUTO_INCREMENT for table `commentmeta`
 --
-ALTER TABLE `wlsm_commentmeta`
+ALTER TABLE `commentmeta`
   MODIFY `meta_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `wlsm_comments`
+-- AUTO_INCREMENT for table `comments`
 --
-ALTER TABLE `wlsm_comments`
+ALTER TABLE `comments`
   MODIFY `comment_ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `wlsm_companies`
+-- AUTO_INCREMENT for table `companies`
 --
-ALTER TABLE `wlsm_companies`
+ALTER TABLE `companies`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `wlsm_departments`
+-- AUTO_INCREMENT for table `departments`
 --
-ALTER TABLE `wlsm_departments`
+ALTER TABLE `departments`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
--- AUTO_INCREMENT for table `wlsm_goals_sales`
+-- AUTO_INCREMENT for table `goals_sales`
 --
-ALTER TABLE `wlsm_goals_sales`
+ALTER TABLE `goals_sales`
   MODIFY `id` bigint(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=430346;
 
 --
--- AUTO_INCREMENT for table `wlsm_links`
+-- AUTO_INCREMENT for table `links`
 --
-ALTER TABLE `wlsm_links`
+ALTER TABLE `links`
   MODIFY `link_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `wlsm_options`
+-- AUTO_INCREMENT for table `options`
 --
-ALTER TABLE `wlsm_options`
+ALTER TABLE `options`
   MODIFY `option_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
--- AUTO_INCREMENT for table `wlsm_postmeta`
+-- AUTO_INCREMENT for table `postmeta`
 --
-ALTER TABLE `wlsm_postmeta`
+ALTER TABLE `postmeta`
   MODIFY `meta_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `wlsm_posts`
+-- AUTO_INCREMENT for table `posts`
 --
-ALTER TABLE `wlsm_posts`
+ALTER TABLE `posts`
   MODIFY `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `wlsm_sales_temporary`
+-- AUTO_INCREMENT for table `sales_temporary`
 --
-ALTER TABLE `wlsm_sales_temporary`
+ALTER TABLE `sales_temporary`
   MODIFY `id` bigint(200) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `wlsm_termmeta`
+-- AUTO_INCREMENT for table `termmeta`
 --
-ALTER TABLE `wlsm_termmeta`
+ALTER TABLE `termmeta`
   MODIFY `meta_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `wlsm_terms`
+-- AUTO_INCREMENT for table `terms`
 --
-ALTER TABLE `wlsm_terms`
+ALTER TABLE `terms`
   MODIFY `term_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `wlsm_term_taxonomy`
+-- AUTO_INCREMENT for table `term_taxonomy`
 --
-ALTER TABLE `wlsm_term_taxonomy`
+ALTER TABLE `term_taxonomy`
   MODIFY `term_taxonomy_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `wlsm_usermeta`
+-- AUTO_INCREMENT for table `usermeta`
 --
-ALTER TABLE `wlsm_usermeta`
+ALTER TABLE `usermeta`
   MODIFY `umeta_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `wlsm_users`
+-- AUTO_INCREMENT for table `warehouse`
 --
-ALTER TABLE `wlsm_users`
-  MODIFY `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `wlsm_warehouse`
---
-ALTER TABLE `wlsm_warehouse`
+ALTER TABLE `warehouse`
   MODIFY `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 COMMIT;
 

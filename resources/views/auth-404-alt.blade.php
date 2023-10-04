@@ -26,7 +26,7 @@
                                         <h1 class="text-primary mb-4">Oops !</h1>
                                         <h4 class="text-uppercase">Sorry, Page not Found 😭</h4>
                                         <p class="text-muted mb-4">The page you are looking for not available!</p>
-                                        <a href="index" class="btn btn-success"><i class="mdi mdi-home me-1"></i>Back
+                                        <a href="{{env('APP_URL')}}" class="btn btn-success"><i class="mdi mdi-home me-1"></i>Back
                                             to home</a>
                                     </div>
                                 </div>

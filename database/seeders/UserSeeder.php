@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             'email' => 'bertogross2@gmail.com',
             'password' => Hash::make('12345678gross'),
             'avatar' => 'media/uploads/avatars/avatar-1.jpg',
-            'subdomain' => 'daniel',
+            'subdomain' => 'daniel', // RELATED TO TENANCY FOR LARAVEL
         ]);
 
 

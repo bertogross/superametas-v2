@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class RegisterController extends Controller
 {
@@ -62,7 +64,7 @@ class RegisterController extends Controller
                 'regex:/^\S+$/u', // To check for no white spaces
                 Rule::unique('users', 'subdomain')->where(function ($query) use ($data) {
                     return $query->where('subdomain', strtolower($data['subdomain']));
-                }),
+                }), // RELATED TO TENANCY FOR LARAVEL
             ]
         ]);
     }
@@ -83,12 +85,45 @@ class RegisterController extends Controller
             $avatar->move($avatarPath, $avatarName);
         }
 
-        return User::create([
+        //return User::create([
+        /*return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             //'avatar' =>  $avatarName,
             'subdomain' =>  strtolower($data['subdomain']),
+        ]);*/
+
+        // RELATED TO TENANCY FOR LARAVEL
+        $subdomain = strtolower(trim($data['subdomain']));
+        $newUser = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            //'avatar' =>  $avatarName,
+            'subdomain' =>  $subdomain,
         ]);
+
+        $newUserId = $newUser->id;
+
+        $tenant = \App\Models\Tenant::create(['id' => 'App'.$newUserId.'']);
+        $tenant->domains()->create(['domain' => $subdomain.'.'.env('APP_DOMAIN')]);
+
+        $tenantDatabaseName = 'tenantApp'.$newUserId.'';
+
+        // Path to default_schema.sql file
+        $sqlFilePath = base_path('database/default_schema/tenancy.sql');
+
+        // Read the SQL file
+        $sql = file_get_contents($sqlFilePath);
+
+        // Switch to the tenant database
+        DB::statement("USE $tenantDatabaseName");
+
+        // Execute the SQL statements from the file
+        DB::unprepared($sql);
+
+        return $newUser;
+        // RELATED TO TENANCY FOR LARAVEL
     }
 }

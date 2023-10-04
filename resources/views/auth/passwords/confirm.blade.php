@@ -17,7 +17,7 @@
                                                 <div class="w-100">
                                                     <div class="d-flex flex-column h-100">
                                                         <div class="mb-4 mb-md-5">
-                                                            <a href="index" class="d-block auth-logo">
+                                                            <a href="{{env('APP_URL')}}" class="d-block auth-logo">
                                                                 <img src="{{ URL::asset('build/images/logo-dark.png')}}" alt="" height="22" class="auth-logo-dark me-start">
                                                                 <img src="{{ URL::asset('build/images/logo-light.png')}}" alt="" height="22" class="auth-logo-light me-start">
                                                             </a>
@@ -33,7 +33,7 @@
                                                                     <h4>Success !</h4>
                                                                     <p class="text-muted">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et</p>
                                                                     <div class="mt-4">
-                                                                        <a href="index" class="btn btn-primary w-100">Back to Home</a>
+                                                                        <a href="{{env('APP_URL')}}" class="btn btn-primary w-100">Back to Home</a>
                                                                     </div>
                                                                 </div>
                                                             </div>

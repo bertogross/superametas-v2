@@ -13,7 +13,7 @@
                 <div class="col-lg-12">
                     <div class="text-center mt-sm-5 mb-4 text-white-50">
                         <div>
-                            <a href="index" class="d-inline-block auth-logo">
+                            <a href="<?php echo e(env('APP_URL')); ?>" class="d-inline-block auth-logo">
                                 <img src="<?php echo e(URL::asset('build/images/logo-light.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="49">
                             </a>
                         </div>
@@ -39,7 +39,7 @@ if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" value="" id="username" name="email" placeholder="Enter username">
+unset($__errorArgs, $__bag); ?>" value="" id="username" name="email" placeholder="Informe o e-mail">
                                         <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
