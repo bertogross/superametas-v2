@@ -7,7 +7,7 @@ use Stancl\Tenancy\Database\Models\Tenant;
 
 return [
     //'tenant_model' => Tenant::class,
-    'tenant_model' => \App\Models\Tenant::class, // RELATED TO TENANCY FOR LARAVEL
+    //'tenant_model' => \App\Models\Tenant::class, // RELATED TO TENANCY FOR LARAVEL
 
     'id_generator' => Stancl\Tenancy\UUIDGenerator::class,
 

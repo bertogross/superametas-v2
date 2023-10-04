@@ -60,6 +60,7 @@ class HomeController extends Controller
             'email' => ['required', 'string', 'email'],
             //'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:1024'],
             //'subdomain' => ['required', 'string', 'max:100'],
+            /*
             'subdomain' => [
                 'required',
                 'string',
@@ -69,6 +70,7 @@ class HomeController extends Controller
                     return $query->where('subdomain', strtolower($data['subdomain']));
                 }),  // RELATED TO TENANCY FOR LARAVEL
             ]
+            */
         ]);
 
         $user = User::find($id);

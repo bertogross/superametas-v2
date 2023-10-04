@@ -33,7 +33,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    /*public function boot()
+    public function boot()
     {
         $this->configureRateLimiting();
 
@@ -47,8 +47,9 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
         });
-    }*/
+    }
 
+    /*
     // RELATED TO TENANCY FOR LARAVEL
     public function boot()
     {
@@ -59,6 +60,7 @@ class RouteServiceProvider extends ServiceProvider
             $this->mapWebRoutes();
         });
     }
+    */
 
 
     /**
@@ -77,6 +79,7 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * RELATED TO TENANCY FOR LARAVEL
      */
+    /*
     protected function mapWebRoutes()
     {
         foreach ($this->centralDomains() as $domain) {
@@ -102,6 +105,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         return config('tenancy.central_domains');
     }
+    */
     /**
      * RELATED TO TENANCY FOR LARAVEL
     */

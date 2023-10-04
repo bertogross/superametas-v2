@@ -61,10 +61,12 @@ class RegisterController extends Controller
                 'required',
                 'string',
                 'max:100',
+                /*
                 'regex:/^\S+$/u', // To check for no white spaces
                 Rule::unique('users', 'subdomain')->where(function ($query) use ($data) {
                     return $query->where('subdomain', strtolower($data['subdomain']));
-                }), // RELATED TO TENANCY FOR LARAVEL
+                }),
+                */ // RELATED TO TENANCY FOR LARAVEL
             ]
         ]);
     }
@@ -86,14 +88,14 @@ class RegisterController extends Controller
         }
 
         //return User::create([
-        /*return User::create([
+        return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             //'avatar' =>  $avatarName,
-            'subdomain' =>  strtolower($data['subdomain']),
-        ]);*/
+        ]);
 
+        /*
         // RELATED TO TENANCY FOR LARAVEL
         $subdomain = strtolower(trim($data['subdomain']));
         $newUser = User::create([
@@ -125,5 +127,6 @@ class RegisterController extends Controller
 
         return $newUser;
         // RELATED TO TENANCY FOR LARAVEL
+        */
     }
 }

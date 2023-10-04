@@ -22,7 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         //'avatar',
-        'subdomain', // RELATED TO TENANCY FOR LARAVEL
+        //'subdomain', // RELATED TO TENANCY FOR LARAVEL
     ];
 
     /**

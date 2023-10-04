@@ -25,7 +25,7 @@ class CreateUsersTable extends Migration
             $table->unsignedTinyInteger('status')->default(1);
             $table->unsignedTinyInteger('role')->nullable();
             $table->text('avatar')->nullable();
-            $table->string('subdomain'); // RELATED TO TENANCY FOR LARAVEL
+            //$table->string('subdomain'); // RELATED TO TENANCY FOR LARAVEL
             $table->rememberToken();
             $table->timestamps();
         });

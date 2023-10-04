@@ -40,7 +40,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->text('avatar')->nullable();
             $table->string('role', 10)->default(1);
-            $table->string('subdomain', 200)->unique(); // RELATED TO TENANCY FOR LARAVEL
+            //$table->string('subdomain', 200)->unique(); // RELATED TO TENANCY FOR LARAVEL
             $table->rememberToken();
             $table->string('erp', 200)->nullable();
             $table->longText('erp_data')->nullable();
