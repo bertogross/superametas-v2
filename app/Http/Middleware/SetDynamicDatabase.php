@@ -28,23 +28,23 @@ class SetDynamicDatabase
             return redirect()->back()->withErrors(['database' => 'Database not found']);
         }
 
-        $dynamicDatabaseNameEncrypted = !empty($dynamicDatabaseName) ? Crypt::encryptString($dynamicDatabaseName) : '';
-
         // Set the dynamic database connection configurations
         Config::set('database.connections.smAppTemplate.database', $dynamicDatabaseName);
 
+        $dynamicDatabaseNameEncrypted = !empty($dynamicDatabaseName) ? Crypt::encryptString($dynamicDatabaseName) : '';
+
         // SM-DBN store the client Supera Metas DataBase Name
         //Cookie::queue('SM-DBN', $dynamicDatabaseNameEncrypted, 60 * 24 * 360);
-
         //Cookie::queue('SM-DBN', $dynamicDatabaseName, 60 * 24 * 360);
         //setcookie("SM-DBN", $dynamicDatabaseNameEncrypted, time()+(3600 * 24 * 360));
-        setcookie("SM-DBN", $dynamicDatabaseName, time()+(3600 * 24 * 360));
+        setcookie("SM-DBN", base64_encode('diI6IlZrNWllZmxSNXZ0WEJsNUpMM1cEtNa2VBMmhqQWErK0F0dkphRHhQemZ0Z01id1djK3lQN3Q5eE01WkEwNWFsaDNiSStSUGk4ZzNWSEZhR2phbmNYQnE0MUVpdlR0YTk5N3hzUUJmcTR' . $dynamicDatabaseName . 'E9PSIsInZhbHVlIjoiNjcrazQ1cEtNa2V'), time()+(3600 * 24 * 360));
 
         //Session::put('SM-DBN', $dynamicDatabaseNameEncrypted);
         //Session::save();
 
         // Make sure to use the new database connection
         DB::purge('smAppTemplate');
+        DB::reconnect('smAppTemplate');
 
         return $next($request);
     }

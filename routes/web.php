@@ -34,17 +34,9 @@ Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 /*Route::middleware(['set-dynamic-database'])->group(function () {
    //Route::post('/login', [LoginController::class, 'login'])->middleware(SetDynamicDatabase::class);
-    Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
+    Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name('index')->middleware(SetDynamicDatabase::class);
 });*/
 
-
-//Route::post('/login', 'LoginController@login')->middleware(SetDynamicDatabase::class);
-//Route::post('/login', [LoginController::class, 'login']);
-//Route::post('/login', 'Auth\LoginController@login');
-/*Route::middleware(['set-dynamic-database'])->group(function () {
-    Route::post('/login', [LoginController::class, 'login'])->middleware(SetDynamicDatabase::class);
-});*/
-//Route::post('/login', 'Auth\LoginController@login')->middleware('set-dynamic-database');
 Route::post('/login', [LoginController::class, 'login'])->middleware(SetDynamicDatabase::class);
 
 

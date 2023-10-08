@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Crypt;
+//use Illuminate\Support\Facades\Cookie;
 
 /*
 use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Session;
 */
 
@@ -91,12 +91,10 @@ return [
         'smAppTemplate' => [
             'driver' => 'mysql',
             'host' => env('DB_HOST', '127.0.0.1'),
-            //'database' => isset($_COOKIE['SM-DBN']) && !empty($_COOKIE['SM-DBN']) ? Crypt::decryptString($_COOKIE['SM-DBN']) : null, // dynamic
-            //'database' => isset($_COOKIE['SM-DBN']) ? Crypt::decryptString(Cookie::get('SM-DBN')) : null, // dynamic
-            //'database' =>  Crypt::decryptString(Session::get('SM-DBN')), // dynamic
-            //'database' =>  Session::get('SM-DBN'), // dynamic
-            'database' => isset($_COOKIE['SM-DBN']) ? $_COOKIE['SM-DBN'] : null, // dynamic
-            //'database' => null, // dynamic
+            //'database' => 'smApp1',
+            //'database' => isset($_COOKIE['SM-DBN']) ? Crypt::decryptString($_COOKIE['SM-DBN']) : null,
+            'database' => isset($_COOKIE['SM-DBN']) ? str_replace( array('diI6IlZrNWllZmxSNXZ0WEJsNUpMM1cEtNa2VBMmhqQWErK0F0dkphRHhQemZ0Z01id1djK3lQN3Q5eE01WkEwNWFsaDNiSStSUGk4ZzNWSEZhR2phbmNYQnE0MUVpdlR0YTk5N3hzUUJmcTR', 'E9PSIsInZhbHVlIjoiNjcrazQ1cEtNa2V'), '', base64_decode($_COOKIE['SM-DBN']) ): null,
+            //'database' => null,
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),

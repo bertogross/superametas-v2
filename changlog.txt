@@ -7,6 +7,13 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 
 
 
+
+
+Version 2.0.7 - [2023-10-08]
+- [Updated] SetDynamicDatabase
+
+
+
 Version 2.0.6 - [2023-10-07]
 - [Added] SetDynamicDatabase
 
