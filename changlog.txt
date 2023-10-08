@@ -2,6 +2,25 @@ Changelog
 =========
 
 
+USEFULL
+https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-laravel
+
+
+
+Version 2.0.6 - [2023-10-07]
+- [Added] SetDynamicDatabase
+
+
+
+Version 2.0.5 - [2023-10-05 - 2023-10-06]
+- [Started] Localhost reconfigured with Laravel Sail and Docker
+- re-hash password https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-laravel
+
+
+
+Version 2.0.4 - [2023-10-04]
+- [Started] Production environment configured with php8.2
+
 
 
 Version 2.0.3 - [2023-10-04]

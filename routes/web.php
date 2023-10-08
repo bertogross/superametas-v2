@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Middleware\SetDynamicDatabase;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,7 +18,9 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
+
 Auth::routes();
+
 //Language Translation
 Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang']);
 
@@ -25,46 +32,20 @@ Route::post('/update-password/{id}', [App\Http\Controllers\HomeController::class
 
 Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
 
-/*
-// RELATED TO TENANCY FOR LARAVEL
-// Default routes for the main domain (without subdomain)
-Route::group(['domain' => env('APP_DOMAIN')], function () {
-    Auth::routes();
-
-    // Language Translation
-    Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang']);
-
-    Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');
-
-    // Update User Details
-    Route::post('/update-profile/{id}', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('updateProfile');
-    Route::post('/update-password/{id}', [App\Http\Controllers\HomeController::class, 'updatePassword'])->name('updatePassword');
-
-    // Other routes for the main domain can go here
-
+/*Route::middleware(['set-dynamic-database'])->group(function () {
+   //Route::post('/login', [LoginController::class, 'login'])->middleware(SetDynamicDatabase::class);
     Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
-});
+});*/
 
 
-$subdomainParts = isset($_SERVER['HTTP_HOST']) ? explode('.', $_SERVER['HTTP_HOST']) : '';
-$subdomain = is_array($subdomainParts) ? array_shift($subdomainParts) : 'app';
+//Route::post('/login', 'LoginController@login')->middleware(SetDynamicDatabase::class);
+//Route::post('/login', [LoginController::class, 'login']);
+//Route::post('/login', 'Auth\LoginController@login');
+/*Route::middleware(['set-dynamic-database'])->group(function () {
+    Route::post('/login', [LoginController::class, 'login'])->middleware(SetDynamicDatabase::class);
+});*/
+//Route::post('/login', 'Auth\LoginController@login')->middleware('set-dynamic-database');
+Route::post('/login', [LoginController::class, 'login'])->middleware(SetDynamicDatabase::class);
 
-// Wildcard subdomain route
-Route::group(['domain' => $subdomain.'.'.env('APP_DOMAIN')], function () {
-    Auth::routes();
 
-    // Language Translation
-    Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang']);
-
-    Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');
-
-    // Update User Details
-    Route::post('/update-profile/{id}', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('updateProfile');
-    Route::post('/update-password/{id}', [App\Http\Controllers\HomeController::class, 'updatePassword'])->name('updatePassword');
-
-    // Other routes specific to the tenant can go here
-
-    Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
-});
-// RELATED TO TENANCY FOR LARAVEL
-*/
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

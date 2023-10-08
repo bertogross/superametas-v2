@@ -2,6 +2,13 @@
 
 use Illuminate\Support\Str;
 
+/*
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Session;
+*/
+
 return [
 
     /*
@@ -49,6 +56,47 @@ return [
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'forge'),
+            'username' => env('DB_USERNAME', 'forge'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+        'smOnboard' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_ONBOARD_DATABASE', 'smOnboard'),
+            'username' => env('DB_USERNAME', 'forge'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+        'smAppTemplate' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            //'database' => isset($_COOKIE['SM-DBN']) && !empty($_COOKIE['SM-DBN']) ? Crypt::decryptString($_COOKIE['SM-DBN']) : null, // dynamic
+            //'database' => isset($_COOKIE['SM-DBN']) ? Crypt::decryptString(Cookie::get('SM-DBN')) : null, // dynamic
+            //'database' =>  Crypt::decryptString(Session::get('SM-DBN')), // dynamic
+            //'database' =>  Session::get('SM-DBN'), // dynamic
+            'database' => isset($_COOKIE['SM-DBN']) ? $_COOKIE['SM-DBN'] : null, // dynamic
+            //'database' => null, // dynamic
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
