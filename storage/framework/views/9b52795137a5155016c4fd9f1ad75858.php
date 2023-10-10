@@ -76,7 +76,7 @@
                         <div class="p-2">
                             <div class="row g-0">
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="goals-sales" title="Meta de Vendas">
+                                    <a class="dropdown-icon-item" href="goal-sales" title="Meta de Vendas">
                                         <img src="<?php echo e(URL::asset('build/images/svg/happy.png')); ?>" alt="Meta de Vendas">
                                         <span>Vendas</span>
                                     </a>
@@ -388,7 +388,7 @@
                         <div class="dropdown-divider"></div>
                         -->
 
-                        <a class="dropdown-item" href="settings"><i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Configurações</span></a>
+                        <a class="dropdown-item" href="advance-ui-tour"><i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Configurações</span></a>
 
                         <!--
                         <a class="dropdown-item" href="auth-lockscreen-basic"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Lock screen</span></a>

@@ -373,28 +373,30 @@ File: Main Js File
 			}
 			var ul = document.createElement("ul");
 			ul.innerHTML = '<a href="#" class="logo"><img src="build/images/logo-sm.png" alt="" height="22"></a>';
-			Array.from(document.getElementById("navbar-nav").querySelectorAll(".menu-link")).forEach(function (item) {
-				ul.className = "twocolumn-iconview";
-				var li = document.createElement("li");
-				var a = item;
-				a.querySelectorAll("span").forEach(function (element) {
-					element.classList.add("d-none");
-				});
+            if(document.getElementById("navbar-nav")){
+                Array.from(document.getElementById("navbar-nav").querySelectorAll(".menu-link")).forEach(function (item) {
+                    ul.className = "twocolumn-iconview";
+                    var li = document.createElement("li");
+                    var a = item;
+                    a.querySelectorAll("span").forEach(function (element) {
+                        element.classList.add("d-none");
+                    });
 
-				if (item.parentElement.classList.contains("twocolumn-item-show")) {
-					item.classList.add("active");
-				}
-				li.appendChild(a);
-				ul.appendChild(li);
+                    if (item.parentElement.classList.contains("twocolumn-item-show")) {
+                        item.classList.add("active");
+                    }
+                    li.appendChild(a);
+                    ul.appendChild(li);
 
-				a.classList.contains("nav-link") ? a.classList.replace("nav-link", "nav-icon") : "";
-				a.classList.remove("collapsed", "menu-link");
-			});
+                    a.classList.contains("nav-link") ? a.classList.replace("nav-link", "nav-icon") : "";
+                    a.classList.remove("collapsed", "menu-link");
+                });
+            }
 			var currentPath = location.pathname == "/" ? "index" : location.pathname.substring(1);
 			currentPath = currentPath.substring(currentPath.lastIndexOf("/") + 1);
 			if (currentPath) {
 				// navbar-nav
-				var a = document.getElementById("navbar-nav") ? document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]') : ''; // By Upididu
+				var a = document.getElementById("navbar-nav") ? document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]') : false;
 
 				if (a) {
 					var parentCollapseDiv = a.closest(".collapse.menu-dropdown");
@@ -417,7 +419,9 @@ File: Main Js File
 				}
 			}
 			// add all sidebar menu icons
-			document.getElementById("two-column-menu").innerHTML = ul.outerHTML;
+            if(document.getElementById("two-column-menu")){
+			    document.getElementById("two-column-menu").innerHTML = ul.outerHTML;
+            }
 
 			// show submenu on sidebar menu click
 			Array.from(document.querySelector("#two-column-menu ul").querySelectorAll("li a")).forEach(function (element) {
@@ -426,7 +430,9 @@ File: Main Js File
 				element.addEventListener("click", function (e) {
 					if (!(currentPath == "/" + element.getAttribute("href") && !element.getAttribute("data-bs-toggle")))
 						document.body.classList.contains("twocolumn-panel") ? document.body.classList.remove("twocolumn-panel") : "";
-					document.getElementById("navbar-nav").classList.remove("twocolumn-nav-hide");
+                    if(document.getElementById("navbar-nav")){
+                        document.getElementById("navbar-nav").classList.remove("twocolumn-nav-hide");
+                    }
 					document.querySelector(".hamburger-icon").classList.remove("open");
 					if ((e.target && e.target.matches("a.nav-icon")) || (e.target && e.target.matches("i"))) {
 						if (document.querySelector("#two-column-menu ul .nav-icon.active") !== null)
@@ -447,7 +453,9 @@ File: Main Js File
 				// add active class to the sidebar menu icon who has direct link
 				if (currentPath == "/" + element.getAttribute("href") && !element.getAttribute("data-bs-toggle")) {
 					element.classList.add("active");
-					document.getElementById("navbar-nav").classList.add("twocolumn-nav-hide");
+                    if(document.getElementById("navbar-nav")){
+                        document.getElementById("navbar-nav").classList.add("twocolumn-nav-hide");
+                    }
 					if (document.querySelector(".hamburger-icon")) {
 						document.querySelector(".hamburger-icon").classList.add("open");
 					}
@@ -606,23 +614,25 @@ File: Main Js File
 		 * Vertical layout menu scroll add
 		 */
 		if (document.documentElement.getAttribute("data-layout") == "vertical" || document.documentElement.getAttribute("data-layout") == "semibox") {
-			document.getElementById("two-column-menu").innerHTML = "";
+            if(document.getElementById("two-column-menu")){
+                document.getElementById("two-column-menu").innerHTML = "";
+            }
 			if (document.querySelector(".navbar-menu")) {
 				document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
 			}
-			document.getElementById("scrollbar").setAttribute("data-simplebar", "");
-			document.getElementById("navbar-nav").setAttribute("data-simplebar", "");
-			document.getElementById("scrollbar").classList.add("h-100");
+            if(document.getElementById("scrollbar") && document.getElementById("navbar-nav")){
+                document.getElementById("scrollbar").setAttribute("data-simplebar", "");
+                document.getElementById("navbar-nav").setAttribute("data-simplebar", "");
+                document.getElementById("scrollbar").classList.add("h-100");
+            }
 		}
 
 		/**
 		 * Two-column layout menu scroll add
 		 */
-		if (document.documentElement.getAttribute("data-layout") == "twocolumn") {
-            if(document.getElementById("scrollbar")){ // By Upididu
-                document.getElementById("scrollbar").removeAttribute("data-simplebar");
-                document.getElementById("scrollbar").classList.remove("h-100");
-            }
+		if (document.getElementById("scrollbar") && document.documentElement.getAttribute("data-layout") == "twocolumn") {
+			document.getElementById("scrollbar").removeAttribute("data-simplebar");
+			document.getElementById("scrollbar").classList.remove("h-100");
 		}
 
 		/**
@@ -859,11 +869,13 @@ File: Main Js File
 		var windowSize = document.documentElement.clientWidth;
 
 		if (defaultValues["data-layout"] == "twocolumn" && windowSize < 767) {
-			Array.from(document.getElementById("two-column-menu").querySelectorAll("li")).forEach(function (item) {
-				item.addEventListener("click", function (e) {
-					document.body.classList.remove("twocolumn-panel");
-				});
-			});
+            if(document.getElementById("two-column-menu")){
+                Array.from(document.getElementById("two-column-menu").querySelectorAll("li")).forEach(function (item) {
+                    item.addEventListener("click", function (e) {
+                        document.body.classList.remove("twocolumn-panel");
+                    });
+                });
+            }
 		}
 	}
 
@@ -882,11 +894,11 @@ File: Main Js File
 		var currentPath = location.pathname == "/" ? "index" : location.pathname.substring(1);
 		currentPath = currentPath.substring(currentPath.lastIndexOf("/") + 1);
 		if (currentPath) {
-			if (document.body.className == "twocolumn-panel") {
+			if (document.body.className == "twocolumn-panel" && document.getElementById("two-column-menu")) {
 				document.getElementById("two-column-menu").querySelector('[href="' + currentPath + '"]').classList.add("active");
 			}
 			// navbar-nav
-			var a = document.getElementById("navbar-nav") ? document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]') : '';
+			var a = document.getElementById("navbar-nav") ? document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]') : false;
 			if (a) {
 				a.classList.add("active");
 				var parentCollapseDiv = a.closest(".collapse.menu-dropdown");
@@ -898,16 +910,16 @@ File: Main Js File
 						var menuIdSub = parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse.menu-dropdown").getAttribute("id");
 						parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse.menu-dropdown").parentElement.classList.add("twocolumn-item-show");
 						parentCollapseDiv.parentElement.closest(".collapse.menu-dropdown").parentElement.classList.remove("twocolumn-item-show");
-						if (document.getElementById("two-column-menu").querySelector('[href="#' + menuIdSub + '"]'))
+						if (document.getElementById("two-column-menu") && document.getElementById("two-column-menu").querySelector('[href="#' + menuIdSub + '"]'))
 							document.getElementById("two-column-menu").querySelector('[href="#' + menuIdSub + '"]').classList.add("active");
-					}
-					var menuId = parentCollapseDiv.parentElement.closest(".collapse.menu-dropdown").getAttribute("id");
-					if (document.getElementById("two-column-menu").querySelector('[href="#' + menuId + '"]'))
+					    }
+					    var menuId = parentCollapseDiv.parentElement.closest(".collapse.menu-dropdown").getAttribute("id");
+					if (document.getElementById("two-column-menu") && document.getElementById("two-column-menu").querySelector('[href="#' + menuId + '"]'))
 						document.getElementById("two-column-menu").querySelector('[href="#' + menuId + '"]').classList.add("active");
 				} else {
 					a.closest(".collapse.menu-dropdown").parentElement.classList.add("twocolumn-item-show");
 					var menuId = parentCollapseDiv.getAttribute("id");
-					if (document.getElementById("two-column-menu").querySelector('[href="#' + menuId + '"]'))
+					if (document.getElementById("two-column-menu") && document.getElementById("two-column-menu").querySelector('[href="#' + menuId + '"]'))
 						document.getElementById("two-column-menu").querySelector('[href="#' + menuId + '"]').classList.add("active");
 				}
 			} else {
@@ -922,7 +934,7 @@ File: Main Js File
 		currentPath = currentPath.substring(currentPath.lastIndexOf("/") + 1);
 		if (currentPath) {
 			// navbar-nav
-			var a = document.getElementById("navbar-nav") ? document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]') : '';
+			var a = document.getElementById("navbar-nav") ? document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]') : false;
 			if (a) {
 				a.classList.add("active");
 				var parentCollapseDiv = a.closest(".collapse.menu-dropdown");
@@ -1136,19 +1148,16 @@ File: Main Js File
 	}
 
 	function updateHorizontalMenus() {
-        if (document.getElementById("two-column-menu")){ // By Upididu
+        if(document.getElementById("two-column-menu")){
             document.getElementById("two-column-menu").innerHTML = "";
+
         }
 		if (document.querySelector(".navbar-menu")) {
 			document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
 		}
-        if(document.getElementById("scrollbar")){ // By Upididu
+        if(document.getElementById("scrollbar") && document.getElementById("navbar-nav")){
             document.getElementById("scrollbar").removeAttribute("data-simplebar");
-        }
-        if(document.getElementById("navbar-nav")){ // By Upididu
             document.getElementById("navbar-nav").removeAttribute("data-simplebar");
-        }
-        if(document.getElementById("scrollbar")){ // By Upididu
             document.getElementById("scrollbar").classList.remove("h-100");
         }
 
@@ -1184,8 +1193,9 @@ File: Main Js File
 
 	function hideShowLayoutOptions(dataLayout) {
 		if (dataLayout == "vertical") {
-            if(document.getElementById("two-column-menu")){ // By Upididu
+            if(document.getElementById("two-column-menu")){
                 document.getElementById("two-column-menu").innerHTML = "";
+
             }
 			if (document.querySelector(".navbar-menu")) {
 				document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
@@ -1220,7 +1230,7 @@ File: Main Js File
 			}
 			initActiveMenu();
 		} else if (dataLayout == "twocolumn") {
-            if(document.getElementById("scrollbar")){ // By Upididu
+            if(document.getElementById("scrollbar")){
                 document.getElementById("scrollbar").removeAttribute("data-simplebar");
                 document.getElementById("scrollbar").classList.remove("h-100");
             }
@@ -1236,7 +1246,9 @@ File: Main Js File
 				document.getElementById("sidebar-visibility").style.display = "none";
 			}
 		} else if (dataLayout == "semibox") {
-			document.getElementById("two-column-menu").innerHTML = "";
+            if(document.getElementById("two-column-menu")){
+                document.getElementById("two-column-menu").innerHTML = "";
+            }
 			if (document.querySelector(".navbar-menu")) {
 				document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
 			}
@@ -2009,7 +2021,7 @@ File: Main Js File
 	function setResize() {
 		var currentLayout = document.documentElement.getAttribute("data-layout");
 		if (currentLayout !== "horizontal") {
-			if (document.getElementById("navbar-nav")) {
+			if (document.getElementById("navbar-nav") && document.getElementById("navbar-nav")) {
 				var simpleBar = new SimpleBar(document.getElementById("navbar-nav"));
 				if (simpleBar) simpleBar.getContentElement();
 			}

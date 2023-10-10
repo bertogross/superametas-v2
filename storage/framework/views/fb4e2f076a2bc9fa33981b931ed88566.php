@@ -32,14 +32,14 @@
                                     <?php echo csrf_field(); ?>
                                     <div class="mb-3">
                                         <label for="username" class="form-label">E-mail <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control <?php $__errorArgs = ['email'];
+                                        <input type="email" class="form-control <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" value="" id="username" name="email" placeholder="Informe o e-mail">
+unset($__errorArgs, $__bag); ?>" id="username" name="email" placeholder="Informe o e-mail">
                                         <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -67,7 +67,7 @@ if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" name="password" placeholder="Senha aqui" id="password-input" value="">
+unset($__errorArgs, $__bag); ?>" name="password" placeholder="Senha aqui" id="password-input">
                                             <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
                                             <?php $__errorArgs = ['password'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -85,8 +85,8 @@ unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="auth-remember-check">
-                                        <label class="form-check-label" for="auth-remember-check">Lembrar-me</label>
+                                        <input class="form-check-input" type="checkbox" id="auth-remember-check">
+                                        <label class="form-check-label" for="auth-remember-check">Manter conexão</label>
                                     </div>
 
                                     <div class="mt-4">

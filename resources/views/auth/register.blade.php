@@ -38,7 +38,7 @@
                                             <label for="useremail" class="form-label">E-mail <span class="text-danger">*</span></label>
                                             <input type="email" class="form-control @error('email') is-invalid @enderror"
                                                 name="email" value="{{ old('email') }}" id="useremail"
-                                                placeholder="Informe o e-mail corporativo" required>
+                                                placeholder="Informe o e-mail corporativo" maxlength="100" required>
                                             @error('email')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -49,7 +49,7 @@
                                             <label for="username" class="form-label">Razão Social <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control @error('name') is-invalid @enderror"
                                                 name="name" value="{{ old('name') }}" id="username"
-                                                placeholder="Informe a Razão Social" required>
+                                                placeholder="Informe a Razão Social" maxlength="100" required>
                                             @error('name')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -58,11 +58,13 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="userpassword" class="form-label">Senha <span
-                                                    class="text-danger">*</span></label>
+                                            <label for="userpassword" class="form-label">Senha <span class="text-danger">*</span></label>
                                             <input type="password"
                                                 class="form-control @error('password') is-invalid @enderror" name="password"
-                                                id="userpassword" placeholder="Senha aqui" required>
+                                                id="userpassword" onpaste="return false" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Senha aqui" minlength="8" maxlength="20" required>
+                                                <div id="passwordHelpBlock" class="form-text">
+                                                    Sua senha deve conter entre 8 a 20 caracteres, letras e números e não deve ter espaços, caracteres especiais ou emojis.
+                                                </div>
                                             @error('password')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -96,7 +98,6 @@
                                                 <i data-feather="file"></i>
                                             </div>
                                         </div>
-                                        -->
 
                                         <div class="mb-3">
                                             <label for="subdomain" class="form-label">Subdomínio <span class="text-danger">*</span></label>
@@ -109,6 +110,7 @@
                                                 </span>
                                             @enderror
                                         </div>
+                                        -->
 
                                         <div class="mb-4">
                                             <p class="mb-0 fs-12 text-muted fst-italic">Ao se cadastrar, você concorda com os <a href="#"

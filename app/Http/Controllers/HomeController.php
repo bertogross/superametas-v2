@@ -55,9 +55,9 @@ class HomeController extends Controller
     public function updateProfile(Request $request, $id)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email'],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:1024'],
+            'name' => ['required', 'string', 'max:191'],
+            'email' => ['required', 'string', 'email', 'max:191'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:1024'],
         ]);
 
         $user = User::find($id);

@@ -35,7 +35,7 @@
 
                                 </div>
 
-                                <div class="alert alert-borderless alert-warning text-center mb-2 mx-2" role="alert">
+                                <div class="alert border-0 alert-warning text-center mb-2 mx-2" role="alert">
                                     Informe seu e-mail e instruções serão enviadas!
                                 </div>
                                 <div class="p-2">

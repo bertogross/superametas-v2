@@ -33,7 +33,7 @@
                                     @csrf
                                     <div class="mb-3">
                                         <label for="username" class="form-label">E-mail <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control @error('email') is-invalid @enderror" value="" id="username" name="email" placeholder="Informe o e-mail">
+                                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="username" name="email" placeholder="Informe o e-mail">
                                         @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -47,7 +47,7 @@
                                         </div>
                                         <label class="form-label" for="password-input">Senha <span class="text-danger">*</span></label>
                                         <div class="position-relative auth-pass-inputgroup mb-3">
-                                            <input type="password" class="form-control pe-5 password-input @error('password') is-invalid @enderror" name="password" placeholder="Senha aqui" id="password-input" value="">
+                                            <input type="password" class="form-control pe-5 password-input @error('password') is-invalid @enderror" name="password" placeholder="Senha aqui" id="password-input">
                                             <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
                                             @error('password')
                                                 <span class="invalid-feedback" role="alert">
@@ -58,8 +58,8 @@
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="auth-remember-check">
-                                        <label class="form-check-label" for="auth-remember-check">Lembrar-me</label>
+                                        <input class="form-check-input" type="checkbox" id="auth-remember-check">
+                                        <label class="form-check-label" for="auth-remember-check">Manter conexão</label>
                                     </div>
 
                                     <div class="mt-4">

@@ -13,12 +13,21 @@ class SetDynamicDatabase
 {
     public function handle($request, Closure $next)
     {
+        $email = $request->email;
+
+        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
+
+        if (!$email) {
+            // Handle invalid user
+            return redirect()->back()->withErrors(['email' => 'Informe um endereço de e-mail válido']);
+        }
+
         // Retrieve user by email from smOnboard
-        $user = DB::connection('smOnboard')->table('app_users')->where('user_email', $request->email)->first();
+        $user = DB::connection('smOnboard')->table('app_users')->where('user_email', $email)->first();
 
         if (!$user) {
             // Handle invalid user
-            return redirect()->back()->withErrors(['email' => 'User email not found']);
+            return redirect()->back()->withErrors(['email' => 'Endereço de e-mail não cadastrado em nossa base de dados']);
         }
 
         // Determine which database to connect to based on user ID

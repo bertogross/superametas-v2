@@ -76,7 +76,7 @@
                         <div class="p-2">
                             <div class="row g-0">
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="goals-sales" title="Meta de Vendas">
+                                    <a class="dropdown-icon-item" href="goal-sales" title="Meta de Vendas">
                                         <img src="<?php echo e(URL::asset('build/images/svg/happy.png')); ?>" alt="Meta de Vendas">
                                         <span>Vendas</span>
                                     </a>

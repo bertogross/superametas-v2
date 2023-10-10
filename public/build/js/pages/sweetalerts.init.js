@@ -377,7 +377,7 @@ if (document.getElementById("custom-sa-community"))
                 '<input type="email" class="form-control" id="input-email" placeholder="Enter Email Address">' +
                 '</div>',
             imageUrl: 'build/images/logo-sm.png',
-            footer: '<p class="fs-13 text-muted mb-0">Já possui cadastro? <a href="#" class="fw-semibold text-decoration-underline"> Clique aqui </a> </p>',
+            footer: '<p class="fs-13 text-muted mb-0">Already have an account ? <a href="#" class="fw-semibold text-decoration-underline"> Signin </a> </p>',
             imageHeight: 40,
             confirmButtonClass: 'btn btn-primary w-xs mb-2',
             confirmButtonText: 'Register <i class="ri-arrow-right-line ms-1 align-bottom"></i>',
