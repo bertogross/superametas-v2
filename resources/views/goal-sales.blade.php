@@ -9,11 +9,8 @@
 @endsection
 @section('content')
     @component('components.breadcrumb')
-        @slot('li_1')
-            Meta de
-        @endslot
         @slot('title')
-            Vendas
+            @lang('translation.goal-sales')
         @endslot
     @endcomponent
     <div class="row">

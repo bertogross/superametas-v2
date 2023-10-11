@@ -6,8 +6,15 @@
 
             <div class="page-title-right">
                 <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="javascript: void(0);"><?php echo e($li_1); ?></a></li>
-                    <?php if(isset($title)): ?>
+                    <?php if(isset($li_1)): ?>
+                        <li class="breadcrumb-item">
+                            <a href="<?php if(isset($url)): ?><?php echo e($url); ?><?php else: ?> javascript: void(0);<?php endif; ?>">
+                                <?php echo e($li_1); ?>
+
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                    <?php if(isset($title) && isset($li_1)): ?>
                         <li class="breadcrumb-item active"><?php echo e($title); ?></li>
                     <?php endif; ?>
                 </ol>

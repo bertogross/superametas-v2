@@ -4,6 +4,19 @@ Changelog
 
 USEFULL
 https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-laravel
+https://laravel-news.com/openai-for-laravel
+
+
+
+
+
+
+Version 2.0.10 - [2023-10-11]
+- [Added] app\Http\Controllers\PostController.php
+- [Added] app\Models\Post.php
+- [Added] app\Models\PostMeta.php
+- [Added] app\Http\Controllers\UserController.php
+- [Updated] routes\web.php
 
 
 

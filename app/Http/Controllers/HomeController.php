@@ -58,6 +58,7 @@ class HomeController extends Controller
             'name' => ['required', 'string', 'max:191'],
             'email' => ['required', 'string', 'email', 'max:191'],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:1024'],
+            'cover' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:1024'],
         ]);
 
         $user = User::find($id);
@@ -70,6 +71,13 @@ class HomeController extends Controller
             $avatarPath = public_path('/images/');
             $avatar->move($avatarPath, $avatarName);
             $user->avatar =  $avatarName;
+        }
+        if ($request->file('cover')) {
+            $cover = $request->file('cover');
+            $coverName = time() . '.' . $cover->getClientOriginalExtension();
+            $coverPath = public_path('/images/');
+            $cover->move($coverPath, $coverName);
+            $user->cover =  $coverName;
         }
 
         $user->update();

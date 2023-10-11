@@ -9,14 +9,10 @@ class Post extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var string[]
-     */
-    protected $fillable = [
-        'post_tile',
-        'post_content',
-        'post_author',
-    ];
+    protected $fillable = ['post_title', 'post_content'];
+
+    public function meta()
+    {
+        return $this->hasMany(PostMeta::class);
+    }
 }

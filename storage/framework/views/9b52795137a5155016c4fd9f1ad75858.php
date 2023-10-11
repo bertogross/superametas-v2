@@ -4,18 +4,18 @@
             <div class="d-flex">
                 <!-- LOGO -->
                 <div class="navbar-brand-box horizontal-logo">
-                    <a href="<?php echo e(env('APP_URL')); ?>" class="logo logo-dark">
+                    <a href="<?php echo e(url('/')); ?>" class="logo logo-dark">
                         <span class="logo-sm">
-                            <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="" height="22">
+                            <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="22">
                         </span>
                         <span class="logo-lg">
                             <img src="<?php echo e(URL::asset('build/images/logo-dark.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="39">
                         </span>
                     </a>
 
-                    <a href="<?php echo e(env('APP_URL')); ?>" class="logo logo-light">
+                    <a href="<?php echo e(url('/')); ?>" class="logo logo-light">
                         <span class="logo-sm">
-                            <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="" height="22">
+                            <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="22">
                         </span>
                         <span class="logo-lg">
                             <img src="<?php echo e(URL::asset('build/images/logo-light.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="39">
@@ -76,19 +76,19 @@
                         <div class="p-2">
                             <div class="row g-0">
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="goal-sales" title="Meta de Vendas">
+                                    <a class="dropdown-icon-item" href="<?php echo e(url('goal-sales')); ?>" title="Meta de Vendas">
                                         <img src="<?php echo e(URL::asset('build/images/svg/happy.png')); ?>" alt="Meta de Vendas">
                                         <span>Vendas</span>
                                     </a>
                                 </div>
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="goals-expenses" title="Meta de Resultados">
+                                    <a class="dropdown-icon-item" href="<?php echo e(url('goal-results')); ?>" title="Meta de Resultados">
                                         <img src="<?php echo e(URL::asset('build/images/bg-d.png')); ?>" alt="Meta de Resultados">
                                         <span>Resultados</span>
                                     </a>
                                 </div>
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="audit" title="Auditoria">
+                                    <a class="dropdown-icon-item" href="<?php echo e(url('audit')); ?>" title="Auditoria">
                                         <img src="<?php echo e(URL::asset('build/images/verification-img.png')); ?>" alt="Auditoria">
                                         <span>Auditoria</span>
                                     </a>
@@ -388,7 +388,7 @@
                         <div class="dropdown-divider"></div>
                         -->
 
-                        <a class="dropdown-item" href="advance-ui-tour"><i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Configurações</span></a>
+                        <a class="dropdown-item" href="<?php echo e(url('settings')); ?>"><i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Configurações</span></a>
 
                         <!--
                         <a class="dropdown-item" href="auth-lockscreen-basic"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Lock screen</span></a>

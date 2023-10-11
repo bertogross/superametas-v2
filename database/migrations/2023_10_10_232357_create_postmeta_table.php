@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('postmeta', function (Blueprint $table) {
             $table->id();
-            $table->string('post_id');
+            $table->bigInteger('post_id');
             $table->string('meta_key');
-            $table->string('meta_value');
+            $table->longText('meta_value');
         });
     }
 

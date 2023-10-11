@@ -1,56 +1,49 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\PostController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\{
+    HomeController,
+    PostController,
+    UserController,
+    Auth\LoginController
+};
 use App\Http\Middleware\SetDynamicDatabase;
-use App\Http\Controllers\Auth\LoginController;
-
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
-
 
 Auth::routes();
 
-
-//Language Translation
+// Language Translation
 Route::get('index/{locale}', [HomeController::class, 'lang']);
 
-
-//Call home dashboard template resources\views\index.blade.php
+// Root & Dashboard
 Route::get('/', [HomeController::class, 'root'])->name('root');
 
+// User Profile & Password Update
+Route::prefix('user')->middleware('auth')->group(function () {
+    Route::post('update-profile/{id}', [HomeController::class, 'updateProfile'])->name('user.updateProfile');
+    Route::post('update-password/{id}', [HomeController::class, 'updatePassword'])->name('user.updatePassword');
+});
 
-//Update User Details
-Route::post('/update-profile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfile');
-Route::post('/update-password/{id}', [HomeController::class, 'updatePassword'])->name('updatePassword');
+// User Settings and page Profile
+Route::get('/settings-users', [UserController::class, 'index'])->name('settings-users.index');
+Route::post('/settings-users', [UserController::class, 'store']);
+Route::put('/settings-users', [UserController::class, 'update']);
+Route::get('/profile/{id?}', [UserController::class, 'show'])->name('profile.show');
 
+// Authentication with Dynamic Database
+Route::middleware([SetDynamicDatabase::class])->group(function () {
+    Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/goal-sales-store', [PostController::class, 'store']);
+});
 
-//Call diferent template views with path related
-Route::get('{any}', [HomeController::class, 'index'])->name('index');// ->middleware(SetDynamicDatabase::class)
-
-
-/*Route::middleware(['set-dynamic-database'])->group(function () {
-   //Route::post('/login', [LoginController::class, 'login'])->middleware(SetDynamicDatabase::class);
-    Route::get('{any}', [HomeController::class, 'index'])->name('index')->middleware(SetDynamicDatabase::class);
-});*/
-
-
-Route::post('/login', [LoginController::class, 'login'])->middleware(SetDynamicDatabase::class);
-
+// Logout
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-
-Route::post('/goal-sales-create', [PostController::class, 'createPost'])->middleware(SetDynamicDatabase::class);
-
+// Catch-All Route - should be the last route
+Route::get('{any}', [HomeController::class, 'index'])->where('any', '.*')->name('index');
