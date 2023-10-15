@@ -11,6 +11,13 @@ https://laravel-news.com/openai-for-laravel
 
 
 
+Version 2.0.11 - [2023-10-14]
+- [Added] app\Http\Controllers\SettingsDatabaseController.php
+- [Added] resources\views\settings-database.blade.php
+- [Updated] routes\web.php
+
+
+
 Version 2.0.10 - [2023-10-11]
 - [Added] app\Http\Controllers\PostController.php
 - [Added] app\Models\Post.php

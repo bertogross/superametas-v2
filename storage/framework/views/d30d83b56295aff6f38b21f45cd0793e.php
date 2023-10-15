@@ -16,6 +16,13 @@
         <div class="col-xxl-3">
             <div class="card">
                 <div class="card-body p-4">
+
+                    <pre>
+                        <?php echo e(print_r($posts->toArray())); ?>
+
+                    </pre>
+                    
+
                     <div>
                         <div class="flex-shrink-0 avatar-md mx-auto">
                             <div class="avatar-title bg-light rounded">

@@ -17,6 +17,28 @@
         <div class="col-xxl-3">
             <div class="card">
                 <div class="card-body p-4">
+
+                    <pre>
+                        {{ print_r($posts->toArray()) }}
+                    </pre>
+                    {{--
+                    @foreach($posts as $post)
+                        <article>
+                            <h2>{{ $post->post_title }}</h2>
+                            <p>{{ $post->post_content }}</p>
+
+                            <section>
+                                <h3>Meta Data</h3>
+                                <ul>
+                                    @foreach($post->meta as $meta)
+                                        <li><strong>{{ $meta->meta_key }}:</strong> {{ $meta->meta_value }}</li>
+                                    @endforeach
+                                </ul>
+                            </section>
+                        </article>
+                    @endforeach
+                    --}}
+
                     <div>
                         <div class="flex-shrink-0 avatar-md mx-auto">
                             <div class="avatar-title bg-light rounded">
