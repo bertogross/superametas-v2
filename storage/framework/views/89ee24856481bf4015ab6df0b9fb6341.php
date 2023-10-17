@@ -1,4 +1,4 @@
-<div class="col">
+<div class="col" data-search-user-id="<?php echo e($id); ?>" data-search-user-name="<?php if(isset($name)): ?> <?php echo e($name); ?> <?php endif; ?>" data-search-user-role="<?php if(isset($role)): ?><?php echo e($role); ?><?php endif; ?>">
     <div class="card team-box">
         <div class="team-cover"> <img src="build/images/small/img-9.jpg" alt="" class="img-fluid"> </div>
         <div class="card-body p-4">
@@ -15,7 +15,7 @@
                         <div class="col text-end dropdown"> <a href="javascript:void(0);" data-bs-toggle="dropdown"
                                 aria-expanded="false"> <i class="ri-more-fill fs-17"></i> </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item btn-edit-user" data-user-id="<?php echo e($id); ?>" data-user-name="<?php if(isset($name)): ?> <?php echo e($name); ?> <?php endif; ?>"><i class="ri-pencil-line me-2 align-bottom text-muted"></i>Edit</a></li>
+                                <li><a class="dropdown-item btn-edit-user" data-user-id="<?php echo e($id); ?>" data-user-name="<?php if(isset($name)): ?> <?php echo e($name); ?> <?php endif; ?>"><i class="ri-pencil-line me-2 align-bottom text-muted"></i>Editar</a></li>
                             </ul>
                         </div>
                     </div>
@@ -70,4 +70,4 @@
         </div>
     </div>
 </div>
-<?php /**PATH D:\www\superametas\application\development.superametas.com\public_html\resources\views/components/settings-card-user.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\www\superametas\application\development.superametas.com\public_html\resources\views/components/settings-users-card.blade.php ENDPATH**/ ?>

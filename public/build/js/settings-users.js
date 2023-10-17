@@ -1,267 +1,194 @@
+import {ToastAlert} from './helpers.js';
 
-//Fiter Js
-var list = document.querySelectorAll(".team-list");
-if (list) {
-    var buttonGroups = document.querySelectorAll('.filter-button');
-    if (buttonGroups) {
-        Array.from(buttonGroups).forEach(function (btnGroup) {
-            btnGroup.addEventListener('click', onButtonGroupClick);
-        });
-    }
-}
+document.addEventListener("DOMContentLoaded", function() {
 
-function onButtonGroupClick(event) {
-    if (event.target.id === 'list-view-button' || event.target.parentElement.id === 'list-view-button') {
-        document.getElementById("list-view-button").classList.add("active");
-        document.getElementById("grid-view-button").classList.remove("active");
-        Array.from(list).forEach(function (el) {
-            el.classList.add("list-view-filter");
-            el.classList.remove("grid-view-filter");
-        });
+    function loadModalContent(userId = null, userName = '') {
+        var xhr = new XMLHttpRequest();
+        var url = '/get-user-modal-form';
+        if (userId) {
+            url += '/' + userId;
+        }
+        xhr.open('GET', url, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                document.getElementById('modalContainer').innerHTML = xhr.responseText;
 
-    } else {
-        document.getElementById("grid-view-button").classList.add("active");
-        document.getElementById("list-view-button").classList.remove("active");
-        Array.from(list).forEach(function (el) {
-            el.classList.remove("list-view-filter");
-            el.classList.add("grid-view-filter");
-        });
-    }
-}
+                var modalElement = document.getElementById('userModal');
+                var modal = new bootstrap.Modal(modalElement, {
+                    backdrop: 'static',
+                    keyboard: false  // Prevent closing the modal with the escape key
+                });
+                modal.show();
 
-var editlist = false;
+                if (userId) {
+                    document.getElementById("modalUserTitle").innerHTML = userName ? '<span class="text-theme">'+ userName + '</span>' : 'Editar Usuário';
+                    document.getElementById("btn-save-user").innerHTML = 'Atualizar Usuário';
 
-// avatar image
-document.querySelector("#member-image-input").addEventListener("change", function () {
-    var preview = document.querySelector("#member-img");
-    var file = document.querySelector("#member-image-input").files[0];
-    var reader = new FileReader();
-    reader.addEventListener("load",function () {
-        preview.src = reader.result;
-    },false);
-    if (file) {
-        reader.readAsDataURL(file);
-    }
-});
-
-
-// cover image
-document.querySelector("#cover-image-input").addEventListener("change", function () {
-    var preview = document.querySelector("#cover-img");
-    var file = document.querySelector("#cover-image-input").files[0];
-    var reader = new FileReader();
-    reader.addEventListener("load",function () {
-        preview.src = reader.result;
-    },false);
-    if (file) {
-        reader.readAsDataURL(file);
-    }
-});
-
-function editMemberList() {
-    var getEditid = 0;
-    Array.from(document.querySelectorAll(".edit-list")).forEach(function (elem) {
-        elem.addEventListener('click', function (event) {
-            getEditid = elem.getAttribute('data-edit-id');
-            allmemberlist = allmemberlist.map(function (item) {
-                if (item.id == getEditid) {
-                    editlist = true;
-                    document.getElementById("createMemberLabel").innerHTML = "Edit Member";
-                    document.getElementById("addNewMember").innerHTML = "Save";
-
-                    if(item.memberImg == ""){
-                        document.getElementById("member-img").src = "build/images/users/user-dummy-img.jpg";
-                    }else{
-                        document.getElementById("member-img").src = item.memberImg;
-                    }
-
-                    document.getElementById("cover-img").src = item.coverImg;
-                    document.getElementById("memberid-input").value = item.id;
-                    document.getElementById('teammembersName').value = item.memberName;
-                    document.getElementById('designation').value = item.position;
-                    document.getElementById('project-input').value = item.projects;
-                    document.getElementById('task-input').value = item.tasks;
-                    document.getElementById("memberlist-form").classList.remove('was-validated');
-                }
-                return item;
-            });
-        });
-    });
-};
-
-
-Array.from(document.querySelectorAll(".addMembers-modal")).forEach(function (elem) {
-    elem.addEventListener('click', function (event) {
-      document.getElementById("createMemberLabel").innerHTML = "Adicionar";
-      document.getElementById("addNewMember").innerHTML = "Add Member";
-      document.getElementById("teammembersName").value = "";
-      document.getElementById("designation").value = "";
-
-      document.getElementById("cover-img").src = "build/images/small/img-9.jpg";
-      document.getElementById("member-img").src = "build/images/users/user-dummy-img.jpg";
-
-      document.getElementById("memberlist-form").classList.remove('was-validated');
-    });
-});
-
-// Form Event
-(function () {
-    'use strict'
-
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    var forms = document.querySelectorAll('.needs-validation')
-
-    // Loop over them and prevent submission
-    Array.prototype.slice.call(forms)
-        .forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
+                    injectScript("/build/js/pages/password-addon.init.js");
                 } else {
-                    event.preventDefault();
-                    var inputName = document.getElementById('teammembersName').value;
-                    var inputDesignation = document.getElementById('designation').value;
-                    var memberImg = document.getElementById("member-img").src;
-                    var coverImg = document.getElementById("cover-img").src;
-
-                    var memberImgValue = memberImg.substring(
-                        memberImg.indexOf("/as") + 1
-                    );
-
-                    var memberImageValue
-                    if(memberImgValue == "build/images/users/user-dummy-img.jpg"){
-                        memberImageValue = ""
-                    }else{
-                        memberImageValue = memberImg
-                    }
-
-                    var str = inputName;
-                    var matches = str.match(/\b(\w)/g);
-                    var acronym = matches.join(''); // JSON
-                    var nicknameValue = acronym.substring(0,2)
-
-                    if (inputName !== "" && inputDesignation !== "" && !editlist) {
-                        var newMemberId = findNextId();
-                        var newMember = {
-                            'id': newMemberId,
-                            "coverImg": coverImg,
-                            "bookmark": false,
-                            "memberImg": memberImageValue,
-                            "nickname": nicknameValue,
-                            'memberName': inputName,
-                            'position': inputDesignation,
-                            'projects': "0",
-                            'tasks': "0"
-                        };
-
-                        allmemberlist.push(newMember);
-
-                        sortElementsById();
-
-                    }else if(inputName !== "" && inputDesignation !== "" && editlist){
-                        var getEditid = 0;
-                        getEditid = document.getElementById("memberid-input").value;
-                        allmemberlist = allmemberlist.map(function (item) {
-                            if (item.id == getEditid) {
-                                var editObj = {
-                                    'id': getEditid,
-                                    "coverImg": coverImg,
-                                    "bookmark": item.bookmark,
-                                    "memberImg": memberImg,
-                                    "nickname": nicknameValue,
-                                    'memberName': inputName,
-                                    'position': inputDesignation,
-                                    'projects': document.getElementById('project-input').value,
-                                    'tasks': document.getElementById('task-input').value
-                                }
-                                return editObj;
-                            }
-                            return item;
-                        });
-                        editlist = false;
-                    }
-
-                    loadTeamData(allmemberlist)
-                    document.getElementById("createMemberBtn-close").click();
+                    document.getElementById("modalUserTitle").innerHTML = 'Adicionar Usuário';
+                    document.getElementById("btn-save-user").innerHTML = 'Salvar Usuário';
                 }
-                form.classList.add('was-validated');
-            }, false)
-        })
-})()
 
+                attachModalEventListeners();  // Attach the event listeners after content is loaded
 
-
-function removeItem() {
-    var getid = 0;
-    Array.from(document.querySelectorAll(".remove-list")).forEach(function (item) {
-        item.addEventListener('click', function (event) {
-            getid = item.getAttribute('data-remove-id');
-            document.getElementById("remove-item").addEventListener("click", function () {
-                function arrayRemove(arr, value) {
-                    return arr.filter(function (ele) {
-                        return ele.id != value;
-                    });
-                }
-                var filtered = arrayRemove(allmemberlist, getid);
-
-                allmemberlist = filtered;
-
-                loadTeamData(allmemberlist);
-                document.getElementById("close-removeMemberModal").click();
-            });
-        });
-    });
-}
-
-function memberDetailShow() {
-    Array.from(document.querySelectorAll(".team-box")).forEach(function (item) {
-        item.querySelector(".member-name").addEventListener("click", function () {
-
-            var memberName = item.querySelector(".member-name h5").innerHTML;
-            var memberDesignation = item.querySelector(".member-designation").innerHTML;
-
-            var memberProfileImg
-            if(item.querySelector(".member-img")){
-                memberProfileImg = item.querySelector(".member-img").src;
-            }else{
-                memberProfileImg = "build/images/users/user-dummy-img.jpg"
+            } else {
+                console.log("Error fetching modal content:", xhr.statusText);
             }
-            var memberCoverImg = item.querySelector(".team-cover img").src;
-            var memberProject = item.querySelector(".projects-num").innerHTML;
-            var memberTask = item.querySelector(".tasks-num").innerHTML;
+        };
+        xhr.send();
+    }
 
-            document.querySelector("#member-overview .profile-img").src = memberProfileImg;
-            document.querySelector("#member-overview .team-cover img").src = memberCoverImg;
+    document.getElementById('btn-add-user').addEventListener('click', function() {
+        loadModalContent();
+    });
 
-            document.querySelector("#member-overview .profile-name").innerHTML = memberName;
-            document.querySelector("#member-overview .profile-designation").innerHTML = memberDesignation;
-
-            document.querySelector("#member-overview .profile-project").innerHTML = memberProject;
-            document.querySelector("#member-overview .profile-task").innerHTML = memberTask;
+    var editButtons = document.querySelectorAll('.btn-edit-user');
+    editButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var userId = this.getAttribute('data-user-id');
+            var userName = this.getAttribute('data-user-name');
+            loadModalContent(userId, userName);
         });
     });
-}
 
-// Search member on list
-var allmemberlist = '';
-var searchMemberList = document.getElementById("searchMemberList");
-searchMemberList.addEventListener("keyup", function () {
-    var inputVal = searchMemberList.value.toLowerCase();
-    function filterItems(arr, query) {
-        return arr.filter(function (el) {
-            return (el.memberName.toLowerCase().indexOf(query.toLowerCase()) !== -1 || el.position.toLowerCase().indexOf(query.toLowerCase()) !== -1)
-        })
+    function injectScript(src) {
+        var script = document.createElement('script');
+        script.src = src;
+        document.body.appendChild(script);
     }
 
-    var filterData = filterItems(allmemberlist, inputVal);
-    if (filterData.length == 0) {
-        document.getElementById("noresult").style.display = "block";
-        document.getElementById("teamlist").style.display = "none";
-    } else {
-        document.getElementById("noresult").style.display = "none";
-        document.getElementById("teamlist").style.display = "block";
+
+
+    // Search functionality
+    var searchInput = document.getElementById('searchMemberList');
+    searchInput.addEventListener('keyup', function() {
+        var searchTerm = this.value.toLowerCase();
+        var users = document.querySelectorAll('[data-search-user-id]');
+
+        users.forEach(function(user) {
+            var userName = user.getAttribute('data-search-user-name').toLowerCase();
+            // var userRole = user.getAttribute('data-search-user-role').toLowerCase();
+
+            //if (userName.includes(searchTerm) || userRole.includes(searchTerm)) {
+            if (userName.includes(searchTerm)) {
+                user.style.display = ''; // Show the user
+            } else {
+                user.style.display = 'none'; // Hide the user
+            }
+        });
+    });
+
+
+    function attachModalEventListeners() {
+        // Update/Save user from modal form
+        const form = document.getElementById('memberlist-form');
+        const btn = document.getElementById('btn-save-user');
+
+        if (btn) {
+            btn.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                //console.log("Button clicked!");
+
+                // form.dataset.id get value from <form data-id
+                let formData = new FormData(form);
+                //formData.append('_method', 'PUT');
+
+                let url = form.dataset.id ? `/settings-users/update/${form.dataset.id}` : '/settings-users/store';
+
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(response => {
+                    if (response.success) {
+                        ToastAlert(response.message, 'success', 10000);
+                        setTimeout(() => {
+                            location.reload();
+                        }, form.dataset.id ? 5000 : 120000);
+
+                        document.getElementById('btn-save-user').remove();
+                    } else {
+                        ToastAlert(response.message, 'danger', 60000);
+                    }
+                })
+                .catch(error => {
+                    ToastAlert('Error: ' + error, 'danger', 60000);
+                    console.error('Error:', error);
+                });
+            });
+        }
     }
 
-    loadTeamData(filterData);
+
+    // avatar image
+    if( document.querySelector("#member-image-input") ){
+        document.querySelector("#member-image-input").addEventListener("change", function () {
+            var preview = document.querySelector("#member-img");
+            var file = document.querySelector("#member-image-input").files[0];
+            var reader = new FileReader();
+            reader.addEventListener("load", function () {
+                preview.src = reader.result;
+            }, false);
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // cover image
+    if( document.querySelector("#cover-image-input") ){
+        document.querySelector("#cover-image-input").addEventListener("change", function () {
+            var preview = document.querySelector("#cover-img");
+            var file = document.querySelector("#cover-image-input").files[0];
+            var reader = new FileReader();
+            reader.addEventListener("load", function () {
+                preview.src = reader.result;
+            }, false);
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+
+
+    //Fiter Js
+    var list = document.querySelectorAll(".team-list");
+    if (list) {
+        var buttonGroups = document.querySelectorAll('.filter-button');
+        if (buttonGroups) {
+            Array.from(buttonGroups).forEach(function (btnGroup) {
+                btnGroup.addEventListener('click', onButtonGroupClick);
+            });
+        }
+    }
+
+    function onButtonGroupClick(event) {
+        if (event.target.id === 'list-view-button' || event.target.parentElement.id === 'list-view-button') {
+            document.getElementById("list-view-button").classList.add("active");
+            document.getElementById("grid-view-button").classList.remove("active");
+            Array.from(list).forEach(function (el) {
+                el.classList.add("list-view-filter");
+                el.classList.remove("grid-view-filter");
+            });
+
+        } else {
+            document.getElementById("grid-view-button").classList.add("active");
+            document.getElementById("list-view-button").classList.remove("active");
+            Array.from(list).forEach(function (el) {
+                el.classList.remove("list-view-filter");
+                el.classList.add("grid-view-filter");
+            });
+        }
+    }
+
+
 });
+

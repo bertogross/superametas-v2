@@ -48,7 +48,7 @@
                                         <label class="form-label" for="password-input">Senha <span class="text-danger">*</span></label>
                                         <div class="position-relative auth-pass-inputgroup mb-3">
                                             <input type="password" class="form-control pe-5 password-input @error('password') is-invalid @enderror" name="password" placeholder="Senha aqui" id="password-input">
-                                            <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
+                                            <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle text-body"></i></button>
                                             @error('password')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>

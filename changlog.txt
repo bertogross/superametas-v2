@@ -9,6 +9,10 @@ https://laravel-news.com/openai-for-laravel
 
 
 
+Version 2.0.12 - [2023-10-15 - 2023-10-16]
+- [Updated] /settings
+- [Updated] /settings-users
+
 
 
 Version 2.0.11 - [2023-10-14]

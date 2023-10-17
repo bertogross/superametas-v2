@@ -1,3 +1,6 @@
+@php
+use App\Models\User;
+@endphp
 <header id="page-topbar">
     <div class="layout-width">
         <div class="navbar-header">
@@ -388,7 +391,12 @@
                         <div class="dropdown-divider"></div>
                         -->
 
-                        <a class="dropdown-item" href="{{ url('settings') }}"><i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Configurações</span></a>
+                        @if(auth()->user() && auth()->user()->hasRole(User::ROLE_ADMIN))
+                            <a class="dropdown-item" href="{{ url('settings') }}">
+                                <i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i>
+                                <span class="align-middle">Configurações</span>
+                            </a>
+                        @endif
 
                         <!--
                         <a class="dropdown-item" href="auth-lockscreen-basic"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Lock screen</span></a>

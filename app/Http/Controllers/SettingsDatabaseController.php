@@ -9,7 +9,7 @@ class SettingsDatabaseController extends Controller
 {
     protected $connection = 'smAppTemplate';
 
-    public function showSettingsDatabase() {
+    public function showDatabase() {
         $departments = DB::connection('smAppTemplate')
         ->table('wlsm_departments')
         ->orderBy('department_id', 'asc')
@@ -21,6 +21,7 @@ class SettingsDatabaseController extends Controller
         ->get();
 
         return view('settings-database', compact('departments', 'companies'));
+
     }
 
 
@@ -90,5 +91,7 @@ class SettingsDatabaseController extends Controller
 
         return redirect()->back()->with('active_tab', 'companies')->with('success', 'Empresas atualizadas');
     }
+
+
 
 }

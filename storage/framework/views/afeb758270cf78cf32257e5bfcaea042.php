@@ -40,7 +40,7 @@
                 <div class="col-lg-10">
                     <div class="tab-content text-muted mt-3 mt-lg-0">
                         <div class="tab-pane fade <?php echo e(session('active_tab') == 'departments' || session('active_tab') == '' ? 'active show' : ''); ?>" id="v-pills-departments" role="tabpanel" aria-labelledby="v-pills-departments-tab">
-                            <form action="<?php echo e(route('departments.updateDepartments')); ?>" method="POST">
+                            <form action="<?php echo e(route('departments.updateDepartments')); ?>" method="POST" autocomplete="off">
                                 <?php echo csrf_field(); ?>
                                 <?php echo method_field('PUT'); ?>
                                 <button type="submit" class="btn btn-theme float-end">Atualizar Departamentos</button>
@@ -82,7 +82,7 @@
 
                                                     </td>
                                                     <td class="align-middle">
-                                                        <input type="text" name="aliases[<?php echo e($department->id); ?>]" value="<?php echo e(e($department->department_alias)); ?>" maxlength="100" class="form-control">
+                                                        <input type="text" name="aliases[<?php echo e($department->id); ?>]" value="<?php echo e(empty($department->department_alias) ? e(strip_tags($department->description )) : e(strip_tags($department->department_alias))); ?>" maxlength="100" class="form-control">
                                                     </td>
                                                 </tr>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -92,7 +92,7 @@
                             </form>
                         </div><!--end tab-pane-->
                         <div class="tab-pane fade <?php echo e(session('active_tab') == 'companies' ? 'active show' : ''); ?>" id="v-pills-companies" role="tabpanel" aria-labelledby="v-pills-companies-tab">
-                            <form action="<?php echo e(route('companies.updateCompanies')); ?>" method="POST">
+                            <form action="<?php echo e(route('companies.updateCompanies')); ?>" method="POST" autocomplete="off">
                                 <?php echo csrf_field(); ?>
                                 <?php echo method_field('PUT'); ?>
                                 <button type="submit" class="btn btn-theme float-end">Atualizar Empresas</button>
@@ -133,7 +133,7 @@
 
                                                     </td>
                                                     <td class="align-middle">
-                                                        <input type="text" name="aliases[<?php echo e($company->id); ?>]" value="<?php echo e(e($company->company_alias)); ?>" maxlength="100" class="form-control">
+                                                        <input type="text" name="aliases[<?php echo e($company->id); ?>]" value="<?php echo e(empty($company->company_alias) ? e($company->company_name) : e($company->company_alias)); ?>" maxlength="100" class="form-control">
                                                     </td>
                                                 </tr>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

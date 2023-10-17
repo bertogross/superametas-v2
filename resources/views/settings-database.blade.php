@@ -40,7 +40,7 @@
                 <div class="col-lg-10">
                     <div class="tab-content text-muted mt-3 mt-lg-0">
                         <div class="tab-pane fade {{ session('active_tab') == 'departments' || session('active_tab') == '' ? 'active show' : '' }}" id="v-pills-departments" role="tabpanel" aria-labelledby="v-pills-departments-tab">
-                            <form action="{{ route('departments.updateDepartments') }}" method="POST">
+                            <form action="{{ route('departments.updateDepartments') }}" method="POST" autocomplete="off">
                                 @csrf
                                 @method('PUT')
                                 <button type="submit" class="btn btn-theme float-end">Atualizar Departamentos</button>
@@ -80,7 +80,7 @@
                                                         {!! $department->description !!}
                                                     </td>
                                                     <td class="align-middle">
-                                                        <input type="text" name="aliases[{{ $department->id }}]" value="{{ e($department->department_alias) }}" maxlength="100" class="form-control">
+                                                        <input type="text" name="aliases[{{ $department->id }}]" value="{{ empty($department->department_alias) ? e(strip_tags($department->description )) : e(strip_tags($department->department_alias)) }}" maxlength="100" class="form-control">
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -90,7 +90,7 @@
                             </form>
                         </div><!--end tab-pane-->
                         <div class="tab-pane fade {{ session('active_tab') == 'companies' ? 'active show' : '' }}" id="v-pills-companies" role="tabpanel" aria-labelledby="v-pills-companies-tab">
-                            <form action="{{ route('companies.updateCompanies') }}" method="POST">
+                            <form action="{{ route('companies.updateCompanies') }}" method="POST" autocomplete="off">
                                 @csrf
                                 @method('PUT')
                                 <button type="submit" class="btn btn-theme float-end">Atualizar Empresas</button>
@@ -129,7 +129,7 @@
                                                         {!! $company->company_name !!}
                                                     </td>
                                                     <td class="align-middle">
-                                                        <input type="text" name="aliases[{{ $company->id }}]" value="{{ e($company->company_alias) }}" maxlength="100" class="form-control">
+                                                        <input type="text" name="aliases[{{ $company->id }}]" value="{{ empty($company->company_alias) ? e($company->company_name) : e($company->company_alias) }}" maxlength="100" class="form-control">
                                                     </td>
                                                 </tr>
                                             @endforeach

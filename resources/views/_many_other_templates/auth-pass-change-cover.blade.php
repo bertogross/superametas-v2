@@ -69,7 +69,7 @@
                                                             placeholder="Senha aqui" id="password-input" aria-describedby="passwordInput"
                                                             pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required>
                                                         <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon"
-                                                            type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
+                                                            type="button" id="password-addon"><i class="ri-eye-fill align-middle text-body"></i></button>
                                                     </div>
                                                     <div id="passwordInput" class="form-text">Must be at least 8 characters.</div>
                                                 </div>
@@ -81,7 +81,7 @@
                                                             placeholder="Confirm password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" id="confirm-password-input"
                                                             required>
                                                         <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon"
-                                                            type="button" id="confirm-password-input"><i class="ri-eye-fill align-middle"></i></button>
+                                                            type="button" id="confirm-password-input"><i class="ri-eye-fill align-middle text-body"></i></button>
                                                     </div>
                                                 </div>
 

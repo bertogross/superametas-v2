@@ -1,4 +1,4 @@
-<div class="col">
+<div class="col" data-search-user-id="{{ $id }}" data-search-user-name="@if(isset($name)) {{ $name }} @endif" data-search-user-role="@if(isset($role)){{ $role }}@endif">
     <div class="card team-box">
         <div class="team-cover"> <img src="build/images/small/img-9.jpg" alt="" class="img-fluid"> </div>
         <div class="card-body p-4">
@@ -6,20 +6,16 @@
                 <div class="col team-settings">
                     <div class="row">
                         <div class="col">
-                            <div class="flex-shrink-0 me-2"> <button type="button"
-                                    class="btn btn-light btn-icon rounded-circle btn-sm favourite-btn "> <i
-                                        class="ri-star-fill fs-14"></i> </button> </div>
+                            <div class="flex-shrink-0 me-2">
+                                <!--
+                                <button type="button" class="btn btn-light btn-icon rounded-circle btn-sm favourite-btn "> <i class="ri-star-fill fs-14"></i> </button>
+                                -->
+                           </div>
                         </div>
                         <div class="col text-end dropdown"> <a href="javascript:void(0);" data-bs-toggle="dropdown"
                                 aria-expanded="false"> <i class="ri-more-fill fs-17"></i> </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item edit-list" href="#addmemberModal" data-bs-toggle="modal"
-                                        data-edit-id="12"><i
-                                            class="ri-pencil-line me-2 align-bottom text-muted"></i>Edit</a></li>
-                                <li><a class="dropdown-item remove-list" href="#removeMemberModal"
-                                        data-bs-toggle="modal" data-remove-id="12"><i
-                                            class="ri-delete-bin-5-line me-2 align-bottom text-muted"></i>Remove</a>
-                                </li>
+                                <li><a class="dropdown-item btn-edit-user" data-user-id="{{ $id }}" data-user-name="@if(isset($name)) {{ $name }} @endif"><i class="ri-pencil-line me-2 align-bottom text-muted"></i>Editar</a></li>
                             </ul>
                         </div>
                     </div>
@@ -32,14 +28,21 @@
                         <div class="team-content"> <a class="member-name" data-bs-toggle="offcanvas"
                                 href="#member-overview" aria-controls="member-overview">
                                 <h5 class="fs-16 mb-1">
-                                    @if(isset($title))
-                                        {{ $title }}
+                                    @if(isset($name))
+                                        {{ $name }}
                                     @endif
                                 </h5>
                             </a>
                             <p class="text-muted member-designation mb-0">
                                 @if(isset($role))
                                     {{ $role }}
+                                @endif
+                            </p>
+                            <p class="text-muted member-designation mb-0">
+                                @if(isset($status) && $status == '1')
+                                    <span class="text-theme">Ativo</span>
+                                @else
+                                    <span class="text-danger">Inoperante</span>
                                 @endif
                             </p>
                         </div>
@@ -58,7 +61,7 @@
                     </div>
                 </div>
                 <div class="col-lg-2 col">
-                    <div class="text-end"> <a href="profile/@if(isset($id)){{ $id }}@endif" class="btn btn-light view-btn">View Profile</a>
+                    <div class="text-end"> <a href="profile/@if(isset($id)){{ $id }}@endif" class="btn btn-light view-btn">Visualizar Perfil</a>
                     </div>
                 </div>
             </div>

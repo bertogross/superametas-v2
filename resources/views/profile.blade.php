@@ -6,7 +6,13 @@
     <link rel="stylesheet" href="{{ URL::asset('build/libs/swiper/swiper-bundle.min.css') }}">
 @endsection
 @section('content')
+    @php
+    use Illuminate\Support\Facades\Auth;
+    use App\Models\User;
 
+    $phone = getUserMeta($user->id, 'phone');
+    $phone = formatPhoneNumber($phone);
+    @endphp
     <div class="profile-foreground position-relative mx-n4 mt-n4">
         <div class="profile-wid-bg">
             <img src="{{ URL::asset('build/images/profile-bg.jpg') }}" alt="" class="profile-wid-img" />
@@ -24,7 +30,7 @@
             <div class="col">
                 <div class="p-2">
                     <h3 class="text-white mb-1">{{ $user->name }}</h3>
-                    <p class="text-white text-opacity-75">Owner & Founder</p>
+                    <p class="text-white text-opacity-75">{{ (new User)->getRoleName($user['role']) }}</p>
                     <div class="hstack text-white-50 gap-1">
                         <div class="me-2"><i
                                 class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>California,
@@ -89,8 +95,9 @@
                         </li>
                     </ul>
                     <div class="flex-shrink-0">
-                        <a href="pages-profile-settings" class="btn btn-success"><i
-                                class="ri-edit-box-line align-bottom"></i> Edit Profile</a>
+                        @if(Auth::id() == $user->id)
+                            <a href="{{ url('profile-settings') }}" class="btn btn-success"><i class="ri-edit-box-line align-bottom"></i> Edit Profile</a>
+                        @endif
                     </div>
                 </div>
                 <!-- Tab panes -->
@@ -118,11 +125,15 @@
                                                 <tbody>
                                                     <tr>
                                                         <th class="ps-0" scope="row">Full Name :</th>
-                                                        <td class="text-muted">Anna Adame</td>
+                                                        <td class="text-muted">
+                                                            {{ $user->name }}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <th class="ps-0" scope="row">Mobile :</th>
-                                                        <td class="text-muted">+(1) 987 6543</td>
+                                                        <td class="text-muted">
+                                                            {{ $phone }}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <th class="ps-0" scope="row">E-mail :</th>
