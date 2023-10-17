@@ -60,10 +60,13 @@
 
                         $users = collect($users);
                         @endphp
+
                         @foreach ($users as $user)
                             @component('components.settings-users-card')
                                 @slot('id') {{ $user['id'] }} @endslot
                                 @slot('status') {{ $user['status'] }} @endslot
+                                @slot('avatar') {{ $user['avatar'] }} @endslot
+                                @slot('cover') {{ $user['cover'] }} @endslot
                                 @slot('name') {{ $user['name'] }} @endslot
                                 @slot('role') {{ (new User)->getRoleName($user['role']) }} @endslot
                             @endcomponent
@@ -84,6 +87,7 @@
 
 @endsection
 @section('script')
+
     <script src="{{ URL::asset('build/js/settings-users.js') }}" type="module"></script>
     <script src="{{ URL::asset('build/js/app.js') }}"></script>
 @endsection

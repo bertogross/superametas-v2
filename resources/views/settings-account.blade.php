@@ -45,13 +45,13 @@
                             <form action="{{ route('settings.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
                                 @csrf
                                 <div class="mb-3">
-                                    <label class="form-label" for="company_name">Nome da Empresa:</label>
-                                    <input type="text" name="company_name" id="company_name" class="form-control" maxlength="190" value="{{ old('company_name', $settings['company_name'] ?? '') }}" required>
+                                    <label class="form-label" for="name">Nome da Empresa:</label>
+                                    <input type="text" name="name" id="name" class="form-control" maxlength="190" value="{{ old('name', $settings['name'] ?? '') }}" required>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label" for="phone">Número do telefone móvel:</label>
-                                    <input type="tel" name="phone" id="phone" class="form-control" value="{{ old('phone', formatPhoneNumber($settings['phone']) ?? '') }}" maxlength="16" required>
+                                    <input type="tel" name="phone" id="phone" class="form-control phone-mask" value="{{ old('phone', formatPhoneNumber($settings['phone']) ?? '') }}" maxlength="16" required>
                                 </div>
 
                                 <hr class="w-50 start-50 position-relative translate-middle-x clearfix">
@@ -67,7 +67,7 @@
                                         <input type="password" name="new_password" id="password-input" maxlength="8" class="form-control password-input" autocomplete="false" readonly onfocus="this.removeAttribute('readonly');">
                                         <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle text-body"></i></button>
                                     </div>
-                                    <div class="form-text">Para não modificar a senha, deixe em branco</div>
+                                    <div class="form-text">Para não modificar a senha, deixe este campo vazio</div>
                                 </div>
 
                                 <hr class="w-50 start-50 position-relative translate-middle-x clearfix">
@@ -81,10 +81,14 @@
                                             Formato suportado: <strong class="text-theme">JPG</strong> | Dimensão recomendada: 200 x 200 pixels
                                         </p>
                                         <div class="avatar-xl mx-auto">
-                                            <input type="file" class="filepond filepond-input-circle" name="company_logo" accept="image/jpeg" />
-                                            <!--
-                                            data-default-file="{{ asset('storage/' . ($settings['company_logo'] ?? '')) }}"
-                                            -->
+                                            <input
+                                            type="file"
+                                            class="filepond filepond-input-logo"
+                                            name="logo"
+                                            @if(isset($settings['logo']) && $settings['logo'])
+                                                data-default-file="{{ asset('storage/' . $settings['logo']) }}"
+                                            @endif
+                                            accept="image/jpeg"/>
                                         </div>
                                     </div>
                                 </div>
@@ -113,87 +117,7 @@
     <script src="{{ URL::asset('build/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js') }}"></script>
     <script src="{{ URL::asset('build/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
 
-    <!--
-    <script src="{{ URL::asset('build/js/settings-account.js') }}"></script>
-    -->
-    <script>
-    window.addEventListener('load', function() {
-        // FilePond
-        FilePond.registerPlugin(
-            // encodes the file as base64 data
-            FilePondPluginFileEncode,
-            // validates the size of the file
-            FilePondPluginFileValidateSize,
-            // corrects mobile image orientation
-            FilePondPluginImageExifOrientation,
-            // previews dropped images
-            FilePondPluginImagePreview
-        );
-
-        var inputMultipleElements = document.querySelectorAll('input.filepond-input-multiple');
-        if(inputMultipleElements){
-
-            // loop over input elements
-            Array.from(inputMultipleElements).forEach(function (inputElement) {
-                // create a FilePond instance at the input element location
-                FilePond.create(inputElement);
-            })
-
-        }
-
-
-        // Get the input element
-        var inputElement = document.querySelector('.filepond-input-circle');
-        //console.log(inputElement);
-
-        if(inputElement) {
-            const pond = FilePond.create(inputElement, {
-                labelIdle: 'Drag & Drop your picture or <span class="filepond--label-action">Browse</span>',
-                imagePreviewHeight: 170,
-                imageCropAspectRatio: '1:1',
-                imageResizeTargetWidth: 200,
-                imageResizeTargetHeight: 200,
-                stylePanelLayout: 'compact circle',
-                styleLoadIndicatorPosition: 'center bottom',
-                styleProgressIndicatorPosition: 'right bottom',
-                styleButtonRemoveItemPosition: 'left bottom',
-                styleButtonProcessItemPosition: 'right bottom',
-                allowImagePreview: true,
-                allowRevert: false,
-                server: {
-                    url: '/upload', // Your endpoint for file uploads
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Send CSRF token in header
-                    }
-                }
-            });
-
-            // Set the initial file if it exists
-            if(inputElement.dataset.defaultFile) {
-                pond.addFile(inputElement.dataset.defaultFile);
-            }
-        } else {
-            console.error('Input element not found!');
-        }
-
-
-
-
-        // Mask for input phone
-        document.getElementById('phone').addEventListener('input', function (e) {
-            var target = e.target,
-                value = target.value;
-
-            value = value.replace(/\D/g, ''); // Remove non-numeric characters
-            value = value.replace(/^(\d{0,2})(\d{0,1})(\d{0,4})(\d{0,4}).*/, '($1) $2 $3-$4'); // Format the input
-
-            target.value = value;
-        });
-
-
-
-    });
-    </script>
+    <script src="{{ URL::asset('build/js/settings-account.js') }}" type="module"></script>
 
     <script src="{{ URL::asset('build/js/app.js') }}"></script>
 

@@ -60,10 +60,13 @@
 
                         $users = collect($users);
                         ?>
+
                         <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <?php $__env->startComponent('components.settings-users-card'); ?>
                                 <?php $__env->slot('id'); ?> <?php echo e($user['id']); ?> <?php $__env->endSlot(); ?>
                                 <?php $__env->slot('status'); ?> <?php echo e($user['status']); ?> <?php $__env->endSlot(); ?>
+                                <?php $__env->slot('avatar'); ?> <?php echo e($user['avatar']); ?> <?php $__env->endSlot(); ?>
+                                <?php $__env->slot('cover'); ?> <?php echo e($user['cover']); ?> <?php $__env->endSlot(); ?>
                                 <?php $__env->slot('name'); ?> <?php echo e($user['name']); ?> <?php $__env->endSlot(); ?>
                                 <?php $__env->slot('role'); ?> <?php echo e((new User)->getRoleName($user['role'])); ?> <?php $__env->endSlot(); ?>
                             <?php echo $__env->renderComponent(); ?>
@@ -85,6 +88,7 @@
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
+
     <script src="<?php echo e(URL::asset('build/js/settings-users.js')); ?>" type="module"></script>
     <script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
 <?php $__env->stopSection(); ?>

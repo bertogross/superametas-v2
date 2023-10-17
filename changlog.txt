@@ -9,6 +9,24 @@ https://laravel-news.com/openai-for-laravel
 
 
 
+Version 2.0.13 - [2023-10-17]
+- [Added] middleware CheckUserStatus
+- [Updated] LoginController [ Check if the user's status is 0 and prevent login]
+- [Updated] SettingsAccountController
+- [Updated] UploadController
+- [Updated] blade templates
+- [Added] settings-account.js
+- [Updated] settings-users.js
+- [Updated] routes\web.php
+
+
+
+Version 2.0.12 - [2023-10-15 - 2023-10-16]
+- [Updated] /settings
+- [Updated] /settings-users
+
+
+
 Version 2.0.12 - [2023-10-15 - 2023-10-16]
 - [Updated] /settings
 - [Updated] /settings-users

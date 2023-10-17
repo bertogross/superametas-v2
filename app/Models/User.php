@@ -57,8 +57,8 @@ class User extends Authenticatable
         'password',
         'role',
         'status',
-        'avatar',
-        'cover',
+        //'avatar',
+        //'cover',
     ];
 
     // Attributes that should be hidden for arrays

@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Session;
  */
 class UserController extends Controller
 {
+    protected $connection = 'smAppTemplate';
+
     /**
      * Display a listing of all users.
      *
@@ -62,8 +64,6 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:191',
             'email' => ['required', 'string', 'email', 'max:191'],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:1024'],
-            'cover' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:1024'],
         ]);
 
         // Check if email exist
@@ -77,8 +77,7 @@ class UserController extends Controller
         }
 
         // Check and set role based on conditions
-        if (empty($request->role)) {
-            //$request->merge(['role' => 4]);
+        if (empty($request->role) || ( intval($request->role) > 5 || intval($request->role) < 1 ) ) {
             return response()->json(['success' => false, 'message' => "Selecione o Nível"], 200);
         }
 
@@ -90,21 +89,6 @@ class UserController extends Controller
 
         // Create a new user
         $user = User::create(array_merge($request->all(), ['password' => $hashedPassword]));
-
-        if ($request->file('avatar')) {
-            $avatar = $request->file('avatar');
-            $avatarName = time() . '.' . $avatar->getClientOriginalExtension();
-            $avatarPath = public_path('/images/');
-            $avatar->move($avatarPath, $avatarName);
-            $user->avatar = $avatarName;
-        }
-        if ($request->file('cover')) {
-            $cover = $request->file('cover');
-            $coverName = time() . '.' . $cover->getClientOriginalExtension();
-            $coverPath = public_path('/images/');
-            $cover->move($coverPath, $coverName);
-            $user->cover = $coverName;
-        }
 
         // After creating the user
         $companies = $request->get('companies'); // Assuming 'companies' is the name of the checkboxes
@@ -134,45 +118,28 @@ class UserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:191'],
             'email' => ['required', 'string', 'email', 'max:191'],
-            //'role' => 'required|integer|max:1|not_in:1', // Add the not_in:1 rule here
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:1024'],
-            'cover' => ['nullable', 'image', 'mimes:jpg,jpeg', 'max:1024'],
         ]);
-
-        // Check and set role based on conditions
-        if (empty($request->role)) {
-            //$request->merge(['role' => 4]);
-            return response()->json(['success' => false, 'message' => "Selecione o Nível"], 200);
-        }
 
         $user = User::find($id);
 
+        // Check and set role based on conditions
+        if ($user->id != 1 && ( empty($request->role) || ( intval($request->role) > 5 || intval($request->role) < 1 ) )) {
+            return response()->json(['success' => false, 'message' => "Selecione o Nível"], 200);
+        }
+
         if ($user->id == 1) {
             $user->role = 1;
+            $user->status = 1;
         }else{
-            $user->role = intval($request->get('role'));
+            $user->role = $request->get('role') ? intval($request->get('role')) : 5;
+            $user->status = $request->get('status') ? intval( $request->get('status') ) : 0;
         }
         $user->name = strip_tags( $request->get('name') );
         $user->email = strip_tags( $request->get('email') );
-        $user->status = intval( $request->get('status') );
 
-        if ($request->file('avatar')) {
-            $avatar = $request->file('avatar');
-            $avatarName = time() . '.' . $avatar->getClientOriginalExtension();
-            $avatarPath = public_path('/images/');
-            $avatar->move($avatarPath, $avatarName);
-            $user->avatar = $avatarName;
-        }
-        if ($request->file('cover')) {
-            $cover = $request->file('cover');
-            $coverName = time() . '.' . $cover->getClientOriginalExtension();
-            $coverPath = public_path('/images/');
-            $cover->move($coverPath, $coverName);
-            $user->cover = $coverName;
-        }
 
         // After updating the user
-        $companies = $request->get('companies'); // Assuming 'companies' is the name of the checkboxes
+        $companies = is_array($request->get('companies')) ? json_encode(array_map('intval', $request->get('companies'))) : $request->get('companies'); // Assuming 'companies' is the name of the checkboxes
         $this->updateUserMeta($user->id, 'companies', $companies);
 
         if ($user->update()) {

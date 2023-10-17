@@ -58,8 +58,11 @@ Route::middleware(['auth'])->group(function () {
     //Route::put('/settings-users/update/{id}', [UserController::class, 'update']);
     Route::post('/settings-users/update/{id}', [UserController::class, 'update']);
     Route::get('/profile/{id?}', [UserController::class, 'show'])->name('profile.show');
-    Route::get('/profile-settings', [ProfileController::class, 'settings'])->middleware('auth');
     Route::get('/get-user-modal-form/{id?}', [UserController::class, 'getUserModalContent']);
+
+    // TODO profile-settings.blade.php
+    //Route::get('/profile-settings', [ProfileController::class, 'settings'])->middleware('auth');
+
 
     // Admin Settings
     Route::middleware(['admin'])->group(function () {
@@ -71,7 +74,11 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // File Upload
-    Route::post('/upload', [UploadController::class, 'upload'])->name('file.upload');
+    Route::post('/upload-avatar', [UploadController::class, 'uploadAvatar']);
+    Route::post('/upload-cover', [UploadController::class, 'uploadCover']);
+    Route::post('/upload-logo', [UploadController::class, 'uploadCompanyLogo']);
+    Route::delete('/upload-logo', [UploadController::class, 'deleteCompanyLogo']);
+
 });
 
 // Authentication with Dynamic Database

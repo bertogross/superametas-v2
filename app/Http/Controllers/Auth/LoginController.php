@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 use Illuminate\Support\Facades\Cookie;
 //use Illuminate\Support\Facades\Session;
 
@@ -44,27 +42,32 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
 
         // Authenticate using the dynamic database connection
         if (Auth::guard('web')->attempt($credentials)) {
+            // Check if the user's status is 0
+            if (Auth::user()->status == 0) {
+                // Log the user out
+                Auth::logout();
+
+                // Redirect back with an error message
+                return redirect()->back()->withErrors(['email' => 'Your account is inactive. Please contact support.']);
+            }
+
             // Authentication passed
-            return redirect()->intended('dashboard');
+            //return redirect()->intended('dashboard');
+            return redirect('/');
         }
 
         // Handle failed authentication
         return redirect()->back()->withErrors(['email' => 'Authentication failed']);
     }
 
-
-
     public function logout(Request $request)
     {
-
-
         // Logout the user
         Auth::logout();
 
@@ -78,6 +81,4 @@ class LoginController extends Controller
         // Redirect to the homepage or login page with the forgotten cookies
         return redirect('/')->withCookies([$cookie1, $cookie2]);
     }
-
-
 }

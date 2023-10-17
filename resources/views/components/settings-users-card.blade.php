@@ -1,6 +1,12 @@
 <div class="col" data-search-user-id="{{ $id }}" data-search-user-name="@if(isset($name)) {{ $name }} @endif" data-search-user-role="@if(isset($role)){{ $role }}@endif">
     <div class="card team-box">
-        <div class="team-cover"> <img src="build/images/small/img-9.jpg" alt="" class="img-fluid"> </div>
+        <div class="team-cover"> <img
+            @if(empty(trim($cover)))
+                src="build/images/small/img-9.jpg"
+            @else
+                src="{{ URL::asset('storage/' . $cover) }}"
+            @endif
+            alt="@if(isset($name)) {{ $name }} @endif" class="img-fluid" id="cover-img-@if(isset($id)){{ $id }}@endif"> </div>
         <div class="card-body p-4">
             <div class="row align-items-center team-row">
                 <div class="col team-settings">
@@ -23,16 +29,20 @@
                 <div class="col-lg-4 col">
                     <div class="team-profile-img">
                         <div class="avatar-lg img-thumbnail rounded-circle flex-shrink-0"><img
-                                src="build/images/users/avatar-2.jpg" alt=""
-                                class="member-img img-fluid d-block rounded-circle"></div>
-                        <div class="team-content"> <a class="member-name" data-bs-toggle="offcanvas"
-                                href="#member-overview" aria-controls="member-overview">
-                                <h5 class="fs-16 mb-1">
-                                    @if(isset($name))
-                                        {{ $name }}
-                                    @endif
-                                </h5>
-                            </a>
+                            @if(empty(trim($avatar)))
+                                src="build/images/users/user-dummy-img.jpg"
+                            @else
+                            src="{{ URL::asset('storage/' . $avatar) }}"
+                            @endif
+                            alt="@if(isset($name)){{ $name }}@endif"
+                            class="member-img img-fluid d-block rounded-circle" id="avatar-img-@if(isset($id)){{ $id }}@endif">
+                        </div>
+                        <div class="team-content">
+                            <h5 class="fs-16 mb-1">
+                                @if(isset($name))
+                                    {{ $name }}
+                                @endif
+                            </h5>
                             <p class="text-muted member-designation mb-0">
                                 @if(isset($role))
                                     {{ $role }}

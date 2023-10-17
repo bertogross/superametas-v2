@@ -15,7 +15,13 @@
     @endphp
     <div class="profile-foreground position-relative mx-n4 mt-n4">
         <div class="profile-wid-bg">
-            <img src="{{ URL::asset('build/images/profile-bg.jpg') }}" alt="" class="profile-wid-img" />
+            <img
+            @if(empty(trim($user->cover)))
+                src="{{URL::asset('build/images/small/img-9.jpg')}}"
+            @else
+                src="{{ URL::asset('storage/' . $user->cover) }}"
+            @endif
+            alt="cover" class="profile-wid-img" />
         </div>
     </div>
 
@@ -23,7 +29,13 @@
         <div class="row g-4">
             <div class="col-auto">
                 <div class="avatar-lg">
-                    <img src="@if (Auth::user()->avatar != '') {{ URL::asset('images/' . Auth::user()->avatar) }}@else{{ URL::asset('build/images/users/avatar-1.jpg') }} @endif" alt="user-img" class="img-thumbnail rounded-circle" />
+                    <img
+                    @if(empty(trim($user->avatar)))
+                        src="{{URL::asset('build/images/users/user-dummy-img.jpg')}}"
+                    @else
+                        src="{{ URL::asset('storage/' . $user->avatar) }}"
+                    @endif
+                    alt="avatar" class="img-thumbnail rounded-circle" />
                 </div>
             </div>
             <!--end col-->
@@ -31,13 +43,17 @@
                 <div class="p-2">
                     <h3 class="text-white mb-1">{{ $user->name }}</h3>
                     <p class="text-white text-opacity-75">{{ (new User)->getRoleName($user['role']) }}</p>
+
+                    <!--
                     <div class="hstack text-white-50 gap-1">
-                        <div class="me-2"><i
-                                class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>California,
-                            United States</div>
-                        <div><i class="ri-building-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>Themesbrand
+                        <div class="me-2">
+                            <i class="ri-map-pin-user-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>California, United States
+                        </div>
+                        <div>
+                            <i class="ri-building-line me-1 text-white text-opacity-75 fs-16 align-middle"></i>Themesbrand
                         </div>
                     </div>
+                    -->
                 </div>
             </div>
             <!--end col-->
@@ -96,7 +112,10 @@
                     </ul>
                     <div class="flex-shrink-0">
                         @if(Auth::id() == $user->id)
+                            <!--
+                            TODO
                             <a href="{{ url('profile-settings') }}" class="btn btn-success"><i class="ri-edit-box-line align-bottom"></i> Edit Profile</a>
+                            -->
                         @endif
                     </div>
                 </div>

@@ -1,7 +1,8 @@
 import {ToastAlert} from './helpers.js';
 
-document.addEventListener("DOMContentLoaded", function() {
+window.addEventListener('load', function() {
 
+    // Load the content for the user modal
     function loadModalContent(userId = null, userName = '') {
         var xhr = new XMLHttpRequest();
         var url = '/get-user-modal-form';
@@ -22,27 +23,32 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 if (userId) {
                     document.getElementById("modalUserTitle").innerHTML = userName ? '<span class="text-theme">'+ userName + '</span>' : 'Editar Usuário';
-                    document.getElementById("btn-save-user").innerHTML = 'Atualizar Usuário';
+                    document.getElementById("btn-save-user").innerHTML = 'Atualizar';
 
                     injectScript("/build/js/pages/password-addon.init.js");
                 } else {
                     document.getElementById("modalUserTitle").innerHTML = 'Adicionar Usuário';
-                    document.getElementById("btn-save-user").innerHTML = 'Salvar Usuário';
+                    document.getElementById("btn-save-user").innerHTML = 'Salvar';
                 }
 
-                attachModalEventListeners();  // Attach the event listeners after content is loaded
+                attachModalEventListeners();
+                attachImageEventListeners("#member-image-input", "#avatar-img", "/upload-avatar");
+                attachImageEventListeners("#cover-image-input", "#cover-img", "/upload-cover");
+
 
             } else {
-                console.log("Error fetching modal content:", xhr.statusText);
+                //console.log("Error fetching modal content:", xhr.statusText);
             }
         };
         xhr.send();
     }
 
+    // Event listener for the 'Add User' button
     document.getElementById('btn-add-user').addEventListener('click', function() {
         loadModalContent();
     });
 
+    // Event listeners for each 'Edit User' button
     var editButtons = document.querySelectorAll('.btn-edit-user');
     editButtons.forEach(function(button) {
         button.addEventListener('click', function() {
@@ -52,6 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    // Function to inject a script into the page
     function injectScript(src) {
         var script = document.createElement('script');
         script.src = src;
@@ -60,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-    // Search functionality
+    // Search functionality for the user list
     var searchInput = document.getElementById('searchMemberList');
     searchInput.addEventListener('keyup', function() {
         var searchTerm = this.value.toLowerCase();
@@ -79,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-
+    // Attach event listeners for the modal form
     function attachModalEventListeners() {
         // Update/Save user from modal form
         const form = document.getElementById('memberlist-form');
@@ -89,11 +96,7 @@ document.addEventListener("DOMContentLoaded", function() {
             btn.addEventListener('click', function(event) {
                 event.preventDefault();
 
-                //console.log("Button clicked!");
-
-                // form.dataset.id get value from <form data-id
                 let formData = new FormData(form);
-                //formData.append('_method', 'PUT');
 
                 let url = form.dataset.id ? `/settings-users/update/${form.dataset.id}` : '/settings-users/store';
 
@@ -126,40 +129,124 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    // Attach event listeners for Avatar and Cover image upload
+    function attachImageEventListeners(inputSelector, imageSelector, uploadUrl) {
+        const inputFile = document.querySelector(inputSelector);
 
-    // avatar image
-    if( document.querySelector("#member-image-input") ){
-        document.querySelector("#member-image-input").addEventListener("change", function () {
-            var preview = document.querySelector("#member-img");
-            var file = document.querySelector("#member-image-input").files[0];
-            var reader = new FileReader();
-            reader.addEventListener("load", function () {
-                preview.src = reader.result;
-            }, false);
-            if (file) {
-                reader.readAsDataURL(file);
-            }
-        });
+        if (inputFile) {
+            inputFile.addEventListener("change", function() {
+                const preview = document.querySelector(imageSelector);
+                const userID = preview.getAttribute("data-user-id");
+                const previewCard = document.querySelector(`${imageSelector}-${userID}`);
+                const file = inputFile.files[0];
+                const reader = new FileReader();
+
+                reader.addEventListener("load", function() {
+                    preview.src = reader.result;
+                    //console.log("Image source:", preview.src);
+
+                    const img = new Image();
+                    img.src = reader.result;
+                    //console.log("Image source:", img.src);
+
+                    img.onload = function() {
+                        //console.log("Image loaded with dimensions:", img.width, "x", img.height);
+
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+
+                        if (imageSelector == '#avatar-img') {
+                            canvas.width = 200;
+                            canvas.height = 200;
+                            //console.log("Canvas dimensions:", canvas.width, "x", canvas.height);
+
+                            const aspectRatio = img.width / img.height;
+                            let sourceX, sourceY, sourceWidth, sourceHeight;
+
+                            if (aspectRatio > 1) {
+                                sourceWidth = img.height;
+                                sourceHeight = img.height;
+                                sourceX = (img.width - sourceWidth) / 2;
+                                sourceY = 0;
+                            } else if (aspectRatio < 1) {
+                                sourceWidth = img.width;
+                                sourceHeight = img.width;
+                                sourceX = 0;
+                                sourceY = (img.height - sourceHeight) / 2;
+                            } else {
+                                sourceWidth = img.width;
+                                sourceHeight = img.height;
+                                sourceX = 0;
+                                sourceY = 0;
+                            }
+                            //console.log("Source dimensions and positions:", sourceX, sourceY, sourceWidth, sourceHeight);
+
+                            ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
+                        } else if (imageSelector == '#cover-img') {
+                            let targetWidth = img.width;
+                            let targetHeight = img.height;
+
+                            if (targetWidth > 1920 || targetHeight > 1920) {
+                                const aspectRatio = targetWidth / targetHeight;
+                                if (targetWidth > targetHeight) {
+                                    targetWidth = 1920;
+                                    targetHeight = targetWidth / aspectRatio;
+                                } else {
+                                    targetHeight = 1920;
+                                    targetWidth = targetHeight * aspectRatio;
+                                }
+                            }
+
+                            canvas.width = targetWidth;
+                            canvas.height = targetHeight;
+                            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+                        }
+
+                        canvas.toBlob(function(blob) {
+                            const formData = new FormData();
+                            formData.append('file', blob, file.name);
+                            formData.append('user_id', userID);
+
+                            //console.log("Blob size:", blob.size);
+
+                            fetch(uploadUrl, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(response => {
+                                if (response.success) {
+                                    ToastAlert(response.message, 'success');
+                                    if (response.path) {
+                                        preview.src = '/storage/' + response.path;
+                                        previewCard.src = '/storage/' + response.path;
+                                    }
+                                } else {
+                                    ToastAlert(response.message, 'danger');
+                                }
+                            })
+                            .catch(error => {
+                                ToastAlert('Upload failed: ' + error, 'danger');
+                                console.error('Error:', error);
+                            });
+                        }, 'image/jpeg', 0.7);
+                    };
+                }, false);
+
+                if (file) {
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
     }
 
-    // cover image
-    if( document.querySelector("#cover-image-input") ){
-        document.querySelector("#cover-image-input").addEventListener("change", function () {
-            var preview = document.querySelector("#cover-img");
-            var file = document.querySelector("#cover-image-input").files[0];
-            var reader = new FileReader();
-            reader.addEventListener("load", function () {
-                preview.src = reader.result;
-            }, false);
-            if (file) {
-                reader.readAsDataURL(file);
-            }
-        });
-    }
 
 
-
-    //Fiter Js
+    // Filter functionality for switching between list and grid views
     var list = document.querySelectorAll(".team-list");
     if (list) {
         var buttonGroups = document.querySelectorAll('.filter-button');
@@ -170,6 +257,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    // This block handles the switch between list and grid views
     function onButtonGroupClick(event) {
         if (event.target.id === 'list-view-button' || event.target.parentElement.id === 'list-view-button') {
             document.getElementById("list-view-button").classList.add("active");
@@ -188,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
     }
-
+    // End Filter functionality
 
 });
 

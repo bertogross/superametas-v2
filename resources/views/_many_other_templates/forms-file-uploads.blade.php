@@ -111,7 +111,7 @@
                             <p class="text-muted">FilePond is a JavaScript library with profile picture-shaped file
                                 upload variation.</p>
                             <div class="avatar-xl mx-auto">
-                                <input type="file" class="filepond filepond-input-circle" name="filepond"
+                                <input type="file" class="filepond filepond-input-logo" name="filepond"
                                     accept="image/png, image/jpeg, image/gif" />
                             </div>
 

@@ -15,7 +15,13 @@
     ?>
     <div class="profile-foreground position-relative mx-n4 mt-n4">
         <div class="profile-wid-bg">
-            <img src="<?php echo e(URL::asset('build/images/profile-bg.jpg')); ?>" alt="" class="profile-wid-img" />
+            <img
+            <?php if(empty(trim($user->cover))): ?>
+                src="<?php echo e(URL::asset('build/images/small/img-9.jpg')); ?>"
+            <?php else: ?>
+                src="<?php echo e(URL::asset('storage/' . $user->cover)); ?>"
+            <?php endif; ?>
+            alt="cover" class="profile-wid-img" />
         </div>
     </div>
 
@@ -23,7 +29,13 @@
         <div class="row g-4">
             <div class="col-auto">
                 <div class="avatar-lg">
-                    <img src="<?php if(Auth::user()->avatar != ''): ?> <?php echo e(URL::asset('images/' . Auth::user()->avatar)); ?><?php else: ?><?php echo e(URL::asset('build/images/users/avatar-1.jpg')); ?> <?php endif; ?>" alt="user-img" class="img-thumbnail rounded-circle" />
+                    <img
+                    <?php if(empty(trim($user->avatar))): ?>
+                        src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
+                    <?php else: ?>
+                        src="<?php echo e(URL::asset('storage/' . $user->avatar)); ?>"
+                    <?php endif; ?>
+                    alt="avatar" class="img-thumbnail rounded-circle" />
                 </div>
             </div>
             <!--end col-->
@@ -96,7 +108,10 @@
                     </ul>
                     <div class="flex-shrink-0">
                         <?php if(Auth::id() == $user->id): ?>
+                            <!--
+                            TODO
                             <a href="<?php echo e(url('profile-settings')); ?>" class="btn btn-success"><i class="ri-edit-box-line align-bottom"></i> Edit Profile</a>
+                            -->
                         <?php endif; ?>
                     </div>
                 </div>
