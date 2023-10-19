@@ -8,10 +8,24 @@ https://laravel-news.com/openai-for-laravel
 
 
 
+Version 2.0.15 - [2023-10-19]
+
+
+
+
+Version 2.0.14 - [2023-10-18]
+- [Added] SettingsDatabaseController ( get sysmo data from synchronization )
+- [Added] routes\api.php
+- [Updated] helpers.php ( function getERPdata() to interact with function updateSales)
+- [Added] settings-database.js
+- [Updated] settings-database.blade.php ( a new tab-pane synchronization)
+
+
+
 
 Version 2.0.13 - [2023-10-17]
 - [Added] middleware CheckUserStatus
-- [Updated] LoginController [ Check if the user's status is 0 and prevent login]
+- [Updated] LoginController ( Check if the user's status is 0 and prevent login)
 - [Updated] SettingsAccountController
 - [Updated] UploadController
 - [Updated] blade templates

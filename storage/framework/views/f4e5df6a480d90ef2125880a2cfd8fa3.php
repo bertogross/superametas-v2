@@ -1,7 +1,7 @@
 <?php
 use App\Models\User;
 
-$selectedCompanies = !empty($selectedCompanies) ? json_decode($selectedCompanies , true) : [];
+$selectedCompanies = !empty($selectedCompanies) && is_array($selectedCompanies) ? json_decode($selectedCompanies, true) : [];
 
 ?>
 <!-- Modal -->
@@ -103,7 +103,7 @@ $selectedCompanies = !empty($selectedCompanies) ? json_decode($selectedCompanies
                                         <input type="password" name="new_password" id="password-input" maxlength="8" class="form-control password-input" autocomplete="false" readonly onfocus="this.removeAttribute('readonly');">
                                         <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle text-body"></i></button>
                                     </div>
-                                    <div class="small text-muted">Para não modificar a senha, deixe este campo vazio.</div>
+                                    <div class="form-text">Para não modificar a senha, deixe este campo vazio</div>
                                 </div>
                             <?php endif; ?>
 

@@ -5,7 +5,7 @@
         <!-- Dark Logo-->
         <a href="<?php echo e(url('/')); ?>" class="logo logo-dark">
             <span class="logo-sm">
-                <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="" height="22">
+                <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="22">
             </span>
             <span class="logo-lg">
                 <img src="<?php echo e(URL::asset('build/images/logo-dark.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="39">
@@ -14,7 +14,7 @@
         <!-- Light Logo-->
         <a href="<?php echo e(url('/')); ?>" class="logo logo-light">
             <span class="logo-sm">
-                <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="" height="22">
+                <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="22">
             </span>
             <span class="logo-lg">
                 <img src="<?php echo e(URL::asset('build/images/logo-light.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="39">

@@ -1,8 +1,4 @@
 /*
-Template Name: Velzon - Admin & Dashboard Template
-Author: Themesbrand
-Website: https://themesbrand.com/
-Contact: support@themesbrand.com
 File: Custom Css File
 */
 
@@ -637,6 +633,16 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
 .toast-border-theme .toast-body {
   color: var(--vz-theme) !important;
   border-bottom: 3px solid var(--vz-theme) !important;
+}
+.toast-backdrop,
+#custom-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+    z-index: 1089; /* ensure it's on top of other content */
 }
 
 /**

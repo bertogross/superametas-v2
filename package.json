@@ -53,6 +53,7 @@
         "fullcalendar": "^6.1.8",
         "glightbox": "^3.2.0",
         "gmaps": "^0.4.25",
+        "googleapis": "^127.0.0",
         "gridjs": "^6.0.6",
         "isotope-layout": "^3.0.6",
         "jsvectormap": "1.4.2",

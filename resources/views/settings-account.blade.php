@@ -120,5 +120,4 @@
     <script src="{{ URL::asset('build/js/settings-account.js') }}" type="module"></script>
 
     <script src="{{ URL::asset('build/js/app.js') }}"></script>
-
 @endsection

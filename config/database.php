@@ -93,7 +93,7 @@ return [
             'host' => env('DB_HOST', '127.0.0.1'),
             //'database' => 'smApp1',
             //'database' => isset($_COOKIE['SM-DBN']) ? Crypt::decryptString($_COOKIE['SM-DBN']) : null,
-            'database' => isset($_COOKIE['SM-DBN']) ? str_replace( array('diI6IlZrNWllZmxSNXZ0WEJsNUpMM1cEtNa2VBMmhqQWErK0F0dkphRHhQemZ0Z01id1djK3lQN3Q5eE01WkEwNWFsaDNiSStSUGk4ZzNWSEZhR2phbmNYQnE0MUVpdlR0YTk5N3hzUUJmcTR', 'E9PSIsInZhbHVlIjoiNjcrazQ1cEtNa2V'), '', base64_decode($_COOKIE['SM-DBN']) ): null,
+            'database' => isset($_COOKIE['SM-DBN']) ? str_replace( array('diI6IlZrNWllZmxSNXZ0WEJsNUpMM1cEtNa2VBMmhqQWErK0F0dkphRHhQemZ0Z01id1djK3lQN3Q5eE01WkEwNWFsaDNiSStSUGk4ZzNWSEZhR2phbmNYQnE0MUVpdlR0YTk5N3hzUUJmcTR', 'E9PSIsInZhbHVlIjoiNjcrazQ1cEtNa2V'), '', base64_decode($_COOKIE['SM-DBN']) ) : null,
             //'database' => null,
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),

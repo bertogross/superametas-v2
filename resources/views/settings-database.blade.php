@@ -1,6 +1,13 @@
+@php
+//phpinfo();
+//exit;
+@endphp
 @extends('layouts.master')
 @section('title')
     @lang('translation.your-erp')
+@endsection
+@section('css')
+<link href="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
     @component('components.breadcrumb')
@@ -32,7 +39,7 @@
                         <a class="nav-link text-uppercase {{ session('active_tab') == 'companies' ? 'active show' : '' }}" id="v-pills-companies-tab" data-bs-toggle="pill" href="#v-pills-companies" role="tab" aria-controls="v-pills-companies"
                             aria-selected="false">
                             Empresas</a>
-                        <a class="nav-link text-uppercase" id="v-pills-synchronization-tab" data-bs-toggle="pill" href="#v-pills-synchronization" role="tab" aria-controls="v-pills-synchronization"
+                        <a class="nav-link text-uppercase {{ session('active_tab') == 'synchronization' ? 'active show' : '' }}" id="v-pills-synchronization-tab" data-bs-toggle="pill" href="#v-pills-synchronization" role="tab" aria-controls="v-pills-synchronization"
                             aria-selected="false">
                             Sincronizacão</a>
                     </div>
@@ -138,13 +145,32 @@
                                 </div>
                             </form>
                         </div><!--end tab-pane-->
-                        <div class="tab-pane fade" id="v-pills-synchronization" role="tabpanel" aria-labelledby="v-pills-synchronization-tab">
-                            <button type="button" class="btn btn-theme float-end">Sincronizar</button>
+                        <div class="tab-pane fade {{ session('active_tab') == 'synchronization' ? 'active show' : '' }}" id="v-pills-synchronization" role="tabpanel" aria-labelledby="v-pills-synchronization-tab">
+                            <button type="button" id="btn-start-synchronization" class="btn btn-theme float-end">Sincronizar</button>
 
                             <h2 class="text-body mb-2 h4">Sincronização da Base de Dados</h2>
                             <p>Clique em Sincronizar para efetuar a pré carga</p>
 
-                            TODO
+                            <div id="synchronization-progress" class="card bg-light overflow-hidden d-none">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-0">
+                                                <b class="text-theme synchronization-percent me-2 d-none">0%</b>
+                                                <span class="synchronization-percent-text"></span>
+                                            </h6>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <h6 class="synchronization-time mb-0"></h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="progress bg-warning-subtle rounded-0">
+                                    <div class="progress-bar bg-warning synchronization-percent" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <ul class="list-unstyled concluded-meantimes">
+                            </ul>
                         </div><!--end tab-pane-->
                     </div>
                 </div> <!-- end col-->
@@ -152,9 +178,11 @@
         </div><!-- end card-body -->
     </div><!--end card-->
 
-
 @endsection
 @section('script')
-    <script src="{{ URL::asset('build/js/app.js') }}"></script>
+    <script src="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 
+    <script src="{{ URL::asset('build/js/settings-database.js') }}" type="module"></script>
+
+    <script src="{{ URL::asset('build/js/app.js') }}"></script>
 @endsection

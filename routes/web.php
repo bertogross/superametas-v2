@@ -10,6 +10,7 @@ use App\Http\Controllers\{
     UploadController,
     SettingsDatabaseController,
     SettingsAccountController,
+    SettingsStorageController,
     Auth\LoginController
 };
 use App\Http\Middleware\SetDynamicDatabase;
@@ -71,6 +72,11 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/settings-companies/update', [SettingsDatabaseController::class, 'updateCompanies'])->name('companies.updateCompanies');
         Route::get('/settings-account', [SettingsAccountController::class, 'show'])->name('settings.show');
         Route::post('/settings-account', [SettingsAccountController::class, 'store'])->name('settings.store');
+
+
+        Route::get('/settings-storage', [SettingsStorageController::class, 'index'])->name('settings.storage');
+        Route::get('/settings-storage/oauth-callback', [SettingsStorageController::class, 'oauthCallback'])->name('settings.storage.callback');
+
     });
 
     // File Upload
@@ -78,6 +84,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/upload-cover', [UploadController::class, 'uploadCover']);
     Route::post('/upload-logo', [UploadController::class, 'uploadCompanyLogo']);
     Route::delete('/upload-logo', [UploadController::class, 'deleteCompanyLogo']);
+
 
 });
 
