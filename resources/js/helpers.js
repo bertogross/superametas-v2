@@ -8,13 +8,13 @@
  * @param {number} [duration] - The duration (in milliseconds) for which the toast should be displayed.
  */
 export function ToastAlert(message, type = 'success', duration = 0) {
-    document.querySelectorAll('.toast-backdrop').forEach(element => element.remove());
+    //document.querySelectorAll('.toast-backdrop').forEach(element => element.remove());
     document.querySelectorAll('.toast-container').forEach(element => element.remove());
 
     // Define the HTML template for the toast
     const icon = type === 'success' ? 'ri-checkbox-circle-fill text-success' : 'ri-alert-fill text-danger';
     const ToastHtml = `
-        <div class="toast-backdrop"></div>
+        <!--<div class="toast-backdrop"></div>-->
         <div class="toast-container position-fixed bottom-0 end-0 p-3">
             <div class="toast fade show toast-border-${type} overflow-hidden mt-3" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-body">
@@ -43,7 +43,7 @@ export function ToastAlert(message, type = 'success', duration = 0) {
     // Add event listener to the close button
     const closeButton = document.querySelector('.btn-close');
     closeButton.addEventListener('click', () => {
-        document.querySelectorAll('.toast-backdrop').forEach(element => element.remove());
+        //document.querySelectorAll('.toast-backdrop').forEach(element => element.remove());
         document.querySelectorAll('.toast-container').forEach(element => element.remove());
     });
 
@@ -52,7 +52,7 @@ export function ToastAlert(message, type = 'success', duration = 0) {
         setTimeout(() => {
             toast.hide();
             toastElement.addEventListener('hidden.bs.toast', () => {
-                document.querySelectorAll('.toast-backdrop').forEach(element => element.remove());
+                //document.querySelectorAll('.toast-backdrop').forEach(element => element.remove());
                 document.querySelectorAll('.toast-container').forEach(element => element.remove());
             });
         }, duration);
@@ -67,9 +67,9 @@ export function ToastAlert(message, type = 'success', duration = 0) {
 function checkInternetConnection() {
     function updateConnectionStatus() {
         if (navigator.onLine) {
-            console.log('Online');
+            //console.log('Online');
         } else {
-            console.log('Offline');
+            //console.log('Offline');
             ToastAlert('A conexão foi perdida. Por favor, verifique sua rede de internet.', 'error');
         }
     }
@@ -79,13 +79,13 @@ function checkInternetConnection() {
 
     // Set up event listeners for online and offline events
     window.addEventListener('online', function() {
-        console.log('Back online');
+        //console.log('Back online');
         ToastAlert('A conexão foi reestabelecida.', 'success', 5000);
         updateConnectionStatus();
     });
 
     window.addEventListener('offline', function() {
-        console.log('Lost connection');
+        //console.log('Lost connection');
         ToastAlert('A conexão foi perdida. Por favor, verifique sua rede de internet.', 'error');
         updateConnectionStatus();
     });

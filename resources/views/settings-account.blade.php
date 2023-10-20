@@ -54,24 +54,6 @@
                                     <input type="tel" name="phone" id="phone" class="form-control phone-mask" value="{{ old('phone', formatPhoneNumber($settings['phone']) ?? '') }}" maxlength="16" required>
                                 </div>
 
-                                <hr class="w-50 start-50 position-relative translate-middle-x clearfix">
-
-                                <div class="mb-3">
-                                    <label class="form-label" for="email">E-mail (login) corporativo:</label>
-                                    <input type="email" name="email" id="email" value="{{ old('email', auth()->user()->email) }}" maxlength="100" class="form-control" disabled readonly>
-                                    <div class="form-text">Este campo não poderá ser modificado</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label" for="password-input">Senha:</label>
-                                    <div class="position-relative auth-pass-inputgroup">
-                                        <input type="password" name="new_password" id="password-input" maxlength="8" class="form-control password-input" autocomplete="false" readonly onfocus="this.removeAttribute('readonly');">
-                                        <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle text-body"></i></button>
-                                    </div>
-                                    <div class="form-text">Para não modificar a senha, deixe este campo vazio</div>
-                                </div>
-
-                                <hr class="w-50 start-50 position-relative translate-middle-x clearfix">
-
                                 <div class="card mb-3">
                                     <div class="card-header">
                                         <h4 class="card-title mb-0">Envie o logotipo de sua empresa</h4>

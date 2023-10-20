@@ -27,19 +27,12 @@ class SettingsAccountController extends Controller
             'name.max' => 'The company name may not be greater than 191 characters.',
             'phone.required' => 'The phone number is required.',
             'phone.max' => 'The phone number may not be greater than 20 characters.',
-            'email.required' => 'The email address is required.',
-            'email.email' => 'Please provide a valid email address.',
-            'email.max' => 'The email may not be greater than 100 characters.',
-            'new_password.min' => 'The password must be at least 8 characters.',
-            'new_password.max' => 'The password may not be greater than 8 characters.',
         ];
 
         // Validate the request data
         $request->validate([
             'name' => 'required|string|max:191',
             'phone' => 'required|string|max:20',
-            //'email' => 'required|email|max:100',
-            'new_password' => 'nullable|string|min:8|max:8',
         ], $messages);
 
         // Update or insert other settings

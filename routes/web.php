@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\{
+    Auth\LoginController,
     HomeController,
     PostController,
     UserController,
@@ -11,7 +12,7 @@ use App\Http\Controllers\{
     SettingsDatabaseController,
     SettingsAccountController,
     SettingsStorageController,
-    Auth\LoginController
+    GoalSalesController
 };
 use App\Http\Middleware\SetDynamicDatabase;
 
@@ -47,7 +48,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     // Goal Sales Routes
-    Route::get('/goal-sales', [PostController::class, 'showGoalSales']);
+    Route::get('/goal-sales', [GoalSalesController::class, 'index'])->name('goal-sales.index');
     Route::post('/goal-sales-store', [PostController::class, 'store']);
 
     // Goal Results Routes
@@ -85,13 +86,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/upload-logo', [UploadController::class, 'uploadCompanyLogo']);
     Route::delete('/upload-logo', [UploadController::class, 'deleteCompanyLogo']);
 
-
 });
 
 // Authentication with Dynamic Database
 Route::middleware([SetDynamicDatabase::class])->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
 });
+
+Route::post('/check-databases', [LoginController::class, 'checkDatabases']);
+
 
 // Logout
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

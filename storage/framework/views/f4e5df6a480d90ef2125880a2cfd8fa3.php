@@ -1,8 +1,18 @@
 <?php
 use App\Models\User;
 
-$selectedCompanies = !empty($selectedCompanies) && is_array($selectedCompanies) ? json_decode($selectedCompanies, true) : [];
+$getActiveCompanies = getActiveCompanies();
+//APP_print_r($getActiveCompanies);
 
+$getAuthorizedCompanies = $user ? getAuthorizedCompanies($user->id) : $getActiveCompanies;
+//APP_print_r($getAuthorizedCompanies);
+
+if (is_object($getActiveCompanies)) {
+    $extractCompanyIds = $getActiveCompanies->pluck('company_id')->map(function ($value) {
+        return (int) $value;
+    })->all();
+    //APP_print_r($extractCompanyIds);
+}
 ?>
 <!-- Modal -->
 <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
@@ -100,10 +110,13 @@ $selectedCompanies = !empty($selectedCompanies) && is_array($selectedCompanies) 
                                 <div class="form-group mb-4">
                                     <label class="form-label">Nova Senha <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Alterar Senha" data-bs-content="A nova senha deve conter entre 8 e 15 caracteres.<br>Componha utilizando números + letras maiúsculas + minúsculas."></i></label>
                                     <div class="position-relative auth-pass-inputgroup">
-                                        <input type="password" name="new_password" id="password-input" maxlength="8" class="form-control password-input" autocomplete="false" readonly onfocus="this.removeAttribute('readonly');">
+                                        <input type="password" name="new_password" id="password-input" minlength="8" maxlength="20" class="form-control password-input" autocomplete="false" readonly onfocus="this.removeAttribute('readonly');">
                                         <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle text-body"></i></button>
                                     </div>
-                                    <div class="form-text">Para não modificar a senha, deixe este campo vazio</div>
+                                    <div class="form-text">
+                                        A senha deve ser composta por entre 8 e 20 caracteres.<br>
+                                        <span class="text-warning">Para não modificar a senha, deixe este campo vazio.</span>
+                                    </div>
                                 </div>
                             <?php endif; ?>
 
@@ -145,31 +158,24 @@ $selectedCompanies = !empty($selectedCompanies) && is_array($selectedCompanies) 
 
                             <!-- Save data in 'user_metas' table collumn 'meta_key' and 'meta_value'-->
                             <?php if(isset($user) && $user->id == 1): ?>
-                                <?php if(isset($companies) && count($companies) > 0): ?>
-                                    <?php
-                                        $companiesArray = $companies->pluck('company_id')->map(function($value) {
-                                            return (int) $value;
-                                        })->toArray();
-
-                                        $encodedValue = json_encode($companiesArray);
-                                    ?>
-                                    <input type="hidden" name="companies" value="<?php echo e($encodedValue); ?>">
+                                <?php if(isset($extractCompanyIds)): ?>
+                                    <input type="hidden" name="companies" value="<?php echo e(json_encode($extractCompanyIds)); ?>">
                                 <?php else: ?>
-                                    <p>Empresas ainda não foram cadastradas</p>
+                                    <p class="small text-warning">Empresas ainda não foram cadastradas/ativadas</p>
                                 <?php endif; ?>
                             <?php else: ?>
                                 <div class="mb-4">
                                     <label class="form-label">Empresas Autorizadas</label>
-                                    <?php if(isset($companies) && count($companies) > 0): ?>
+                                    <?php if(isset($getActiveCompanies) && count($getActiveCompanies) > 0): ?>
                                         <div class="row">
-                                            <?php $__currentLoopData = $companies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $company): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php $__currentLoopData = $getActiveCompanies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $company): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <div class="col-md-6">
                                                     <div class="form-check form-switch form-switch-theme form-switch-md">
                                                         <input
                                                         class="form-check-input"
                                                         type="checkbox"
                                                         role="switch"
-                                                        <?php echo e(in_array($company->company_id, $selectedCompanies) ? 'checked' : ''); ?>
+                                                        <?php echo e(!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && in_array(intval($company->company_id), $getAuthorizedCompanies) ? 'checked' : ''); ?>
 
                                                         id="company-<?php echo e($company->company_id); ?>"
                                                         name="companies[]"
@@ -181,11 +187,10 @@ $selectedCompanies = !empty($selectedCompanies) && is_array($selectedCompanies) 
                                         </div>
                                         <div class="form-text">Selecione as empresas em que este usuário poderá obter acesso aos dados.</div>
                                     <?php else: ?>
-                                        <p>Empresas ainda não foram cadastradas</p>
+                                        <p class="small text-warning">Empresas ainda não foram cadastradas/ativadas</p>
                                     <?php endif; ?>
                                 </div>
                             <?php endif; ?>
-
                             <div class="hstack gap-2 justify-content-end">
                                 <button type="submit" class="btn btn-theme" id="btn-save-user"></button>
                             </div>

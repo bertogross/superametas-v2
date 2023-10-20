@@ -520,12 +520,12 @@ pre:empty{
 }
 
 
-.flatpickr-months{
-  background-color: var(--vz-card-bg) !important;
-}
+.flatpickr-months,
 .flatpickr-monthSelect-theme-dark{
-  background-color: var(--vz-choices-bg) !important;
+    background-color: var(--vz-input-bg-custom) !important;
+    background: var(--vz-input-bg-custom) !important;
 }
+
 .flatpickr-monthSelect-theme-dark .flatpickr-monthSelect-month.selected,
 .flatpickr-monthSelect-theme-dark .flatpickr-monthSelect-month.inRange,
 .flatpickr-monthSelect-theme-dark .flatpickr-monthSelect-month.startRange,

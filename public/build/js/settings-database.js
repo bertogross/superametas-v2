@@ -17,11 +17,11 @@ function preventRightClick(e) {
 // Update the progress bar's color based on the given percentage.
 function updateProgressBarColor(percent) {
     const progressBar = document.querySelector('.progress-bar');
-    progressBar.classList.remove('bg-danger', 'bg-warning', 'bg-info', 'bg-theme');
+    progressBar.classList.remove('bg-warning-subtle', 'bg-warning', 'bg-info', 'bg-theme');
     console.log('progress: ' + percent);
 
     if (percent < 10) {
-        progressBar.classList.add('bg-danger');
+        progressBar.classList.add('bg-warning-subtle');
     } else if (percent >= 10 && percent < 25) {
         progressBar.classList.add('bg-warning');
     } else if (percent >= 25 && percent < 75) {
@@ -50,7 +50,7 @@ function monthDifference(startDate, endDate) {
 async function sendRequest(url) {
     const response = await fetch(url);
     if (!response.ok) {
-        ToastAlert('error', Error(response.statusText));
+        ToastAlert(Error(response.statusText), 'error', 10000);
         throw new Error(response.statusText);
     }
     return response.json();
@@ -66,11 +66,12 @@ async function makeRequests(meantime, initialMeantime, completedIterations) {
     document.addEventListener('contextmenu', preventRightClick);
 
     try {
-        document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">A importação de vários meses podera levar algum tempo. Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
+        document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">A importação poderá levar algum tempo. Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
 
         const response = await sendRequest(`/api/process-sysmo-api/${meantime}`);
         if (!response || response.success === false) {
-            ToastAlert('error', response.message);
+            finalizeSynchronization('error', response.message, '0%')
+
             return;
         }
 
@@ -88,21 +89,28 @@ async function makeRequests(meantime, initialMeantime, completedIterations) {
         const ulElement = document.querySelector('.concluded-meantimes');
         const liElement = document.createElement('li');
         liElement.innerHTML = `<i class="ri-check-double-fill text-theme align-bottom me-2"></i><u>${convertMeantimeToPortuguese(meantime)}</u> foi importado`;
-        ulElement.appendChild(liElement);
+
+        // Insert the new li element at the beginning of the ul element
+        ulElement.insertBefore(liElement, ulElement.firstChild);
 
         // Determine next steps based on progress
         const nextMeantime = incrementMonth(meantime);
         if (new Date(nextMeantime) <= new Date()) {
             makeRequests(nextMeantime, initialMeantime, completedIterations + 1);
         } else {
-            finalizeSynchronization();
+            finalizeSynchronization('success', 'Concluído', '100%');
         }
     } catch (error) {
         toggleCustomBackdrop(false);
+
         document.querySelector('#synchronization-progress .synchronization-time').innerHTML = '';
+
         isExecutionInProgress = false;
+
         document.removeEventListener('contextmenu', preventRightClick);
-        ToastAlert('error', `Erro: ${error.message}`);
+
+        ToastAlert(`Error: ${error.message}`, 'error', 10000);
+
         document.querySelector('.synchronization-percent-text').innerHTML = '<span class="text-danger">Erro: ' + error.message + '</span>';
     }
 }
@@ -126,14 +134,14 @@ function toggleCustomBackdrop(show) {
 
 
 // Finalize the synchronization process and update the UI.
-function finalizeSynchronization() {
+function finalizeSynchronization(type, message, percentage) {
     toggleCustomBackdrop(false);
-    document.querySelector('.progress-bar').style.width = '100%';
-    document.querySelector('.synchronization-percent-text').innerHTML = 'Concluído';
+    document.querySelector('.progress-bar').style.width = percentage;
+    document.querySelector('.synchronization-percent-text').innerHTML = message;
     document.querySelector('#synchronization-progress .synchronization-time').innerHTML = '';
     isExecutionInProgress = false;
     document.removeEventListener('contextmenu', preventRightClick);
-    ToastAlert('success', `Processo de importação finalizado`, 10000);
+    ToastAlert(message, type, 100000000);
 }
 
 // Convert 'YYYY-mm' format to human-readable Portuguese format

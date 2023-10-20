@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\UserController;
+use App\Models\UserMeta;
 
 class SettingsDatabaseController extends Controller
 {
@@ -72,6 +74,7 @@ class SettingsDatabaseController extends Controller
      */
     public function updateCompanies(Request $request)
     {
+
         // Update company aliases
         foreach ($request->aliases as $id => $alias) {
             DB::connection($this->connection)
@@ -87,6 +90,18 @@ class SettingsDatabaseController extends Controller
                 ->where('id', $id)
                 ->update(['status' => $status ? 1 : 0]);
         }
+
+        // Get IDs of active companies
+        $getActiveCompanies = getActiveCompanies();
+        if (is_object($getActiveCompanies)) {
+            $extractCompanyIds = $getActiveCompanies->pluck('company_id')->map(function ($value) {
+                return (int) $value;
+            })->all();
+        }
+
+        // Create an instance of UserController and call updateUserMeta
+        $userController = new UserController();
+        $userController->updateUserMeta(1, 'companies', json_encode($extractCompanyIds));
 
         return redirect()->back()->with('active_tab', 'companies')->with('success', 'Empresas atualizadas');
     }
@@ -114,19 +129,12 @@ class SettingsDatabaseController extends Controller
         // Validate and set the meantime to the current month-year if not provided or invalid
         $meantime = !empty($meantime) && strlen($meantime) === 7 ? $meantime : now()->format('Y-m');
 
-        // Delete old data for the given period from wlsm_sales_temporary
-        try {
-            DB::connection($this->connection)->table('wlsm_sales_temporary')->where('date_sale', 'like', $meantime . '%')->delete();
-        } catch (\Exception $e) {
-            \Log::error('Failed to delete from wlsm_sales_temporary: ' . $e->getMessage());
-            return false;
-        }
 
-        // Delete old data for the given period from wlsm_goals_sales
+        // Delete old data for the given period from wlsm_goal_sales
         try {
-            DB::connection($this->connection)->table('wlsm_goals_sales')->where('date_sale', 'like', $meantime . '%')->delete();
+            DB::connection($this->connection)->table('wlsm_goal_sales')->where('date_sale', 'like', $meantime . '%')->delete();
         } catch (\Exception $e) {
-            \Log::error('Failed to delete from wlsm_goals_sales: ' . $e->getMessage());
+            \Log::error('Failed to delete from wlsm_goal_sales: ' . $e->getMessage());
             return false;
         }
 
@@ -140,7 +148,7 @@ class SettingsDatabaseController extends Controller
         // Initialize variables for data processing
         $hasMorePages = true;
         $slept = $countInserts = 0;
-        $companyIDs = $pageRead = $recordsPerPage = $departments = [];
+        $pageRead = [];
 
         $ERPdata = getERPdata($database);
 
@@ -202,56 +210,89 @@ class SettingsDatabaseController extends Controller
 
                 // Store the current page number to avoid processing it again
                 $pageRead[] = $currentPage;
-                $recordsPerPage[$currentPage] = count($responseData[0]['dados']);
 
                 //$responseDataToMe[] = $responseData[0]['dados'];
+
+                $goalsSalesData = $companyData = $departmentData = [];
 
                 // Process each record in the responseData
                 foreach ($responseData[0]['dados'] as $values) {
                     // Extract department and company information
                     if ($term == 'departamento') {
                         $departmentID = isset($values['departamento']) ? intval($values['departamento']) : 0;
-                        $departments[$departmentID] = isset($values['departamento_descricao']) ? $values['departamento_descricao'] : '';
+                        $department_description = isset($values['departamento_descricao']) ? $values['departamento_descricao'] : '';
                     } else {
                         $categoryID = isset($values['categoria']) ? intval($values['categoria']) : 0;
                         $departmentID = isset($values['departamento']) ? intval($values['departamento'] . $categoryID) : 0;
+
                         $departmentDescription = isset($values['departamento_descricao']) ? $values['departamento_descricao'] : '';
-                        $departments[$departmentID] = isset($values['categoria_descricao']) ? $departmentDescription . '<br> - ' . $values['categoria_descricao'] : '';
+
+                        $departmentDescription = isset($values['categoria_descricao']) ? $departmentDescription . '<br> - ' . $values['categoria_descricao'] : '';
                     }
 
                     $companyID = isset($values['empresa']) ? intval($values['empresa']) : 0;
-                    $companyIDs[] = $companyID;
 
                     $dateSale = isset($values['data_venda']) ? $values['data_venda'] : '';
                     $netValue = isset($values['valor_liquido']) && is_numeric($values['valor_liquido']) ? number_format(floatval($values['valor_liquido']), 2, '.', '') : 0;
 
-                    // Insert the extracted data into the wlsm_sales_temporary table
-                    try {
-                        DB::connection($this->connection)->table('wlsm_sales_temporary')->insert([
-                            'company_id' => $companyID,
-                            'department_id' => $departmentID,
-                            'net_value' => $netValue,
-                            'date_sale' => $dateSale,
-                            'meantime' => $meantime
-                        ]);
-                        $countInserts++;
-                    } catch (\Exception $e) {
-                        \Log::error('Failed to insert into wlsm_sales_temporary: ' . $e->getMessage());
-                    }
+                    /*
+                    // Prepare data for update or create in wlsm_companies
+                    $companyData = [
+                        'company_name' => $companyID
+                    ];
+                    DB::connection($this->connection)->table('wlsm_companies')->updateOrInsert(
+                        ['company_id' => $companyID],
+                        $companyData
+                    );
 
-                    // Insert the extracted data into the wlsm_goals_sales table
+                    // Prepare data for update or create in wlsm_departments
+                    $departmentData = [
+                        'department_description' => $department_description
+                    ];
+                    DB::connection($this->connection)->table('wlsm_departments')->updateOrInsert(
+                        ['department_id' => $departmentID],
+                        $departmentData
+                    );
+                    */
+
+                    $companyData[$companyID] = [
+                        'company_id' => $companyID,
+                        'company_name' => $companyName,
+                    ];
+
+                    $departmentData[$departmentID] = [
+                        'department_id' => $departmentID,
+                        'department_description' => $departmentDescription,
+                    ];
+
+                    $goalsSalesData[] = [
+                        'company_id' => $companyID,
+                        'department_id' => $departmentID,
+                        'net_value' => $netValue,
+                        'date_sale' => $dateSale
+                    ];
+
+                    /*
+                    // Insert the extracted data into the wlsm_goal_sales table
                     try {
-                        DB::connection($this->connection)->table('wlsm_goals_sales')->insert([
+                        DB::connection($this->connection)->table('wlsm_goal_sales')->insert([
                             'company_id' => $companyID,
                             'department_id' => $departmentID,
                             'net_value' => $netValue,
                             'date_sale' => $dateSale
                         ]);
                     } catch (\Exception $e) {
-                        \Log::error('Failed to insert into wlsm_goals_sales: ' . $e->getMessage());
+                        \Log::error('Failed to insert into wlsm_goal_sales: ' . $e->getMessage());
                     }
+                    */
                 }
 
+                // Insert the extracted data into the wlsm_goal_sales table
+                try {
+                    DB::connection($this->connection)->table('wlsm_goal_sales')->insert($goalsSalesData);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to insert into wlsm_goal_sales: ' . $e->getMessage());
+                }
                 // Check if there are more pages to fetch
                 if ($pageNumber >= $totalPages) {
                     $hasMorePages = false;
@@ -266,12 +307,70 @@ class SettingsDatabaseController extends Controller
 
             // If the function has been sleeping for more than 150 seconds in total, exit the loop
             if ($slept >= 150) {
-                break;
+                //break;
+
+                // Close the cURL session
+                curl_close($curl);
+
+                $end_time = microtime(true);
+                $elapsed_time = ($end_time - $start_time);
+                $elapsed_time = $elapsed_time >= 60 ? number_format( ($elapsed_time / 60), 2, '.', '')." minutes" : number_format($elapsed_time, 0, '.', '')." seconds";
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Processo interrompido. Tempo excedido. Tente novamente mais tarde.',
+                    'elapsed_time' => $elapsed_time,
+                    'slept' => $slept.' seconds'
+                    //'response' => $responseDataToMe
+                ]);
+
+                exit;
             }
         } while ($hasMorePages);
 
         // Close the cURL session
         curl_close($curl);
+
+
+        $companyData = array_unique($companyData);
+        // Fetch existing companies and departments
+        $existingCompanies = DB::connection($this->connection)->table('wlsm_companies')
+            ->whereIn('company_id', array_keys($companyData))
+            ->pluck('company_name', 'company_id');
+
+        $existingDepartments = DB::connection($this->connection)->table('wlsm_departments')
+            ->whereIn('department_id', array_keys($departmentData))
+            ->pluck('department_description', 'department_id');
+
+        // Update or insert companies
+        foreach ($companyData as $companyID => $data) {
+            if (isset($existingCompanies[$companyID])) {
+                // Update existing company
+                DB::connection($this->connection)->table('wlsm_companies')
+                    ->where('company_id', $companyID)
+                    ->update($data);
+            } else {
+                // Insert new company
+                DB::connection($this->connection)->table('wlsm_companies')
+                    ->insert($data);
+            }
+        }
+
+
+        $departmentData = array_unique($departmentData);
+        // Update or insert departments
+        foreach ($departmentData as $departmentID => $data) {
+            if (isset($existingDepartments[$departmentID])) {
+                // Update existing department
+                DB::connection($this->connection)->table('wlsm_departments')
+                    ->where('department_id', $departmentID)
+                    ->update($data);
+            } else {
+                // Insert new department
+                DB::connection($this->connection)->table('wlsm_departments')
+                    ->insert($data);
+            }
+        }
 
         $end_time = microtime(true);
         $elapsed_time = ($end_time - $start_time);
@@ -279,7 +378,7 @@ class SettingsDatabaseController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Data processed successfully!',
+            'message' => 'Dados processados com sucesso!',
             'elapsed_time' => $elapsed_time,
             'slept' => $slept.' seconds'
             //'response' => $responseDataToMe

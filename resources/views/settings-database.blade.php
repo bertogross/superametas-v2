@@ -59,8 +59,8 @@
                                         <thead class="table-light text-uppercase">
                                             <tr>
                                                 <th width="65" class="text-center"></th>
-                                                <th width="130">Department ID</th>
-                                                <th>Department Description</th>
+                                                <th width="130">ID</th>
+                                                <th>Departamento</th>
                                                 <th>Alias</th>
                                             </tr>
                                         </thead>
@@ -109,8 +109,8 @@
                                         <thead class="table-light text-uppercase">
                                             <tr>
                                                 <th width="65" class="text-center"></th>
-                                                <th width="130">Company ID</th>
-                                                <th>Company Name</th>
+                                                <th width="130">ID</th>
+                                                <th>Empresa</th>
                                                 <th>Alias</th>
                                             </tr>
                                         </thead>

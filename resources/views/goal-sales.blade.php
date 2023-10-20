@@ -5,7 +5,7 @@
 @section('css')
 <link href="{{ URL::asset('build/libs/gridjs/theme/mermaid.min.css') }}" rel="stylesheet">
 <link href="{{ URL::asset('build/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
-
+<link href="{{ URL::asset('build/libs/flatpickr/plugins/monthSelect/style.css') }}" rel="stylesheet">
 @endsection
 @section('content')
     @component('components.breadcrumb')
@@ -13,474 +13,140 @@
             @lang('translation.goal-sales')
         @endslot
     @endcomponent
-    <div class="row">
-        <div class="col-xxl-3">
-            <div class="card">
-                <div class="card-body p-4">
 
-                    <pre>
-                        {{ print_r($posts->toArray()) }}
-                    </pre>
-                    {{--
-                    @foreach($posts as $post)
-                        <article>
-                            <h2>{{ $post->post_title }}</h2>
-                            <p>{{ $post->post_content }}</p>
+    @php
+        use App\Models\User;
 
-                            <section>
-                                <h3>Meta Data</h3>
-                                <ul>
-                                    @foreach($post->meta as $meta)
-                                        <li><strong>{{ $meta->meta_key }}:</strong> {{ $meta->meta_value }}</li>
-                                    @endforeach
-                                </ul>
-                            </section>
-                        </article>
+        $getAuthorizedCompanies = getAuthorizedCompanies();
+        //APP_print_r($getAuthorizedCompanies);
+        $getActiveCompanies = getActiveCompanies();
+        //APP_print_r($getActiveCompanies);
+        $getActiveDepartments = getActiveDepartments();
+        //APP_print_r($getActiveDepartments);
+
+        $getMeantime = isset($_REQUEST['meantime']) ? $_REQUEST['meantime'] : '';
+
+        $getCustomMeantime = isset($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : '';
+
+        $filterCompanies = isset($_REQUEST['companies']) ? $_REQUEST['companies'] : array();
+        $filterDepartments = isset($_REQUEST['departments']) ? $_REQUEST['departments'] : array();
+        $customMeantime = isset($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : date('Y-m');
+
+    @endphp
+
+    <div id="filter" class="p-3 bg-light-subtle rounded position-relative mb-4" style="z-index: 3;">
+        <form id="filterForm" action="{{ route('goal-sales.index') }}" class="row g-2 text-uppercase" autocomplete="off">
+
+            <div class="col-sm-12 col-md-2 col-lg-auto">
+                <select class="form-control form-select" name="meantime" title="Selecione o período">
+                    <option {{ $getMeantime == 'today' ? 'selected' : '' }} value="today">HOJE</option>
+
+                    @php
+                        $dateRange = getSaleDateRange();
+                        //APP_print_r($dateRange);
+                        $firstDate = $dateRange['first_date'];
+                        $lastDate = $dateRange['last_date'];
+                        $currentMonth = now()->format('Y-m');
+                        $previousMonth = now()->subMonth()->format('Y-m');
+                    @endphp
+
+                    <option {{ $getMeantime == $currentMonth || empty($getMeantime) || ( $getMeantime == 'custom' && empty($getCustomMeantime) )  ? 'selected' : '' }} value="{{ $currentMonth }}">MÊS ATUAL</option>
+
+                    @if ($firstDate <= $previousMonth)
+                        <option {{ $getMeantime == $previousMonth ? 'selected' : '' }} value="{{ $previousMonth }}">MÊS ANTERIOR</option>
+                    @endif
+
+                    <option @if($getMeantime == 'custom' && !empty($getCustomMeantime)) selected @endif value="custom">CUSTOMIZADO</option>
+                </select>
+            </div>
+
+            <div class="col-sm-12 col-md-auto col-lg-auto custom_meantime_is_selected" style="min-width:270px; @if(empty($getCustomMeantime)) display:none; @endif ">
+                <input type="text" class="form-control flatpickr-range-month" name="custom_meantime" data-min-date="{{ $firstDate }}"
+                data-max-date="{{ $lastDate }}" value="@if($getMeantime == 'custom'){{ $customMeantime}}@endif" placeholder="Selecione o Período">
+            </div>
+
+            @if (!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && count($getAuthorizedCompanies) > 1)
+                <div class="col-sm-12 col-md col-lg" title="Exibir somente Lojas selecionadas">
+                    <select class="form-control" data-choices data-choices-removeItem name="companies[]" multiple data-placeholder="Loja">
+                        @foreach ($getAuthorizedCompanies as $company)
+                            <option {{ in_array($company, $filterCompanies) ? 'selected' : '' }} value="{{ $company }}">{{ getCompanyAlias(intval($company)) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+
+            @if (!empty($getActiveDepartments) && is_object($getActiveDepartments) && count($getActiveDepartments) > 1)
+                <div class="col-sm-12 col-md col-lg" title="Exibir somente Departamentos selecionados">
+                    <select class="form-control" data-choices data-choices-removeItem name="departments[]" multiple data-placeholder="Departamento">
+                        @foreach ($getActiveDepartments as $department)
+                            <option {{ in_array($department->department_id, $filterDepartments) ? 'selected' : '' }} value="{{ $department->department_id }}">{{ $department->department_alias }}</option>
+                        @endforeach
+                    </select>
+            </div>
+            @endif
+
+            <div class="col-sm-12 col-md-auto col-lg-auto wrap-form-btne">
+                <button type="submit" class="btn btn-theme w-100 init-loader" title="Filtrar">Filtrar</button>
+            </div>
+        </form>
+    </div>
+
+
+    <div class=" mb-4 rounded position-relative wrap-filter-result toogle_zoomInOut ribbon-box border ribbon-fill shadow-none" id="load-listing">
+        <div class="ribbon ribbon-info bg-theme text-black fs-12 @if(empty($result) ) d-none @endif" style="z-index: 2; scale: 1.5; top: -10px; left: -30px;">
+            @php
+                echo metricGoalSales();
+            @endphp
+        </div>
+        <div class="table-responsive mb-0">
+            <table id="goals_sales-dataTable" class="table table-striped-columns table-nowrap listing-chart mb-0">
+                <thead class="text-uppercase table-light">
+                    <tr>
+                        <th scope="col" class="bg-transparent fs-20 text-center invisible"></th>
+                        @foreach ($companies as $company)
+                            <th scope="col" class="text-center" data-emp-id="{{ $company }}">
+                                {{ getCompanyAlias(intval($company)) }}
+                            </th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($result as $row)
+                        <tr tr-department="{{ $row['department_id'] }}" class="">
+                            <th scope="row" class="text-uppercase fs-16 align-middle text-end p-3">
+                                {{ getDepartmentAlias(intval($row['department_id'])) }}
+                            </th>
+                            @foreach ($companies as $company)
+                                <td class="text-center align-middle" data-emp-id="{{ $company }}" data-chart-id="0">
+                                    {{ $row[$company] }}
+                                </td>
+                            @endforeach
+                        </tr>
                     @endforeach
-                    --}}
-
-                    <div>
-                        <div class="flex-shrink-0 avatar-md mx-auto">
-                            <div class="avatar-title bg-light rounded">
-                                <img src="{{ URL::asset('build/images/companies/img-2.png') }}" alt="" height="50" />
-                            </div>
-                        </div>
-                        <div class="mt-4 text-center">
-                            <h5 class="mb-1">Force Medicines</h5>
-                            <p class="text-muted">Since 1987</p>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table mb-0 table-borderless">
-                                <tbody>
-                                    <tr>
-                                        <th><span class="fw-medium">Owner Name</span></th>
-                                        <td>David Marshall</td>
-                                    </tr>
-                                    <tr>
-                                        <th><span class="fw-medium">Company Type</span></th>
-                                        <td>Partnership</td>
-                                    </tr>
-                                    <tr>
-                                        <th><span class="fw-medium">Email</span></th>
-                                        <td>forcemedicines@gamil.com</td>
-                                    </tr>
-                                    <tr>
-                                        <th><span class="fw-medium">Website</span></th>
-                                        <td><a href="javascript:void(0);" class="link-primary">www.forcemedicines.com</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th><span class="fw-medium">Contact No.</span></th>
-                                        <td>+(123) 9876 654 321</td>
-                                    </tr>
-                                    <tr>
-                                        <th><span class="fw-medium">Fax</span></th>
-                                        <td>+1 999 876 5432</td>
-                                    </tr>
-                                    <tr>
-                                        <th><span class="fw-medium">Location</span></th>
-                                        <td>United Kingdom</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <!--end card-body-->
-                <div class="card-body border-top border-top-dashed p-4">
-                    <div>
-                        <h6 class="text-muted text-uppercase fw-semibold mb-4">Customer Reviews</h6>
-                        <div>
-                            <div>
-                                <div class="bg-light px-3 py-2 rounded-2 mb-2">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-grow-1">
-                                            <div class="fs-16 align-middle text-warning">
-                                                <i class="ri-star-fill"></i>
-                                                <i class="ri-star-fill"></i>
-                                                <i class="ri-star-fill"></i>
-                                                <i class="ri-star-fill"></i>
-                                                <i class="ri-star-half-fill"></i>
-                                            </div>
-                                        </div>
-                                        <div class="flex-shrink-0">
-                                            <h6 class="mb-0">4.5 out of 5</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-center">
-                                    <div class="text-muted">Total <span class="fw-medium">5.50k</span>
-                                        reviews</div>
-                                </div>
-                            </div>
-
-                            <div class="mt-3">
-                                <div class="row align-items-center g-2">
-                                    <div class="col-auto">
-                                        <div class="p-1">
-                                            <h6 class="mb-0">5 star</h6>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="p-1">
-                                            <div class="progress animated-progress progress-sm">
-                                                <div class="progress-bar bg-success" role="progressbar"
-                                                    style="width: 50.16%" aria-valuenow="50.16" aria-valuemin="0"
-                                                    aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="p-1">
-                                            <h6 class="mb-0 text-muted">2758</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- end row -->
-
-                                <div class="row align-items-center g-2">
-                                    <div class="col-auto">
-                                        <div class="p-1">
-                                            <h6 class="mb-0">4 star</h6>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="p-1">
-                                            <div class="progress animated-progress progress-sm">
-                                                <div class="progress-bar bg-success" role="progressbar"
-                                                    style="width: 29.32%" aria-valuenow="29.32" aria-valuemin="0"
-                                                    aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="p-1">
-                                            <h6 class="mb-0 text-muted">1063</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- end row -->
-
-                                <div class="row align-items-center g-2">
-                                    <div class="col-auto">
-                                        <div class="p-1">
-                                            <h6 class="mb-0">3 star</h6>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="p-1">
-                                            <div class="progress animated-progress progress-sm">
-                                                <div class="progress-bar bg-warning" role="progressbar"
-                                                    style="width: 18.12%" aria-valuenow="18.12" aria-valuemin="0"
-                                                    aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="p-1">
-                                            <h6 class="mb-0 text-muted">997</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- end row -->
-
-                                <div class="row align-items-center g-2">
-                                    <div class="col-auto">
-                                        <div class="p-1">
-                                            <h6 class="mb-0">2 star</h6>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="p-1">
-                                            <div class="progress animated-progress progress-sm">
-                                                <div class="progress-bar bg-success" role="progressbar" style="width: 4.98%"
-                                                    aria-valuenow="4.98" aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-auto">
-                                        <div class="p-1">
-                                            <h6 class="mb-0 text-muted">227</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- end row -->
-
-                                <div class="row align-items-center g-2">
-                                    <div class="col-auto">
-                                        <div class="p-1">
-                                            <h6 class="mb-0">1 star</h6>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="p-1">
-                                            <div class="progress animated-progress progress-sm">
-                                                <div class="progress-bar bg-danger" role="progressbar" style="width: 7.42%"
-                                                    aria-valuenow="7.42" aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="p-1">
-                                            <h6 class="mb-0 text-muted">408</h6>
-                                        </div>
-                                    </div>
-                                </div><!-- end row -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--end card-body-->
-                <div class="card-body p-4 border-top border-top-dashed">
-                    <h6 class="text-muted text-uppercase fw-semibold mb-4">Products Reviews</h6>
-                    <!-- Swiper -->
-                    <div class="swiper vertical-swiper" style="height: 242px;">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide">
-                                <div class="card border border-dashed shadow-none">
-                                    <div class="card-body">
-                                        <div class="d-flex">
-                                            <div class="flex-shrink-0 avatar-sm">
-                                                <div class="avatar-title bg-light rounded">
-                                                    <img src="{{ URL::asset('build/images/companies/img-1.png') }}" alt="" height="30">
-                                                </div>
-                                            </div>
-                                            <div class="flex-grow-1 ms-3">
-                                                <div>
-                                                    <p class="text-muted mb-1 fst-italic">" Great
-                                                        product and looks great, lots of features. "</p>
-                                                    <div class="fs-11 align-middle text-warning">
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="text-end mb-0 text-muted">
-                                                    - by <cite title="Source Title">Force
-                                                        Medicines</cite>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="card border border-dashed shadow-none">
-                                    <div class="card-body">
-                                        <div class="d-flex">
-                                            <div class="flex-shrink-0">
-                                                <img src="{{ URL::asset('build/images/users/avatar-3.jpg') }}" alt=""
-                                                    class="avatar-sm rounded">
-                                            </div>
-                                            <div class="flex-grow-1 ms-3">
-                                                <div>
-                                                    <p class="text-muted mb-1 fst-italic">" Amazing
-                                                        template, very easy to understand and
-                                                        manipulate. "</p>
-                                                    <div class="fs-11 align-middle text-warning">
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-half-fill"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="text-end mb-0 text-muted">
-                                                    - by <cite title="Source Title">Henry Baird</cite>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="card border border-dashed shadow-none">
-                                    <div class="card-body">
-                                        <div class="d-flex">
-                                            <div class="flex-shrink-0 avatar-sm">
-                                                <div class="avatar-title bg-light rounded">
-                                                    <img src="{{ URL::asset('build/images/companies/img-8.png') }}" alt="" height="30">
-                                                </div>
-                                            </div>
-                                            <div class="flex-grow-1 ms-3">
-                                                <div>
-                                                    <p class="text-muted mb-1 fst-italic">"Very
-                                                        beautiful product and Very helpful customer
-                                                        service."</p>
-                                                    <div class="fs-11 align-middle text-warning">
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-line"></i>
-                                                        <i class="ri-star-line"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="text-end mb-0 text-muted">
-                                                    - by <cite title="Source Title">Zoetic
-                                                        Fashion</cite>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-slide">
-                                <div class="card border border-dashed shadow-none">
-                                    <div class="card-body">
-                                        <div class="d-flex">
-                                            <div class="flex-shrink-0">
-                                                <img src="{{ URL::asset('build/images/users/avatar-2.jpg') }}" alt=""
-                                                    class="avatar-sm rounded">
-                                            </div>
-                                            <div class="flex-grow-1 ms-3">
-                                                <div>
-                                                    <p class="text-muted mb-1 fst-italic">" The product
-                                                        is very beautiful. I like it. "</p>
-                                                    <div class="fs-11 align-middle text-warning">
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-half-fill"></i>
-                                                        <i class="ri-star-line"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="text-end mb-0 text-muted">
-                                                    - by <cite title="Source Title">Nancy Martino</cite>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-3">
-                        <a href="javascript:void(0)" class="link-primary">View All Reviews <i
-                                class="ri-arrow-right-line align-bottom ms-1"></i></a>
-                    </div>
-                </div>
-                <div class="card-body p-4 border-top border-top-dashed">
-                    <h6 class="text-muted text-uppercase fw-semibold mb-4">Contact Support</h6>
-                    <form action="#">
-                        <div class="mb-3">
-                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="4"
-                                placeholder="Enter your messages..."></textarea>
-                        </div>
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-primary"><i
-                                    class="ri-mail-send-line align-bottom me-1"></i> Send
-                                Messages</button>
-                        </div>
-                    </form>
-                </div>
-                <!--end card-body-->
-            </div>
-            <!--end card-->
+                </tbody>
+                <tfoot class="text-uppercase table-light">
+                    <tr>
+                        <th scope="col" class="bg-transparent invisible"></th>
+                        @foreach ($companies as $company)
+                            <th scope="col" class="text-center" data-emp-id="{{ $company }}">
+                                {{ getCompanyAlias(intval($company)) }}
+                            </th>
+                        @endforeach
+                    </tr>
+                </tfoot>
+            </table>
         </div>
-        <!--end col-->
-
-        <div class="col-xxl-9">
-            <div class="card">
-                <div class="card-header border-0 align-items-center d-flex">
-                    <h4 class="card-title mb-0 flex-grow-1">Revenue</h4>
-                    <div>
-                        <button type="button" class="btn btn-soft-secondary btn-sm">
-                            ALL
-                        </button>
-                        <button type="button" class="btn btn-soft-secondary btn-sm">
-                            1M
-                        </button>
-                        <button type="button" class="btn btn-soft-secondary btn-sm">
-                            6M
-                        </button>
-                        <button type="button" class="btn btn-soft-primary btn-sm">
-                            1Y
-                        </button>
-                    </div>
-                </div><!-- end card header -->
-
-                <div class="card-header p-0 border-0 bg-light-subtle">
-                    <div class="row g-0 text-center">
-                        <div class="col-6 col-sm-3">
-                            <div class="p-3 border border-dashed border-start-0">
-                                <h5 class="mb-1"><span class="counter-value" data-target="7585">0</span>
-                                </h5>
-                                <p class="text-muted mb-0">Orders</p>
-                            </div>
-                        </div>
-                        <!--end col-->
-                        <div class="col-6 col-sm-3">
-                            <div class="p-3 border border-dashed border-start-0">
-                                <h5 class="mb-1">$<span class="counter-value" data-target="22.89">0</span>k
-                                </h5>
-                                <p class="text-muted mb-0">Earnings</p>
-                            </div>
-                        </div>
-                        <!--end col-->
-                        <div class="col-6 col-sm-3">
-                            <div class="p-3 border border-dashed border-start-0">
-                                <h5 class="mb-1"><span class="counter-value" data-target="367">0</span>
-                                </h5>
-                                <p class="text-muted mb-0">Refunds</p>
-                            </div>
-                        </div>
-                        <!--end col-->
-                        <div class="col-6 col-sm-3">
-                            <div class="p-3 border border-dashed border-start-0 border-end-0">
-                                <h5 class="mb-1 text-success"><span class="counter-value" data-target="18.92">0</span>%
-                                </h5>
-                                <p class="text-muted mb-0">Conversation Ratio</p>
-                            </div>
-                        </div>
-                        <!--end col-->
-                    </div>
-                </div><!-- end card header -->
-
-                <div class="card-body p-0 pb-2">
-                    <div>
-                        <div id="customer_impression_charts" data-colors='["--vz-success", "--vz-primary", "--vz-danger"]'
-                            class="apex-charts"></div>
-                    </div>
-                </div><!-- end card body -->
-            </div><!-- end card -->
-
-            <div class="row g-4 mb-3">
-                <div class="col-sm-auto">
-                    <div>
-                        <a href="apps-ecommerce-add-product" class="btn btn-success"><i
-                                class="ri-add-line align-bottom me-1"></i> Add New</a>
-                    </div>
-                </div>
-                <div class="col-sm">
-                    <div class="d-flex justify-content-sm-end">
-                        <div class="search-box ms-2">
-                            <input type="text" class="form-control" placeholder="Search Products...">
-                            <i class="ri-search-line search-icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <div id="table-product-list-all" class="table-card gridjs-border-none"></div>
-                </div>
-            </div>
-
-        </div>
-        <!--end col-->
     </div>
     <!--end row-->
 @endsection
 @section('script')
-<script src="{{ URL::asset('build/libs/nouislider/nouislider.min.js') }}"></script>
-<script src="{{ URL::asset('build/libs/wnumb/wNumb.min.js') }}"></script>
-<script src="{{ URL::asset('build/libs/gridjs/gridjs.umd.js') }}"></script>
-<script src="https://unpkg.com/gridjs/plugins/selection/dist/selection.umd.js"></script>
+
 <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
-<script src="{{ URL::asset('build/libs/swiper/swiper-bundle.min.js') }}"></script>
-<script src="{{ URL::asset('build/js/pages/seller-details.init.js') }}"></script>
+<script src="{{ URL::asset('build/libs/flatpickr/flatpickr.min.js') }}"></script>
+<script src="{{ URL::asset('build/libs/flatpickr/l10n/pt.js') }}"></script>
+<script src="{{ URL::asset('build/libs/flatpickr/plugins/monthSelect/index.js') }}"></script>
+
+<script src="{{ URL::asset('build/js/goal-sales.js') }}" type="module"></script>
+
 <script src="{{ URL::asset('build/js/app.js') }}"></script>
 @endsection

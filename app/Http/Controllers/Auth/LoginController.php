@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 //use Illuminate\Support\Facades\Session;
@@ -46,8 +48,28 @@ class LoginController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
+        // Check if the user exists in the another databases
+        $getOtherDatabases = getOtherDatabases($credentials['email']);
+
+        if(!$getOtherDatabases){
+            return redirect()->back()->withErrors(['email' => 'Authentication failed']);
+        }
+
+        // Get from the first account
+        $databaseName = $request->database ? $request->database : $getOtherDatabases[0];
+
+        // Set the dynamic database connection
+        Config::set('database.connections.smAppTemplate.database', $databaseName);
+        DB::purge('smAppTemplate');
+        DB::reconnect('smAppTemplate');
+
+        // Debugging: Log the current database connection
+        //\Log::info('Current Database Connection: ' . config('database.connections.smAppTemplate.database'));
+        //dd(session()->all());
+
+
         // Authenticate using the dynamic database connection
-        if (Auth::guard('web')->attempt($credentials)) {
+        if (Auth::guard('web')->attempt($credentials, $request->filled('remember'))) {
             // Check if the user's status is 0
             if (Auth::user()->status == 0) {
                 // Log the user out
@@ -58,13 +80,13 @@ class LoginController extends Controller
             }
 
             // Authentication passed
-            //return redirect()->intended('dashboard');
-            return redirect('/');
+            return redirect()->intended('/');
         }
 
         // Handle failed authentication
         return redirect()->back()->withErrors(['email' => 'Authentication failed']);
     }
+
 
     public function logout(Request $request)
     {
@@ -81,4 +103,20 @@ class LoginController extends Controller
         // Redirect to the homepage or login page with the forgotten cookies
         return redirect('/')->withCookies([$cookie1, $cookie2]);
     }
+
+    public function checkDatabases(Request $request)
+    {
+
+        $email = $request->input('email');
+
+        if (empty($email)) {
+            return response()->json(['error' => 'Email is required']);
+        }
+
+        $databases = getOtherDatabases($email);
+
+        return response()->json(['databases' => $databases]);
+    }
+
+
 }
