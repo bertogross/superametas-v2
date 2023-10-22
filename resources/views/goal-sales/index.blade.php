@@ -63,13 +63,12 @@ $customMeantime = isset($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meanti
                     <option {{ $getMeantime == 'today' ? 'selected' : '' }} value="today">HOJE</option>
 
                     @php
-                        $dateRange = getSaleDateRange();
-                        //APP_print_r($dateRange);
-                        $firstDate = $dateRange['first_date'];
-                        $lastDate = $dateRange['last_date'];
-                        $currentMonth = now()->format('Y-m');
-                        $previousMonth = now()->subMonth()->format('Y-m');
-
+                    $dateRange = getSaleDateRange();
+                    //APP_print_r($dateRange);
+                    $firstDate = $dateRange['first_date'];
+                    $lastDate = $dateRange['last_date'];
+                    $currentMonth = now()->format('Y-m');
+                    $previousMonth = now()->subMonth()->format('Y-m');
                     @endphp
 
                     <option {{ $getMeantime == $currentMonth || $getMeantime == date('Y-m') || ( $getMeantime == 'custom' && empty($getCustomMeantime) )  ? 'selected' : '' }} value="{{ $currentMonth }}">MÊS ATUAL</option>

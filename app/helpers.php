@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use App\Models\UserMeta;
 use Illuminate\Support\Facades\DB;
 
@@ -137,13 +138,8 @@ if (!function_exists('formatBrazilianReal')) {
      * @param float $number The number to be formatted.
      * @return string The formatted number.
      */
-    function formatBrazilianReal(float $number): string {
-        return 'R$ ' . number_format(
-            number: $number,
-            decimals: 2,
-            decimal_separator: ',',
-            thousands_separator: '.'
-        );
+    function formatBrazilianReal(float $number, $decimal = 2): string {
+        return !empty($number) ? 'R$ ' . number_format( $number, $decimal, ',', '.') : '';
     }
 }
 
@@ -156,6 +152,8 @@ if (!function_exists('getCompanyAlias')) {
      * @return string|null The company alias or null if not found.
      */
     function getCompanyAlias(int $companyId): ?string {
+        $companyId = intval($companyId);
+
         $companyAlias = DB::connection('smAppTemplate')
             ->table('wlsm_companies') // replace with your companies table name
             ->where('company_id', $companyId)
@@ -174,6 +172,8 @@ if (!function_exists('getDepartmentAlias')) {
      * @return string|null The department alias or null if not found.
      */
     function getDepartmentAlias(int $departmentId): ?string {
+        $departmentId = intval($departmentId);
+
         $departmentAlias = DB::connection('smAppTemplate')
             ->table('wlsm_departments') // replace with your departments table name
             ->where('department_id', $departmentId)
@@ -185,12 +185,18 @@ if (!function_exists('getDepartmentAlias')) {
 
 
 if (!function_exists('metricGoalSales')) {
-    function metricGoalSales($meantime = false){
-        $days_in_month = intval(date('t'));
+    function metricGoalSales($meantime = null){
+        $daysInMonth = intval(date('t'));
 
-        $metric = empty($meantime) || $meantime == date('Y-m') ? number_format( ( ( 100/$days_in_month ) * intval(date('d') ) ), 1, '.', '') : 100;
+        if( empty($meantime) || $meantime == date('Y-m') ){
+            $metric = number_format( ( ( 100/$daysInMonth ) * intval(date('d') ) ), 1, '.', '');
+        } elseif (is_string($meantime) && strtotime($meantime) !== false && date('Y-m', strtotime($meantime)) < date('Y-m')) {
+            $metric = 100;
+        } else{
+            $metric = 100;
+        }
 
-        return $metric . '%';
+        return $metric;
     }
 }
 
@@ -282,6 +288,36 @@ if (!function_exists('getGoalsId')) {
     }
 }
 
+
+if( !function_exists('goalsEmojiChart') ){
+	function goalsEmojiChart($nChartId, $goal, $sale, $departmentId, $departmentName, $companyName, $percent, $percentAccrued, $style = ''){
+		$html = '';
+
+		$bsTitle = !empty($companyName) ? $companyName.' :: '.$departmentName : ':: '.$departmentName;
+
+		if( $goal == 0 && $sale > 0 && $departmentId != 'general' && ( APP_IS_ADMIN || APP_IS_MANAGER || APP_IS_PARTNER ) ){
+			$html .= '<i class="text-danger blink ri-error-warning-line fw-bold position-relatvie w-auto mx-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Existe um conflito entre valor de Meta e Vendas para departamento '.$departmentName.'. Não há Meta ou não deveria haver vendas para este departamento no estabelecimento '.$companyName.'" style="z-index:2;"></i>';
+		}
+
+		$html .= '<div id="goal-chart-'.$nChartId.'" class="goal-chart text-center d-inline-block" ';
+            if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) ) {
+                $html .=  'data-sale="'.$sale.'" data-goal="'.$goal.'" ';
+            }
+		    $html .= 'data-percent="'.$percent.'" data-percent-from-metric="'.$percentAccrued.'" data-department-name="'.$departmentName.'" data-department="'.$departmentId.'" ';
+			if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) ) {
+				$html .= 'data-bs-toggle="popover" data-bs-placement="top" data-bs-trigger="hover focus" data-bs-title="'.$bsTitle.'" data-bs-content="';
+				$html .= "<i class='text-theme ri-checkbox-blank-circle-fill align-bottom me-1'></i>Vendas: ".formatBrazilianReal($sale, 0)."<br>";
+
+				$html .= "<i class='text-info ri-checkbox-blank-circle-fill align-bottom me-1'></i>Meta: ".formatBrazilianReal($goal, 0)."";
+
+				$html .= '" data-bs-html="true" ';
+			}
+			$html .= 'data-style="'.$style.'" dir="ltr">';
+		$html .= '</div>';
+
+		return $html;
+	}
+}
 
 
 if(!function_exists('APP_print_r')){
