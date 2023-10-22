@@ -14,33 +14,41 @@
     <?php echo $__env->make('layouts.head-css', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 </head>
 
-<?php $__env->startSection('body'); ?>
-    <?php echo $__env->make('layouts.body', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-<?php echo $__env->yieldSection(); ?>
-    <!-- Begin page -->
-    <div id="layout-wrapper">
-        <?php echo $__env->make('layouts.topbar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-        <?php echo $__env->make('layouts.sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-        <!-- ============================================================== -->
-        <!-- Start right Content here -->
-        <!-- ============================================================== -->
-        <div class="main-content">
-            <div class="page-content">
-                <div class="container-fluid">
-                    <?php echo $__env->yieldContent('content'); ?>
+    <?php $__env->startSection('body'); ?>
+        <?php echo $__env->make('layouts.body', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php echo $__env->yieldSection(); ?>
+        <!-- Begin page -->
+        <div id="layout-wrapper">
+            <?php echo $__env->make('layouts.topbar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+            <?php echo $__env->make('layouts.sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+            <!-- ============================================================== -->
+            <!-- Start right Content here -->
+            <!-- ============================================================== -->
+            <div class="main-content">
+                <div class="page-content">
+                    <div class="container-fluid">
+                        <?php echo $__env->yieldContent('content'); ?>
+                    </div>
+                    <!-- container-fluid -->
                 </div>
-                <!-- container-fluid -->
+                <!-- End Page-content -->
+                <?php echo $__env->make('layouts.footer', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
             </div>
-            <!-- End Page-content -->
-            <?php echo $__env->make('layouts.footer', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+            <!-- end main content-->
         </div>
-        <!-- end main content-->
-    </div>
-    <!-- END layout-wrapper -->
+        <!-- END layout-wrapper -->
 
-    <!-- JAVASCRIPT -->
-    <?php echo $__env->make('layouts.vendor-scripts', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-</body>
+        <!-- JAVASCRIPT -->
+        <?php echo $__env->make('layouts.vendor-scripts', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
+        <div id="custom-backdrop" class="d-none text-muted">
+            <div style="display: flex; align-items: flex-end; justify-content: flex-start; height: 100vh; padding: 25px;">
+                Para continuar trabalhando enquanto este processo está em andamento, <a href="<?php echo e(url('/')); ?>" target="_blank" class="text-theme me-1 ms-1">clique aqui</a> para abrir o <?php echo e(env('APP_NAME')); ?> em nova guia
+            </div>
+        </div>
+
+        <div id="modalContainer"></div>
+
+    </body>
 </html>
 <?php /**PATH D:\www\superametas\application\development.superametas.com\public_html\resources\views/layouts/master.blade.php ENDPATH**/ ?>

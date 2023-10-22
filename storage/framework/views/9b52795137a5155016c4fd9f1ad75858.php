@@ -391,16 +391,26 @@ use App\Models\User;
                         <div class="dropdown-divider"></div>
                         -->
 
-                        <?php if(auth()->user() && auth()->user()->hasRole(User::ROLE_ADMIN)): ?>
+                        <?php if(auth()->user()->hasRole(User::ROLE_ADMIN)): ?>
                             <a class="dropdown-item" href="<?php echo e(url('settings')); ?>">
-                                <i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i>
-                                <span class="align-middle">Configurações</span>
+                                <i class="ri-settings-4-fill text-muted fs-16 align-middle me-1"></i>
+                                <span class="align-middle">Configurações Gerais</span>
                             </a>
                         <?php endif; ?>
+
+                        <?php if(auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) && request()->is('goal-sales')): ?>
+                            <a class="dropdown-item" href="javascript:void(0);" id="btn-goal-sales-settings">
+                                <i class="ri-edit-line text-muted fs-16 align-middle me-1 text-theme"></i>
+                                <span class="align-middle">Gerenciar Meta de Vendas</span>
+                            </a>
+                        <?php endif; ?>
+
 
                         <!--
                         <a class="dropdown-item" href="auth-lockscreen-basic"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Lock screen</span></a>
                         -->
+
+                        <div class="dropdown-divider"></div>
 
                         <a class="dropdown-item " href="javascript:void();" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="bx bx-power-off font-size-16 align-middle me-1"></i> <span key="t-logout">Sair</span></a>
                         <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">

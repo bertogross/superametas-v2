@@ -51,7 +51,7 @@ class SettingsStorageController extends Controller
         $files = $driveService->files->listFiles();
 
         // Returning the view with the list of files.
-        return view('settings-storage', ['files' => $files->getFiles()]);
+        return view('settings/storage', ['files' => $files->getFiles()]);
     }
 
     /**

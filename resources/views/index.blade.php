@@ -1353,5 +1353,4 @@
     <script src="{{ URL::asset('build/libs/swiper/swiper-bundle.min.js')}}"></script>
     <!-- dashboard init -->
     <script src="{{ URL::asset('build/js/pages/dashboard-ecommerce.init.js') }}"></script>
-    <script src="{{ URL::asset('build/js/app.js') }}"></script>
 @endsection

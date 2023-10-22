@@ -8,8 +8,9 @@ https://laravel-news.com/openai-for-laravel
 
 
 
-Version 2.0.15 - [2023-10-19]
-
+Version 2.0.15 - [2023-10-19 - 2023-10-22]
+- [Updated] helpers.php
+- [Updated] GoalSalesController
 
 
 

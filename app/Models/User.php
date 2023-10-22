@@ -102,6 +102,11 @@ class User extends Authenticatable
         return $this->role === $role;
     }
 
+
+    public function hasAnyRole(...$roles) {
+        return in_array($this->role, $roles);
+    }
+
     /**
      * Check if the user has a specific capability.
      *
@@ -171,4 +176,6 @@ class User extends Authenticatable
 
         return $html;
     }
+
+
 }

@@ -1,37 +1,47 @@
+<?php
+use App\Models\User;
+
+$getAuthorizedCompanies = getAuthorizedCompanies();
+//APP_print_r($getAuthorizedCompanies);
+$getActiveCompanies = getActiveCompanies();
+//APP_print_r($getActiveCompanies);
+$getActiveDepartments = getActiveDepartments();
+//APP_print_r($getActiveDepartments);
+
+$getMeantime = isset($_REQUEST['meantime']) ? $_REQUEST['meantime'] : date('Y-m');
+
+$getCustomMeantime = isset($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : '';
+$explodeCustomMeantime = $getCustomMeantime ? explode(' até ', $getCustomMeantime) : '';
+
+$filterCompanies = isset($_REQUEST['companies']) ? $_REQUEST['companies'] : array();
+$filterDepartments = isset($_REQUEST['departments']) ? $_REQUEST['departments'] : array();
+$customMeantime = isset($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : date('Y-m');
+?>
+
+
 <?php $__env->startSection('title'); ?>
     <?php echo app('translator')->get('translation.goal-sales'); ?>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('css'); ?>
-<link href="<?php echo e(URL::asset('build/libs/gridjs/theme/mermaid.min.css')); ?>" rel="stylesheet">
-<link href="<?php echo e(URL::asset('build/libs/swiper/swiper-bundle.min.css')); ?>" rel="stylesheet">
-<link href="<?php echo e(URL::asset('build/libs/flatpickr/plugins/monthSelect/style.css')); ?>" rel="stylesheet">
+    <link href="<?php echo e(URL::asset('build/libs/gridjs/theme/mermaid.min.css')); ?>" rel="stylesheet">
+    <link href="<?php echo e(URL::asset('build/libs/swiper/swiper-bundle.min.css')); ?>" rel="stylesheet">
+    <link href="<?php echo e(URL::asset('build/libs/flatpickr/plugins/monthSelect/style.css')); ?>" rel="stylesheet">
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>
     <?php $__env->startComponent('components.breadcrumb'); ?>
+        <?php $__env->slot('url'); ?>
+            <?php echo e(url('/')); ?>
+
+        <?php $__env->endSlot(); ?>
+        <?php $__env->slot('li_1'); ?>
+            <?php echo app('translator')->get('translation.dashboards'); ?>
+        <?php $__env->endSlot(); ?>
         <?php $__env->slot('title'); ?>
             <?php echo app('translator')->get('translation.goal-sales'); ?>
         <?php $__env->endSlot(); ?>
     <?php echo $__env->renderComponent(); ?>
 
-    <?php
-        use App\Models\User;
 
-        $getAuthorizedCompanies = getAuthorizedCompanies();
-        //APP_print_r($getAuthorizedCompanies);
-        $getActiveCompanies = getActiveCompanies();
-        //APP_print_r($getActiveCompanies);
-        $getActiveDepartments = getActiveDepartments();
-        //APP_print_r($getActiveDepartments);
-
-        $getMeantime = isset($_REQUEST['meantime']) ? $_REQUEST['meantime'] : '';
-
-        $getCustomMeantime = isset($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : '';
-
-        $filterCompanies = isset($_REQUEST['companies']) ? $_REQUEST['companies'] : array();
-        $filterDepartments = isset($_REQUEST['departments']) ? $_REQUEST['departments'] : array();
-        $customMeantime = isset($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : date('Y-m');
-
-    ?>
 
     <div id="filter" class="p-3 bg-light-subtle rounded position-relative mb-4" style="z-index: 3;">
         <form id="filterForm" action="<?php echo e(route('goal-sales.index')); ?>" class="row g-2 text-uppercase" autocomplete="off">
@@ -49,7 +59,7 @@
                         $previousMonth = now()->subMonth()->format('Y-m');
                     ?>
 
-                    <option <?php echo e($getMeantime == $currentMonth || empty($getMeantime) || ( $getMeantime == 'custom' && empty($getCustomMeantime) )  ? 'selected' : ''); ?> value="<?php echo e($currentMonth); ?>">MÊS ATUAL</option>
+                    <option <?php echo e($getMeantime == $currentMonth || $getMeantime == date('Y-m') || ( $getMeantime == 'custom' && empty($getCustomMeantime) )  ? 'selected' : ''); ?> value="<?php echo e($currentMonth); ?>">MÊS ATUAL</option>
 
                     <?php if($firstDate <= $previousMonth): ?>
                         <option <?php echo e($getMeantime == $previousMonth ? 'selected' : ''); ?> value="<?php echo e($previousMonth); ?>">MÊS ANTERIOR</option>
@@ -90,68 +100,19 @@
         </form>
     </div>
 
+    <!-- resources/views/goal-sales_table.blade.php -->
+    <?php echo $__env->make('goal-sales-table', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-    <div class=" mb-4 rounded position-relative wrap-filter-result toogle_zoomInOut ribbon-box border ribbon-fill shadow-none" id="load-listing">
-        <div class="ribbon ribbon-info bg-theme text-black fs-12 <?php if(empty($result) ): ?> d-none <?php endif; ?>" style="z-index: 2; scale: 1.5; top: -10px; left: -30px;">
-            <?php
-                echo metricGoalSales();
-            ?>
-        </div>
-        <div class="table-responsive mb-0">
-            <table id="goals_sales-dataTable" class="table table-striped-columns table-nowrap listing-chart mb-0">
-                <thead class="text-uppercase table-light">
-                    <tr>
-                        <th scope="col" class="bg-transparent fs-20 text-center invisible"></th>
-                        <?php $__currentLoopData = $companies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $company): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <th scope="col" class="text-center" data-emp-id="<?php echo e($company); ?>">
-                                <?php echo e(getCompanyAlias(intval($company))); ?>
-
-                            </th>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $__currentLoopData = $result; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <tr tr-department="<?php echo e($row['department_id']); ?>" class="">
-                            <th scope="row" class="text-uppercase fs-16 align-middle text-end p-3">
-                                <?php echo e(getDepartmentAlias(intval($row['department_id']))); ?>
-
-                            </th>
-                            <?php $__currentLoopData = $companies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $company): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <td class="text-center align-middle" data-emp-id="<?php echo e($company); ?>" data-chart-id="0">
-                                    <?php echo e($row[$company]); ?>
-
-                                </td>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </tr>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </tbody>
-                <tfoot class="text-uppercase table-light">
-                    <tr>
-                        <th scope="col" class="bg-transparent invisible"></th>
-                        <?php $__currentLoopData = $companies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $company): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <th scope="col" class="text-center" data-emp-id="<?php echo e($company); ?>">
-                                <?php echo e(getCompanyAlias(intval($company))); ?>
-
-                            </th>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    </div>
-    <!--end row-->
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
+    <script src="<?php echo e(URL::asset('build/libs/apexcharts/apexcharts.min.js')); ?>"></script>
+    <script src="<?php echo e(URL::asset('build/libs/flatpickr/flatpickr.min.js')); ?>"></script>
+    <script src="<?php echo e(URL::asset('build/libs/flatpickr/l10n/pt.js')); ?>"></script>
+    <script src="<?php echo e(URL::asset('build/libs/flatpickr/plugins/monthSelect/index.js')); ?>"></script>
 
-<script src="<?php echo e(URL::asset('build/libs/apexcharts/apexcharts.min.js')); ?>"></script>
-<script src="<?php echo e(URL::asset('build/libs/flatpickr/flatpickr.min.js')); ?>"></script>
-<script src="<?php echo e(URL::asset('build/libs/flatpickr/l10n/pt.js')); ?>"></script>
-<script src="<?php echo e(URL::asset('build/libs/flatpickr/plugins/monthSelect/index.js')); ?>"></script>
+    <script src="<?php echo e(URL::asset('build/js/goal-sales.js')); ?>" type="module"></script>
 
-<script src="<?php echo e(URL::asset('build/js/goal-sales.js')); ?>" type="module"></script>
-
-<script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
+    <script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\application\development.superametas.com\public_html\resources\views/goal-sales.blade.php ENDPATH**/ ?>

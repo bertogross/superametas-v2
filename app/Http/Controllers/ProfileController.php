@@ -18,11 +18,11 @@ class ProfileController extends Controller
 
         // Check if the authenticated user has ROLE_ADMIN
         if (Auth::user()->hasRole(User::ROLE_ADMIN)) {
-            return redirect('/settings-account'); // Redirect admins to settings-account
+            return redirect('/settings/account'); // Redirect admins to settings/account
         }
 
         // Load the view
-        return view('profile-settings');
+        return view('profile/settings');
     }
 
 }

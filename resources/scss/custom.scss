@@ -599,6 +599,10 @@ pre:empty{
 body.modal-open .table .wrap-table-listing-td-buttons{
   display: none !important;
 }
+#modalContainer{
+    z-index: 1060 !important;
+    position: absolute !important;
+}
 
 .table-fixedColumns th.dtfc-fixed-left{
   z-index: 2 !important;
@@ -782,3 +786,12 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
   }
 }
 
+
+
+#load-listing {
+    transition: opacity 0.5s ease-in-out;
+}
+
+.hide-slowly {
+    opacity: 0;
+}

@@ -24,38 +24,38 @@
             <li class="menu-title"><i class="ri-more-fill"></i> <span><?php echo app('translator')->get('translation.components'); ?></span></li>
 
             <li class="nav-item">
-                <a class="nav-link menu-link <?php echo e(request()->is('settings-account') ? 'active' : ''); ?>" href="<?php echo e(url('settings-account')); ?>">
+                <a class="nav-link menu-link <?php echo e(request()->is('settings/account') ? 'active' : ''); ?>" href="<?php echo e(url('settings/account')); ?>">
                     <i class="ri-arrow-right-up-line"></i> <span>Meu <?php echo e(env('APP_NAME')); ?></span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link menu-link <?php echo e(request()->is('settings-api-keys') || request()->is('settings-storage') || request()->is('settings-database') ? 'active' : ''); ?>" href="#sidebarAPIs" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAPIs">
+                <a class="nav-link menu-link <?php echo e(request()->is('settings/api-keys') || request()->is('settings/storage') || request()->is('settings/database') ? 'active' : ''); ?>" href="#sidebarAPIs" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAPIs">
                     <i class="ri-cloud-windy-fill"></i> <span><?php echo app('translator')->get('translation.api-conections'); ?></span>
                 </a>
                 <div class="collapse menu-dropdown" id="sidebarAPIs">
                     <ul class="nav nav-sm flex-column">
                         <li class="nav-item">
-                            <a href="<?php echo e(url('settings-api-keys')); ?>" class="nav-link <?php echo e(request()->is('settings-api-keys') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.api-keys'); ?></a>
+                            <a href="<?php echo e(url('settings/api-keys')); ?>" class="nav-link <?php echo e(request()->is('settings/api-keys') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.api-keys'); ?></a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?php echo e(url('settings-storage')); ?>" class="nav-link <?php echo e(request()->is('settings-storage') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.file-manager'); ?></a>
+                            <a href="<?php echo e(url('settings/storage')); ?>" class="nav-link <?php echo e(request()->is('settings/storage') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.file-manager'); ?></a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?php echo e(url('settings-database')); ?>" class="nav-link <?php echo e(request()->is('settings-database') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.your-erp'); ?></a>
+                            <a href="<?php echo e(url('settings/database')); ?>" class="nav-link <?php echo e(request()->is('settings/database') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.your-erp'); ?></a>
                         </li>
                     </ul>
                 </div>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link menu-link <?php echo e(request()->is('settings-users') ? 'active' : ''); ?>" href="<?php echo e(url('settings-users')); ?>">
+                <a class="nav-link menu-link <?php echo e(request()->is('settings/users') ? 'active' : ''); ?>" href="<?php echo e(url('settings/users')); ?>">
                     <i class="ri-admin-fill"></i> <span><?php echo app('translator')->get('translation.users'); ?></span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link menu-link <?php echo e(request()->is('settings-security') ? 'active' : ''); ?>" href="<?php echo e(url('settings-security')); ?>">
+                <a class="nav-link menu-link <?php echo e(request()->is('settings/security') ? 'active' : ''); ?>" href="<?php echo e(url('settings/security')); ?>">
                     <i class="ri-shield-keyhole-line"></i> <span><?php echo app('translator')->get('translation.security'); ?></span>
                 </a>
             </li>

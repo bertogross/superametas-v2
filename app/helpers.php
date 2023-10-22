@@ -65,7 +65,7 @@ if (!function_exists('getERPdata')) {
             return null;
         }
 
-        return view('settings-database', [
+        return view('settings/database', [
             'onboard_id' => $customer,
             'target' => 'sales',
             'key' => 'ffs64DSA2ds4',
@@ -203,7 +203,7 @@ if (!function_exists('getActiveCompanies')) {
         return DB::connection('smAppTemplate')
             ->table('wlsm_companies')
             ->where('status', 1)
-            ->orderBy('company_alias')
+            ->orderBy('company_id')
             ->get();
     }
 }
@@ -240,14 +240,18 @@ if (!function_exists('getActiveDepartments')) {
 }
 
 
+function onlyNumber($goalData = null) {
+    return $goalData ? preg_replace('/\D/', '', $goalData) : 0;
+}
+
 if (!function_exists('getSaleDateRange')) {
     function getSaleDateRange()
     {
-        $firstDate = DB::connection('smAppTemplate')->table('wlsm_goal_sales')
+        $firstDate = DB::connection('smAppTemplate')->table('wlsm_sales')
             ->select(DB::raw('DATE_FORMAT(MIN(date_sale), "%Y-%m") as first_date'))
             ->first();
 
-        $lastDate = DB::connection('smAppTemplate')->table('wlsm_goal_sales')
+        $lastDate = DB::connection('smAppTemplate')->table('wlsm_sales')
             ->select(DB::raw('DATE_FORMAT(MAX(date_sale), "%Y-%m") as last_date'))
             ->first();
 
@@ -255,6 +259,26 @@ if (!function_exists('getSaleDateRange')) {
             'first_date' => $firstDate->first_date,
             'last_date' => $lastDate->last_date,
         ];
+    }
+}
+
+
+if (!function_exists('getGoalsId')) {
+    function getGoalsId($companyId, $meantime, $type) {
+        try {
+            $goal = DB::connection('smAppTemplate')
+                ->table('wlsm_goals')
+                ->where('company_id', $companyId)
+                ->where('meantime', $meantime)
+                ->where('type', $type)
+                ->first();
+
+            return $goal ? $goal->id : null;
+        } catch (\Exception $e) {
+            \Log::error('Failed to get goal sales post ID: ' . $e->getMessage());
+            return false;
+        }
+        return false;
     }
 }
 

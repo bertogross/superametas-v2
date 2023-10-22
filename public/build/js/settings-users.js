@@ -3,60 +3,71 @@ import {ToastAlert} from './helpers.js';
 window.addEventListener('load', function() {
 
     // Load the content for the user modal
-    function loadModalContent(userId = null, userName = '') {
+    function loadUserSettingsModal(userId = null, userName = '') {
         var xhr = new XMLHttpRequest();
-        var url = '/get-user-modal-form';
+        var url = '/settings/users/modal-form';
         if (userId) {
             url += '/' + userId;
         }
         xhr.open('GET', url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
-                document.getElementById('modalContainer').innerHTML = xhr.responseText;
+                if(xhr.responseText){
+                    document.getElementById('modalContainer').innerHTML = xhr.responseText;
 
-                var modalElement = document.getElementById('userModal');
-                var modal = new bootstrap.Modal(modalElement, {
-                    backdrop: 'static',
-                    keyboard: false  // Prevent closing the modal with the escape key
-                });
-                modal.show();
+                    var modalElement = document.getElementById('userModal');
+                    var modal = new bootstrap.Modal(modalElement, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    modal.show();
 
-                if (userId) {
-                    document.getElementById("modalUserTitle").innerHTML = userName ? '<span class="text-theme">'+ userName + '</span>' : 'Editar Usuário';
-                    document.getElementById("btn-save-user").innerHTML = 'Atualizar';
+                    if (userId) {
+                        document.getElementById("modalUserTitle").innerHTML = userName ? '<span class="text-theme">'+ userName + '</span>' : 'Editar Usuário';
+                        document.getElementById("btn-save-user").innerHTML = 'Atualizar';
 
-                    injectScript("/build/js/pages/password-addon.init.js");
-                } else {
-                    document.getElementById("modalUserTitle").innerHTML = 'Adicionar Usuário';
-                    document.getElementById("btn-save-user").innerHTML = 'Salvar';
+                        injectScript("/build/js/pages/password-addon.init.js");
+                    } else {
+                        document.getElementById("modalUserTitle").innerHTML = 'Adicionar Usuário';
+                        document.getElementById("btn-save-user").innerHTML = 'Salvar';
+                    }
+
+                    attachModalEventListeners();
+                    attachImageEventListeners("#member-image-input", "#avatar-img", "/upload/avatar");
+                    attachImageEventListeners("#cover-image-input", "#cover-img", "/upload/cover");
+
+                }else{
+                    ToastAlert('Não foi possível carregar o conteúdo', 'error', 10000);
                 }
 
-                attachModalEventListeners();
-                attachImageEventListeners("#member-image-input", "#avatar-img", "/upload-avatar");
-                attachImageEventListeners("#cover-image-input", "#cover-img", "/upload-cover");
-
-
             } else {
-                //console.log("Error fetching modal content:", xhr.statusText);
+                console.log("Error fetching modal content:", xhr.statusText);
             }
         };
         xhr.send();
     }
 
     // Event listener for the 'Add User' button
-    document.getElementById('btn-add-user').addEventListener('click', function() {
-        loadModalContent();
-    });
+    if(document.getElementById('btn-add-user')){
+        document.getElementById('btn-add-user').addEventListener('click', function() {
+            loadUserSettingsModal();
+        });
+    }
 
     // Event listeners for each 'Edit User' button
     var editButtons = document.querySelectorAll('.btn-edit-user');
-    editButtons.forEach(function(button) {
-        button.addEventListener('click', function() {
-            var userId = this.getAttribute('data-user-id');
-            var userName = this.getAttribute('data-user-name');
-            loadModalContent(userId, userName);
+    if(editButtons){
+        editButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                var userId = this.getAttribute('data-user-id');
+                var userName = this.getAttribute('data-user-name');
+
+                loadUserSettingsModal(userId, userName);
+            });
         });
-    });
+    }
 
     // Function to inject a script into the page
     function injectScript(src) {
@@ -89,7 +100,7 @@ window.addEventListener('load', function() {
     // Attach event listeners for the modal form
     function attachModalEventListeners() {
         // Update/Save user from modal form
-        const form = document.getElementById('memberlist-form');
+        const form = document.getElementById('userForm');
         const btn = document.getElementById('btn-save-user');
 
         if (btn) {
@@ -98,7 +109,7 @@ window.addEventListener('load', function() {
 
                 let formData = new FormData(form);
 
-                let url = form.dataset.id ? `/settings-users/update/${form.dataset.id}` : '/settings-users/store';
+                let url = form.dataset.id ? `/settings/users/update/${form.dataset.id}` : '/settings/users/store';
 
                 fetch(url, {
                     method: 'POST',

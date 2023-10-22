@@ -88,7 +88,7 @@ async function makeRequests(meantime, initialMeantime, completedIterations) {
         // Populate the <li> elements with concluded meantimes
         const ulElement = document.querySelector('.concluded-meantimes');
         const liElement = document.createElement('li');
-        liElement.innerHTML = `<i class="ri-check-double-fill text-theme align-bottom me-2"></i><u>${convertMeantimeToPortuguese(meantime)}</u> foi importado`;
+        liElement.innerHTML = `<i class="ri-check-double-fill text-theme align-bottom me-2"></i>${convertMeantimeToPortuguese(meantime)}`;
 
         // Insert the new li element at the beginning of the ul element
         ulElement.insertBefore(liElement, ulElement.firstChild);
@@ -103,7 +103,7 @@ async function makeRequests(meantime, initialMeantime, completedIterations) {
     } catch (error) {
         toggleCustomBackdrop(false);
 
-        document.querySelector('#synchronization-progress .synchronization-time').innerHTML = '';
+        document.querySelector('.synchronization-time').innerHTML = '';
 
         isExecutionInProgress = false;
 
@@ -138,7 +138,7 @@ function finalizeSynchronization(type, message, percentage) {
     toggleCustomBackdrop(false);
     document.querySelector('.progress-bar').style.width = percentage;
     document.querySelector('.synchronization-percent-text').innerHTML = message;
-    document.querySelector('#synchronization-progress .synchronization-time').innerHTML = '';
+    document.querySelector('.synchronization-time').innerHTML = '';
     isExecutionInProgress = false;
     document.removeEventListener('contextmenu', preventRightClick);
     ToastAlert(message, type, 100000000);
@@ -167,7 +167,7 @@ window.addEventListener('load', function() {
         e.preventDefault();
 
         // Display initial status messages with delays
-        const estimatedElement = document.querySelector('#synchronization-progress .synchronization-time');
+        const estimatedElement = document.querySelector('.synchronization-time');
         ['Iniciando...', 'Conectando...', 'Recebendo dados...'].forEach((message, index) => {
             setTimeout(() => {
                 estimatedElement.innerHTML = `<span class="blink">${message}</span>`;

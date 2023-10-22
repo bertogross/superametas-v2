@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\{
     Auth\LoginController,
     HomeController,
-    PostController,
     UserController,
     ProfileController,
     UploadController,
@@ -49,42 +48,47 @@ Route::middleware(['auth'])->group(function () {
 
     // Goal Sales Routes
     Route::get('/goal-sales', [GoalSalesController::class, 'index'])->name('goal-sales.index');
-    Route::post('/goal-sales-store', [PostController::class, 'store']);
+    Route::get('/goal-sales/settings', [GoalSalesController::class, 'getGoalSalesSettingsModalContent']);
+    Route::get('/goal-sales/form/{meantime?}/{companyId?}/{purpose?}', [GoalSalesController::class, 'getGoalSalesEditModalContent']);
+
+    Route::post('/goal-sales/post/{meantime?}/{companyId?}', [GoalSalesController::class, 'storeOrUpdateGoals']);
 
     // Goal Results Routes
-    Route::get('/goal-results', [PostController::class, 'showGoalResults']);
+    //Route::get('/goal-results', [GoalResultsController::class, 'index'])->name('goal-results.index');
 
-    // User Settings and Profile
-    Route::get('/settings-users', [UserController::class, 'index'])->name('settings-users.index');
-    Route::post('/settings-users/store', [UserController::class, 'store']);
-    //Route::put('/settings-users/update/{id}', [UserController::class, 'update']);
-    Route::post('/settings-users/update/{id}', [UserController::class, 'update']);
+    // User Profile
     Route::get('/profile/{id?}', [UserController::class, 'show'])->name('profile.show');
-    Route::get('/get-user-modal-form/{id?}', [UserController::class, 'getUserModalContent']);
 
     // TODO profile-settings.blade.php
-    //Route::get('/profile-settings', [ProfileController::class, 'settings'])->middleware('auth');
+    //Route::get('/profile/settings', [ProfileController::class, 'settings'])->middleware('auth');
 
 
     // Admin Settings
     Route::middleware(['admin'])->group(function () {
-        Route::get('/settings-database', [SettingsDatabaseController::class, 'showDatabase'])->name('settings.show');
-        Route::put('/settings-departments/update', [SettingsDatabaseController::class, 'updateDepartments'])->name('departments.updateDepartments');
-        Route::put('/settings-companies/update', [SettingsDatabaseController::class, 'updateCompanies'])->name('companies.updateCompanies');
-        Route::get('/settings-account', [SettingsAccountController::class, 'show'])->name('settings.show');
-        Route::post('/settings-account', [SettingsAccountController::class, 'store'])->name('settings.store');
+        Route::get('/settings', [SettingsAccountController::class, 'index'])->name('index');
+        Route::get('/settings/database', [SettingsDatabaseController::class, 'showDatabase'])->name('settings.database.show');
 
+        Route::put('/settings/departments/update', [SettingsDatabaseController::class, 'updateDepartments'])->name('settings.departments.updateDepartments');
+        Route::put('/settings/companies/update', [SettingsDatabaseController::class, 'updateCompanies'])->name('settings.companies.updateCompanies');
 
-        Route::get('/settings-storage', [SettingsStorageController::class, 'index'])->name('settings.storage');
-        Route::get('/settings-storage/oauth-callback', [SettingsStorageController::class, 'oauthCallback'])->name('settings.storage.callback');
+        Route::get('/settings/account', [SettingsAccountController::class, 'show'])->name('settings.account.show');
+        Route::post('/settings/account/update', [SettingsAccountController::class, 'store'])->name('settings.account.store');
 
+        // User Settings and Profile
+        Route::get('/settings/users', [UserController::class, 'index'])->name('settings-users.index');
+        Route::post('/settings/users/store', [UserController::class, 'store']);
+        Route::post('/settings/users/update/{id}', [UserController::class, 'update']);
+        Route::get('/settings/users/modal-form/{id?}', [UserController::class, 'getUserModalContent']);
+
+        Route::get('/settings/storage', [SettingsStorageController::class, 'index'])->name('settings.storage');
+        Route::get('/settings/storage/oauth-callback', [SettingsStorageController::class, 'oauthCallback'])->name('settings.storage.callback');
     });
 
     // File Upload
-    Route::post('/upload-avatar', [UploadController::class, 'uploadAvatar']);
-    Route::post('/upload-cover', [UploadController::class, 'uploadCover']);
-    Route::post('/upload-logo', [UploadController::class, 'uploadCompanyLogo']);
-    Route::delete('/upload-logo', [UploadController::class, 'deleteCompanyLogo']);
+    Route::post('/upload/avatar', [UploadController::class, 'uploadAvatar']);
+    Route::post('/upload/cover', [UploadController::class, 'uploadCover']);
+    Route::post('/upload/logo', [UploadController::class, 'uploadCompanyLogo']);
+    Route::delete('/upload/logo', [UploadController::class, 'deleteCompanyLogo']);
 
 });
 

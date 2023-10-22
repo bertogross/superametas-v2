@@ -32,21 +32,21 @@ File: Main Js File
 	function setLanguage(lang) {
 		if (document.getElementById("header-lang-img")) {
 			if (lang == "en") {
-				document.getElementById("header-lang-img").src = "build/images/flags/us.svg";
+				document.getElementById("header-lang-img").src = App.url +"build/images/flags/us.svg";
 			} else if (lang == "sp") {
-				document.getElementById("header-lang-img").src = "build/images/flags/spain.svg";
+				document.getElementById("header-lang-img").src = App.url +"build/images/flags/spain.svg";
 			} else if (lang == "gr") {
-				document.getElementById("header-lang-img").src = "build/images/flags/germany.svg";
+				document.getElementById("header-lang-img").src = App.url +"build/images/flags/germany.svg";
 			} else if (lang == "it") {
-				document.getElementById("header-lang-img").src = "build/images/flags/italy.svg";
+				document.getElementById("header-lang-img").src = App.url +"build/images/flags/italy.svg";
 			} else if (lang == "ru") {
-				document.getElementById("header-lang-img").src = "build/images/flags/russia.svg";
+				document.getElementById("header-lang-img").src = App.url +"build/images/flags/russia.svg";
 			} else if (lang == "ch") {
-				document.getElementById("header-lang-img").src = "build/images/flags/china.svg";
+				document.getElementById("header-lang-img").src = App.url +"build/images/flags/china.svg";
 			} else if (lang == "fr") {
-				document.getElementById("header-lang-img").src = "build/images/flags/french.svg";
+				document.getElementById("header-lang-img").src = App.url +"build/images/flags/french.svg";
 			} else if (lang == "ar") {
-				document.getElementById("header-lang-img").src = "build/images/flags/ae.svg";
+				document.getElementById("header-lang-img").src = App.url +"build/images/flags/ae.svg";
 			}
 			localStorage.setItem("language", lang);
 			language = localStorage.getItem("language");
@@ -137,155 +137,161 @@ File: Main Js File
 		 * Choices Select plugin
 		 */
 		var choicesExamples = document.querySelectorAll("[data-choices]");
-		Array.from(choicesExamples).forEach(function (item) {
-			var choiceData = {};
-			var isChoicesVal = item.attributes;
-			if (isChoicesVal["data-choices-groups"]) {
-				choiceData.placeholderValue = "This is a placeholder set in the config";
-			}
-			if (isChoicesVal["data-choices-search-false"]) {
-				choiceData.searchEnabled = false;
-			}
-			if (isChoicesVal["data-choices-search-true"]) {
-				choiceData.searchEnabled = true;
-			}
-			if (isChoicesVal["data-choices-removeItem"]) {
-				choiceData.removeItemButton = true;
-			}
-			if (isChoicesVal["data-choices-sorting-false"]) {
-				choiceData.shouldSort = false;
-			}
-			if (isChoicesVal["data-choices-sorting-true"]) {
-				choiceData.shouldSort = true;
-			}
-			if (isChoicesVal["data-choices-multiple-remove"]) {
-				choiceData.removeItemButton = true;
-			}
-			if (isChoicesVal["data-choices-limit"]) {
-				choiceData.maxItemCount = isChoicesVal["data-choices-limit"].value.toString();
-			}
-			if (isChoicesVal["data-choices-limit"]) {
-				choiceData.maxItemCount = isChoicesVal["data-choices-limit"].value.toString();
-			}
-			if (isChoicesVal["data-choices-editItem-true"]) {
-				choiceData.maxItemCount = true;
-			}
-			if (isChoicesVal["data-choices-editItem-false"]) {
-				choiceData.maxItemCount = false;
-			}
-			if (isChoicesVal["data-choices-text-unique-true"]) {
-				choiceData.duplicateItemsAllowed = false;
-			}
-			if (isChoicesVal["data-choices-text-disabled-true"]) {
-				choiceData.addItems = false;
-			}
-			isChoicesVal["data-choices-text-disabled-true"] ? new Choices(item, choiceData).disable() : new Choices(item, choiceData);
-		});
+        if(choicesExamples){
+            Array.from(choicesExamples).forEach(function (item) {
+                var choiceData = {};
+                var isChoicesVal = item.attributes;
+                if (isChoicesVal["data-choices-groups"]) {
+                    choiceData.placeholderValue = "This is a placeholder set in the config";
+                }
+                if (isChoicesVal["data-choices-search-false"]) {
+                    choiceData.searchEnabled = false;
+                }
+                if (isChoicesVal["data-choices-search-true"]) {
+                    choiceData.searchEnabled = true;
+                }
+                if (isChoicesVal["data-choices-removeItem"]) {
+                    choiceData.removeItemButton = true;
+                }
+                if (isChoicesVal["data-choices-sorting-false"]) {
+                    choiceData.shouldSort = false;
+                }
+                if (isChoicesVal["data-choices-sorting-true"]) {
+                    choiceData.shouldSort = true;
+                }
+                if (isChoicesVal["data-choices-multiple-remove"]) {
+                    choiceData.removeItemButton = true;
+                }
+                if (isChoicesVal["data-choices-limit"]) {
+                    choiceData.maxItemCount = isChoicesVal["data-choices-limit"].value.toString();
+                }
+                if (isChoicesVal["data-choices-limit"]) {
+                    choiceData.maxItemCount = isChoicesVal["data-choices-limit"].value.toString();
+                }
+                if (isChoicesVal["data-choices-editItem-true"]) {
+                    choiceData.maxItemCount = true;
+                }
+                if (isChoicesVal["data-choices-editItem-false"]) {
+                    choiceData.maxItemCount = false;
+                }
+                if (isChoicesVal["data-choices-text-unique-true"]) {
+                    choiceData.duplicateItemsAllowed = false;
+                }
+                if (isChoicesVal["data-choices-text-disabled-true"]) {
+                    choiceData.addItems = false;
+                }
+                isChoicesVal["data-choices-text-disabled-true"] ? new Choices(item, choiceData).disable() : new Choices(item, choiceData);
+            });
+        }
 
 		/**
 		 * flatpickr
 		 */
 		var flatpickrExamples = document.querySelectorAll("[data-provider]");
-		Array.from(flatpickrExamples).forEach(function (item) {
-			if (item.getAttribute("data-provider") == "flatpickr") {
-				var dateData = {};
-				var isFlatpickerVal = item.attributes;
-				dateData.disableMobile = "true";
-				if (isFlatpickerVal["data-date-format"])
-					dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
-				if (isFlatpickerVal["data-enable-time"]) {
-					(dateData.enableTime = true),
-						(dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString() + " H:i");
-				}
-				if (isFlatpickerVal["data-altFormat"]) {
-					(dateData.altInput = true),
-						(dateData.altFormat = isFlatpickerVal["data-altFormat"].value.toString());
-				}
-				if (isFlatpickerVal["data-minDate"]) {
-					dateData.minDate = isFlatpickerVal["data-minDate"].value.toString();
-					dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
-				}
-				if (isFlatpickerVal["data-maxDate"]) {
-					dateData.maxDate = isFlatpickerVal["data-maxDate"].value.toString();
-					dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
-				}
-				if (isFlatpickerVal["data-deafult-date"]) {
-					dateData.defaultDate = isFlatpickerVal["data-deafult-date"].value.toString();
-					dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
-				}
-				if (isFlatpickerVal["data-multiple-date"]) {
-					dateData.mode = "multiple";
-					dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
-				}
-				if (isFlatpickerVal["data-range-date"]) {
-					dateData.mode = "range";
-					dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
-				}
-				if (isFlatpickerVal["data-inline-date"]) {
-					(dateData.inline = true),
-						(dateData.defaultDate = isFlatpickerVal["data-deafult-date"].value.toString());
-					dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
-				}
-				if (isFlatpickerVal["data-disable-date"]) {
-					var dates = [];
-					dates.push(isFlatpickerVal["data-disable-date"].value);
-					dateData.disable = dates.toString().split(",");
-				}
-				if (isFlatpickerVal["data-week-number"]) {
-					var dates = [];
-					dates.push(isFlatpickerVal["data-week-number"].value);
-					dateData.weekNumbers = true
-				}
-				flatpickr(item, dateData);
-			} else if (item.getAttribute("data-provider") == "timepickr") {
-				var timeData = {};
-				var isTimepickerVal = item.attributes;
-				if (isTimepickerVal["data-time-basic"]) {
-					(timeData.enableTime = true),
-						(timeData.noCalendar = true),
-						(timeData.dateFormat = "H:i");
-				}
-				if (isTimepickerVal["data-time-hrs"]) {
-					(timeData.enableTime = true),
-						(timeData.noCalendar = true),
-						(timeData.dateFormat = "H:i"),
-						(timeData.time_24hr = true);
-				}
-				if (isTimepickerVal["data-min-time"]) {
-					(timeData.enableTime = true),
-						(timeData.noCalendar = true),
-						(timeData.dateFormat = "H:i"),
-						(timeData.minTime = isTimepickerVal["data-min-time"].value.toString());
-				}
-				if (isTimepickerVal["data-max-time"]) {
-					(timeData.enableTime = true),
-						(timeData.noCalendar = true),
-						(timeData.dateFormat = "H:i"),
-						(timeData.minTime = isTimepickerVal["data-max-time"].value.toString());
-				}
-				if (isTimepickerVal["data-default-time"]) {
-					(timeData.enableTime = true),
-						(timeData.noCalendar = true),
-						(timeData.dateFormat = "H:i"),
-						(timeData.defaultDate = isTimepickerVal["data-default-time"].value.toString());
-				}
-				if (isTimepickerVal["data-time-inline"]) {
-					(timeData.enableTime = true),
-						(timeData.noCalendar = true),
-						(timeData.defaultDate = isTimepickerVal["data-time-inline"].value.toString());
-					timeData.inline = true;
-				}
-				flatpickr(item, timeData);
-			}
-		});
+        if(flatpickrExamples){
+            Array.from(flatpickrExamples).forEach(function (item) {
+                if (item.getAttribute("data-provider") == "flatpickr") {
+                    var dateData = {};
+                    var isFlatpickerVal = item.attributes;
+                    dateData.disableMobile = "true";
+                    if (isFlatpickerVal["data-date-format"])
+                        dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
+                    if (isFlatpickerVal["data-enable-time"]) {
+                        (dateData.enableTime = true),
+                            (dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString() + " H:i");
+                    }
+                    if (isFlatpickerVal["data-altFormat"]) {
+                        (dateData.altInput = true),
+                            (dateData.altFormat = isFlatpickerVal["data-altFormat"].value.toString());
+                    }
+                    if (isFlatpickerVal["data-minDate"]) {
+                        dateData.minDate = isFlatpickerVal["data-minDate"].value.toString();
+                        dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
+                    }
+                    if (isFlatpickerVal["data-maxDate"]) {
+                        dateData.maxDate = isFlatpickerVal["data-maxDate"].value.toString();
+                        dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
+                    }
+                    if (isFlatpickerVal["data-deafult-date"]) {
+                        dateData.defaultDate = isFlatpickerVal["data-deafult-date"].value.toString();
+                        dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
+                    }
+                    if (isFlatpickerVal["data-multiple-date"]) {
+                        dateData.mode = "multiple";
+                        dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
+                    }
+                    if (isFlatpickerVal["data-range-date"]) {
+                        dateData.mode = "range";
+                        dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
+                    }
+                    if (isFlatpickerVal["data-inline-date"]) {
+                        (dateData.inline = true),
+                            (dateData.defaultDate = isFlatpickerVal["data-deafult-date"].value.toString());
+                        dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
+                    }
+                    if (isFlatpickerVal["data-disable-date"]) {
+                        var dates = [];
+                        dates.push(isFlatpickerVal["data-disable-date"].value);
+                        dateData.disable = dates.toString().split(",");
+                    }
+                    if (isFlatpickerVal["data-week-number"]) {
+                        var dates = [];
+                        dates.push(isFlatpickerVal["data-week-number"].value);
+                        dateData.weekNumbers = true
+                    }
+                    flatpickr(item, dateData);
+                } else if (item.getAttribute("data-provider") == "timepickr") {
+                    var timeData = {};
+                    var isTimepickerVal = item.attributes;
+                    if (isTimepickerVal["data-time-basic"]) {
+                        (timeData.enableTime = true),
+                            (timeData.noCalendar = true),
+                            (timeData.dateFormat = "H:i");
+                    }
+                    if (isTimepickerVal["data-time-hrs"]) {
+                        (timeData.enableTime = true),
+                            (timeData.noCalendar = true),
+                            (timeData.dateFormat = "H:i"),
+                            (timeData.time_24hr = true);
+                    }
+                    if (isTimepickerVal["data-min-time"]) {
+                        (timeData.enableTime = true),
+                            (timeData.noCalendar = true),
+                            (timeData.dateFormat = "H:i"),
+                            (timeData.minTime = isTimepickerVal["data-min-time"].value.toString());
+                    }
+                    if (isTimepickerVal["data-max-time"]) {
+                        (timeData.enableTime = true),
+                            (timeData.noCalendar = true),
+                            (timeData.dateFormat = "H:i"),
+                            (timeData.minTime = isTimepickerVal["data-max-time"].value.toString());
+                    }
+                    if (isTimepickerVal["data-default-time"]) {
+                        (timeData.enableTime = true),
+                            (timeData.noCalendar = true),
+                            (timeData.dateFormat = "H:i"),
+                            (timeData.defaultDate = isTimepickerVal["data-default-time"].value.toString());
+                    }
+                    if (isTimepickerVal["data-time-inline"]) {
+                        (timeData.enableTime = true),
+                            (timeData.noCalendar = true),
+                            (timeData.defaultDate = isTimepickerVal["data-time-inline"].value.toString());
+                        timeData.inline = true;
+                    }
+                    flatpickr(item, timeData);
+                }
+            });
+        }
 
 		// Dropdown
-		Array.from(document.querySelectorAll('.dropdown-menu a[data-bs-toggle="tab"]')).forEach(function (element) {
-			element.addEventListener("click", function (e) {
-				e.stopPropagation();
-				bootstrap.Tab.getInstance(e.target).show();
-			});
-		});
+        if(document.querySelectorAll('.dropdown-menu a[data-bs-toggle="tab"]')){
+            Array.from(document.querySelectorAll('.dropdown-menu a[data-bs-toggle="tab"]')).forEach(function (element) {
+                element.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    bootstrap.Tab.getInstance(e.target).show();
+                });
+            });
+        }
 	}
 
 	// on click collapse menu
@@ -372,7 +378,7 @@ File: Main Js File
 				document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
 			}
 			var ul = document.createElement("ul");
-			ul.innerHTML = '<a href="#" class="logo"><img src="build/images/logo-sm.png" alt="" height="22"></a>';
+			ul.innerHTML = '<a href="#" class="logo"><img src="'+ App.url +'build/images/logo-sm.png" alt="" height="22"></a>';
             if(document.getElementById("navbar-nav")){
                 Array.from(document.getElementById("navbar-nav").querySelectorAll(".menu-link")).forEach(function (item) {
                     ul.className = "twocolumn-iconview";
@@ -1044,7 +1050,7 @@ File: Main Js File
 						if (!emptyNotificationElem) {
 							elem.innerHTML += '<div class="empty-notification-elem">\
 							<div class="w-25 w-sm-50 pt-3 mx-auto">\
-								<img src="build/images/svg/bell.svg" class="img-fluid" alt="user-pic">\
+								<img src="'+ App.url +'build/images/svg/bell.svg" class="img-fluid" alt="user-pic">\
 							</div>\
 							<div class="text-center pb-5 mt-2">\
 								<h6 class="fs-18 fw-semibold lh-base">Hey! You have no any notifications </h6>\

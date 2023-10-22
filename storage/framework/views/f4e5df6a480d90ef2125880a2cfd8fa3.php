@@ -161,7 +161,7 @@ if (is_object($getActiveCompanies)) {
                                 <?php if(isset($extractCompanyIds)): ?>
                                     <input type="hidden" name="companies" value="<?php echo e(json_encode($extractCompanyIds)); ?>">
                                 <?php else: ?>
-                                    <p class="small text-warning">Empresas ainda não foram cadastradas/ativadas</p>
+                                    <div class="alert alert-warning">Empresas ainda não foram cadastradas/ativadas</div>
                                 <?php endif; ?>
                             <?php else: ?>
                                 <div class="mb-4">
@@ -187,7 +187,7 @@ if (is_object($getActiveCompanies)) {
                                         </div>
                                         <div class="form-text">Selecione as empresas em que este usuário poderá obter acesso aos dados.</div>
                                     <?php else: ?>
-                                        <p class="small text-warning">Empresas ainda não foram cadastradas/ativadas</p>
+                                        <div class="alert alert-warning">Empresas ainda não foram cadastradas/ativadas</div>
                                     <?php endif; ?>
                                 </div>
                             <?php endif; ?>

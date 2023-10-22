@@ -11,15 +11,21 @@ class SettingsAccountController extends Controller
 {
     protected $connection = 'smAppTemplate';
 
+    public function index()
+    {
+        // Returning the view with the list of files.
+        return view('settings.index');
+    }
+
     public function show()
     {
         $settings = DB::connection($this->connection)->table('settings')->pluck('value', 'key')->toArray();
-        return view('settings-account', compact('settings'));
+        return view('settings/account', compact('settings'));
     }
 
     public function store(Request $request)
     {
-        \Log::info($request->all());
+        //\Log::info($request->all());
 
         // Custom error messages
         $messages = [

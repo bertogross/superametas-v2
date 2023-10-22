@@ -86,11 +86,11 @@
 
                                                     </td>
                                                     <td class="align-middle">
-                                                        <?php echo $department->description; ?>
+                                                        <?php echo $department->department_description; ?>
 
                                                     </td>
                                                     <td class="align-middle">
-                                                        <input type="text" name="aliases[<?php echo e($department->id); ?>]" value="<?php echo e(empty($department->department_alias) ? e(strip_tags($department->description )) : e(strip_tags($department->department_alias))); ?>" maxlength="100" class="form-control">
+                                                        <input type="text" name="aliases[<?php echo e($department->id); ?>]" value="<?php echo e(empty($department->department_alias) ? e(strip_tags($department->department_description )) : e(strip_tags($department->department_alias))); ?>" maxlength="100" class="form-control">
                                                     </td>
                                                 </tr>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -100,7 +100,7 @@
                             </form>
                         </div><!--end tab-pane-->
                         <div class="tab-pane fade <?php echo e(session('active_tab') == 'companies' ? 'active show' : ''); ?>" id="v-pills-companies" role="tabpanel" aria-labelledby="v-pills-companies-tab">
-                            <form action="<?php echo e(route('companies.updateCompanies')); ?>" method="POST" autocomplete="off">
+                            <form action="<?php echo e(route('settings.companies.updateCompanies')); ?>" method="POST" autocomplete="off">
                                 <?php echo csrf_field(); ?>
                                 <?php echo method_field('PUT'); ?>
                                 <button type="submit" class="btn btn-theme float-end">Atualizar Empresas</button>

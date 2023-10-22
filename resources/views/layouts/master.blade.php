@@ -14,32 +14,40 @@
     @include('layouts.head-css')
 </head>
 
-@section('body')
-    @include('layouts.body')
-@show
-    <!-- Begin page -->
-    <div id="layout-wrapper">
-        @include('layouts.topbar')
-        @include('layouts.sidebar')
-        <!-- ============================================================== -->
-        <!-- Start right Content here -->
-        <!-- ============================================================== -->
-        <div class="main-content">
-            <div class="page-content">
-                <div class="container-fluid">
-                    @yield('content')
+    @section('body')
+        @include('layouts.body')
+    @show
+        <!-- Begin page -->
+        <div id="layout-wrapper">
+            @include('layouts.topbar')
+            @include('layouts.sidebar')
+            <!-- ============================================================== -->
+            <!-- Start right Content here -->
+            <!-- ============================================================== -->
+            <div class="main-content">
+                <div class="page-content">
+                    <div class="container-fluid">
+                        @yield('content')
+                    </div>
+                    <!-- container-fluid -->
                 </div>
-                <!-- container-fluid -->
+                <!-- End Page-content -->
+                @include('layouts.footer')
             </div>
-            <!-- End Page-content -->
-            @include('layouts.footer')
+            <!-- end main content-->
         </div>
-        <!-- end main content-->
-    </div>
-    <!-- END layout-wrapper -->
+        <!-- END layout-wrapper -->
 
-    <!-- JAVASCRIPT -->
-    @include('layouts.vendor-scripts')
-</body>
+        <!-- JAVASCRIPT -->
+        @include('layouts.vendor-scripts')
 
+        <div id="custom-backdrop" class="d-none text-muted">
+            <div style="display: flex; align-items: flex-end; justify-content: flex-start; height: 100vh; padding: 25px;">
+                Para continuar trabalhando enquanto este processo está em andamento, <a href="{{ url('/') }}" target="_blank" class="text-theme me-1 ms-1">clique aqui</a> para abrir o {{ env('APP_NAME') }} em nova guia
+            </div>
+        </div>
+
+        <div id="modalContainer"></div>
+
+    </body>
 </html>

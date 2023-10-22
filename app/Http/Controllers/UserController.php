@@ -28,7 +28,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        return view('settings-users', compact('users'));
+        return view('settings/users', compact('users'));
     }
 
     /**
@@ -50,7 +50,7 @@ class UserController extends Controller
             }*/
         }
 
-        return view('profile', compact('user'));
+        return view('profile.index', compact('user'));
     }
 
     /**
@@ -370,7 +370,7 @@ class UserController extends Controller
             $user = User::find($id);
         }
 
-        return view('components.settings-users-modal-form', compact('user'));
+        return view('settings/users-modal-form', compact('user'));
 
     }
 }

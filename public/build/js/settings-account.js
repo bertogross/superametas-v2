@@ -28,7 +28,7 @@ window.addEventListener('load', function() {
                 allowImagePreview: true,
                 allowRevert: true,
                 server: {
-                    url: '/upload-logo',
+                    url: '/upload/logo',
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
