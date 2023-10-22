@@ -7,6 +7,10 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 https://laravel-news.com/openai-for-laravel
 
 
+Version 2.0.16 - [2023-10-22]
+
+
+
 
 Version 2.0.15 - [2023-10-19 - 2023-10-22]
 - [Updated] helpers.php
