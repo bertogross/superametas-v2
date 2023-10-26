@@ -116,6 +116,8 @@ class SettingsDatabaseController extends Controller
     {
         $start_time = microtime(true);
 
+        $now = now();
+
         set_time_limit(600);
 
         // Set the database connection name dynamically
@@ -225,7 +227,7 @@ class SettingsDatabaseController extends Controller
                     $companyID = isset($values['empresa']) ? intval($values['empresa']) : 0;
 
                     $dateSale = isset($values['data_venda']) ? $values['data_venda'] : '';
-                    $netValue = isset($values['valor_liquido']) && is_numeric($values['valor_liquido']) ? number_format(floatval($values['valor_liquido']), 2, '.', '') : 0;
+                    $netValue = isset($values['valor_liquido']) && is_numeric($values['valor_liquido']) ? numberFormat(floatval($values['valor_liquido']), 2) : 0;
 
                     $companyData[$companyID] = [
                         'company_id' => $companyID,
@@ -241,7 +243,8 @@ class SettingsDatabaseController extends Controller
                         'company_id' => $companyID,
                         'department_id' => $departmentID,
                         'net_value' => $netValue,
-                        'date_sale' => $dateSale
+                        'date_sale' => $dateSale,
+                        'created_at' => $now
                     ];
                 }
                 // Check if there are more pages to fetch
@@ -265,7 +268,7 @@ class SettingsDatabaseController extends Controller
 
                 $end_time = microtime(true);
                 $elapsed_time = ($end_time - $start_time);
-                $elapsed_time = $elapsed_time >= 60 ? number_format( ($elapsed_time / 60), 2, '.', '')." minutes" : number_format($elapsed_time, 0, '.', '')." seconds";
+                $elapsed_time = $elapsed_time >= 60 ? numberFormat( ($elapsed_time / 60), 2)." minutes" : numberFormat($elapsed_time, 0)." seconds";
 
                 return response()->json([
                     'success' => false,
@@ -343,7 +346,7 @@ class SettingsDatabaseController extends Controller
 
         $end_time = microtime(true);
         $elapsed_time = ($end_time - $start_time);
-        $elapsed_time = $elapsed_time >= 60 ? number_format( ($elapsed_time / 60), 2, '.', '')." minutes" : number_format($elapsed_time, 0, '.', '')." seconds";
+        $elapsed_time = $elapsed_time >= 60 ? numberFormat( ($elapsed_time / 60), 2)." minutes" : numberFormat($elapsed_time, 0)." seconds";
 
         DB::disconnect($this->connection);
 

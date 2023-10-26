@@ -4,7 +4,6 @@ use App\Models\User;
 use App\Models\UserMeta;
 use Illuminate\Support\Facades\DB;
 
-
 // Retrieve a user's meta value based on the given key.
 if (!function_exists('getUserMeta')) {
     /**
@@ -26,7 +25,7 @@ if (!function_exists('formatPhoneNumber')) {
      */
     function formatPhoneNumber($phoneNumber) {
         // Remove all non-numeric characters from the phone number.
-        $phoneNumber = preg_replace('/\D/', '', $phoneNumber);
+        $phoneNumber = onlyNumber($phoneNumber);
 
         // Apply the desired formatting pattern to the phone number.
         return !empty($phoneNumber) ? preg_replace('/(\d{2})(\d{1})(\d{4})(\d{4})/', '($1) $2 $3-$4', $phoneNumber) : '';
@@ -75,6 +74,48 @@ if (!function_exists('getERPdata')) {
     }
 }
 
+if (!function_exists('getIPCAdata')) {
+    function getIPCAdata($meantime)
+    {
+        $return = '';
+
+        try {
+            $OnboardConnection = DB::connection('smOnboard');
+            $result = $OnboardConnection->table('app_api')->where('api_origin', 'ipca')->first();
+
+            if (!$result) {
+                return '';
+            }
+
+            $queryResult = isset($result->api_data) ? json_decode($result->api_data, true) : '';
+
+            if (!empty($queryResult)) {
+                if (!empty($queryResult[onlyNumber($meantime)]) && !empty($meantime)) {
+                    $return = array(
+                        'period' => $meantime,
+                        'value' => $queryResult[onlyNumber($meantime)]
+                    );
+                } else {
+                    end($queryResult);
+                    $lastKey = key($queryResult);
+
+                    $date = substr($lastKey, 0, -2) . '-' . substr($lastKey, -2, 6);
+                    $return = isset($queryResult[$lastKey]) ? array(
+                        'period' => date('Y-m', strtotime($date)),
+                        'value' => $queryResult[$lastKey]
+                    ) : '';
+                }
+            }
+        } catch (\Exception $e) {
+            // Log the error message
+            \Log::error($e->getMessage(), ['method' => __METHOD__, 'file' => __FILE__, 'line' => $e->getLine()]);
+
+            return '';
+        }
+
+        return $return;
+    }
+}
 
 if (!function_exists('extractDatabaseId')) {
     function extractDatabaseId($databaseConnection)
@@ -82,7 +123,7 @@ if (!function_exists('extractDatabaseId')) {
         // Logic to get the ID of the current database connection
         // This depends on how you have structured your database names and IDs
         // If your database names are smApp1, smApp2, etc., and IDs are 1, 2, etc.
-        return intval(preg_replace('/\D/', '', $databaseConnection));
+        return onlyNumber($databaseConnection);
     }
 }
 
@@ -138,8 +179,8 @@ if (!function_exists('formatBrazilianReal')) {
      * @param float $number The number to be formatted.
      * @return string The formatted number.
      */
-    function formatBrazilianReal(float $number, $decimal = 2): string {
-        return !empty($number) ? 'R$ ' . number_format( $number, $decimal, ',', '.') : '';
+    function formatBrazilianReal($number, $decimalPlaces = 2): string {
+        return !empty($number) && intval($number) > 0 ? 'R$ ' . numberFormat( $number, $decimalPlaces ) : 'R$ 0,00';
     }
 }
 
@@ -151,7 +192,7 @@ if (!function_exists('getCompanyAlias')) {
      * @param int $companyId The ID of the company.
      * @return string|null The company alias or null if not found.
      */
-    function getCompanyAlias(int $companyId): ?string {
+    function getCompanyAlias($companyId){
         $companyId = intval($companyId);
 
         $companyAlias = DB::connection('smAppTemplate')
@@ -171,7 +212,7 @@ if (!function_exists('getDepartmentAlias')) {
      * @param int $departmentId The ID of the department.
      * @return string|null The department alias or null if not found.
      */
-    function getDepartmentAlias(int $departmentId): ?string {
+    function getDepartmentAlias($departmentId){
         $departmentId = intval($departmentId);
 
         $departmentAlias = DB::connection('smAppTemplate')
@@ -189,7 +230,7 @@ if (!function_exists('metricGoalSales')) {
         $daysInMonth = intval(date('t'));
 
         if( empty($meantime) || $meantime == date('Y-m') ){
-            $metric = number_format( ( ( 100/$daysInMonth ) * intval(date('d') ) ), 1, '.', '');
+            $metric = numberFormat( ( ( 100/$daysInMonth ) * intval(date('d') ) ), 1);
         } elseif (is_string($meantime) && strtotime($meantime) !== false && date('Y-m', strtotime($meantime)) < date('Y-m')) {
             $metric = 100;
         } else{
@@ -225,7 +266,7 @@ if (!function_exists('getAuthorizedCompanies')) {
 
         $AuthorizedCompanies = getUserMeta($userId, 'companies');
 
-        $AuthorizedCompanies = $AuthorizedCompanies ? json_decode($AuthorizedCompanies, true) : '';
+        $AuthorizedCompanies = $AuthorizedCompanies ? json_decode($AuthorizedCompanies, true) : array();
 
         return empty($AuthorizedCompanies) ? getActiveCompanies() : $AuthorizedCompanies;
     }
@@ -246,8 +287,40 @@ if (!function_exists('getActiveDepartments')) {
 }
 
 
-function onlyNumber($goalData = null) {
-    return $goalData ? preg_replace('/\D/', '', $goalData) : 0;
+if (!function_exists('getCompanyLogo')) {
+    function getCompanyLogo(){
+        $settings = DB::connection('smAppTemplate')->table('settings')->pluck('value', 'key')->toArray();
+        return isset($settings['logo']) ? URL::asset('storage/' . $settings['logo']) : '';
+    }
+}
+
+
+if (!function_exists('getCompanyName')) {
+    function getCompanyName(){
+        $settings = DB::connection('smAppTemplate')->table('settings')->pluck('value', 'key')->toArray();
+        return isset($settings['name']) ? $settings['name'] : '';
+    }
+}
+
+
+if (!function_exists('onlyNumber')) {
+    function onlyNumber($number = null) {
+        $numericValue = preg_replace('/\D/', '', $number);
+        return is_numeric($numericValue) ? intval($numericValue) : 0;
+    }
+}
+
+if (!function_exists('numberFormat')) {
+    function numberFormat($number, $decimalPlaces = 0) {
+        $numericValue = is_numeric($number) ? floatval($number) : 0;
+        return number_format($numericValue, $decimalPlaces, ',', '.');
+    }
+}
+
+if (!function_exists('convertToNumeric')) {
+    function convertToNumeric($number) {
+        return floatval(str_replace(',', '.', str_replace('.', '', $number)));
+    }
 }
 
 if (!function_exists('getSaleDateRange')) {
@@ -267,6 +340,31 @@ if (!function_exists('getSaleDateRange')) {
         ];
     }
 }
+
+
+if (!function_exists('getLastUpdate')) {
+    function getLastUpdate($tableName, $dateFormat = "Y-m-d") {
+        try {
+            // Get the last updated date from the table
+            $lastUpdate = DB::connection('smAppTemplate')
+                ->table($tableName)
+                ->orderBy('updated_at', 'desc')
+                ->limit(1)
+                ->value('updated_at');
+
+            // Check if there is a result
+            if ($lastUpdate) {
+                // Format the date and return it
+                return date($dateFormat, strtotime($lastUpdate));
+            } else {
+                return '';
+            }
+        } catch (\Exception $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
+}
+
 
 
 if (!function_exists('getGoalsId')) {
@@ -295,7 +393,7 @@ if( !function_exists('goalsEmojiChart') ){
 
 		$bsTitle = !empty($companyName) ? $companyName.' :: '.$departmentName : ':: '.$departmentName;
 
-		if( $goal == 0 && $sale > 0 && $departmentId != 'general' && ( APP_IS_ADMIN || APP_IS_MANAGER || APP_IS_PARTNER ) ){
+		if( $goal == 0 && $sale > 0 && $departmentId != 'general' && ( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) ) ){
 			$html .= '<i class="text-danger blink ri-error-warning-line fw-bold position-relatvie w-auto mx-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Existe um conflito entre valor de Meta e Vendas para departamento '.$departmentName.'. Não há Meta ou não deveria haver vendas para este departamento no estabelecimento '.$companyName.'" style="z-index:2;"></i>';
 		}
 
@@ -318,6 +416,24 @@ if( !function_exists('goalsEmojiChart') ){
 		return $html;
 	}
 }
+
+
+if (!function_exists('getCookie')) {
+    /**
+     * Get the value of a specific cookie by its name.
+     *
+     * @param string $cookieName The name of the cookie.
+     * @return mixed The value of the cookie or null if the cookie does not exist.
+     */
+    function getCookie($cookieName) {
+        $cookieValue = request()->cookie($cookieName);
+        //dd($cookieValue);
+        return $cookieValue;
+    }
+}
+
+
+
 
 
 if(!function_exists('APP_print_r')){

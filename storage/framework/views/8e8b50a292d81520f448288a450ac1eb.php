@@ -1,4 +1,4 @@
-<div class=" mb-4 rounded position-relative wrap-filter-result toogle_zoomInOut ribbon-box border ribbon-fill shadow-none" id="load-listing">
+<div class=" mb-4 rounded position-relative toogle_zoomInOut ribbon-box border ribbon-fill shadow-none" id="load-listing">
     <div class="ribbon ribbon-info bg-theme text-black fs-12 <?php if(empty($result) ): ?> d-none <?php endif; ?>" style="z-index: 2; scale: 1.5; top: -10px; left: -30px;">
         <?php
             echo metricGoalSales();

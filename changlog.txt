@@ -8,9 +8,24 @@ https://laravel-news.com/openai-for-laravel
 
 
 
+Version 2.0.17 - [2023-10-23 - 2023-10-25]
+- [Added] helpers.php ( goalsEmojiChart )
+- [Updated] views\goal-sales\table.blade.php
+- [Added] views\goal-sales\edit-modal.blade.php
+- [Added] views\goal-sales\settings-modal.blade.php
+- [Added] views\goal-sales\single.blade.php
+- [Added] views\goal-sales\slide.blade.php
+- [Updated] GoalSalesController
+- [Updated] SettingsDatabaseController
+- [Updated] goal-sales.js
+- [Updated] helpers.js
+- [Updated] helpers.php
+- [Updated] routes\web.php
+
+
 
 Version 2.0.16 - [2023-10-22]
-- [Added] helpers.php ( goalsEmojiChart )
+- [Updated] helpers.php ( goalsEmojiChart )
 - [Updated] views\goal-sales\table.blade.php
 - [Updated] GoalSalesController
 - [Updated] goal-sales.js

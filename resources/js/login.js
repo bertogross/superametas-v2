@@ -1,4 +1,4 @@
-import {ToastAlert} from './helpers.js';
+import {toastAlert} from './helpers.js';
 
 window.addEventListener('load', function() {
     document.getElementById('btn-login').addEventListener('click', function(event) {
@@ -8,11 +8,11 @@ window.addEventListener('load', function() {
         let password = document.getElementById('password-input').value;
 
         if(!email){
-            ToastAlert('Informe o e-mail', 'error', 5000);
+            toastAlert('Informe o e-mail', 'error', 5000);
             return;
         }
         if(!password){
-            ToastAlert('Informe a senha', 'error', 5000);
+            toastAlert('Informe a senha', 'error', 5000);
             return;
         }
 

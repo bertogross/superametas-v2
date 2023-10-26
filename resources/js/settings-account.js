@@ -1,4 +1,4 @@
-import {ToastAlert} from './helpers.js';
+import {toastAlert} from './helpers.js';
 
 window.addEventListener('load', function() {
     // Register the plugins
@@ -43,7 +43,7 @@ window.addEventListener('load', function() {
             }
         } else {
             console.error('Input element not found!');
-            ToastAlert('Input element not found!', 'error');
+            toastAlert('Input element not found!', 'error');
         }
     }
     // Start the FilePond instance
@@ -63,7 +63,7 @@ window.addEventListener('load', function() {
                 var target = e.target,
                     value = target.value;
 
-                value = value.replace(/\D/g, ''); // Remove non-numeric characters
+                value = onlyNumbers(value); // Remove non-numeric characters
 
                 // If value is empty after removing non-numeric characters, clear the field
                 if (!value) {

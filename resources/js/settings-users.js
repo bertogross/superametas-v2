@@ -1,4 +1,4 @@
-import {ToastAlert} from './helpers.js';
+import {toastAlert} from './helpers.js';
 
 window.addEventListener('load', function() {
 
@@ -37,7 +37,7 @@ window.addEventListener('load', function() {
                     attachImageEventListeners("#cover-image-input", "#cover-img", "/upload/cover");
 
                 }else{
-                    ToastAlert('Não foi possível carregar o conteúdo', 'error', 10000);
+                    toastAlert('Não foi possível carregar o conteúdo', 'error', 10000);
                 }
 
             } else {
@@ -122,18 +122,18 @@ window.addEventListener('load', function() {
                 .then(response => response.json())
                 .then(response => {
                     if (response.success) {
-                        ToastAlert(response.message, 'success', 10000);
+                        toastAlert(response.message, 'success', 10000);
                         setTimeout(() => {
                             location.reload();
                         }, form.dataset.id ? 5000 : 120000);
 
                         document.getElementById('btn-save-user').remove();
                     } else {
-                        ToastAlert(response.message, 'danger', 60000);
+                        toastAlert(response.message, 'danger', 60000);
                     }
                 })
                 .catch(error => {
-                    ToastAlert('Error: ' + error, 'danger', 60000);
+                    toastAlert('Error: ' + error, 'danger', 60000);
                     console.error('Error:', error);
                 });
             });
@@ -231,17 +231,17 @@ window.addEventListener('load', function() {
                             .then(response => response.json())
                             .then(response => {
                                 if (response.success) {
-                                    ToastAlert(response.message, 'success');
+                                    toastAlert(response.message, 'success');
                                     if (response.path) {
                                         preview.src = '/storage/' + response.path;
                                         previewCard.src = '/storage/' + response.path;
                                     }
                                 } else {
-                                    ToastAlert(response.message, 'danger');
+                                    toastAlert(response.message, 'danger');
                                 }
                             })
                             .catch(error => {
-                                ToastAlert('Upload failed: ' + error, 'danger');
+                                toastAlert('Upload failed: ' + error, 'danger');
                                 console.error('Error:', error);
                             });
                         }, 'image/jpeg', 0.7);

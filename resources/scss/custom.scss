@@ -795,3 +795,27 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
 .hide-slowly {
     opacity: 0;
 }
+
+
+.swiper-button-next,
+.swiper-button-prev,
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    color: var(--vz-theme) !important;
+}
+.swiper-button-next,
+.swiper-button-prev{
+    visibility: hidden;
+}
+.pagination-scrollbar-swiper:hover .swiper-button-next,
+.pagination-scrollbar-swiper:hover .swiper-button-prev{
+    visibility: visible;
+}
+@media (max-width: 767.98px) {
+    .pagination-scrollbar-swiper:hover .swiper-button-next,
+    .pagination-scrollbar-swiper:hover .swiper-button-prev,
+    .swiper-button-next,
+    .swiper-button-prev {
+        visibility: hidden;
+    }
+}

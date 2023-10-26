@@ -1,15 +1,29 @@
-import { ToastAlert, MultipleModal, formatNumberInput, helperSumValues } from './helpers.js';
+import {
+    toastAlert,
+    multipleModal,
+    formatNumberInput,
+    sumInputNumbers,
+    toggleZoomInOut,
+    setSessionStorage,
+    getSessionStorage,
+    showButtonWhenInputChange,
+    goTo,
+    onlyNumbers,
+    bsPopoverTooltip,
+    formatNumber,
+    percentageResult
+} from './helpers.js';
 
 window.addEventListener('load', function () {
 
     /**
      * Toggle the display of the custom meantime input field based on the selected option in the meantime select dropdown.
      */
-    const meantimeSelect = document.querySelector('select[name="meantime"]');
-    const customMeantimeDiv = document.querySelector('.custom_meantime_is_selected');
-    const customMeantimeInput = document.querySelector('.custom_meantime_is_selected input');
-
     function toggleCustomMeantimeInput() {
+        const meantimeSelect = document.querySelector('select[name="meantime"]');
+        const customMeantimeDiv = document.querySelector('.custom_meantime_is_selected');
+        const customMeantimeInput = document.querySelector('.custom_meantime_is_selected input');
+
         const selectedOption = meantimeSelect.value;
         if (selectedOption === 'custom') {
             customMeantimeDiv.style.display = 'block';
@@ -20,10 +34,9 @@ window.addEventListener('load', function () {
                 customMeantimeInput.value = '';
             }
         }
+        meantimeSelect.addEventListener('change', toggleCustomMeantimeInput);
     }
     toggleCustomMeantimeInput();
-
-    meantimeSelect.addEventListener('change', toggleCustomMeantimeInput);
 
     /**
      * Initialize flatpickr with specific options for elements with the class 'flatpickr-range-month'.
@@ -50,23 +63,6 @@ window.addEventListener('load', function () {
         });
     }
 
-    /**
-     * Hide the load listing element slowly on form change.
-     */
-    function hideLoadListingOnFormChange() {
-        // Get the form element
-        var filterForm = document.getElementById("filterForm");
-
-        // Get the load listing element
-        var loadListing = document.getElementById("load-listing");
-
-        // Add a change event listener to the form
-        filterForm.addEventListener("change", function () {
-            // Hide the load listing element slowly
-            loadListing.classList.add("hide-slowly");
-        });
-    }
-    hideLoadListingOnFormChange();
 
 
     /**
@@ -98,7 +94,7 @@ window.addEventListener('load', function () {
             attachModalEventListeners();
         } catch (error) {
             console.error('Error fetching modal content:', error);
-            ToastAlert('Não foi possível carregar o conteúdo', 'error', 10000);
+            toastAlert('Não foi possível carregar o conteúdo', 'error', 10000);
         }
     }
 
@@ -145,23 +141,23 @@ window.addEventListener('load', function () {
             const btnText = purpose === 'update' ? 'Atualizar' : 'Salvar';
             document.querySelector("#goalSalesEditModal #btn-goal-sales-update").innerHTML = btnText;
 
-            MultipleModal();
+            //sumInputNumbers('.o-sum-fields-previous-year', '.sum-result-previous-year');
+            //sumInputNumbers('.o-sum-fields-previous-month', '.sum-result-previous-month');
+            sumInputNumbers('.o-sum-fields-current', '.sum-result-current');
 
             formatNumberInput();
 
-            // Call helperSumValues after the modal content has been loaded
-            helperSumValues('.o-sum-fields-previous', 'sum-result-previous', 0);
-            helperSumValues('.o-sum-fields-current', 'sum-result-current', 0);
-            helperSumValues('.o-sum-fields', 'sum-result', 0);
+            showButtonWhenInputChange();
 
-            makeGoalSalesUpdate(meantime, companyId);
+            multipleModal();
+
+            attachGoalSalesUpdateListeners(meantime, companyId);
 
         } catch (error) {
             console.error('Error fetching modal content:', error);
-            ToastAlert('Não foi possível carregar o conteúdo', 'error', 10000);
+            toastAlert('Não foi possível carregar o conteúdo', 'error', 10000);
         }
     }
-
 
     // Event listeners for each 'Edit Goal Sales' button
     function attachModalEventListeners(){
@@ -184,7 +180,7 @@ window.addEventListener('load', function () {
     }
 
     // Event listeners for 'Update' button
-    function makeGoalSalesUpdate(meantime, companyId) {
+    function attachGoalSalesUpdateListeners(meantime, companyId) {
 
         // store/update goalSalesForm
         document.getElementById('btn-goal-sales-update').addEventListener('click', async function(event) {
@@ -231,218 +227,642 @@ window.addEventListener('load', function () {
                         tr.classList.remove('blink');
                     }, 10000);
 
-                    ToastAlert(data.message, 'success', 10000);
+                    toastAlert(data.message, 'success', 10000);
                 } else {
-                    ToastAlert(data.message, 'danger', 60000);
+                    toastAlert(data.message, 'danger', 60000);
                 }
             } catch (error) {
-                ToastAlert('Error: ' + error, 'danger', 60000);
+                toastAlert('Error: ' + error, 'danger', 60000);
                 console.error('Error:', error);
             }
         });
     }
 
+    // Check if the element with class 'analytic-mode' exists
+    if (document.querySelector('.analytic-mode')) {
+        document.querySelector('.analytic-mode').addEventListener('click', function () {
 
-    function emoticonChart() {
-        // Check if there are any elements with the class 'goal-chart' inside the element with class 'listing-chart'
-        if (document.querySelectorAll('.listing-chart .goal-chart')) {
-            // Loop through each element with the class 'goal-chart' inside the element with class 'listing-chart'
-            document.querySelectorAll('.listing-chart .goal-chart').forEach(function (element) {
-                // Get attributes from the element
-                var chartId = element.getAttribute('id');
-                var chartStyle = element.getAttribute('data-style');
-                var companyCount = element.getAttribute('data-company-count');
-                var departmentName = element.getAttribute('data-department-name');
+            // Send AJAX request to toggle analytics mode in the database
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/goal-sales/analytic-mode', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    var response = JSON.parse(xhr.responseText);
 
-                // Parse percent values or default to 0
-                var chartPercent = parseInt(element.getAttribute('data-percent')) || 0;
-                var chartPercentAccrued = parseInt(element.getAttribute('data-percent-from-metric')) || 0;
+                    setSessionStorage('analytic-mode', response.analyticMode);
 
-                // Define emoji icons
-                var iconSleep = App.url + 'build/images/svg/sleep.png';
-                var iconCrying = App.url + 'build/images/svg/crying.png';
-                var iconSad = App.url + 'build/images/svg/sad.png';
-                var iconWow = App.url + 'build/images/svg/wow.png';
-                var iconSmile = App.url + 'build/images/svg/smile.png';
-                var iconHappy = App.url + 'build/images/svg/happy.png';
-                var iconBoss = App.url + 'build/images/svg/boss.png';
-                var iconCongratulations = App.url + 'build/images/svg/congratulations.png';
+                    setSessionStorage('slide-mode', false)
 
-                // Define chart dimensions and styles based on chartStyle attribute
-                var chartWidth, chartHeight, imageWH, vOffsetY, cFontSize;
-                switch (chartStyle) {
-                    case 'general':
-                    case 'global':
-                        chartWidth = 160;
-                        chartHeight = 160;
-                        imageWH = 90;
-                        vOffsetY = 60;
-                        cFontSize = '18px';
-                        break;
-                    case 'small':
-                        chartWidth = 55;
-                        chartHeight = 55;
-                        imageWH = 35;
-                        vOffsetY = 28;
-                        cFontSize = '12px';
-                        break;
-                    case 'medium':
-                        chartWidth = 70;
-                        chartHeight = 70;
-                        imageWH = 50;
-                        vOffsetY = 35;
-                        cFontSize = '14px';
-                        break;
-                    default:
-                        chartWidth = 130;
-                        chartHeight = 130;
-                        imageWH = 72;
-                        vOffsetY = 51;
-                        cFontSize = '16px';
-                        break;
+                    setTimeout(function () {
+                        location.reload(true);
+                    }, 300);
+                }
+            };
+            xhr.send('_token=' + encodeURIComponent(document.querySelector('meta[name="csrf-token"]').content));
+        });
+    }
+
+    // Check if the element with class 'slide-mode' exists
+    if (document.querySelector('.slide-mode')) {
+        document.querySelector('.slide-mode').addEventListener('click', function () {
+
+            // Send AJAX request to toggle analytics mode in the database
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/goal-sales/slide-mode', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    var response = JSON.parse(xhr.responseText);
+
+                    setSessionStorage('slide-mode', response.slideMode);
+
+                    setSessionStorage('analytic-mode', false);
+
+                    setTimeout(function () {
+                        location.reload(true);
+                    }, 300);
+                }
+            };
+            xhr.send('_token=' + encodeURIComponent(document.querySelector('meta[name="csrf-token"]').content));
+        });
+    }
+
+    // Check if the element with ID 'restore-session' exists
+    if (document.querySelector('#restore-session')) {
+        document.querySelector('#restore-session').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            setSessionStorage('filter-toggle', false);
+
+            // Send AJAX request to remove analytics and slide mode from database
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/goal-sales/default-mode', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    setSessionStorage('slide-mode', false);
+
+                    setSessionStorage('analytic-mode', false);
+
+                    setTimeout(function () {
+                        location.reload(true);
+                    }, 300);
+                }
+            };
+            xhr.send('_token=' + encodeURIComponent(document.querySelector('meta[name="csrf-token"]').content));
+        });
+    }
+
+    // Check if the element with class 'filter-toggle' exists
+    if (document.querySelector('.filter-toggle')) {
+        document.addEventListener('click', function (event) {
+            if (event.target.classList.contains('filter-toggle')) {
+                var toggleFilter = event.target;
+
+                // Remove focus from the clicked button
+                toggleFilter.blur();
+
+                // Check if the toggle button is checked
+                if (toggleFilter.checked) {
+                    document.getElementById('filter').style.display = 'block'; // Show the filter
+
+                    setSessionStorage('filter-toggle', false); // Remove the session
+
+                    toggleFilter.checked = true; // Set the toggle button to checked
+
+                    document.querySelector('label[for="filter-toggle"] span').textContent = 'Filtro'; // Change the label text
+
+                } else {
+                    document.getElementById('filter').style.display = 'none'; // Hide the filter
+
+                    setSessionStorage('filter-toggle'); // Set the session
+
+                    toggleFilter.checked = false; // Set the toggle button to unchecked
+
+                    document.querySelector('label[for="filter-toggle"] span').textContent = 'Exibir Filtro'; // Change the label text
                 }
 
-                // Initialize hollowIcon
-                var hollowIcon = iconSleep;
+            }
+        });
 
-                // Define gradient colors based on chartPercent
-                var gradientFromColor = '#87DF01';
-                var gradientToColor = '#FF4E1E';
-                if (chartPercent < 25 || !chartPercent) {
-                    gradientFromColor = '#262a2f';
-                    gradientToColor = '#FF4E1E';
-                } else if (chartPercent >= 25 && chartPercent < 50) {
-                    gradientFromColor = '#262a2f';
-                    gradientToColor = '#FF4E1E';
-                } else if (chartPercent >= 50 && chartPercent < 90) {
-                    gradientFromColor = '#262a2f';
-                    gradientToColor = '#FF9101';
-                } else if (chartPercent >= 90 && chartPercent < 100) {
-                    gradientFromColor = '#262a2f';
-                    gradientToColor = '#FCD828';
-                } else if (chartPercent >= 100 && chartPercent < 125) {
-                    gradientFromColor = '#262a2f';
-                    gradientToColor = '#87DF01';
-                } else if (chartPercent >= 125 && chartPercent < 150) {
-                    gradientFromColor = '#87DF01';
-                    gradientToColor = '#87DF01';
-                } else if (chartPercent >= 150 && chartPercent < 175) {
-                    gradientFromColor = '#87DF01';
-                    gradientToColor = '#87DF01';
-                } else if (chartPercent >= 175) {
-                    gradientFromColor = '#87DF01';
-                    gradientToColor = '#87DF01';
-                }
+        // Set the initial state of the filter based on the session value
+        setTimeout(function () {
+            if (getSessionStorage('filter-toggle')) {
+                document.getElementById('filter').style.display = 'none'; // Hide the filter
 
-                // Define hollowIcon based on chartPercentAccrued
-                if (chartPercentAccrued < 25 || !chartPercentAccrued) {
-                    hollowIcon = iconSleep;
-                } else if (chartPercentAccrued >= 25 && chartPercentAccrued < 50) {
-                    hollowIcon = iconCrying;
-                } else if (chartPercentAccrued >= 50 && chartPercentAccrued < 90) {
-                    hollowIcon = iconSad;
-                } else if (chartPercentAccrued >= 90 && chartPercentAccrued < 100) {
-                    hollowIcon = iconSmile;
-                } else if (chartPercentAccrued >= 100 && chartPercentAccrued < 125) {
-                    hollowIcon = iconWow;
-                } else if (chartPercentAccrued >= 125 && chartPercentAccrued < 150) {
-                    hollowIcon = iconHappy;
-                } else if (chartPercentAccrued >= 150 && chartPercentAccrued < 175) {
-                    hollowIcon = iconBoss;
-                } else if (chartPercentAccrued >= 175) {
-                    hollowIcon = iconCongratulations;
-                }
+                document.querySelector('label[for="filter-toggle"] span').textContent = 'Exibir Filtro'; // Change the label text
 
-                // Define chart options
-                var options = {
-                    series: [chartPercent],
-                    colors: [gradientFromColor, gradientFromColor],
-                    chart: {
-                        width: chartWidth,
-                        height: chartHeight,
-                        type: 'radialBar',
-                        toolbar: {
-                            show: false
+                document.querySelector('input.filter-toggle').checked = false; // Set the toggle button to unchecked
+            } else {
+                document.getElementById('filter').style.display = 'block'; // Show the filter
+
+                document.querySelector('label[for="filter-toggle"] span').textContent = 'Filtro'; // Change the label text
+
+                document.querySelector('input.filter-toggle').checked = true; // Set the toggle button to checked
+            }
+        }, 300);
+    }
+
+    /**
+     * Initialize flatpickr
+     */
+    toggleZoomInOut();
+
+
+
+    // Check if there are any elements with the class 'goal-chart' inside the element with class 'listing-chart'
+    if (document.querySelectorAll('.listing-chart .goal-chart')) {
+        // Loop through each element with the class 'goal-chart' inside the element with class 'listing-chart'
+        document.querySelectorAll('.listing-chart .goal-chart').forEach(function (element) {
+            // Get attributes from the element
+            var chartId = element.getAttribute('id');
+            var chartStyle = element.getAttribute('data-style');
+            var companyCount = element.getAttribute('data-company-count');
+            var departmentName = element.getAttribute('data-department-name');
+
+            // Parse percent values or default to 0
+            var chartPercent = parseInt(element.getAttribute('data-percent')) || 0;
+            var chartPercentAccrued = parseInt(element.getAttribute('data-percent-from-metric')) || 0;
+
+            // Define emoji icons
+            var iconSleep = App.url + 'build/images/svg/sleep.png';
+            var iconCrying = App.url + 'build/images/svg/crying.png';
+            var iconSad = App.url + 'build/images/svg/sad.png';
+            var iconWow = App.url + 'build/images/svg/wow.png';
+            var iconSmile = App.url + 'build/images/svg/smile.png';
+            var iconHappy = App.url + 'build/images/svg/happy.png';
+            var iconBoss = App.url + 'build/images/svg/boss.png';
+            var iconCongratulations = App.url + 'build/images/svg/congratulations.png';
+
+            // Define chart dimensions and styles based on chartStyle attribute
+            var chartWidth, chartHeight, imageWH, vOffsetY, cFontSize;
+            switch (chartStyle) {
+                case 'general':
+                case 'global':
+                    chartWidth = 160;
+                    chartHeight = 160;
+                    imageWH = 90;
+                    vOffsetY = 60;
+                    cFontSize = '18px';
+                    break;
+                case 'small':
+                    chartWidth = 55;
+                    chartHeight = 55;
+                    imageWH = 35;
+                    vOffsetY = 28;
+                    cFontSize = '12px';
+                    break;
+                case 'medium':
+                    chartWidth = 70;
+                    chartHeight = 70;
+                    imageWH = 50;
+                    vOffsetY = 35;
+                    cFontSize = '14px';
+                    break;
+                default:
+                    chartWidth = 130;
+                    chartHeight = 130;
+                    imageWH = 72;
+                    vOffsetY = 51;
+                    cFontSize = '16px';
+                    break;
+            }
+
+            // Initialize hollowIcon
+            var hollowIcon = iconSleep;
+
+            // Define gradient colors based on chartPercent
+            var gradientFromColor = '#87DF01';
+            var gradientToColor = '#FF4E1E';
+            if (chartPercent < 25 || !chartPercent) {
+                gradientFromColor = '#262a2f';
+                gradientToColor = '#FF4E1E';
+            } else if (chartPercent >= 25 && chartPercent < 50) {
+                gradientFromColor = '#262a2f';
+                gradientToColor = '#FF4E1E';
+            } else if (chartPercent >= 50 && chartPercent < 90) {
+                gradientFromColor = '#262a2f';
+                gradientToColor = '#FF9101';
+            } else if (chartPercent >= 90 && chartPercent < 100) {
+                gradientFromColor = '#262a2f';
+                gradientToColor = '#FCD828';
+            } else if (chartPercent >= 100 && chartPercent < 125) {
+                gradientFromColor = '#262a2f';
+                gradientToColor = '#87DF01';
+            } else if (chartPercent >= 125 && chartPercent < 150) {
+                gradientFromColor = '#87DF01';
+                gradientToColor = '#87DF01';
+            } else if (chartPercent >= 150 && chartPercent < 175) {
+                gradientFromColor = '#87DF01';
+                gradientToColor = '#87DF01';
+            } else if (chartPercent >= 175) {
+                gradientFromColor = '#87DF01';
+                gradientToColor = '#87DF01';
+            }
+
+            // Define hollowIcon based on chartPercentAccrued
+            if (chartPercentAccrued < 25 || !chartPercentAccrued) {
+                hollowIcon = iconSleep;
+            } else if (chartPercentAccrued >= 25 && chartPercentAccrued < 50) {
+                hollowIcon = iconCrying;
+            } else if (chartPercentAccrued >= 50 && chartPercentAccrued < 90) {
+                hollowIcon = iconSad;
+            } else if (chartPercentAccrued >= 90 && chartPercentAccrued < 100) {
+                hollowIcon = iconSmile;
+            } else if (chartPercentAccrued >= 100 && chartPercentAccrued < 125) {
+                hollowIcon = iconWow;
+            } else if (chartPercentAccrued >= 125 && chartPercentAccrued < 150) {
+                hollowIcon = iconHappy;
+            } else if (chartPercentAccrued >= 150 && chartPercentAccrued < 175) {
+                hollowIcon = iconBoss;
+            } else if (chartPercentAccrued >= 175) {
+                hollowIcon = iconCongratulations;
+            }
+
+            // Define chart options
+            var options = {
+                series: [chartPercent],
+                colors: [gradientFromColor, gradientFromColor],
+                chart: {
+                    width: chartWidth,
+                    height: chartHeight,
+                    type: 'radialBar',
+                    toolbar: {
+                        show: false
+                    },
+                    events: {
+                        mounted: function (chart) {
+                            chart.windowResizeHandler();
+                        }
+                    }
+                },
+                plotOptions: {
+                    radialBar: {
+                        startAngle: -135,
+                        endAngle: 135,
+                        hollow: {
+                            margin: 0,
+                            size: '60%',
+                            image: hollowIcon,
+                            imageWidth: imageWH,
+                            imageHeight: imageWH,
+                            imageClipped: false
                         },
-                        events: {
-                            mounted: function (chart) {
-                                chart.windowResizeHandler();
+                        track: {
+                            background: '#32383E',
+                            strokeWidth: '98%',
+                            margin: 2,
+                        },
+                        dataLabels: {
+                            show: true,
+                            name: {
+                                show: false,
+                                offsetY: 40,
+                                color: '#ced4da',
+                                fontSize: '15px'
+                            },
+                            value: {
+                                show: true,
+                                formatter: function (val) {
+                                    return parseInt(val) + '%';
+                                },
+                                color: '#ced4da',
+                                fontSize: cFontSize,
+                                offsetY: vOffsetY,
                             }
                         }
+                    }
+                },
+                grid: {
+                    padding: {
+                        top: -10,
+                        right: -10,
+                        bottom: -10,
+                        left: -10
+                    }
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'dark',
+                        type: 'vertical',
+                        gradientToColors: [gradientToColor],
+                        inverseColors: true,
+                        opacityFrom: 1,
+                        opacityTo: 1,
+                        stops: [0, 100]
+                    }
+                },
+                stroke: {
+                    lineCap: 'butt'
+                }
+            };
+
+            // Create and render the chart
+            var EmoticonChart = new ApexCharts(document.querySelector("#" + chartId), options);
+            setTimeout(function () {
+                EmoticonChart.render();
+            }, 10);
+        });
+    }
+
+
+    if (document.querySelectorAll('#goal-sales-chart-area').length) {
+        document.querySelectorAll('#goal-sales-chart-area').forEach(function (chartElement) {
+            var chartID = chartElement.id;
+            var chartMin = 0;
+            var chartMax = parseInt(chartElement.getAttribute('data-max'));
+            var chartTick = parseInt(chartElement.getAttribute('data-tick'));
+            var chartFilename = chartElement.getAttribute('data-meantime');
+            var chartMeantime = chartElement.getAttribute('data-meantime') ? chartElement.getAttribute('data-meantime').split(',') : '';
+
+            //var chartGoal = chartElement.getAttribute('data-goal') ? chartElement.getAttribute('data-goal').split(',').map(Number) : '';
+            /*var chartGoal = chartElement.getAttribute('data-goal')
+            ? chartElement.getAttribute('data-goal').split(',').map(function(item) {
+                var number = Number(item);
+                return isNaN(number) ? 0 : number;
+            })
+            : '';*/
+            var chartGoal = chartElement.getAttribute('data-goal')
+            ? chartElement.getAttribute('data-goal').split(',').map(function(num) {
+                return isNaN(Number(num)) ? 0 : Number(num);
+            })
+            : [];
+
+            //var chartSale = chartElement.getAttribute('data-sale') ? chartElement.getAttribute('data-sale').split(',').map(Number) : '';
+            /*var chartSale = chartElement.getAttribute('data-sale')
+            ? chartElement.getAttribute('data-sale').split(',').map(function(item) {
+                var number = Number(item);
+                return isNaN(number) ? 0 : number;
+            })
+            : '';*/
+            var chartSale = chartElement.getAttribute('data-sale')
+            ? chartElement.getAttribute('data-sale').split(',').map(function(num) {
+                return isNaN(Number(num)) ? 0 : Number(num);
+            })
+            : [];
+
+            var options = {
+                series: [
+                    {
+                        name: 'Vendas',
+                        data: chartSale
+                    }, {
+                        name: 'Meta',
+                        data: chartGoal
+                    }
+                ],
+                chart: {
+                    height: 600,
+                    type: 'area',//bar
+                    toolbar: {
+                        show: true,
+                        offsetX: 0,
+                        offsetY: -33,
+                        tools: {
+                            download: false,
+                            selection: false,
+                            zoom: false,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: false,
+                            customIcons: []
+                        },
+                        export: {
+                            csv: {
+                                filename: chartFilename,
+                                columnDelimiter: ',',
+                                headerCategory: 'Período',
+                                headerValue: 'value',
+                                dateFormatter: function (timestamp) {
+                                    return new Date(timestamp).toDateString();
+                                }
+                            },
+                            svg: {
+                                filename: chartFilename,
+                            },
+                            png: {
+                                filename: chartFilename,
+                            }
+                        },
+                        autoSelected: 'zoom'
+                    }
+                },
+                dataLabels: {
+                    enabled: false,
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2,
+                },
+                xaxis: {
+                    categories: chartMeantime
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function (value) {
+                            var brFormat = new Intl.NumberFormat(undefined, {
+                                style: 'currency',
+                                currency: 'BRL',
+                                maximumFractionDigits: 0,
+                                minimumFractionDigits: 0,
+                            }).format(value);
+
+                            return brFormat;
+                        }
                     },
-                    plotOptions: {
-                        radialBar: {
-                            startAngle: -135,
-                            endAngle: 135,
-                            hollow: {
-                                margin: 0,
-                                size: '60%',
-                                image: hollowIcon,
-                                imageWidth: imageWH,
-                                imageHeight: imageWH,
-                                imageClipped: false
-                            },
-                            track: {
-                                background: '#32383E',
-                                strokeWidth: '98%',
-                                margin: 2,
-                            },
-                            dataLabels: {
-                                show: true,
-                                name: {
-                                    show: false,
-                                    offsetY: 40,
-                                    color: '#ced4da',
-                                    fontSize: '15px'
-                                },
-                                value: {
-                                    show: true,
-                                    formatter: function (val) {
-                                        return parseInt(val) + '%';
-                                    },
-                                    color: '#ced4da',
-                                    fontSize: cFontSize,
-                                    offsetY: vOffsetY,
+                    tickAmount: chartTick,
+                    min: chartMin,
+                    max: chartMax
+                },
+                colors: getChartColorsArray(chartID),
+                fill: {
+                    opacity: 0.06,
+                    colors: getChartColorsArray(chartID),
+                    type: 'solid'
+                }
+            };
+            var areaChart = new ApexCharts(document.getElementById(chartID), options);
+            areaChart.render();
+        });
+    }
+
+
+    showButtonWhenInputChange();
+
+
+
+    document.addEventListener('click', function (event) {
+        // Check if the clicked element has the ID 'btn-ipca-self-fill'
+        if (event.target && event.target.id === 'btn-ipca-self-fill') {
+            event.preventDefault();
+
+            const button = event.target;
+
+            // Get the from and to selectors
+            const from = button.getAttribute('data-from');
+            const to = button.getAttribute('data-to');
+
+            // Remove focus from the button
+            button.blur();
+
+            // Get the original title of the button
+            var buttonSwalText = button.getAttribute('data-swal-title');
+
+            // Get the previous meantime
+            var previousMeantime = button.getAttribute('data-previous-meantime');
+
+            // Get the IPCA percentage value
+            var ipcaPercentValue = button.getAttribute('data-ipca-value');
+
+            // Extract the percentage value from the IPCA percentage value
+            var inputValue = formatNumber(ipcaPercentValue, 2);
+
+            // Show the Swal modal
+            Swal.fire({
+                title: 'Variação IPCA',
+                html: '<div class="text-center small mb-1">Aplique o valor proposto ou ajuste ao percentual desejado</div><div class="small fs-11 mt-2 text-start">' + buttonSwalText + '</div>',
+                input: 'text',
+                inputValue: inputValue,
+                inputValidator: (value) => {
+                    if (!value || value <= 0) {
+                        toastAlert('Necessário informar o percentual', 'error', 10000);
+
+                        return 'Necessário informar o percentual'
+                    }
+                },
+                focusConfirm: false,
+                //allowEscapeKey: false,
+                //allowEnterKey: false,
+                //stopKeydownPropagation: true,
+                //inputAutoTrim: true,
+                allowOutsideClick: false,
+                width: '397px',
+                buttonsStyling: false,
+                showCloseButton: true,
+                showCancelButton: false,
+                cancelButtonText: 'Voltar',
+                showConfirmButton: true,
+                confirmButtonText: 'Aplicar',
+                inputAutoFocus: true,
+                inputAttributes: {
+                    minlength: 1,
+                    maxlength: 5
+                },
+                customClass: {
+                    closeButton: 'btn btn-dark ms-1',
+                    cancelButton: 'btn btn-sm btn-outline-danger ms-1',
+                    confirmButton: 'btn btn-theme ms-1'
+                },
+                didOpen: function () {
+                    setTimeout(function () {
+                        showButtonWhenInputChange();
+
+                        formatNumberInput('.swal2-input', 2);
+                    }, 100);
+                }
+            }).then(result => {
+                // Check if the confirm button was clicked
+                if (result.isConfirmed) {
+                    //console.log(result.value);
+
+                    // Get the new IPCA percentage value
+                    var newPercentage = onlyNumbers(result.value);
+                    console.log('newPercentage' + newPercentage);
+
+                    // Initialize the sum of prices
+                    var sumPrice = 0;
+
+                    if (!newPercentage || newPercentage <= 0) {
+                        toastAlert('Necessário informar o percentual', 'error', 10000);
+
+                        return;
+                    }
+                    setTimeout(function () {
+
+                        // Get all the elements that match the 'to' selector
+                        var toElements = document.querySelectorAll(to);
+
+                        // Loop through each element
+                        toElements.forEach(function (element) {
+                            // Get the price element and its value
+                            var priceElement = element.closest('tr').querySelector(from).textContent;
+
+                            var price = onlyNumbers(priceElement);
+
+                            // Add the price to the sum of prices
+                            sumPrice += price;
+
+                            // Check if the price and percentage values are not empty
+                            if (price) {
+                                // Calculate the result and format it
+                                var percentage = percentageResult(price, newPercentage, 2);
+
+                                // Check if the result is not empty
+                                if (percentage) {
+                                    // Get the 'to' element and set its value
+                                    var toElement = element.closest('tr').querySelector(to);
+
+                                    toElement.value = onlyNumbers(percentage);
+
+                                    // Get the 'wrap-form-btn' element and remove the 'd-none' class
+                                    var wrapFormBtn = element.closest('form').querySelector('.wrap-form-btn');
+                                    if (wrapFormBtn) {
+                                        wrapFormBtn.classList.remove('d-none');
+                                    }
                                 }
                             }
-                        }
-                    },
-                    grid: {
-                        padding: {
-                            top: -10,
-                            right: -10,
-                            bottom: -10,
-                            left: -10
-                        }
-                    },
-                    fill: {
-                        type: 'gradient',
-                        gradient: {
-                            shade: 'dark',
-                            type: 'vertical',
-                            gradientToColors: [gradientToColor],
-                            inverseColors: true,
-                            opacityFrom: 1,
-                            opacityTo: 1,
-                            stops: [0, 100]
-                        }
-                    },
-                    stroke: {
-                        lineCap: 'butt'
-                    }
-                };
+                        });
 
-                // Create and render the chart
-                var EmoticonChart = new ApexCharts(document.querySelector("#" + chartId), options);
-                setTimeout(function () {
-                    EmoticonChart.render();
-                }, 10);
+                        // Check if the sum of prices is zero
+                        if (sumPrice === 0) {
+                            toastAlert('Não há dados de vendas relativa ao periodo ' + previousMeantime + ' e por isso não será possível executar o autopreenchimento', 'warning', 20000);
+
+                            return false;
+                        }
+
+                        // Call the sumInputNumbers function (you need to define this function)
+                        sumInputNumbers('.o-sum-fields-current', '.sum-result-current');
+
+                        formatNumberInput();
+
+                        // Add the 'blink' class to the button
+                        var blinkButton = document.querySelector('.wrap-form-btn button');
+                        if (blinkButton) {
+                            blinkButton.classList.add('blink');
+                        }
+
+                        // Get the target ID for scrolling
+                        var goToTarget = document.querySelector('.wrap-form-btn').querySelector('button').id;
+
+                        // Call the goTo function (you need to define this function)
+                        goTo(goToTarget, 0);
+
+                        // Remove the 'blink' class from the button after 10 seconds
+                        setTimeout(function () {
+                            var blinkButton = document.querySelector('.wrap-form-btn button');
+                            if (blinkButton) {
+                                blinkButton.classList.remove('blink');
+                            }
+                        }, 10000);
+
+                    }, 100);
+
+                    return;
+                }
             });
+
         }
-    }
-    emoticonChart();
+    });
 
 
+    //Initialize bsPopoverTooltip
+    bsPopoverTooltip();
 
 
 });

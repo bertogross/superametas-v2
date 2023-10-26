@@ -1,5 +1,5 @@
 @php
-use App\Models\User;
+    use App\Models\User;
 @endphp
 <header id="page-topbar">
     <div class="layout-width">
@@ -395,13 +395,6 @@ use App\Models\User;
                             <a class="dropdown-item" href="{{ url('settings') }}">
                                 <i class="ri-settings-4-fill text-muted fs-16 align-middle me-1"></i>
                                 <span class="align-middle">Configurações Gerais</span>
-                            </a>
-                        @endif
-
-                        @if(auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) && request()->is('goal-sales'))
-                            <a class="dropdown-item" href="javascript:void(0);" id="btn-goal-sales-settings">
-                                <i class="ri-edit-line text-muted fs-16 align-middle me-1 text-theme"></i>
-                                <span class="align-middle">Gerenciar Meta de Vendas</span>
                             </a>
                         @endif
 

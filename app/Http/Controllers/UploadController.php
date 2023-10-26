@@ -57,7 +57,13 @@ class UploadController extends Controller
             // Check if a file was provided in the request
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
-                $path = $folder . '/' . $user->id;
+
+                // Get the database name from the connection configuration
+                $config = config("database.connections.{$this->connection}");
+                $dbName = $config['database'];
+
+                $path = "{$dbName}/" . date('Y') . '/' . date('m') . '/' . $folder;
+
                 $filePath = $file->store($path, 'public');
 
                 // Delete old avatar
@@ -84,8 +90,7 @@ class UploadController extends Controller
         }
     }
 
-
-    public function uploadCompanyLogo(Request $request)
+    public function uploadLogo(Request $request)
     {
         try {
             // Validate the uploaded file
@@ -99,8 +104,13 @@ class UploadController extends Controller
                 Storage::disk('public')->delete($oldLogo);
             }
 
+            // Get the database name from the connection configuration
+            $config = config("database.connections.{$this->connection}");
+            $dbName = $config['database'];
+
+            $path = "{$dbName}/" . date('Y') . '/' . date('m') . '/logo';
+
             // Store the uploaded file
-            $path = 'logo';
             $file = $request->file('logo');
             $filePath = $file->store($path, 'public');
 
@@ -116,7 +126,7 @@ class UploadController extends Controller
         }
     }
 
-    public function deleteCompanyLogo(Request $request)
+    public function deleteLogo(Request $request)
     {
         try {
             // Retrieve the logo path from the settings table
@@ -137,6 +147,5 @@ class UploadController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
-
 
 }

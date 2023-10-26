@@ -45,7 +45,7 @@ class SettingsAccountController extends Controller
         $this->updateOrInsertSetting('name', $request->name);
 
         // Remove non-numeric characters from phone number
-        $cleanedPhone = preg_replace('/\D/', '', $request->phone);
+        $cleanedPhone = onlyNumber($request->phone);
         $this->updateOrInsertSetting('phone', $cleanedPhone);
 
         return redirect()->back()->with('success', 'Settings updated successfully!');

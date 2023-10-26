@@ -2,60 +2,287 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Post;
+use App\Models\UserMeta;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class GoalSalesController extends Controller
 {
     protected $connection = 'smAppTemplate';
 
+    /**
+     * Chart Area and Table listing
+     */
     public function index(Request $request)
     {
-        $meantime = $request->input('meantime');
-        $meantime = empty($meantime) ? date('Y-m') : $meantime;
-        $customMeantime = $request->input('custom_meantime');
+        $userId = Auth::user()->id;
+
         $selectedCompanies = $request->input('companies');
         $selectedDepartments = $request->input('departments');
 
+        // Get the filters from the request
+        $getMeantime = $request->input('meantime', date('Y-m'));
+        $getCustomMeantime = $request->input('custom_meantime');
+        $getMeantime = $getMeantime == 'custom' && empty($getCustomMeantime) ? date('Y-m') : $getMeantime;
+
+        if( strlen($getMeantime) == 7 ){
+            $getMeantime = $getMeantime;
+        } elseif ( strlen($getCustomMeantime) == 7 || strlen($getCustomMeantime) > 7 ){
+            $getMeantime = $getCustomMeantime;
+        }else{
+            $getMeantime = $getMeantime;
+        }
+
+        // Calculate the start and end dates based on the selected timeframe
+        list($startDate, $endDate) = $this->calculateStartAndEndDate($getMeantime);
+
+        // Check if the user has analytic mode enabled
+        if (getUserMeta($userId, 'analytic-mode') == 'on') {
+            // Get sales data
+            $resultsSales = $this->getSalesData($startDate, $endDate, $selectedCompanies, $selectedDepartments);
+
+            // Get goals data
+            $resultsGoals = $this->getGoalsData($startDate, $endDate, $selectedCompanies, $selectedDepartments);
+
+            // Process the results
+            list($data, $dateTickLabels, $totalSalesByMonth, $totalGoalsByMonth) = $this->processResults($resultsSales, $resultsGoals, $getMeantime);
+
+            $departments = $this->getDepartmentData($data);
+
+            // Return the view with the processed data
+            return view('goal-sales.index', compact(
+                'data',
+                'departments',
+                'resultsSales',
+                'resultsGoals',
+                'dateTickLabels',
+                'totalSalesByMonth',
+                'totalGoalsByMonth'
+            ));
+        } else {
+            // If analytic mode is not enabled, use the old query
+            $data = $this->getGoalAndSalesData($startDate, $endDate, $selectedCompanies, $selectedDepartments);
+
+            // Return the view with the old data
+            return view('goal-sales.index', compact('data'));
+        }
+    }
+
+    private function calculateStartAndEndDate($meantime)
+    {
         if ($meantime == 'today') {
             $startDate = Carbon::today();
             $endDate = Carbon::today();
-        } elseif ($meantime == 'custom' && !empty($customMeantime)) {
-            $explodeCustomMeantime = explode(' até ', $customMeantime);
-            if(is_array($explodeCustomMeantime) && count($explodeCustomMeantime) == 2){
-                $customMeantime1 = $explodeCustomMeantime[0];
-                $customMeantime2 = $explodeCustomMeantime[1];
+        } elseif ( strlen($meantime) > 7 ) {
+            $explodeMeantime = explode(' até ', $meantime);
 
-                list($year1, $month1) = explode('-', $customMeantime1);
-                list($year2, $month2) = explode('-', $customMeantime2);
+            if (is_array($explodeMeantime) && count($explodeMeantime) == 2) {
+                list($year1, $month1) = explode('-', $explodeMeantime[0]);
+                list($year2, $month2) = explode('-', $explodeMeantime[1]);
 
                 $startDate = Carbon::createFromDate($year1, $month1, 1)->startOfMonth();
                 $endDate = Carbon::createFromDate($year2, $month2, 1)->endOfMonth();
-            }else{
-                list($year, $month) = explode('-', $customMeantime);
+            } else {
+                list($year, $month) = explode('-', $meantime);
+
                 $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
                 $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
             }
-        } else {
-            if($meantime == 'custom' && empty($customMeantime)){
-                $meantime = date('Y-m');
-            }
+        } elseif ( strlen($meantime) == 7 ) {
             list($year, $month) = explode('-', $meantime);
+
+            $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+            $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+        } else {
+            $meantime = date('Y-m');
+
             list($year, $month) = explode('-', $meantime);
 
             $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
             $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
         }
 
+        return [$startDate, $endDate];
+    }
+
+    private function getSalesData($startDate, $endDate, $selectedCompanies, $selectedDepartments)
+    {
+        // Query for sales data
+        $query = DB::connection($this->connection)
+            ->table('wlsm_sales as sales')
+            ->join('wlsm_companies as companies', 'sales.company_id', '=', 'companies.company_id')
+            ->join('wlsm_departments as departments', 'sales.department_id', '=', 'departments.department_id')
+            ->select(
+                'sales.company_id',
+                'sales.department_id',
+                'sales.date_sale as meantime',
+                DB::raw('SUM(sales.net_value) as total_net_value'),
+                DB::raw('ANY_VALUE(companies.company_alias) as company_alias'),
+                DB::raw('ANY_VALUE(departments.department_alias) as department_alias')
+            )
+            ->whereBetween('sales.date_sale', [$startDate, $endDate])
+            ->where('companies.status', 1)
+            ->where('departments.status', 1);
+
+        if ($selectedCompanies) {
+            $query->whereIn('sales.company_id', $selectedCompanies);
+        }
+
+        if ($selectedDepartments) {
+            $query->whereIn('sales.department_id', $selectedDepartments);
+        }
+
+        return $query->groupBy('sales.company_id', 'sales.department_id', 'meantime')
+            ->orderBy('company_id')
+            ->orderBy('department_alias')
+            ->orderBy('meantime')
+            ->get();
+    }
+
+    private function getGoalsData($startDate, $endDate, $selectedCompanies, $selectedDepartments)
+    {
+        // Query for goals data
+        $query = DB::connection($this->connection)
+            ->table('wlsm_goals as goals')
+            ->join('wlsm_companies as companies', 'goals.company_id', '=', 'companies.company_id')
+            ->join('wlsm_departments as departments', 'goals.department_id', '=', 'departments.department_id')
+            ->select(
+                'goals.company_id',
+                'goals.department_id',
+                'goals.meantime',
+                DB::raw('SUM(goals.goal_value) as total_goal_value'),
+                DB::raw('ANY_VALUE(companies.company_alias) as company_alias'),
+                DB::raw('ANY_VALUE(departments.department_alias) as department_alias')
+            )
+            ->whereBetween('goals.meantime', [date('Y-m', strtotime($startDate)), date('Y-m', strtotime($endDate))])
+            ->where('companies.status', 1)
+            ->where('departments.status', 1)
+            ->where('goals.type', 'sales');
+
+        if ($selectedCompanies) {
+            $query->whereIn('goals.company_id', $selectedCompanies);
+        }
+
+        if ($selectedDepartments) {
+            $query->whereIn('goals.department_id', $selectedDepartments);
+        }
+
+        return $query->groupBy('goals.company_id', 'goals.department_id', 'meantime')
+            ->orderBy('company_id')
+            ->orderBy('department_alias')
+            ->orderBy('meantime')
+            ->get();
+    }
+
+    private function processResults($resultsSales, $resultsGoals, $meantime)
+    {
+        // Process the results
+        $data = [];
+        $dateTickLabels = [];
+        $totalGoalsByMonth = [];
+        $totalSalesByMonth = [];
+
+        if (strlen($meantime) == 7){
+            $dateFormat = 'd/m/Y';
+
+            /**
+             * if a date is missing or dont exists yeat from data, it adds with a 0 value
+             */
+            $firstOfMonth = Carbon::createFromFormat('Y-m', $meantime)->startOfMonth();
+            $endOfMonth = Carbon::createFromFormat('Y-m', $meantime)->endOfMonth();
+            $currentDate = $firstOfMonth->copy();
+
+            while ($currentDate->lte($endOfMonth)) {
+                $formattedDate = $currentDate->format($dateFormat);
+                if (!isset($totalSalesByMonth[$formattedDate])) {
+                    $totalSalesByMonth[$formattedDate] = 0;
+                }
+                if (!isset($totalGoalsByMonth[$formattedDate])) {
+                    $totalGoalsByMonth[$formattedDate] = 0;
+                }
+                $currentDate->addDay();
+            }
+        }else{
+            $dateFormat = 'F/Y';
+        }
+
+        foreach ($resultsSales as $result) {
+            $companyId = $result->company_id;
+            $departmentId = $result->department_id;
+
+            if (!isset($data[$companyId])) {
+                $data[$companyId] = [];
+            }
+
+            if (!isset($data[$companyId][$departmentId])) {
+                $data[$companyId][$departmentId] = [
+                    'sales' => 0,
+                    'goal' => 0,
+                ];
+            }
+
+            $data[$companyId][$departmentId]['sales'] += $result->total_net_value;
+
+            $yearMonth = Carbon::createFromDate($result->meantime, 1)->format($dateFormat);
+            if (!in_array($yearMonth, $dateTickLabels)) {
+                $dateTickLabels[] = $yearMonth;
+                $totalSalesByMonth[$yearMonth] = $result->total_net_value;
+            } else {
+                if (!isset($totalSalesByMonth[$yearMonth])) {
+                    $totalSalesByMonth[$yearMonth] = 0;
+                }
+                $totalSalesByMonth[$yearMonth] += $result->total_net_value;
+            }
+        }
+
+        foreach ($resultsGoals as $result) {
+            $companyId = $result->company_id;
+            $departmentId = $result->department_id;
+
+            if (!isset($data[$companyId])) {
+                $data[$companyId] = [];
+            }
+
+            if (!isset($data[$companyId][$departmentId])) {
+                $data[$companyId][$departmentId] = [
+                    'sales' => 0,
+                    'goal' => 0,
+                ];
+            }
+
+            $data[$companyId][$departmentId]['goal'] += $result->total_goal_value;
+
+            $yearMonth = Carbon::createFromDate($result->meantime, 1)->format($dateFormat);
+            if (!in_array($yearMonth, $dateTickLabels)) {
+                $dateTickLabels[] = $yearMonth;
+                $totalGoalsByMonth[$yearMonth] = $result->total_goal_value;
+            } else {
+                if (!isset($totalGoalsByMonth[$yearMonth])) {
+                    $totalGoalsByMonth[$yearMonth] = 0;
+                }
+                $totalGoalsByMonth[$yearMonth] += $result->total_goal_value;
+            }
+        }
+
+        return [$data, $dateTickLabels, $totalSalesByMonth, $totalGoalsByMonth];
+    }
+
+    /**
+     * Emoji Chart Default Mode and Slide Mode
+     */
+    private function getGoalAndSalesData($startDate, $endDate, $selectedCompanies, $selectedDepartments)
+    {
+        // Query for old data
         $query = DB::connection($this->connection)
             ->table('wlsm_sales as sales')
             ->join('wlsm_companies as companies', 'sales.company_id', '=', 'companies.company_id')
             ->join('wlsm_departments as departments', 'sales.department_id', '=', 'departments.department_id')
             ->leftJoin(DB::raw('(SELECT company_id, department_id, SUM(goal_value) AS goal_value
                     FROM wlsm_goals
-                    WHERE meantime BETWEEN "'.date('Y-m', strtotime($startDate)).'" AND "'.date('Y-m', strtotime($endDate)).'"
+                    WHERE meantime BETWEEN "' . date('Y-m', strtotime($startDate)) . '" AND "' . date('Y-m', strtotime($endDate)) . '"
                     AND type = "sales"
                     GROUP BY company_id, department_id) as goals'),
                 function ($join) {
@@ -74,18 +301,16 @@ class GoalSalesController extends Controller
             ->where('companies.status', 1)
             ->where('departments.status', 1);
 
-        // Handle the selected companies filter
         if ($selectedCompanies) {
             $query->whereIn('sales.company_id', $selectedCompanies);
         }
 
-        // Handle the selected departments filter
         if ($selectedDepartments) {
             $query->whereIn('sales.department_id', $selectedDepartments);
         }
 
         $results = $query->groupBy('sales.company_id', 'sales.department_id')
-            ->orderBy('company_alias')
+            ->orderBy('company_id')
             ->orderBy('department_alias')
             ->get();
 
@@ -104,12 +329,74 @@ class GoalSalesController extends Controller
             ];
         }
 
-        return view('goal-sales.index', compact('data'));
+        return $data;
+    }
+
+    /**
+     * Left widget
+     */
+    public function getDepartmentData($data)
+    {
+        // Initialize an empty array to store processed department data.
+        $departments = [];
+
+        // Loop through each company's data.
+        foreach ($data as $companyId => $companyData) {
+            // Loop through each department's data within the company.
+            foreach ($companyData as $departmentId => $departmentData) {
+                // Extract sales and goal values for the department.
+                $sales = $departmentData['sales'];
+                $goal = $departmentData['goal'];
+
+                // Calculate progress as a percentage of sales over goal.
+                // If goal or sales is zero, progress is set to zero to avoid division by zero error.
+                $progress = $goal > 0 && $sales > 0 ? ($sales / $goal) * 100 : 0;
+
+                // Determine the color of the progress bar based on the progress percentage.
+                $color = 'theme'; // Default color
+                if ($progress < 25) {
+                    $color = 'danger';
+                } elseif ($progress < 50) {
+                    $color = 'warning';
+                } elseif ($progress < 75) {
+                    $color = 'info';
+                } elseif ($progress < 99) {
+                    $color = 'success';
+                }
+
+                // Create a tooltip with formatted goal, sales, and progress values.
+                $tooltip = "Meta: " . formatBrazilianReal($goal, 0) . "<br>";
+                $tooltip .= "Vendas: " . formatBrazilianReal($sales, 0) . "<br>";
+                $tooltip .= "Progresso: " . numberFormat($progress, 2) . '%';
+
+                // If the department is not already in the array, add it with calculated values.
+                if (!isset($departments[$departmentId])) {
+                    $departments[$departmentId] = (object) [
+                        'name' => getDepartmentAlias($departmentId),
+                        'progress' => $progress,
+                        'color' => $color,
+                        'tooltip' => $tooltip,
+                        'sales' => $sales,
+                        'goal' => $goal,
+                    ];
+                } else {
+                    // If the department is already in the array, update the values.
+                    $departments[$departmentId]->sales += $sales;
+                    $departments[$departmentId]->goal += $goal;
+                    $departments[$departmentId]->progress = ($departments[$departmentId]->sales / $departments[$departmentId]->goal) * 100;
+                    $departments[$departmentId]->tooltip = "Meta: " . formatBrazilianReal($departments[$departmentId]->goal, 0) . "<br>Vendas: " . formatBrazilianReal($departments[$departmentId]->sales, 0) . "<br>Progresso: " . numberFormat($departments[$departmentId]->progress, 2) . '%';
+                }
+            }// foreach
+        }// foreach
+
+        // Return the processed department data.
+        return $departments;
     }
 
 
-
-
+    /**
+     * GStore or Update Goals
+     */
     public function storeOrUpdateGoals(Request $request)
     {
         $data = $request->all();
@@ -153,7 +440,6 @@ class GoalSalesController extends Controller
                         ->update([
                             'user_id' => $userId,
                             'goal_value' => $goalValue,
-                            'updated_at' => $now,
                         ]);
                 } else {
                     // Insert new record
@@ -165,7 +451,6 @@ class GoalSalesController extends Controller
                         'type' => $type,
                         'goal_value' => $goalValue,
                         'created_at' => $now,
-                        'updated_at' => $now,
                     ]);
                 }
             }
@@ -173,7 +458,6 @@ class GoalSalesController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Goals updated successfully!']);
     }
-
 
     /**
      * Get the content for the modal settings.
@@ -187,18 +471,141 @@ class GoalSalesController extends Controller
 
     }
 
-
     /**
      * Get the content for the modal edit.
      *
      * @param int|null $id The user's ID.
      * @return \Illuminate\View\View
      */
-    public function getGoalSalesEditModalContent() {
+    public function getGoalSalesEditModalContent(Request $request) {
 
-        return view('goal-sales/edit-modal');
+        $getActiveDepartments = getActiveDepartments();
+
+        //$meantime = $request->input('meantime');
+        $meantime = request('meantime', date('Y-m'));
+        //$companyId = $request->input('companyId');
+        $companyId = request('companyId');
+
+        $previousMeantimeMonthBefore = date('Y-m', strtotime($meantime." -1 months"));
+
+        $previousMeantimeYearBefore = date('Y-m', strtotime($meantime." -12 months"));
+
+        $getIPCA = getIPCAdata($meantime);
+
+        // Query the wlsm_goals table to get the goals for the given companyId and meantime
+        $goals = DB::connection($this->connection)
+            ->table('wlsm_goals')
+            ->where('company_id', $companyId)
+            ->where('meantime', $meantime)
+            ->where('type', 'sales')
+            ->get()
+            ->pluck('goal_value', 'department_id')
+            ->toArray();
+
+        // Query the wlsm_sales table to get the sales for the given companyId and meantime
+        $salesYearBefore = DB::connection($this->connection)
+            ->table('wlsm_sales')
+            ->where('company_id', $companyId)
+            ->where('date_sale', 'LIKE', $previousMeantimeYearBefore . '%')
+            ->selectRaw('department_id, SUM(net_value) as total_net_value')
+            ->groupBy('department_id')
+            ->get()
+            ->pluck('total_net_value', 'department_id')
+            ->toArray();
+
+
+        // Query the wlsm_sales table to get the sales for the given companyId and meantime
+        $salesMonthBefore = DB::connection($this->connection)
+            ->table('wlsm_sales')
+            ->where('company_id', $companyId)
+            ->where('date_sale', 'LIKE', $previousMeantimeMonthBefore . '%')
+            ->selectRaw('department_id, SUM(net_value) as total_net_value')
+            ->groupBy('department_id')
+            ->get()
+            ->pluck('total_net_value', 'department_id')
+            ->toArray();
+
+        return view('goal-sales/edit-modal', compact(
+                'goals',
+                'salesYearBefore',
+                'salesMonthBefore',
+                'meantime',
+                'previousMeantimeYearBefore',
+                'previousMeantimeMonthBefore',
+                'getActiveDepartments',
+                'getIPCA',
+                'companyId'
+            )
+        );
 
     }
 
+    /**
+     * Chart Area and Table listing
+     */
+    public function analyticMode(Request $request)
+    {
+        // Get the current user
+        $user = auth()->user();
+
+        // Get the current analytics mode from the user's metadata
+        $analyticMode = UserMeta::getUserMeta($user->id, 'analytic-mode');
+
+        // Toggle the analytics mode
+        $newAnalyticsMode = $analyticMode == 'on' ? 'off' : 'on';
+
+        // Update the analytics mode in the user's metadata
+        UserMeta::updateUserMeta($user->id, 'analytic-mode', $newAnalyticsMode);
+
+        // Update the slide mode in the user's metadata
+        if($newAnalyticsMode == 'on'){
+            UserMeta::updateUserMeta($user->id, 'slide-mode', false);
+        }
+
+        // Return the new analytics mode
+        return response()->json(['analyticMode' => $newAnalyticsMode]);
+    }
+
+    /**
+     * Emoji ChartSlide Mode
+     */
+    public function slideMode(Request $request)
+    {
+        // Get the current user
+        $user = auth()->user();
+
+        // Get the current slide mode from the user's metadata
+        $slideMode = UserMeta::getUserMeta($user->id, 'slide-mode');
+
+        // Toggle the slide mode
+        $newSlideMode = $slideMode == 'on' ? 'off' : 'on';
+
+        // Update the slide mode in the user's metadata
+        UserMeta::updateUserMeta($user->id, 'slide-mode', $newSlideMode);
+
+        // Update the analytics mode in the user's metadata
+        if($newSlideMode == 'on'){
+            UserMeta::updateUserMeta($user->id, 'analytic-mode', false);
+        }
+
+        // Return the new slide mode
+        return response()->json(['slideMode' => $newSlideMode]);
+    }
+
+    /**
+     * Emoji Chart Default Mode
+     */
+    public function defaultMode(Request $request)
+    {
+        // Get the current user
+        $user = auth()->user();
+
+        UserMeta::updateUserMeta($user->id, 'slide-mode', false);
+
+        UserMeta::updateUserMeta($user->id, 'analytic-mode', false);
+
+        // Return the new slide mode
+        return response()->json(['defaultMode' => true]);
+    }
 
 }

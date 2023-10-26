@@ -15,7 +15,7 @@ $explodeCustomMeantime = $getCustomMeantime ? explode(' até ', $getCustomMeanti
 
 $filterCompanies = isset($_REQUEST['companies']) ? $_REQUEST['companies'] : array();
 $filterDepartments = isset($_REQUEST['departments']) ? $_REQUEST['departments'] : array();
-$customMeantime = isset($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : date('Y-m');
+$getCustomMeantime = isset($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : date('Y-m');
 ?>
 
 
@@ -53,15 +53,15 @@ $customMeantime = isset($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meanti
                     <?php
                         $dateRange = getSaleDateRange();
                         //APP_print_r($dateRange);
-                        $firstDate = $dateRange['first_date'];
-                        $lastDate = $dateRange['last_date'];
+                        $createdAt = $dateRange['created_at'];
+                        $updatedAt = $dateRange['updated_at'];
                         $currentMonth = now()->format('Y-m');
                         $previousMonth = now()->subMonth()->format('Y-m');
                     ?>
 
                     <option <?php echo e($getMeantime == $currentMonth || $getMeantime == date('Y-m') || ( $getMeantime == 'custom' && empty($getCustomMeantime) )  ? 'selected' : ''); ?> value="<?php echo e($currentMonth); ?>">MÊS ATUAL</option>
 
-                    <?php if($firstDate <= $previousMonth): ?>
+                    <?php if($createdAt <= $previousMonth): ?>
                         <option <?php echo e($getMeantime == $previousMonth ? 'selected' : ''); ?> value="<?php echo e($previousMonth); ?>">MÊS ANTERIOR</option>
                     <?php endif; ?>
 
@@ -70,8 +70,8 @@ $customMeantime = isset($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meanti
             </div>
 
             <div class="col-sm-12 col-md-auto col-lg-auto custom_meantime_is_selected" style="min-width:270px; <?php if(empty($getCustomMeantime)): ?> display:none; <?php endif; ?> ">
-                <input type="text" class="form-control flatpickr-range-month" name="custom_meantime" data-min-date="<?php echo e($firstDate); ?>"
-                data-max-date="<?php echo e($lastDate); ?>" value="<?php if($getMeantime == 'custom'): ?><?php echo e($customMeantime); ?><?php endif; ?>" placeholder="Selecione o Período">
+                <input type="text" class="form-control flatpickr-range-month" name="custom_meantime" data-min-date="<?php echo e($createdAt); ?>"
+                data-max-date="<?php echo e($updatedAt); ?>" value="<?php if($getMeantime == 'custom'): ?><?php echo e($getCustomMeantime); ?><?php endif; ?>" placeholder="Selecione o Período">
             </div>
 
             <?php if(!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && count($getAuthorizedCompanies) > 1): ?>

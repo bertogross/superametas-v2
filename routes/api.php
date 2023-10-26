@@ -20,3 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/process-sysmo-api/{meantime}/{database?}', [SettingsDatabaseController::class, 'updateSales'])->name('updateSales');
+

@@ -1,4 +1,4 @@
-import { ToastAlert } from './helpers.js';
+import { toastAlert } from './helpers.js';
 
 // A flag to track whether the execution is currently in progress or not.
 let isExecutionInProgress = false;
@@ -18,7 +18,7 @@ function preventRightClick(e) {
 function updateProgressBarColor(percent) {
     const progressBar = document.querySelector('.progress-bar');
     progressBar.classList.remove('bg-warning-subtle', 'bg-warning', 'bg-info', 'bg-theme');
-    console.log('progress: ' + percent);
+    //console.log('progress: ' + percent);
 
     if (percent < 10) {
         progressBar.classList.add('bg-warning-subtle');
@@ -50,7 +50,7 @@ function monthDifference(startDate, endDate) {
 async function sendRequest(url) {
     const response = await fetch(url);
     if (!response.ok) {
-        ToastAlert(Error(response.statusText), 'error', 10000);
+        toastAlert(Error(response.statusText), 'error', 10000);
         throw new Error(response.statusText);
     }
     return response.json();
@@ -109,7 +109,7 @@ async function makeRequests(meantime, initialMeantime, completedIterations) {
 
         document.removeEventListener('contextmenu', preventRightClick);
 
-        ToastAlert(`Error: ${error.message}`, 'error', 10000);
+        toastAlert(`Error: ${error.message}`, 'error', 10000);
 
         document.querySelector('.synchronization-percent-text').innerHTML = '<span class="text-danger">Erro: ' + error.message + '</span>';
     }
@@ -135,13 +135,17 @@ function toggleCustomBackdrop(show) {
 
 // Finalize the synchronization process and update the UI.
 function finalizeSynchronization(type, message, percentage) {
-    toggleCustomBackdrop(false);
-    document.querySelector('.progress-bar').style.width = percentage;
-    document.querySelector('.synchronization-percent-text').innerHTML = message;
-    document.querySelector('.synchronization-time').innerHTML = '';
-    isExecutionInProgress = false;
-    document.removeEventListener('contextmenu', preventRightClick);
-    ToastAlert(message, type, 100000000);
+    setTimeout(function () {
+        document.querySelector('.progress-bar').style.width = percentage;
+        document.querySelector('.synchronization-percent-text').innerHTML = message;
+        document.querySelector('.synchronization-time').innerHTML = '';
+
+        isExecutionInProgress = false;
+        document.removeEventListener('contextmenu', preventRightClick);
+
+        toggleCustomBackdrop(false);
+        toastAlert(message, type, 100000000);
+    }, 5000);
 }
 
 // Convert 'YYYY-mm' format to human-readable Portuguese format
@@ -168,10 +172,10 @@ window.addEventListener('load', function() {
 
         // Display initial status messages with delays
         const estimatedElement = document.querySelector('.synchronization-time');
-        ['Iniciando...', 'Conectando...', 'Recebendo dados...'].forEach((message, index) => {
+        ['Conectando...', 'Recebendo dados...'].forEach((message, index) => {
             setTimeout(() => {
                 estimatedElement.innerHTML = `<span class="blink">${message}</span>`;
-            }, index * 10000 + 5000);
+            }, index * 2000 + 2000);
         });
 
         // Prepare year and month options for user selection

@@ -53,6 +53,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/goal-sales/post/{meantime?}/{companyId?}', [GoalSalesController::class, 'storeOrUpdateGoals']);
 
+    Route::post('/goal-sales/analytic-mode', [GoalSalesController::class, 'analyticMode'])->name('analytic-mode');
+    Route::post('/goal-sales/slide-mode', [GoalSalesController::class, 'slideMode'])->name('slide-mode');
+    Route::post('/goal-sales/default-mode', [GoalSalesController::class, 'defaultMode'])->name('default-mode');
+
     // Goal Results Routes
     //Route::get('/goal-results', [GoalResultsController::class, 'index'])->name('goal-results.index');
 
@@ -87,8 +91,8 @@ Route::middleware(['auth'])->group(function () {
     // File Upload
     Route::post('/upload/avatar', [UploadController::class, 'uploadAvatar']);
     Route::post('/upload/cover', [UploadController::class, 'uploadCover']);
-    Route::post('/upload/logo', [UploadController::class, 'uploadCompanyLogo']);
-    Route::delete('/upload/logo', [UploadController::class, 'deleteCompanyLogo']);
+    Route::post('/upload/logo', [UploadController::class, 'uploadLogo']);
+    Route::delete('/upload/logo', [UploadController::class, 'deleteLogo']);
 
 });
 

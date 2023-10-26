@@ -6,12 +6,12 @@
     $getActiveDepartments = getActiveDepartments();
 
     $dateRange = getSaleDateRange();
-    $firstDate = $dateRange['first_date'];
-    $lastDate = $dateRange['last_date'];
+    $createdAt = $dateRange['created_at'];
+    $updatedAt = $dateRange['updated_at'];
     $currentMonth = now()->format('Y-m');
     $previousMonth = now()->subMonth()->format('Y-m');
 
-    $startYear = date('Y', strtotime($firstDate));
+    $startYear = date('Y', strtotime($createdAt));
     $endYear = intval($currentMonth) >= (intval(date('Y'))+11) ? date('Y', strtotime($currentMonth." +1 year")) : date('Y');
 
     $postType = 'goal-sales';

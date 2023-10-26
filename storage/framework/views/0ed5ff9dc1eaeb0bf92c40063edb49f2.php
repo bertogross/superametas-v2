@@ -1,19 +1,13 @@
 <?php
-// Initialize arrays to store the sum of sales and goals for each company
-$totalSales = [];
-$totalGoals = [];
-$totalPercent = [];
-$uniqueDepartments = [];
-$metric = metricGoalSales($getMeantime);
-$totalPercentAccrued = 0;
-$ndxChartId = 0;
+    $uniqueDepartments = $totalSales = $totalGoals = $totalPercent = [];
 ?>
 
-<div id="load-listing" class="mb-4 rounded position-relative wrap-filter-result toogle_zoomInOut ribbon-box border ribbon-fill shadow-none">
+<div id="load-listing" class="mb-4 rounded position-relative toogle_zoomInOut ribbon-box border ribbon-fill shadow-none <?php if(!$data): ?> d-none <?php endif; ?>">
     <div class="ribbon ribbon-info bg-theme text-black fs-12 <?php if(empty($data)): ?> d-none <?php endif; ?>" style="z-index: 2; scale: 1.5; top: -10px; left: -30px;">
         <?php echo e($metric . '%'); ?>
 
     </div>
+
     <div class="table-responsive mb-0">
         <table id="goal-sales-dataTable" class="table table-striped-columns table-nowrap listing-chart mb-0">
             <thead class="text-uppercase table-light">
@@ -31,7 +25,7 @@ $ndxChartId = 0;
                 <?php $__currentLoopData = $data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $companyId => $departments): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <?php $__currentLoopData = $departments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $departmentId => $values): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <?php
-                        $uniqueDepartments[$departmentId] = getDepartmentAlias(intval($departmentId));
+                            $uniqueDepartments[$departmentId] = getDepartmentAlias(intval($departmentId));
                         ?>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -44,63 +38,53 @@ $ndxChartId = 0;
                         </th>
                         <?php $__currentLoopData = $data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $companyId => $departments): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <?php
-                            $ndxChartId++;
+                                $ndxChartId++;
 
-                            $sales = floatval($departments[$departmentId]['sales'] ?? 0);
-                            $goal = floatval($departments[$departmentId]['goal'] ?? 0);
+                                $sales = isset($departments[$departmentId]['sales']) ? floatval($departments[$departmentId]['sales']) : 0;
+                                $goal = isset($departments[$departmentId]['goal']) ? floatval($departments[$departmentId]['goal']) : 0;
 
-                            $percent = $sales > 0 && $goal > 0 ? ($sales / $goal) * 100 : 0;
+                                $percent = $sales > 0 && $goal > 0 ? ($sales / $goal) * 100 : 0;
 
-                            $percentAccrued = ($percent/$metric) * 100;
+                                $percentAccrued = $percent > 0 && $metricNumber > 0 ? ($percent / $metricNumber) * 100 : 0;
 
-                            // Calculate the sum of sales and goals for each company
-                            $totalSales[$companyId] = floatval($totalSales[$companyId] ?? 0) + $sales;
-                            $totalGoals[$companyId] = floatval($totalGoals[$companyId] ?? 0) + $goal;
+                                // Calculate the sum of sales and goals for each company
+                                $totalSales[$companyId] = isset($totalSales[$companyId]) ? floatval($totalSales[$companyId]) + $sales : 0;
+                                $totalGoals[$companyId] = isset($totalGoals[$companyId]) ? floatval($totalGoals[$companyId]) + $goal : 0;
 
-                            $totalPercent[$companyId] = $totalSales[$companyId] > 1 && $totalGoals[$companyId] > 1 ? ($totalSales[$companyId] / $totalGoals[$companyId]) * 100 : 0;
+                                $totalPercent[$companyId] = $totalSales[$companyId] > 1 && $totalGoals[$companyId] > 1 ? ($totalSales[$companyId] / $totalGoals[$companyId]) * 100 : 0;
+
                             ?>
                             <td class="text-center align-middle" data-company-id="<?php echo e($companyId); ?>" data-chart-id="<?php echo e($ndxChartId); ?>">
-                                
                                 <?php
-                                echo goalsEmojiChart($ndxChartId, $goal, $sales, $departmentId, getDepartmentAlias($departmentId), getCompanyAlias($companyId), $percent, $percentAccrued)
+                                    echo goalsEmojiChart($ndxChartId, $goal, $sales, $departmentId, getDepartmentAlias($departmentId), getCompanyAlias($companyId), $percent, $percentAccrued);
                                 ?>
                             </td>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                <tr tr-department="sum" class="">
-                    <th scope="row" class="text-uppercase fs-16 align-middle text-end p-3">
-                        GERAL
-                    </th>
-                    <?php $__currentLoopData = $data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $companyId => $departments): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php
-                        $ndxChartId++;
-
-                        //APP_print_r($totalPercent);
-                        $totalPercentValue = number_format($totalPercent[$companyId] ?? 0, 2, '.', '');
-                        $totalPercentAccrued = ($totalPercentValue / $metric) * 100;
-                        ?>
-                        <td class="text-center align-middle" data-company-id="<?php echo e($companyId); ?>" data-chart-id="<?php echo e($ndxChartId); ?>">
-                            
-                            <?php
-                            echo goalsEmojiChart($ndxChartId, number_format($totalGoals[$companyId] ?? 0, 2, '.', ''), number_format($totalSales[$companyId] ?? 0, 2, '.', ''), $departmentId, getDepartmentAlias($departmentId), getCompanyAlias($companyId), $totalPercentValue, $totalPercentAccrued, 'general')
-                            ?>
-                        </td>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </tr>
-            </tbody>
-            <tfoot class="text-uppercase table-light">
-                <tr>
-                    <th scope="col" class="bg-transparent invisible"></th>
-                    <?php $__currentLoopData = $data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $companyId => $departments): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <th scope="col" class="text-center" data-company-id="<?php echo e($companyId); ?>">
-                            <?php echo e(getCompanyAlias(intval($companyId))); ?>
-
+                <?php if(count($getActiveDepartments) > 1): ?>
+                    <tr tr-department="sum" class="">
+                        <th scope="row" class="text-uppercase fs-16 align-middle text-end p-3 <?php if(!empty($filterDepartments) && count($filterDepartments) == 1): ?> d-none <?php endif; ?>">
+                            GERAL
                         </th>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </tr>
-            </tfoot>
+                        <?php $__currentLoopData = $data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $companyId => $departments): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
+                                $ndxChartId++;
+
+                                $totalPercentValue = isset($totalPercent[$companyId]) ? floatval($totalPercent[$companyId]) : 0;
+                                $totalPercentAccrued = $totalPercentValue > 0 ? ($totalPercentValue / $metricNumber) * 100 : 0;
+                            ?>
+                            <td class="text-center align-middle <?php if(!empty($filterDepartments) && count($filterDepartments) == 1): ?>  d-none <?php endif; ?>" data-company-id="<?php echo e($companyId); ?>" data-chart-id="<?php echo e($ndxChartId); ?>">
+                                <?php
+                                    echo goalsEmojiChart($ndxChartId, floatval($totalGoals[$companyId]), floatval($totalSales[$companyId]), 'general', 'Geral', getCompanyAlias($companyId), $totalPercentValue, $totalPercentAccrued, 'general');
+                                ?>
+                            </td>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+            
         </table>
     </div>
 </div>
