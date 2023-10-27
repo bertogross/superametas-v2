@@ -107,6 +107,15 @@ window.addEventListener('load', function() {
             btn.addEventListener('click', function(event) {
                 event.preventDefault();
 
+                if (!form.checkValidity()) {
+                    event.stopPropagation();
+                    form.classList.add('was-validated');
+
+                    toastAlert('Preencha os campos obrigatórios', 'danger', 5000);
+
+                    return;
+                }
+
                 let formData = new FormData(form);
 
                 let url = form.dataset.id ? `/settings/users/update/${form.dataset.id}` : '/settings/users/store';

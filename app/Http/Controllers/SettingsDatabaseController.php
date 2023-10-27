@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\SettingsUserController;
 use App\Models\UserMeta;
 
 class SettingsDatabaseController extends Controller
 {
     // Define the custom database connection name
     protected $connection = 'smAppTemplate';
+
+    // Fill created_at
+    public $timestamps = true;
 
     /**
      * Display the database settings page.
@@ -99,8 +102,8 @@ class SettingsDatabaseController extends Controller
             })->all();
         }
 
-        // Create an instance of UserController and call updateUserMeta
-        $userController = new UserController();
+        // Create an instance of SettingsUserController and call updateUserMeta
+        $userController = new SettingsUserController();
         $userController->updateUserMeta(1, 'companies', json_encode($extractCompanyIds));
 
         return redirect()->back()->with('active_tab', 'companies')->with('success', 'Empresas atualizadas');
@@ -176,6 +179,8 @@ class SettingsDatabaseController extends Controller
             return false;
         }
 
+
+
         // Loop to fetch data from the API
         do {
             // Define the JSON payload for the API request
@@ -197,17 +202,43 @@ class SettingsDatabaseController extends Controller
             // Decode the response
             $responseData = json_decode($currentResponse, true);
 
+            if ( isset($responseData['codigo']) ) {
+                $hasMorePages = false;
+
+                curl_close($curl);
+
+                $end_time = microtime(true);
+                $elapsed_time = ($end_time - $start_time);
+                $elapsed_time = $elapsed_time >= 60 ? numberFormat( ($elapsed_time / 60), 2)." minutes" : numberFormat($elapsed_time, 0)." seconds";
+
+                DB::disconnect($this->connection);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dados indisponíveis. Tente novamente mais tarde.',
+                    'elapsed_time' => $elapsed_time,
+                    'slept' => $slept.' seconds',
+                    'response' => json_encode($responseData)
+                ]);
+
+                exit;
+            }
+
             // Process the response if it contains the expected data
             if (isset($responseData[0]['dados']) && is_array($responseData[0]['dados']) && !in_array($pageNumber, $pageRead)) {
                 $totalPages = intval($responseData[0]['total_paginas']);
                 $currentPage = intval($responseData[0]['pagina']);
+
+                if($currentPage === 1 ){
+                    SettingsDatabaseController::deleteOldData($meantime);
+                }
 
                 // Store the current page number to avoid processing it again
                 $pageRead[] = $currentPage;
 
                 //$responseDataToMe[] = $responseData[0]['dados'];
 
-                $goalsSalesData = [];
+                $salesData = [];
 
                 // Process each record in the responseData
                 foreach ($responseData[0]['dados'] as $values) {
@@ -227,7 +258,7 @@ class SettingsDatabaseController extends Controller
                     $companyID = isset($values['empresa']) ? intval($values['empresa']) : 0;
 
                     $dateSale = isset($values['data_venda']) ? $values['data_venda'] : '';
-                    $netValue = isset($values['valor_liquido']) && is_numeric($values['valor_liquido']) ? numberFormat(floatval($values['valor_liquido']), 2) : 0;
+                    $netValue = isset($values['valor_liquido']) && is_numeric($values['valor_liquido']) ? floatval($values['valor_liquido']) : 0;
 
                     $companyData[$companyID] = [
                         'company_id' => $companyID,
@@ -239,7 +270,7 @@ class SettingsDatabaseController extends Controller
                         'department_description' => $departmentDescription,
                     ];
 
-                    $goalsSalesData[] = [
+                    $salesData[] = [
                         'company_id' => $companyID,
                         'department_id' => $departmentID,
                         'net_value' => $netValue,
@@ -252,6 +283,13 @@ class SettingsDatabaseController extends Controller
                     $hasMorePages = false;
                 } else {
                     $pageNumber++;
+                }
+
+                // Insert the extracted data into the wlsm_sales table
+                try {
+                    DB::connection($this->connection)->table('wlsm_sales')->insert($salesData);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to insert into wlsm_sales: ' . $e->getMessage());
                 }
             } else {
                 // If the response doesn't contain the expected data, wait for 15 seconds before retrying
@@ -281,29 +319,10 @@ class SettingsDatabaseController extends Controller
                 exit;
             }
 
-            if (isset($responseData[0]['dados']) && is_array($responseData[0]['dados']) && !in_array($pageNumber, $pageRead)) {
-                if($currentPage == 1){
-                    // Delete old data for the given period from wlsm_sales
-                    try {
-                        DB::connection($this->connection)->table('wlsm_sales')->where('date_sale', 'like', $meantime . '%')->delete();
-                    } catch (\Exception $e) {
-                        \Log::error('Failed to delete from wlsm_sales: ' . $e->getMessage());
-                        return false;
-                    }
-                }
-
-                // Insert the extracted data into the wlsm_sales table
-                try {
-                    DB::connection($this->connection)->table('wlsm_sales')->insert($goalsSalesData);
-                } catch (\Exception $e) {
-                    \Log::error('Failed to insert into wlsm_sales: ' . $e->getMessage());
-                }
-            }
         } while ($hasMorePages);
 
         // Close the cURL session
         curl_close($curl);
-
 
         // Fetch existing companies
         $existingCompanies = DB::connection($this->connection)->table('wlsm_companies')
@@ -323,7 +342,6 @@ class SettingsDatabaseController extends Controller
                     ->insert($data);
             }
         }
-
 
         // Fetch existing departments
         $existingDepartments = DB::connection($this->connection)->table('wlsm_departments')
@@ -354,14 +372,19 @@ class SettingsDatabaseController extends Controller
             'success' => true,
             'message' => 'Dados processados com sucesso!',
             'elapsed_time' => $elapsed_time,
-            'slept' => $slept.' seconds'
-            //'response' => $responseDataToMe
+            'slept' => $slept.' seconds',
+            //'response' => json_encode($responseDataToMe)
         ]);
     }
 
-
-
+    public function deleteOldData($meantime){
+        // Delete old data for the given period from wlsm_sales
+        try {
+            DB::connection($this->connection)->table('wlsm_sales')->where('date_sale', 'like', $meantime . '%')->delete();
+        } catch (\Exception $e) {
+            \Log::error('Failed to delete from wlsm_sales: ' . $e->getMessage());
+            return false;
+        }
+    }
 
 }
-
-

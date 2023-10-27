@@ -15,7 +15,7 @@
                             <a href="{{ url('goal-sales') }}" class="nav-link">@lang('translation.goal-sales')</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('audit') }}" class="nav-link">@lang('translation.audit')</a>
+                            <a href="{{ url('audits') }}" class="nav-link">@lang('translation.audits')</a>
                         </li>
                     </ul>
                 </div>

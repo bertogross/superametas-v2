@@ -277,10 +277,14 @@ p:empty,
 }
 
 .cursor-move{
-  cursor: move;
+    cursor: move;
 }
 .cursor-s-resize{
-  cursor: s-resize;
+    cursor: s-resize;
+}
+.cursor-not-allowed {
+    pointer-events: auto !important;
+    cursor: not-allowed !important;
 }
 
 .alert-theme {
@@ -526,13 +530,21 @@ pre:empty{
     background: var(--vz-input-bg-custom) !important;
 }
 
-.flatpickr-monthSelect-theme-dark .flatpickr-monthSelect-month.selected,
-.flatpickr-monthSelect-theme-dark .flatpickr-monthSelect-month.inRange,
-.flatpickr-monthSelect-theme-dark .flatpickr-monthSelect-month.startRange,
-.flatpickr-monthSelect-theme-dark .flatpickr-monthSelect-month.endRange{
+.flatpickr-day.selected,
+.flatpickr-day.inRange,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-monthSelect-month.selected,
+.flatpickr-monthSelect-month.inRange,
+.flatpickr-monthSelect-month.startRange,
+.flatpickr-monthSelect-month.endRange{
   background: var(--vz-theme) !important;
   border-color: var(--vz-theme) !important;
   color: var(--vz-gray-dark) !important;
+}
+
+.flatpickr-calendar.arrowBottom::after {
+  border-top-color: var(--vz-theme) !important;
 }
 
 .form-control.flatpickr-range-year.input,
@@ -540,7 +552,38 @@ pre:empty{
   background-color: var(--vz-input-bg) !important;
 }
 
+.flatpickr-weekday,
+.flatpickr-weekdays {
+  background: var(--vz-theme) !important;
+  color: var(--vz-gray-dark)!important;
+}
+.flatpickr-day.today {
+  background: var(--vz-gray-dark) !important;
+  border: 2px solid var(--vz-theme) !important;
+  color: var(--vz-theme) !important;
 
+}
+
+.flatpickr-prev-month,
+.flatpickr-next-month,
+.flatpickr-day.weekend {
+  color: var(--vz-theme) !important;
+}
+
+.flatpickr-day:hover {
+  background: var(--vz-theme) !important;
+  color: var(--vz-gray-dark) !important;
+}
+
+.flatpickr-wrapper{
+  width: 100%;
+}
+.flatpickr-monthSelect-month.flatpickr-disabled{
+  opacity: 0.3;
+}
+.flatpickr-calendar.open{
+  z-index: 1090 !important;
+}
 
 .table .goal-chart{
   margin: -5px;
@@ -550,13 +593,6 @@ pre:empty{
   top: -10px;
 }
 
-
-.flatpickr-wrapper{
-  width: 100%;
-}
-.flatpickr-monthSelect-month.flatpickr-disabled{
-  opacity: 0.3;
-}
 
 
 
@@ -603,6 +639,7 @@ body.modal-open .table .wrap-table-listing-td-buttons{
     z-index: 1060 !important;
     position: absolute !important;
 }
+
 
 .table-fixedColumns th.dtfc-fixed-left{
   z-index: 2 !important;

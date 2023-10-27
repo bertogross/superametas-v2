@@ -11,7 +11,8 @@ import {
     onlyNumbers,
     bsPopoverTooltip,
     formatNumber,
-    percentageResult
+    percentageResult,
+    getChartColorsArray
 } from './helpers.js';
 
 window.addEventListener('load', function () {
@@ -74,7 +75,7 @@ window.addEventListener('load', function () {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                },
+                }
             });
 
             if (!response.ok) {
@@ -174,7 +175,6 @@ window.addEventListener('load', function () {
 
                     loadGoalSalesEditModal(meantime, companyId, companyName, purpose);
                 });
-
             });
         }
     }
@@ -187,6 +187,15 @@ window.addEventListener('load', function () {
             event.preventDefault();
 
             const form = document.getElementById('goalSalesForm');
+
+            if (!form.checkValidity()) {
+                event.stopPropagation();
+                form.classList.add('was-validated');
+
+                toastAlert('Preencha os campos obrigatórios', 'danger', 5000);
+
+                return;
+            }
 
             let formData = new FormData(form);
 
@@ -571,130 +580,129 @@ window.addEventListener('load', function () {
     }
 
 
-    if (document.querySelectorAll('#goal-sales-chart-area').length) {
-        document.querySelectorAll('#goal-sales-chart-area').forEach(function (chartElement) {
-            var chartID = chartElement.id;
-            var chartMin = 0;
-            var chartMax = parseInt(chartElement.getAttribute('data-max'));
-            var chartTick = parseInt(chartElement.getAttribute('data-tick'));
-            var chartFilename = chartElement.getAttribute('data-meantime');
-            var chartMeantime = chartElement.getAttribute('data-meantime') ? chartElement.getAttribute('data-meantime').split(',') : '';
+    var chartElement = document.getElementById('goal-sales-chart-area');
+    if (chartElement) {
+        var chartID = chartElement.id;
+        var chartMin = 0;
+        var chartMax = parseInt(chartElement.getAttribute('data-max'));
+        var chartTick = parseInt(chartElement.getAttribute('data-tick'));
+        var chartFilename = chartElement.getAttribute('data-meantime');
+        var chartMeantime = chartElement.getAttribute('data-meantime') ? chartElement.getAttribute('data-meantime').split(',') : '';
 
-            //var chartGoal = chartElement.getAttribute('data-goal') ? chartElement.getAttribute('data-goal').split(',').map(Number) : '';
-            /*var chartGoal = chartElement.getAttribute('data-goal')
-            ? chartElement.getAttribute('data-goal').split(',').map(function(item) {
-                var number = Number(item);
-                return isNaN(number) ? 0 : number;
-            })
-            : '';*/
-            var chartGoal = chartElement.getAttribute('data-goal')
-            ? chartElement.getAttribute('data-goal').split(',').map(function(num) {
-                return isNaN(Number(num)) ? 0 : Number(num);
-            })
-            : [];
+        var chartGoal = chartElement.getAttribute('data-goal')
+        ? chartElement.getAttribute('data-goal').split(',').map(function(num) {
+            return isNaN(Number(num)) ? 0 : Number(num);
+        })
+        : [];
 
-            //var chartSale = chartElement.getAttribute('data-sale') ? chartElement.getAttribute('data-sale').split(',').map(Number) : '';
-            /*var chartSale = chartElement.getAttribute('data-sale')
-            ? chartElement.getAttribute('data-sale').split(',').map(function(item) {
-                var number = Number(item);
-                return isNaN(number) ? 0 : number;
-            })
-            : '';*/
-            var chartSale = chartElement.getAttribute('data-sale')
-            ? chartElement.getAttribute('data-sale').split(',').map(function(num) {
-                return isNaN(Number(num)) ? 0 : Number(num);
-            })
-            : [];
+        var chartSale = chartElement.getAttribute('data-sale')
+        ? chartElement.getAttribute('data-sale').split(',').map(function(num) {
+            return isNaN(Number(num)) ? 0 : Number(num);
+        })
+        : [];
 
-            var options = {
-                series: [
-                    {
-                        name: 'Vendas',
-                        data: chartSale
-                    }, {
-                        name: 'Meta',
-                        data: chartGoal
-                    }
-                ],
-                chart: {
-                    height: 600,
-                    type: 'area',//bar
-                    toolbar: {
-                        show: true,
-                        offsetX: 0,
-                        offsetY: -33,
-                        tools: {
-                            download: false,
-                            selection: false,
-                            zoom: false,
-                            zoomin: false,
-                            zoomout: false,
-                            pan: false,
-                            reset: false,
-                            customIcons: []
-                        },
-                        export: {
-                            csv: {
-                                filename: chartFilename,
-                                columnDelimiter: ',',
-                                headerCategory: 'Período',
-                                headerValue: 'value',
-                                dateFormatter: function (timestamp) {
-                                    return new Date(timestamp).toDateString();
-                                }
-                            },
-                            svg: {
-                                filename: chartFilename,
-                            },
-                            png: {
-                                filename: chartFilename,
+        var allValues = chartGoal.concat(chartSale);
+        var min = Math.min(...allValues);
+        var max = Math.max(...allValues);
+        var average = (min + max) / 2;
+        var interval = (max - min) / 5;
+
+        var yaxisLabels = [];
+        for (var i = 0; i <= 5; i++) {
+            yaxisLabels.push(min + (interval * i));
+        }
+
+        var options = {
+            series: [
+                {
+                    name: 'Vendas',
+                    data: chartSale
+                }, {
+                    name: 'Meta',
+                    data: chartGoal
+                }
+            ],
+            chart: {
+                height: 600,
+                type: 'area',//bar
+                toolbar: {
+                    show: true,
+                    offsetX: 0,
+                    offsetY: -33,
+                    tools: {
+                        download: false,
+                        selection: false,
+                        zoom: false,
+                        zoomin: false,
+                        zoomout: false,
+                        pan: false,
+                        reset: false,
+                        customIcons: []
+                    },
+                    export: {
+                        csv: {
+                            filename: chartFilename,
+                            columnDelimiter: ',',
+                            headerCategory: 'Período',
+                            headerValue: 'value',
+                            dateFormatter: function (timestamp) {
+                                return new Date(timestamp).toDateString();
                             }
                         },
-                        autoSelected: 'zoom'
-                    }
-                },
-                dataLabels: {
-                    enabled: false,
-                },
-                stroke: {
-                    curve: 'smooth',
-                    width: 2,
-                },
-                xaxis: {
-                    categories: chartMeantime
-                },
-                yaxis: {
-                    labels: {
-                        formatter: function (value) {
-                            var brFormat = new Intl.NumberFormat(undefined, {
-                                style: 'currency',
-                                currency: 'BRL',
-                                maximumFractionDigits: 0,
-                                minimumFractionDigits: 0,
-                            }).format(value);
-
-                            return brFormat;
+                        svg: {
+                            filename: chartFilename,
+                        },
+                        png: {
+                            filename: chartFilename,
                         }
                     },
-                    tickAmount: chartTick,
-                    min: chartMin,
-                    max: chartMax
-                },
-                colors: getChartColorsArray(chartID),
-                fill: {
-                    opacity: 0.06,
-                    colors: getChartColorsArray(chartID),
-                    type: 'solid'
+                    autoSelected: 'zoom'
                 }
-            };
-            var areaChart = new ApexCharts(document.getElementById(chartID), options);
-            areaChart.render();
-        });
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                curve: 'smooth',
+                width: 2,
+            },
+            xaxis: {
+                categories: chartMeantime
+            },
+            yaxis: {
+                labels: {
+                    show: true,
+                    //maxLabels: 5, // This will limit the number of y-axis labels (in this case, limite of months)
+                    formatter: function (value) {
+                        var brFormat = new Intl.NumberFormat(undefined, {
+                            style: 'currency',
+                            currency: 'BRL',
+                            maximumFractionDigits: 0,
+                            minimumFractionDigits: 0,
+                        }).format(value);
+
+                        return brFormat;
+                    }
+                },
+                tickAmount: chartTick,
+                min: chartMin,
+                max: max,
+                tickAmount: 5
+            },
+            colors: getChartColorsArray(chartID),
+            fill: {
+                opacity: 0.06,
+                colors: getChartColorsArray(chartID),
+                type: 'solid'
+            }
+        };
+        var areaChart = new ApexCharts(document.getElementById(chartID), options);
+        areaChart.render();
+
     }
 
 
     showButtonWhenInputChange();
-
 
 
     document.addEventListener('click', function (event) {
@@ -863,6 +871,7 @@ window.addEventListener('load', function () {
 
     //Initialize bsPopoverTooltip
     bsPopoverTooltip();
+
 
 
 });

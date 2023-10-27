@@ -8,6 +8,26 @@ https://laravel-news.com/openai-for-laravel
 
 
 
+
+Version 2.0.18 - [2023-10-26]
+
+
+
+
+Version 2.0.18 - [2023-10-26]
+- [Updated] Handler.php ( add function render() to redirect user for error page )
+- [Added] views\error\general.blade.php
+- [Added] AuditsController
+- [Added] Audit Model
+- [Added] AuditMeta Model
+- [Updated] helpers.php
+- [Added] views\audits
+- [Added] views\layouts\custom-pagination.blade.php
+- [Updated] helpers.js
+- [Added] audits.js
+
+
+
 Version 2.0.17 - [2023-10-23 - 2023-10-25]
 - [Added] helpers.php ( goalsEmojiChart )
 - [Updated] views\goal-sales\table.blade.php
@@ -82,7 +102,7 @@ Version 2.0.10 - [2023-10-11]
 - [Added] app\Http\Controllers\PostController.php
 - [Added] app\Models\Post.php
 - [Added] app\Models\PostMeta.php
-- [Added] app\Http\Controllers\UserController.php
+- [Added] app\Http\Controllers\SettingsUserController.php
 - [Updated] routes\web.php
 
 

@@ -1,7 +1,5 @@
 @php
-    use App\Models\User;
-
-    $userId = Auth::user()->id;
+    $userId = getUserData()['id'];
 
     $totalPercentAccrued = $ndxChartId = 0;
 
@@ -12,20 +10,20 @@
     $getActiveDepartments = getActiveDepartments();
     //APP_print_r($getActiveDepartments);
 
-    $getMeantime = request('meantime', date('Y-m'));
-    $getCustomMeantime = request('getCustomMeantime');
+    //$getMeantime = request('meantime', date('Y-m'));
+    //$getCustomMeantime = request('getCustomMeantime');
 
-    //$getMeantime = !empty($_REQUEST['meantime']) ? $_REQUEST['meantime'] : date('Y-m');
-    //$getCustomMeantime = !empty($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : '';
+    $getMeantime = !empty($_REQUEST['meantime']) ? $_REQUEST['meantime'] : date('Y-m');
+    $getCustomMeantime = !empty($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : '';
     $getMeantime = $getMeantime == 'custom' && empty($getCustomMeantime) ? date('Y-m') : $getMeantime;
 
     $explode = !empty($getCustomMeantime) ? explode(' até ', $getCustomMeantime) : '';
     $explodeMeantime = !empty($explode) && is_array($explode) && count($explode) > 1 ? $explode : $getCustomMeantime;
 
-    $filterCompanies = request('companies', array());
-    //$filterCompanies = isset($_REQUEST['companies']) ? $_REQUEST['companies'] : array();
-    $filterDepartments = request('departments', array());
-    //$filterDepartments = isset($_REQUEST['departments']) ? $_REQUEST['departments'] : array();
+    //$filterCompanies = request('companies', array());
+    $filterCompanies = isset($_REQUEST['companies']) ? $_REQUEST['companies'] : array();
+    //$filterDepartments = request('departments', array());
+    $filterDepartments = isset($_REQUEST['departments']) ? $_REQUEST['departments'] : array();
 
     $metric = metricGoalSales($getMeantime);
     $metricNumber = convertToNumeric($metric);
@@ -35,7 +33,6 @@
     $lastDate = $dateRange['last_date'];
     $currentMonth = now()->format('Y-m');
     $previousMonth = now()->subMonth()->format('Y-m');
-
 @endphp
 
 @extends('layouts.master')
@@ -66,7 +63,7 @@
     @endcomponent
 
     <div id="filter" class="p-3 bg-light-subtle rounded position-relative mb-4" style="z-index: 3;">
-        <form id="filterForm" action="{{ route('goal-sales.index') }}" class="row g-2 text-uppercase" autocomplete="off">
+        <form action="{{ route('goal-sales.index') }}" class="row g-2" autocomplete="off">
 
             <div class="col-sm-12 col-md-2 col-lg-auto">
                 <select class="form-control form-select" name="meantime" title="Selecione o período">
@@ -107,8 +104,8 @@
                 </div>
             @endif
 
-            <div class="col-sm-12 col-md-auto col-lg-auto wrap-form-btn d-none">
-                <button type="submit" class="btn btn-theme w-100 init-loader" title="Filtrar">Filtrar</button>
+            <div class="col-sm-12 col-md-auto col-lg-auto wrap-form-btn">{{-- d-none --}}
+                <button type="submit" class="btn btn-theme w-100 init-loader" title="Filtrar"><i class="ri-equalizer-fill me-1 align-bottom"></i> Filtrar</button>
             </div>
         </form>
     </div>
@@ -140,17 +137,6 @@
 @section('script')
     <script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
 
-    <script>
-    // Prevent data-choices sort comapnies by name
-    var isChoiceEl = document.getElementById("filter-companies");
-    if(isChoiceEl){
-        var choices = new Choices(isChoiceEl, {
-            shouldSort: false,
-            removeItems: true,
-            removeItemButton: true
-        });
-    }
-    </script>
 
     <script src="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 

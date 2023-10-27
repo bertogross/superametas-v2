@@ -15,7 +15,7 @@
                             <a href="<?php echo e(url('goal-sales')); ?>" class="nav-link"><?php echo app('translator')->get('translation.goal-sales'); ?></a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?php echo e(url('audit')); ?>" class="nav-link"><?php echo app('translator')->get('translation.audit'); ?></a>
+                            <a href="<?php echo e(url('audits')); ?>" class="nav-link"><?php echo app('translator')->get('translation.audits'); ?></a>
                         </li>
                     </ul>
                 </div>

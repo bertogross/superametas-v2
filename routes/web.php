@@ -5,13 +5,14 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\{
     Auth\LoginController,
     HomeController,
-    UserController,
     ProfileController,
     UploadController,
+    SettingsUserController,
     SettingsDatabaseController,
     SettingsAccountController,
     SettingsStorageController,
-    GoalSalesController
+    GoalSalesController,
+    AuditsController
 };
 use App\Http\Middleware\SetDynamicDatabase;
 
@@ -49,9 +50,9 @@ Route::middleware(['auth'])->group(function () {
     // Goal Sales Routes
     Route::get('/goal-sales', [GoalSalesController::class, 'index'])->name('goal-sales.index');
     Route::get('/goal-sales/settings', [GoalSalesController::class, 'getGoalSalesSettingsModalContent']);
-    Route::get('/goal-sales/form/{meantime?}/{companyId?}/{purpose?}', [GoalSalesController::class, 'getGoalSalesEditModalContent']);
+    Route::get('/goal-sales/form/{meantime?}/{companyId?}/{purpose?}', [GoalSalesController::class, 'getGoalSalesEditModalContent']);// view form
 
-    Route::post('/goal-sales/post/{meantime?}/{companyId?}', [GoalSalesController::class, 'storeOrUpdateGoals']);
+    Route::post('/goal-sales/post/{meantime?}/{companyId?}', [GoalSalesController::class, 'storeOrUpdateGoals']); // update or store
 
     Route::post('/goal-sales/analytic-mode', [GoalSalesController::class, 'analyticMode'])->name('analytic-mode');
     Route::post('/goal-sales/slide-mode', [GoalSalesController::class, 'slideMode'])->name('slide-mode');
@@ -60,8 +61,16 @@ Route::middleware(['auth'])->group(function () {
     // Goal Results Routes
     //Route::get('/goal-results', [GoalResultsController::class, 'index'])->name('goal-results.index');
 
+
+    // Audits Routes
+    Route::get('/audits', [AuditsController::class, 'index'])->name('audits.index');
+    Route::get('/audit/{id?}', [AuditsController::class, 'show'])->name('audits.show');
+    Route::post('/audits', [AuditsController::class, 'store'])->name('audits.store');
+    Route::get('/audits/form/{id?}', [AuditsController::class, 'getAuditEditModalContent']);// view form
+    Route::post('/audits/post/{id?}', [AuditsController::class, 'update'])->name('audits.update'); // update or store
+
     // User Profile
-    Route::get('/profile/{id?}', [UserController::class, 'show'])->name('profile.show');
+    Route::get('/profile/{id?}', [SettingsUserController::class, 'show'])->name('profile.show');
 
     // TODO profile-settings.blade.php
     //Route::get('/profile/settings', [ProfileController::class, 'settings'])->middleware('auth');
@@ -79,10 +88,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/settings/account/update', [SettingsAccountController::class, 'store'])->name('settings.account.store');
 
         // User Settings and Profile
-        Route::get('/settings/users', [UserController::class, 'index'])->name('settings-users.index');
-        Route::post('/settings/users/store', [UserController::class, 'store']);
-        Route::post('/settings/users/update/{id}', [UserController::class, 'update']);
-        Route::get('/settings/users/modal-form/{id?}', [UserController::class, 'getUserModalContent']);
+        Route::get('/settings/users', [SettingsUserController::class, 'index'])->name('settings-users.index');
+        Route::post('/settings/users/store', [SettingsUserController::class, 'store']);
+        Route::post('/settings/users/update/{id}', [SettingsUserController::class, 'update']);
+        Route::get('/settings/users/modal-form/{id?}', [SettingsUserController::class, 'getUserModalContent']);
 
         Route::get('/settings/storage', [SettingsStorageController::class, 'index'])->name('settings.storage');
         Route::get('/settings/storage/oauth-callback', [SettingsStorageController::class, 'oauthCallback'])->name('settings.storage.callback');
@@ -106,6 +115,7 @@ Route::post('/check-databases', [LoginController::class, 'checkDatabases']);
 
 // Logout
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
 
 // Catch-All Route - should be the last route
 Route::get('{any}', [HomeController::class, 'index'])->where('any', '.*')->name('index');

@@ -107,7 +107,7 @@ class LoginController extends Controller
     public function checkDatabases(Request $request)
     {
 
-        $email = $request->input('email');
+        $email = e($request->input('email'));
 
         if (empty($email)) {
             return response()->json(['error' => 'Email is required']);

@@ -4,6 +4,63 @@ use App\Models\User;
 use App\Models\UserMeta;
 use Illuminate\Support\Facades\DB;
 
+
+if (!function_exists('getUsers')) {
+    /**
+     * Get all users with status = 1, ordered by name.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    function getUsers() {
+        return DB::connection('smAppTemplate')
+            ->table('users')
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get();
+    }
+}
+
+if (!function_exists('getUsersByRole')) {
+    function getUsersByRole($role)
+    {
+        return DB::connection('smAppTemplate')
+            ->table('users')
+            ->where('role', $role)
+            ->where('status', 1) // Assuming you want to get only active users
+            ->orderBy('name')
+            ->get();
+    }
+}
+
+
+if( !function_exists('getUserData') ){
+    function getUserData($userId = null) {
+        $user = $userId ? User::find($userId) : Auth::user();
+
+        if ($user) {
+            return array(
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'status' => $user->status,
+                'avatar' => $user->avatar,
+                'cover' => $user->cover,
+                'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+            );
+        }
+
+        return null;
+    }
+}
+
+if (!function_exists('canManageGoalSales')) {
+    function canManageGoalSales() {
+        $user = auth()->user();
+        return $user && $user->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) && request()->is('goal-sales');
+    }
+}
+
+
 // Retrieve a user's meta value based on the given key.
 if (!function_exists('getUserMeta')) {
     /**
@@ -16,6 +73,7 @@ if (!function_exists('getUserMeta')) {
         return UserMeta::getUserMeta($userId, $key);
     }
 }
+
 
 // Format a phone number to the pattern (XX) X XXXX-XXXX.
 if (!function_exists('formatPhoneNumber')) {
@@ -416,6 +474,8 @@ if( !function_exists('goalsEmojiChart') ){
 		return $html;
 	}
 }
+
+
 
 
 if (!function_exists('getCookie')) {

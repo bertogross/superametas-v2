@@ -12,6 +12,9 @@ class UploadController extends Controller
     // Define the custom database connection name
     protected $connection = 'smAppTemplate';
 
+    // Fill created_at
+    public $timestamps = true;
+
     // Handle avatar upload
     public function uploadAvatar(Request $request)
     {
@@ -44,7 +47,7 @@ class UploadController extends Controller
             ]);
 
             // Extract the user ID from the request
-            $userID = intval($request->input('user_id'));
+            $userID = intval(e($request->input('user_id')));
 
             // Retrieve the user from the database using the custom connection
             $user = User::on($this->connection)->find($userID);

@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -38,4 +39,28 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+
+    public function render($request, Throwable $e)
+    {
+        if ($e instanceof ModelNotFoundException) {
+            return response()->view('error.auth-404-basic', [], 404);
+        }
+
+        if ($e instanceof HttpException) {
+            $statusCode = $e->getStatusCode();
+            switch ($statusCode) {
+                case 501:
+                    return response()->view('error.auth-500', [], 501);
+                // Add other status codes as needed
+                default:
+                    return response()->view('error.general', ['exception' => $e], $statusCode);
+            }
+        }
+
+        return parent::render($request, $e);
+    }
+
+
+
 }

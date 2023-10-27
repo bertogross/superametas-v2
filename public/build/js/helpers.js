@@ -1,3 +1,4 @@
+
 // Toast Notifications
 // -------------------
 /**
@@ -95,7 +96,6 @@ export function multipleModal() {
 
 
 
-
 export function formatNumberInput(selector = '.format-numbers', decimals = 0) {
     const numberInputs = document.querySelectorAll(selector);
 
@@ -138,6 +138,34 @@ export function formatNumberInput(selector = '.format-numbers', decimals = 0) {
 }
 
 
+export function getChartColorsArray(chartId) {
+    if (document.getElementById(chartId) !== null) {
+      var colors = document.getElementById(chartId).getAttribute("data-colors");
+
+      if (colors) {
+        colors = JSON.parse(colors);
+        return colors.map(function (value) {
+          var newValue = value.replace(" ", "");
+          if (newValue.indexOf(",") === -1) {
+            var color = getComputedStyle(document.documentElement).getPropertyValue(newValue);
+            if (color) return color;
+            else return newValue;
+          } else {
+            var val = value.split(',');
+            if (val.length == 2) {
+              var rgbaColor = getComputedStyle(document.documentElement).getPropertyValue(val[0]);
+              rgbaColor = "rgba(" + rgbaColor + "," + val[1] + ")";
+              return rgbaColor;
+            } else {
+              return newValue;
+            }
+          }
+        });
+      } else {
+        console.warn('data-colors Attribute not found on:', chartId);
+      }
+    }
+  }
 
 
 export function onlyNumbers(number){
@@ -400,6 +428,33 @@ export function bsPopoverTooltip(){
 }
 
 
+export function initFlatpickrRange() {
+    const elements = document.querySelectorAll('.flatpickr-range');
+    elements.forEach(element => {
+        flatpickr(element, {
+            dateFormat: "d/m/Y",
+            locale: "pt",
+            clear: true,
+            mode: "range"
+        });
+    });
+}
+
+export function initFlatpickr() {
+    const elements = document.querySelectorAll('.flatpickr-default');
+    elements.forEach(element => {
+        flatpickr(element, {
+            dateFormat: "d/m/Y",
+            locale: "pt",
+            allowInput: true,
+            clear: true,
+            minDate: "today",
+            //maxDate: new Date().fp_incr(90)
+        });
+    });
+}
+
+
 
 function destroyModal() {
     document.querySelectorAll('.modal .btn-destroy').forEach(function (btnClose) {
@@ -447,3 +502,25 @@ function checkInternetConnection() {
     setInterval(updateConnectionStatus, 10000); // Check every 10 seconds
 }
 checkInternetConnection();
+
+
+export function maxLengthTextarea() {
+    const textareas = document.querySelectorAll('textarea[maxlength]'); // Select all textareas with a maxlength attribute
+
+    textareas.forEach(textarea => {
+        const maxLength = textarea.getAttribute('maxlength');
+        const counter = document.createElement('div');
+        counter.className = 'counter badge bg-warning-subtle text-warning float-end';
+        textarea.parentNode.insertBefore(counter, textarea.nextSibling);
+
+        textarea.addEventListener('input', function () {
+            const currentLength = textarea.value.length;
+            counter.textContent = `${currentLength} / ${maxLength}`;
+        });
+
+        // Trigger the input event to set the initial counter value
+        textarea.dispatchEvent(new Event('input'));
+    });
+}
+
+

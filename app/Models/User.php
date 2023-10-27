@@ -12,9 +12,9 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    // Database connection for this model
     protected $connection = 'smAppTemplate';
 
+    public $timestamps = true;
 
     // Constants representing user roles
     const ROLE_ADMIN = 1;

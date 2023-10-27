@@ -13,19 +13,21 @@ class GoalSalesController extends Controller
 {
     protected $connection = 'smAppTemplate';
 
+    public $timestamps = true;
+
     /**
      * Chart Area and Table listing
      */
     public function index(Request $request)
     {
-        $userId = Auth::user()->id;
+        $userId = getUserData()['id'];
 
         $selectedCompanies = $request->input('companies');
         $selectedDepartments = $request->input('departments');
 
         // Get the filters from the request
-        $getMeantime = $request->input('meantime', date('Y-m'));
-        $getCustomMeantime = $request->input('custom_meantime');
+        $getMeantime = e($request->input('meantime', date('Y-m')));
+        $getCustomMeantime = e($request->input('custom_meantime'));
         $getMeantime = $getMeantime == 'custom' && empty($getCustomMeantime) ? date('Y-m') : $getMeantime;
 
         if( strlen($getMeantime) == 7 ){
@@ -39,7 +41,7 @@ class GoalSalesController extends Controller
         // Calculate the start and end dates based on the selected timeframe
         list($startDate, $endDate) = $this->calculateStartAndEndDate($getMeantime);
 
-        // Check if the user has analytic mode enabled
+        // If the user has analytic mode enabled
         if (getUserMeta($userId, 'analytic-mode') == 'on') {
             // Get sales data
             $resultsSales = $this->getSalesData($startDate, $endDate, $selectedCompanies, $selectedDepartments);
@@ -48,7 +50,7 @@ class GoalSalesController extends Controller
             $resultsGoals = $this->getGoalsData($startDate, $endDate, $selectedCompanies, $selectedDepartments);
 
             // Process the results
-            list($data, $dateTickLabels, $totalSalesByMonth, $totalGoalsByMonth) = $this->processResults($resultsSales, $resultsGoals, $getMeantime);
+            list($data, $totalSalesByMonth, $totalGoalsByMonth) = $this->processResults($resultsSales, $resultsGoals, $getMeantime);
 
             $departments = $this->getDepartmentData($data);
 
@@ -58,12 +60,11 @@ class GoalSalesController extends Controller
                 'departments',
                 'resultsSales',
                 'resultsGoals',
-                'dateTickLabels',
                 'totalSalesByMonth',
                 'totalGoalsByMonth'
             ));
         } else {
-            // If analytic mode is not enabled, use the old query
+            // If analytic mode is not enabled, use the getGoalAndSalesData query
             $data = $this->getGoalAndSalesData($startDate, $endDate, $selectedCompanies, $selectedDepartments);
 
             // Return the view with the old data
@@ -181,7 +182,6 @@ class GoalSalesController extends Controller
     {
         // Process the results
         $data = [];
-        $dateTickLabels = [];
         $totalGoalsByMonth = [];
         $totalSalesByMonth = [];
 
@@ -227,15 +227,11 @@ class GoalSalesController extends Controller
             $data[$companyId][$departmentId]['sales'] += $result->total_net_value;
 
             $yearMonth = Carbon::createFromDate($result->meantime, 1)->format($dateFormat);
-            if (!in_array($yearMonth, $dateTickLabels)) {
-                $dateTickLabels[] = $yearMonth;
-                $totalSalesByMonth[$yearMonth] = $result->total_net_value;
-            } else {
-                if (!isset($totalSalesByMonth[$yearMonth])) {
-                    $totalSalesByMonth[$yearMonth] = 0;
-                }
-                $totalSalesByMonth[$yearMonth] += $result->total_net_value;
+
+            if (!isset($totalSalesByMonth[$yearMonth])) {
+                $totalSalesByMonth[$yearMonth] = 0;
             }
+            $totalSalesByMonth[$yearMonth] += $result->total_net_value;
         }
 
         foreach ($resultsGoals as $result) {
@@ -256,18 +252,14 @@ class GoalSalesController extends Controller
             $data[$companyId][$departmentId]['goal'] += $result->total_goal_value;
 
             $yearMonth = Carbon::createFromDate($result->meantime, 1)->format($dateFormat);
-            if (!in_array($yearMonth, $dateTickLabels)) {
-                $dateTickLabels[] = $yearMonth;
-                $totalGoalsByMonth[$yearMonth] = $result->total_goal_value;
-            } else {
-                if (!isset($totalGoalsByMonth[$yearMonth])) {
-                    $totalGoalsByMonth[$yearMonth] = 0;
-                }
-                $totalGoalsByMonth[$yearMonth] += $result->total_goal_value;
+
+            if (!isset($totalGoalsByMonth[$yearMonth])) {
+                $totalGoalsByMonth[$yearMonth] = 0;
             }
+            $totalGoalsByMonth[$yearMonth] += $result->total_goal_value;
         }
 
-        return [$data, $dateTickLabels, $totalSalesByMonth, $totalGoalsByMonth];
+        return [$data, $totalSalesByMonth, $totalGoalsByMonth];
     }
 
     /**
@@ -462,7 +454,7 @@ class GoalSalesController extends Controller
     /**
      * Get the content for the modal settings.
      *
-     * @param int|null $id The user's ID.
+     * @param int|null
      * @return \Illuminate\View\View
      */
     public function getGoalSalesSettingsModalContent() {
@@ -474,7 +466,7 @@ class GoalSalesController extends Controller
     /**
      * Get the content for the modal edit.
      *
-     * @param int|null $id The user's ID.
+     * @param int|null
      * @return \Illuminate\View\View
      */
     public function getGoalSalesEditModalContent(Request $request) {

@@ -1,12 +1,9 @@
-@section('css')
-@endsection
 @php
     //APP_print_r($data);
     //APP_print_r($departments);
     //APP_print_r($resultsSales);
     //APP_print_r($resultsGoals);
     //APP_print_r($dateTickLabels);
-
     /**
      * Split Goals for daily view
      */
@@ -17,7 +14,7 @@
 
         $period = array_keys($totalGoalsByMonth)[0];
         $explodePeriod = explode('/', $period);
-        $year = $explodePeriod[0];
+        $year = $explodePeriod[2];
         $month = $explodePeriod[1];
 
         $totalGoal = array_values($totalGoalsByMonth)[0];
@@ -25,11 +22,21 @@
 
         foreach (range(1, $daysInMonth) as $day) {
             $formattedDay = sprintf('%02d', $day);
-            $date = $day.'-'.$month.'-'.$year;
+            $date = $formattedDay.'/'.$month.'/'.$year;
             $dailyGoalsByMonth[$date] = $dailyGoal;
         }
 
         $totalGoalsByMonth = $dailyGoalsByMonth;
+    }else{
+        // For Goals, fill in the missing keys with a value of 0
+        $missingGoalKeys = array_diff_key($totalSalesByMonth, $totalGoalsByMonth);
+        $missingGoals = array_fill_keys(array_keys($missingGoalKeys), 0);
+        $totalGoalsByMonth = array_merge($missingGoals, $totalGoalsByMonth);
+
+        // For Sales, fill in the missing keys with a value of 0
+        $missingSalesKeys = array_diff_key($totalGoalsByMonth, $totalSalesByMonth);
+        $missingSales = array_fill_keys(array_keys($missingSalesKeys), 0);
+        $totalSalesByMonth = array_merge($missingSales, $totalSalesByMonth);
     }
     //APP_print_r($totalGoalsByMonth);
     //APP_print_r($totalSalesByMonth);
@@ -129,8 +136,8 @@
                         </div>
                     </div>
                     -->
-                    <div class="col-4">
-                        <div class="p-3 border border-dashed border-start-0">
+                    <div class="col">
+                        <div class="p-3 border border-dashed border-start-0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Vendas" data-bs-content="Você está visualizando o valor somado de {{ count($filterCompanies) > 0 ? '<span class="text-theme fw-bold me-1">'.count($filterCompanies).'</span> Loja'.$plural.'' : 'Todas as Lojas' }}">
                             <h5 class="mb-1">
                                 <span>
                                     {{ is_array($totalSalesByMonth) && array_sum($totalSalesByMonth) > 0 ? formatBrazilianReal( array_sum($totalSalesByMonth), 0) : 0 }}
@@ -139,8 +146,8 @@
                             <p class="text-muted mb-0">Vendas</p>
                         </div>
                     </div>
-                    <div class="col-4">
-                        <div class="p-3 border border-dashed border-start-0">
+                    <div class="col">
+                        <div class="p-3 border border-dashed border-start-0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Meta" data-bs-content="Você está visualizando o valor somado de {{ count($filterCompanies) > 0 ? '<span class="text-theme fw-bold me-1">'.count($filterCompanies).'</span> Loja'.$plural.'' : 'Todas as Lojas' }}">
                             <h5 class="mb-1">
                                 <span>
                                     {{ is_array($totalGoalsByMonth) && array_sum($totalGoalsByMonth) > 0 ? formatBrazilianReal( array_sum($totalGoalsByMonth), 0) : 0 }}
@@ -149,7 +156,8 @@
                             <p class="text-muted mb-0">Meta</p>
                         </div>
                     </div>
-                    <div class="col-4">
+                    {{--
+                    <div class="col">
                         <div class="p-3 border border-dashed border-start-0 border-end-0">
                             <h5 class="mb-1">
                                 <span>
@@ -157,11 +165,11 @@
                                         $totalPercent = is_array($totalGoalsByMonth) && array_sum($totalGoalsByMonth) > 0 && is_array($totalSalesByMonth) && array_sum($totalSalesByMonth) > 0 ? ( array_sum($totalSalesByMonth) / array_sum($totalGoalsByMonth) ) * 100 : 0;
 
                                         if($totalPercent < 100){
-                                            $totalPercent = abs( numberFormat($totalPercent - 100 , 2) );
+                                            $totalPercent = intval($totalPercent) < 0 ? abs( floatval(numberFormat($totalPercent - 100 , 2)) ) : 0;
 
                                             $icon = '<i class="text-danger ri-arrow-right-down-line fs-16 align-bottom"></i>';
                                         }else{
-                                            $totalPercent = numberFormat($totalPercent - 100 , 2);
+                                            $totalPercent = floatval(numberFormat($totalPercent - 100 , 2));
 
                                             $icon = '<i class="text-success ri-arrow-right-up-line fs-16 align-bottom"></i>';
                                         }
@@ -174,6 +182,7 @@
                             <p class="text-muted mb-0">Conversão</p>
                         </div>
                     </div>
+                    --}}
                 </div>
             </div>
             <div class="card-body p-0 pb-2">
@@ -182,7 +191,8 @@
 
                     $dataMax = is_array($totalGoalsByMonth) && is_array($totalSalesByMonth) ? max( array_merge(array_values($totalGoalsByMonth), array_values($totalSalesByMonth)) ) : 0;
 
-                    $dataMeantime = isset($dateTickLabels) && is_array($dateTickLabels) ? implode(',', $dateTickLabels) : '';
+                    $dateTickLabels = array_merge(array_keys($totalGoalsByMonth), array_keys($totalSalesByMonth));
+                    $dataMeantime = is_array($dateTickLabels) ? implode(',', $dateTickLabels) : '';
 
                     $dataGoals = isset($totalGoalsByMonth) && is_array($totalGoalsByMonth) ? implode(',', $totalGoalsByMonth) : 0;
 

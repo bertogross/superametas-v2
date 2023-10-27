@@ -11,7 +11,7 @@ class PostController extends Controller
     // Specify the database connection to be used for this model
     protected $connection = 'smAppTemplate';
 
-
+    public $timestamps = true;
 
 
 }

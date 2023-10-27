@@ -66,7 +66,8 @@ async function makeRequests(meantime, initialMeantime, completedIterations) {
     document.addEventListener('contextmenu', preventRightClick);
 
     try {
-        document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">A importação poderá levar algum tempo. Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
+        //document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">A importação poderá levar algum tempo. Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
+        document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
 
         const response = await sendRequest(`/api/process-sysmo-api/${meantime}`);
         if (!response || response.success === false) {

@@ -12,13 +12,16 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
 
 /**
- * UserController
+ * SettingsUserController
  *
  * Controller responsible for handling user-related actions.
  */
-class UserController extends Controller
+class SettingsUserController extends Controller
 {
     protected $connection = 'smAppTemplate';
+
+    // Fill created_at
+    public $timestamps = true;
 
     /**
      * Display a listing of all users.

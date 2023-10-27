@@ -91,7 +91,7 @@ use App\Models\User;
                                     </a>
                                 </div>
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="<?php echo e(url('audit')); ?>" title="Auditoria">
+                                    <a class="dropdown-icon-item" href="<?php echo e(url('audits')); ?>" title="Auditoria">
                                         <img src="<?php echo e(URL::asset('build/images/verification-img.png')); ?>" alt="Auditoria">
                                         <span>Auditoria</span>
                                     </a>

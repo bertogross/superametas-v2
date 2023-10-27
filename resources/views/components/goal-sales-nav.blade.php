@@ -1,7 +1,5 @@
 @php
-    use App\Models\User;
-
-    $userId = Auth::user()->id;
+    $userId = getUserData()['id'];
 
     $explodeMeantime = $getCustomMeantime ? explode(' até ', $getCustomMeantime) : '';
 
@@ -46,7 +44,7 @@
                             <div class="dropdown-divider"></div>
                         @endif
 
-                        @if(auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) && request()->is('goal-sales'))
+                        @if(canManageGoalSales())
                             <li>
                                 <a class="dropdown-item" href="javascript:void(0);" id="btn-goal-sales-settings">
                                     <i class="ri-edit-line text-muted fs-16 align-middle me-1 text-theme"></i>

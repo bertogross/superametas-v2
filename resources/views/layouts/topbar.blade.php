@@ -91,7 +91,7 @@
                                     </a>
                                 </div>
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="{{ url('audit') }}" title="Auditoria">
+                                    <a class="dropdown-icon-item" href="{{ url('audits') }}" title="Auditoria">
                                         <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Auditoria">
                                         <span>Auditoria</span>
                                     </a>
