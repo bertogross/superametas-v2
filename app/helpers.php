@@ -372,6 +372,11 @@ if (!function_exists('getGoogleToken')) {
     }
 }
 
+if (!function_exists('getDropboxToken')) {
+    function getDropboxToken(){
+        return getSettings('dropbox_token');
+    }
+}
 
 if (!function_exists('onlyNumber')) {
     function onlyNumber($number = null) {

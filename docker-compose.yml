@@ -19,8 +19,10 @@ services:
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
+            - '.:/var/www/html'
             - '.:/var/www/html/development-superametas'
             - './custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini'
+            - './cacert.pem:/etc/ssl/certs/cacert.pem'
         networks:
             - sail
         depends_on:

@@ -39,7 +39,7 @@
                             <a href="{{ route('settingsApiKeysURL') }}" class="nav-link {{ request()->is('settings/api-keys') ? 'active' : '' }}">@lang('translation.api-keys')</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('googleDriveFilesURL') }}" class="nav-link {{ request()->is('settings/files') ? 'active' : '' }}">@lang('translation.file-manager')</a>
+                            <a href="{{ route('DropboxFilesURL') }}" class="nav-link {{ request()->is('settings/files') ? 'active' : '' }}">@lang('translation.file-manager')</a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('settingsDatabaseIndexURL') }}" class="nav-link {{ request()->is('settings/database') ? 'active' : '' }}">@lang('translation.your-erp')</a>

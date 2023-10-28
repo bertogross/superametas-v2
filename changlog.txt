@@ -9,12 +9,25 @@ https://laravel-news.com/openai-for-laravel
 
 
 Version 2.0.18 - [2023-10-28]
-- [Added] Dropbox with spatie/laravel-dropbox
+- [Added] Dropbox API with
+    - composer require spatie/dropbox-api
+        - https://github.com/spatie/dropbox-api
+        - https://www.dropbox.com/developers/apps
+            To get a Dropbox App Key, you need to create a Dropbox App in the Dropbox Developer Console. Here are the steps:
+            1. Go to the [Dropbox Developer Console](https://www.dropbox.com/developers/apps).
+            2. Sign in with your Dropbox account or create a new account if you don't have one.
+            3. Click on "Create App".
+            4. Choose "Scoped Access".
+            5. Choose "Full dropbox" or "App folder" depending on your needs.
+            6. Enter a name for your app and click "Create App".
+            7. Once your app is created, you will be taken to the app's settings page. Here you will find your "App key" and "App secret".
+            8. Copy the "App key" and use it in your `.env` file as the value for `DROPBOX_APP_KEY`.
 
 
 
 Version 2.0.18 - [2023-10-27]
 - [Failed] Google Drive API (Failed because Google forces you to subscribe to Wrokspace)
+
 
 
 Version 2.0.18 - [2023-10-26]

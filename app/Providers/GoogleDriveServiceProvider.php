@@ -8,7 +8,7 @@ use Google_Service_Drive;
 
 class GoogleDriveServiceProvider extends ServiceProvider
 {
-    public function register()
+    public function register(): void
     {
         $this->app->singleton(Google_Client::class, function ($app) {
             $client = new Google_Client();

@@ -13,7 +13,8 @@ use App\Http\Controllers\{
     GoalSalesController,
     AuditsController,
     SettingsApiKeysController,
-    GoogleDriveController
+    GoogleDriveController,
+    DropboxController
 };
 use App\Http\Middleware\SetDynamicDatabase;
 
@@ -87,7 +88,8 @@ Route::middleware(['auth'])->group(function () {
 
         // API Key, Files Manager, Sinc Database (sales, companies, departments)
         Route::get('/settings/api-keys', [SettingsApiKeysController::class, 'index'])->name('settingsApiKeysURL');
-        Route::get('/settings/files', [GoogleDriveController::class, 'files'])->name('googleDriveFilesURL');
+        //Route::get('/settings/files', [GoogleDriveController::class, 'files'])->name('googleDriveFilesURL');
+        Route::get('/settings/files', [DropboxController::class, 'files'])->name('DropboxFilesURL');
         Route::get('/settings/database', [SettingsDatabaseController::class, 'index'])->name('settingsDatabaseIndexURL');
             Route::put('/settings/departments/store', [SettingsDatabaseController::class, 'updateDepartments'])->name('settingsDepartmentsUpdateURL');
             Route::put('/settings/companies/store', [SettingsDatabaseController::class, 'updateCompanies'])->name('settingsCompaniesUpdateURL');

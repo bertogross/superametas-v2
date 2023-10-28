@@ -142,6 +142,34 @@
                                             @endif
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <th scope="row">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="chk_child" value="option1">
+                                            </div>
+                                        </th>
+                                        <td class="id" style="display:none;"><a href="javascript:void(0);" class="fw-medium link-primary">#VZ002</a></td>
+                                        <td class="name">Dropbox API</td>
+                                        <td class="createBy">Nicholas Ball</td>
+                                        <td class="apikey">
+                                            <input type="text" class="form-control apikey-value" readonly value="b5815DE8A7224438932eb296Z5">
+                                        </td>
+                                        <td class="status"><span class="badge bg-danger-subtle text-danger">Disable</span></td>
+                                        <td class="create_date">24 Sep, 2022</td>
+                                        <td class="expiry_date">24 Jan, 2023</td>
+                                        <td class="text-end">
+                                            @if (getDropboxToken())
+                                                <a class="btn btn-danger" href="{{ route('DropboxDeauthorizeURL') }}">
+                                                    Deauthorize Dropbox
+                                                </a>
+                                            @else
+                                                <a class="btn btn-primary" target="_blank" href="{{ route('DropboxAuthorizeURL') }}">
+                                                    Authorize with Dropbox
+                                                </a>
+
+                                            @endif
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                             <div class="noresult" style="display: none">

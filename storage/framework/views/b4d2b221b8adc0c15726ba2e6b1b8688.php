@@ -39,7 +39,7 @@
                             <a href="<?php echo e(route('settingsApiKeysURL')); ?>" class="nav-link <?php echo e(request()->is('settings/api-keys') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.api-keys'); ?></a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?php echo e(route('googleDriveFilesURL')); ?>" class="nav-link <?php echo e(request()->is('settings/files') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.file-manager'); ?></a>
+                            <a href="<?php echo e(route('DropboxFilesURL')); ?>" class="nav-link <?php echo e(request()->is('settings/files') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.file-manager'); ?></a>
                         </li>
                         <li class="nav-item">
                             <a href="<?php echo e(route('settingsDatabaseIndexURL')); ?>" class="nav-link <?php echo e(request()->is('settings/database') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.your-erp'); ?></a>
