@@ -115,7 +115,7 @@ window.addEventListener('load', function () {
                     // Close current modal
                     document.getElementById('btn-audits-update').closest('.modal').querySelector('.btn-close').click();
 
-                    let loading = '<span class="spinner-grow spinner-grow-sm text-theme ms-2" role="status"><span class="visually-hidden">Loading...</span></span>';
+                    let loading = '<span class="spinner-grow spinner-grow-sm text-theme ms-3" role="status"><span class="visually-hidden">Loading...</span></span>';
 
                     toastAlert(data.message + loading, 'success', 10000);
 

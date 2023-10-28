@@ -8,7 +8,7 @@
 @section('content')
     @component('components.breadcrumb')
         @slot('url')
-            {{ route('audits.index') }}
+            {{ route('auditsIndexURL') }}
         @endslot
         @slot('li_1')
             @lang('translation.list')

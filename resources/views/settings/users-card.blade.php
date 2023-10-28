@@ -71,7 +71,7 @@
                     </div>
                 </div>
                 <div class="col-lg-2 col">
-                    <div class="text-end"> <a href="{{ url('profile') }}/@if(isset($id)){{ $id }}@endif" class="btn btn-light view-btn">Visualizar Perfil</a>
+                    <div class="text-end"> <a href="{{ route('profileShowURL') }}@if(isset($id))/{{ $id }}@endif" class="btn btn-light view-btn">Visualizar Perfil</a>
                     </div>
                 </div>
             </div>

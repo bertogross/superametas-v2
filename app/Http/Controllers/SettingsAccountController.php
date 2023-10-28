@@ -15,14 +15,13 @@ class SettingsAccountController extends Controller
 
     public function index()
     {
-        // Returning the view with the list of files.
         return view('settings.index');
     }
 
     public function show()
     {
         $settings = DB::connection($this->connection)->table('settings')->pluck('value', 'key')->toArray();
-        return view('settings/account', compact('settings'));
+        return view('settings.account', compact('settings'));
     }
 
     public function store(Request $request)
@@ -60,7 +59,7 @@ class SettingsAccountController extends Controller
      * @param  mixed  $value
      * @return void
      */
-    protected function updateOrInsertSetting(string $key, $value)
+    public function updateOrInsertSetting(string $key, $value)
     {
         DB::connection($this->connection)->table('settings')->updateOrInsert(
             ['key' => $key],

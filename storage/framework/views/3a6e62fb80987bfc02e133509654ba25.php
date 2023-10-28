@@ -66,7 +66,7 @@
     <?php echo $__env->renderComponent(); ?>
 
     <div id="filter" class="p-3 bg-light-subtle rounded position-relative mb-4" style="z-index: 3;">
-        <form action="<?php echo e(route('goal-sales.index')); ?>" class="row g-2" autocomplete="off">
+        <form action="<?php echo e(route('goalSalesIndexURL')); ?>" class="row g-2" autocomplete="off">
 
             <div class="col-sm-12 col-md-2 col-lg-auto">
                 <select class="form-control form-select" name="meantime" title="Selecione o período">

@@ -15,6 +15,10 @@
         @endslot
     @endcomponent
 
+    @include('error.alert-errors')
+
+    @include('error.alert-success')
+
 <div class="chat-wrapper d-lg-flex gap-1 mx-n4 mt-1 p-1">
     <div class="file-manager-sidebar">
         <div class="p-3 d-flex flex-column h-100">
@@ -78,9 +82,9 @@
                     </div>
                     <div class="flex-grow-1 ms-3 overflow-hidden">
                         <div class="progress mb-2 progress-sm">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ $storageInfo['percentageUsed'] }}%" aria-valuenow="{{ $storageInfo['percentageUsed'] }}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
-                        <span class="text-muted fs-12 d-block text-truncate"><b>47.52</b>GB used of <b>119</b>GB</span>
+                        <span class="text-muted fs-12 d-block text-truncate"><b>{{ $storageInfo['used'] }}</b>GB used of <b>{{ $storageInfo['total'] }}</b>GB</span>
                     </div>
                 </div>
             </div>
@@ -122,40 +126,21 @@
                 </div>
                 <!--end row-->
                 <div class="row" id="folderlist-data">
-                    <div class="col-xxl-3 col-6 folder-card">
-                        <div class="card bg-light shadow-none" id="folder-1">
-                            <div class="card-body">
-                                <div class="d-flex mb-1">
-                                    <div class="form-check form-check-danger mb-3 fs-15 flex-grow-1">
-                                        <input class="form-check-input" type="checkbox" value="" id="folderlistCheckbox_1" checked>
-                                        <label class="form-check-label" for="folderlistCheckbox_1"></label>
+                    <div class="row" id="folderlist-data">
+                        @foreach ($folders as $folder)
+                            <div class="col-xxl-3 col-6 folder-card">
+                                <div class="card bg-light shadow-none" id="folder-{{ $folder->id }}">
+                                    <div class="card-body">
+                                        <!-- ... (other code) -->
+                                        <h6 class="fs-15 folder-name">{{ $folder->name }}</h6>
+                                        <!-- ... (other code) -->
                                     </div>
-                                    <div class="dropdown">
-                                        <button class="btn btn-ghost-primary btn-icon btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ri-more-2-fill fs-16 align-bottom"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li><a class="dropdown-item view-item-btn" href="javascript:void(0);">Open</a></li>
-                                            <li><a class="dropdown-item edit-folder-list" href="#createFolderModal" data-bs-toggle="modal" role="button">Rename</a></li>
-                                            <li><a class="dropdown-item" href="#removeFolderModal" data-bs-toggle="modal" role="button">Delete</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div class="text-center">
-                                    <div class="mb-2">
-                                        <i class="ri-folder-2-fill align-bottom text-warning display-5"></i>
-                                    </div>
-                                    <h6 class="fs-15 folder-name">Projects</h6>
-                                </div>
-                                <div class="hstack mt-4 text-muted">
-                                    <span class="me-auto"><b>349</b> Files</span>
-                                    <span><b>4.10</b>GB</span>
                                 </div>
                             </div>
-                        </div>
+                        @endforeach
                     </div>
-                    <!--end col-->
+
+                    {{--
                     <div class="col-xxl-3 col-6 folder-card">
                         <div class="card bg-light shadow-none" id="folder-2">
                             <div class="card-body">
@@ -178,85 +163,18 @@
 
                                 <div class="text-center">
                                     <div class="mb-2">
-                                        <i class="ri-folder-2-fill align-bottom text-warning display-5"></i>
+                                        <img src="{{ URL::asset('build/images/mac-img.png') }}" alt="Mac Image"  height="57">
                                     </div>
-                                    <h6 class="fs-15 folder-name">Documents</h6>
+                                    <h6 class="fs-15 folder-name">File Name Here</h6>
                                 </div>
                                 <div class="hstack mt-4 text-muted">
-                                    <span class="me-auto"><b>2348</b> Files</span>
+                                    <span class="me-auto"></span>
                                     <span><b>27.01</b>GB</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!--end col-->
-                    <div class="col-xxl-3 col-6 folder-card">
-                        <div class="card bg-light shadow-none" id="folder-3">
-                            <div class="card-body">
-                                <div class="d-flex mb-1">
-                                    <div class="form-check form-check-danger mb-3 fs-15 flex-grow-1">
-                                        <input class="form-check-input" type="checkbox" value="" id="folderlistCheckbox_3">
-                                        <label class="form-check-label" for="folderlistCheckbox_3"></label>
-                                    </div>
-                                    <div class="dropdown">
-                                        <button class="btn btn-ghost-primary btn-icon btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ri-more-2-fill fs-16 align-bottom"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li><a class="dropdown-item view-item-btn" href="javascript:void(0);">Open</a></li>
-                                            <li><a class="dropdown-item edit-folder-list" href="#createFolderModal" data-bs-toggle="modal" role="button">Rename</a></li>
-                                            <li><a class="dropdown-item" href="#removeFolderModal" data-bs-toggle="modal" role="button">Delete</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div class="text-center">
-                                    <div class="mb-2">
-                                        <i class="ri-folder-2-fill align-bottom text-warning display-5"></i>
-                                    </div>
-                                    <h6 class="fs-15 folder-name">Media</h6>
-                                </div>
-                                <div class="hstack mt-4 text-muted">
-                                    <span class="me-auto"><b>12480</b> Files</span>
-                                    <span><b>20.87</b>GB</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--end col-->
-                    <div class="col-xxl-3 col-6 folder-card">
-                        <div class="card bg-light shadow-none" id="folder-4">
-                            <div class="card-body">
-                                <div class="d-flex mb-1">
-                                    <div class="form-check form-check-danger mb-3 fs-15 flex-grow-1">
-                                        <input class="form-check-input" type="checkbox" value="" id="folderlistCheckbox_4" checked>
-                                        <label class="form-check-label" for="folderlistCheckbox_4"></label>
-                                    </div>
-                                    <div class="dropdown">
-                                        <button class="btn btn-ghost-primary btn-icon btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ri-more-2-fill fs-16 align-bottom"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li><a class="dropdown-item view-item-btn" href="javascript:void(0);">Open</a></li>
-                                            <li><a class="dropdown-item edit-folder-list" href="#createFolderModal" data-bs-toggle="modal" role="button">Rename</a></li>
-                                            <li><a class="dropdown-item" href="#removeFolderModal" data-bs-toggle="modal" role="button">Delete</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="text-center">
-                                    <div class="mb-2">
-                                        <i class="ri-folder-2-fill align-bottom text-warning display-5"></i>
-                                    </div>
-                                    <h6 class="fs-15 folder-name">Velzon v1.7.0</h6>
-                                </div>
-                                <div class="hstack mt-4 text-muted">
-                                    <span class="me-auto"><b>180</b> Files</span>
-                                    <span><b>478.65</b>MB</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--end col-->
+                    --}}
                 </div>
                 <!--end row-->
             </div>
@@ -264,9 +182,10 @@
                 <div class="d-flex align-items-center mb-3">
                     <h5 class="flex-grow-1 fs-16 mb-0" id="filetype-title">Recent File</h5>
                     <div class="flex-shrink-0">
-                        <button class="btn btn-success createFile-modal" data-bs-toggle="modal" data-bs-target="#createFileModal"><i class="ri-add-line align-bottom me-1"></i> Create File</button>
+                        <button class="btn btn-success createFile-modal" data-bs-toggle="modal" data-bs-target="#createFileModal"><i class="ri-add-line align-bottom me-1"></i> Upload File</button>
                     </div>
                 </div>
+                {{--
                 <div class="table-responsive">
                     <table class="table align-middle table-nowrap mb-0">
                         <thead class="table-active">
@@ -279,6 +198,22 @@
                             </tr>
                         </thead>
                         <tbody id="file-list"></tbody>
+                    </table>
+                </div>
+                --}}
+                <div class="table-responsive">
+                    <table class="table align-middle table-nowrap mb-0">
+                        <thead class="table-active">
+                            <!-- ... (other code) -->
+                        </thead>
+                        <tbody id="file-list">
+                            @foreach ($files as $file)
+                                <tr>
+                                    <td>{{ $file->name }}</td>
+                                    <!-- ... (other code) -->
+                                </tr>
+                            @endforeach
+                        </tbody>
                     </table>
                 </div>
                 <!-- <a href="javascript:prevPage()" id="btn_prev">Prev</a> -->
@@ -492,137 +427,8 @@
     </div>
 </div>
 
-<!-- START CREATE FOLDER MODAL -->
-<div class="modal fade zoomIn" id="createFolderModal" tabindex="-1" aria-labelledby="createFolderModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0">
-            <div class="modal-header p-3 bg-success-subtle">
-                <h5 class="modal-title" id="createFolderModalLabel">Create Folder</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" id="addFolderBtn-close" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form autocomplete="off" class="needs-validation createfolder-form" id="createfolder-form" novalidate>
-                    <div class="mb-4">
-                        <label for="foldername-input" class="form-label">Folder Name</label>
-                        <input type="text" class="form-control" id="foldername-input" required placeholder="Enter folder name">
-                        <div class="invalid-feedback">Please enter a folder name.</div>
-                        <input type="hidden" class="form-control" id="folderid-input" value="">
-                    </div>
-                    <div class="hstack gap-2 justify-content-end">
-                        <button type="button" class="btn btn-ghost-success" data-bs-dismiss="modal"><i class="ri-close-line align-bottom"></i> Close</button>
-                        <button type="submit" class="btn btn-primary" id="addNewFolder">Add Folder</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- END CREATE FOLDER MODAL -->
-
-<!-- START CREATE FOLDER MODAL -->
-<div class="modal fade zoomIn" id="createFolderModal" tabindex="-1" aria-labelledby="createFolderModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0">
-            <div class="modal-header p-3 bg-success-subtle">
-                <h5 class="modal-title" id="createFolderModalLabel">Create Folder</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" id="addFolderBtn-close" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form autocomplete="off" class="needs-validation createfolder-form" id="createfolder-form" novalidate>
-                    <div class="mb-4">
-                        <label for="foldername-input" class="form-label">Folder Name</label>
-                        <input type="text" class="form-control" id="foldername-input" required placeholder="Enter file name">
-                        <div class="invalid-feedback">Please enter a folder name.</div>
-                        <input type="hidden" class="form-control" id="folderid-input" value="" placeholder="Enter file name">
-                    </div>
-                    <div class="hstack gap-2 justify-content-end">
-                        <button type="button" class="btn btn-ghost-success" data-bs-dismiss="modal"><i class="ri-close-line align-bottom"></i> Close</button>
-                        <button type="submit" class="btn btn-primary" id="addNewFolder">Add Folder</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- END CREATE FOLDER MODAL -->
-
-<!-- START CREATE FILE MODAL -->
-<div class="modal fade zoomIn" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0">
-            <div class="modal-header p-3 bg-success-subtle">
-                <h5 class="modal-title" id="createFileModalLabel">Create File</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" id="addFileBtn-close" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form autocomplete="off" class="needs-validation createfile-form" id="createfile-form" novalidate>
-                    <div class="mb-4">
-                        <label for="filename-input" class="form-label">File Name</label>
-                        <input type="text" class="form-control" id="filename-input" value="" required>
-                        <div class="invalid-feedback">Please enter a file name.</div>
-                        <input type="hidden" class="form-control" id="fileid-input" value="">
-                    </div>
-                    <div class="hstack gap-2 justify-content-end">
-                        <button type="button" class="btn btn-ghost-success" data-bs-dismiss="modal"><i class="ri-close-line align-bottom"></i> Close</button>
-                        <button type="submit" class="btn btn-primary" id="addNewFile">Create</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- END CREATE FILE MODAL -->
-
-<!-- removeFileItemModal -->
-<div id="removeFileItemModal" class="modal fade zoomIn" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="close-removefilemodal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mt-2 text-center">
-                    <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop" colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
-                    <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
-                        <h4>Are you sure ?</h4>
-                        <p class="text-muted mx-4 mb-0">Are you sure you want to remove this item ?</p>
-                    </div>
-                </div>
-                <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
-                    <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn w-sm btn-danger" id="remove-fileitem">Yes, Delete It!</button>
-                </div>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<!-- removeFileItemModal -->
-<div id="removeFolderModal" class="modal fade zoomIn" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="close-removeFoldermodal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mt-2 text-center">
-                    <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop" colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
-                    <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
-                        <h4>Are you sure ?</h4>
-                        <p class="text-muted mx-4 mb-0">Are you sure you want to remove this folder ?</p>
-                    </div>
-                </div>
-                <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
-                    <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn w-sm btn-danger" id="remove-folderList">Yes, Delete It!</button>
-                </div>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
 @endsection
 @section('script')
-<!-- apexcharts -->
-<script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
+    <!-- apexcharts -->
+    <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
 @endsection

@@ -79,19 +79,19 @@
                         <div class="p-2">
                             <div class="row g-0">
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="{{ url('goal-sales') }}" title="Meta de Vendas">
+                                    <a class="dropdown-icon-item" href="{{ route('goalSalesIndexURL') }}" title="Meta de Vendas">
                                         <img src="{{ URL::asset('build/images/svg/happy.png') }}" alt="Meta de Vendas">
                                         <span>Vendas</span>
                                     </a>
                                 </div>
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="{{ url('goal-results') }}" title="Meta de Resultados">
+                                    <a class="dropdown-icon-item" href="{{-- route('goalResultsIndexURL') --}}#" title="Meta de Resultados">
                                         <img src="{{ URL::asset('build/images/bg-d.png') }}" alt="Meta de Resultados">
                                         <span>Resultados</span>
                                     </a>
                                 </div>
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="{{ url('audits') }}" title="Auditoria">
+                                    <a class="dropdown-icon-item" href="{{ route('auditsIndexURL') }}" title="Auditoria">
                                         <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Auditoria">
                                         <span>Auditoria</span>
                                     </a>
@@ -368,9 +368,9 @@
                 <div class="dropdown ms-sm-3 header-item topbar-user">
                     <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="d-flex align-items-center">
-                            <img class="rounded-circle header-profile-user" src="@if (Auth::user()->avatar != ''){{ URL::asset('storage/' . Auth::user()->avatar) }}@else{{ URL::asset('build/images/users/user-dummy-img.jpg') }}@endif" alt="{{Auth::user()->name}}">
+                            <img class="rounded-circle header-profile-user" src="{{ getUserData()['avatar'] ? URL::asset('storage/' . getUserData()['avatar']) :  URL::asset('build/images/users/user-dummy-img.jpg') }}" alt="{{getUserData()['name']}}">
                             <span class="text-start ms-xl-2">
-                                <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{Auth::user()->name}}</span>
+                                <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{getUserData()['name']}}</span>
                                 <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">Founder</span>
                             </span>
                         </span>
@@ -392,12 +392,16 @@
                         -->
 
                         @if(auth()->user()->hasRole(User::ROLE_ADMIN))
-                            <a class="dropdown-item" href="{{ url('settings') }}">
+                            <a class="dropdown-item" href="{{ route('settingsIndexURL') }}">
                                 <i class="ri-settings-4-fill text-muted fs-16 align-middle me-1"></i>
                                 <span class="align-middle">Configurações Gerais</span>
                             </a>
                         @endif
 
+                        <a class="dropdown-item" href="{{ route('profileShowURL') }}">
+                            <i class="ri-account-box-fill  text-muted fs-16 align-middle me-1"></i>
+                            <span class="align-middle">Meu Perfil</span>
+                        </a>
 
                         <!--
                         <a class="dropdown-item" href="auth-lockscreen-basic"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Lock screen</span></a>

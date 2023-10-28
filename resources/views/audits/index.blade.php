@@ -12,7 +12,7 @@
 @section('content')
     @component('components.breadcrumb')
         @slot('url')
-            {{ route('audits.index') }}
+            {{ route('auditsIndexURL') }}
         @endslot
         @slot('li_1')
             @lang('translation.audits')
@@ -68,7 +68,7 @@
                     </div>
                 </div>
                 <div class="card-body border border-dashed border-end-0 border-start-0">
-                    <form action="{{ route('audits.index') }}" method="get" autocomplete="off">
+                    <form action="{{ route('auditsIndexURL') }}" method="get" autocomplete="off">
                         <div class="row g-3">
                             {{--
                             <div class="col-sm-12 col-md-2 col-lg">
@@ -144,7 +144,7 @@
                             <tbody>
                                 @foreach ($audits as $audit)
                                     <tr>
-                                        <td scope="row"><a class="fw-medium link-primary" href="{{ route('audits.show', $audit->id) }}">{{ $audit->id }}</a></td>
+                                        <td scope="row"><a class="fw-medium link-primary" href="{{ route('auditsShowURL', $audit->id) }}">{{ $audit->id }}</a></td>
                                         <td class="created_at">
                                             {{ $audit->created_at ? \Carbon\Carbon::parse($audit->created_at)->format('d F, Y') : '-' }}
                                         </td>
@@ -194,7 +194,7 @@
                                                 @else
                                                     <button type="button" disabled class="btn btn-sm btn-outline-dark cursor-not-allowed" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Edição Bloqueada" data-bs-content="Status <b class='text-{{ $getAuditStatusTranslations[$audit->status]['color'] }}'>{{ $getAuditStatusTranslations[$audit->status]['label'] }}</b><br><br>A edição será possível somente se o usuário ao qual foi atribuída tal tarefa optar por <b>Abortar</b>"><i class="ri-edit-line"></i></button>
                                                 @endif
-                                                <a href="{{ route('audits.show', $audit->id) }}" class="btn btn-sm btn-outline-dark waves-effect" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar"><i class="ri-eye-line"></i></a>
+                                                <a href="{{ route('auditsShowURL', $audit->id) }}" class="btn btn-sm btn-outline-dark waves-effect" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar"><i class="ri-eye-line"></i></a>
                                             </div>
                                         </td>
                                     </tr>

@@ -22,7 +22,7 @@ class SettingsDatabaseController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function showDatabase() {
+    public function index() {
         $departments = DB::connection($this->connection)
             ->table('wlsm_departments')
             ->orderBy('department_id', 'asc')
@@ -33,7 +33,7 @@ class SettingsDatabaseController extends Controller
             ->orderBy('company_id', 'asc')
             ->get();
 
-        return view('settings/database', compact('departments', 'companies'));
+        return view('settings.database', compact('departments', 'companies'));
     }
 
     /**

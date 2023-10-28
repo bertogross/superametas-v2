@@ -12,7 +12,7 @@
 <?php $__env->startSection('content'); ?>
     <?php $__env->startComponent('components.breadcrumb'); ?>
         <?php $__env->slot('url'); ?>
-            <?php echo e(route('audits.index')); ?>
+            <?php echo e(route('auditsIndexURL')); ?>
 
         <?php $__env->endSlot(); ?>
         <?php $__env->slot('li_1'); ?>
@@ -64,7 +64,7 @@
                     </div>
                 </div>
                 <div class="card-body border border-dashed border-end-0 border-start-0">
-                    <form action="<?php echo e(route('audits.index')); ?>" method="get" autocomplete="off">
+                    <form action="<?php echo e(route('auditsIndexURL')); ?>" method="get" autocomplete="off">
                         <div class="row g-3">
                             
 
@@ -131,7 +131,7 @@
                             <tbody>
                                 <?php $__currentLoopData = $audits; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $audit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td scope="row"><a class="fw-medium link-primary" href="<?php echo e(route('audits.show', $audit->id)); ?>"><?php echo e($audit->id); ?></a></td>
+                                        <td scope="row"><a class="fw-medium link-primary" href="<?php echo e(route('auditsShowURL', $audit->id)); ?>"><?php echo e($audit->id); ?></a></td>
                                         <td class="created_at">
                                             <?php echo e($audit->created_at ? \Carbon\Carbon::parse($audit->created_at)->format('d F, Y') : '-'); ?>
 
@@ -181,7 +181,7 @@
                                                 <?php else: ?>
                                                     <button type="button" disabled class="btn btn-sm btn-outline-dark cursor-not-allowed" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Edição Bloqueada" data-bs-content="Status <b class='text-<?php echo e($getAuditStatusTranslations[$audit->status]['color']); ?>'><?php echo e($getAuditStatusTranslations[$audit->status]['label']); ?></b><br><br>A edição será possível somente se o usuário ao qual foi atribuída tal tarefa optar por <b>Abortar</b>"><i class="ri-edit-line"></i></button>
                                                 <?php endif; ?>
-                                                <a href="<?php echo e(route('audits.show', $audit->id)); ?>" class="btn btn-sm btn-outline-dark waves-effect" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar"><i class="ri-eye-line"></i></a>
+                                                <a href="<?php echo e(route('auditsShowURL', $audit->id)); ?>" class="btn btn-sm btn-outline-dark waves-effect" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar"><i class="ri-eye-line"></i></a>
                                             </div>
                                         </td>
                                     </tr>

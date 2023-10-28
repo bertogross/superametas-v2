@@ -8,10 +8,13 @@ https://laravel-news.com/openai-for-laravel
 
 
 
+Version 2.0.18 - [2023-10-28]
+- [Added] Dropbox with spatie/laravel-dropbox
 
-Version 2.0.18 - [2023-10-26]
 
 
+Version 2.0.18 - [2023-10-27]
+- [Failed] Google Drive API (Failed because Google forces you to subscribe to Wrokspace)
 
 
 Version 2.0.18 - [2023-10-26]

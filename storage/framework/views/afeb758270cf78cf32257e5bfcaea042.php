@@ -100,7 +100,7 @@
                             </form>
                         </div><!--end tab-pane-->
                         <div class="tab-pane fade <?php echo e(session('active_tab') == 'companies' ? 'active show' : ''); ?>" id="v-pills-companies" role="tabpanel" aria-labelledby="v-pills-companies-tab">
-                            <form action="<?php echo e(route('settings.companies.updateCompanies')); ?>" method="POST" autocomplete="off">
+                            <form action="<?php echo e(route('settingsCompaniesUpdateURL')); ?>" method="POST" autocomplete="off">
                                 <?php echo csrf_field(); ?>
                                 <?php echo method_field('PUT'); ?>
                                 <button type="submit" class="btn btn-theme float-end">Atualizar Empresas</button>

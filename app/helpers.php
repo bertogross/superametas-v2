@@ -345,18 +345,30 @@ if (!function_exists('getActiveDepartments')) {
 }
 
 
-if (!function_exists('getCompanyLogo')) {
-    function getCompanyLogo(){
-        $settings = DB::connection('smAppTemplate')->table('settings')->pluck('value', 'key')->toArray();
-        return isset($settings['logo']) ? URL::asset('storage/' . $settings['logo']) : '';
+if (!function_exists('getSettings')) {
+    function getSettings($key) {
+        if(!empty($key)){
+            $settings = DB::connection('smAppTemplate')->table('settings')->pluck('value', 'key')->toArray();
+            return isset($settings[$key]) ? $settings[$key] : '';
+        }
     }
 }
 
+if (!function_exists('getCompanyLogo')) {
+    function getCompanyLogo(){
+        return URL::asset('storage/' . getSettings('logo'));
+    }
+}
 
 if (!function_exists('getCompanyName')) {
     function getCompanyName(){
-        $settings = DB::connection('smAppTemplate')->table('settings')->pluck('value', 'key')->toArray();
-        return isset($settings['name']) ? $settings['name'] : '';
+        return getSettings('name');
+    }
+}
+
+if (!function_exists('getGoogleToken')) {
+    function getGoogleToken(){
+        return getSettings('google_token');
     }
 }
 

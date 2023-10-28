@@ -459,7 +459,7 @@ class GoalSalesController extends Controller
      */
     public function getGoalSalesSettingsModalContent() {
 
-        return view('goal-sales/settings-modal');
+        return view('goal-sales.settings-modal');
 
     }
 
@@ -517,7 +517,7 @@ class GoalSalesController extends Controller
             ->pluck('total_net_value', 'department_id')
             ->toArray();
 
-        return view('goal-sales/edit-modal', compact(
+        return view('goal-sales.edit-modal', compact(
                 'goals',
                 'salesYearBefore',
                 'salesMonthBefore',

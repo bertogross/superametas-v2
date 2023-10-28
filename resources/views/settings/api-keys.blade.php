@@ -18,6 +18,10 @@
         @endslot
     @endcomponent
 
+    @include('error.alert-errors')
+
+    @include('error.alert-success')
+
     <div class="row">
         <div class="col-lg-4">
             <div class="card card-height-100">
@@ -118,7 +122,7 @@
                                             </div>
                                         </th>
                                         <td class="id" style="display:none;"><a href="javascript:void(0);" class="fw-medium link-primary">#VZ001</a></td>
-                                        <td class="name">Streamlab</td>
+                                        <td class="name">Google Drive API</td>
                                         <td class="createBy">Nicholas Ball</td>
                                         <td class="apikey">
                                             <input type="text" class="form-control apikey-value" readonly value="b5815DE8A7224438932eb296Z5">
@@ -126,18 +130,16 @@
                                         <td class="status"><span class="badge bg-danger-subtle text-danger">Disable</span></td>
                                         <td class="create_date">24 Sep, 2022</td>
                                         <td class="expiry_date">24 Jan, 2023</td>
-                                        <td>
-                                            <div class="dropdown">
-                                                <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="ri-more-fill align-middle"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end">
-                                                    <li><a class="dropdown-item edit-item-btn" href="#api-key-modal" data-bs-toggle="modal">Rename</a></li>
-                                                    <li><a class="dropdown-item regenerate-api-btn" href="#api-key-modal" data-bs-toggle="modal">Regenerate Key</a></li>
-                                                    <li><a class="dropdown-item disable-btn" href="javascript:void(0);">Disable</a></li>
-                                                    <li><a class="dropdown-item remove-item-btn" data-bs-toggle="modal" href="#deleteApiKeyModal">Delete</a></li>
-                                                </ul>
-                                            </div>
+                                        <td class="text-end">
+                                            @if (getGoogleToken())
+                                                <a class="btn btn-danger" href="{{ route('GoogleDriveDeauthorizeURL') }}">
+                                                    Deauthorize Google Drive
+                                                </a>
+                                            @else
+                                                <a class="btn btn-primary" href="{{ route('GoogleDriveRedirectURL') }}" target="_blank">
+                                                    Authorize Google Drive
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 </tbody>

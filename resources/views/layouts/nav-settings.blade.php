@@ -12,10 +12,10 @@
                 <div class="collapse menu-dropdown" id="sidebarDashboards">
                     <ul class="nav nav-sm flex-column">
                         <li class="nav-item">
-                            <a href="{{ url('goal-sales') }}" class="nav-link">@lang('translation.goal-sales')</a>
+                            <a href="{{ route('goalSalesIndexURL') }}" class="nav-link">@lang('translation.goal-sales')</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('audits') }}" class="nav-link">@lang('translation.audits')</a>
+                            <a href="{{ route('auditsIndexURL') }}" class="nav-link">@lang('translation.audits')</a>
                         </li>
                     </ul>
                 </div>
@@ -24,38 +24,38 @@
             <li class="menu-title"><i class="ri-more-fill"></i> <span>@lang('translation.components')</span></li>
 
             <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->is('settings/account') ? 'active' : '' }}" href="{{ url('settings/account') }}">
+                <a class="nav-link menu-link {{ request()->is('settings/account') ? 'active' : '' }}" href="{{ route('settingsAccountShowURL') }}">
                     <i class="ri-arrow-right-up-line"></i> <span>Meu {{ env('APP_NAME') }}</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->is('settings/api-keys') || request()->is('settings/storage') || request()->is('settings/database') ? 'active' : '' }}" href="#sidebarAPIs" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAPIs">
+                <a class="nav-link menu-link {{ request()->is('settings/api-keys') || request()->is('settings/files') || request()->is('settings/database') ? 'active' : '' }}" href="#sidebarAPIs" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAPIs">
                     <i class="ri-cloud-windy-fill"></i> <span>@lang('translation.api-conections')</span>
                 </a>
                 <div class="collapse menu-dropdown" id="sidebarAPIs">
                     <ul class="nav nav-sm flex-column">
                         <li class="nav-item">
-                            <a href="{{ url('settings/api-keys') }}" class="nav-link {{ request()->is('settings/api-keys') ? 'active' : '' }}">@lang('translation.api-keys')</a>
+                            <a href="{{ route('settingsApiKeysURL') }}" class="nav-link {{ request()->is('settings/api-keys') ? 'active' : '' }}">@lang('translation.api-keys')</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('settings/storage') }}" class="nav-link {{ request()->is('settings/storage') ? 'active' : '' }}">@lang('translation.file-manager')</a>
+                            <a href="{{ route('googleDriveFilesURL') }}" class="nav-link {{ request()->is('settings/files') ? 'active' : '' }}">@lang('translation.file-manager')</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('settings/database') }}" class="nav-link {{ request()->is('settings/database') ? 'active' : '' }}">@lang('translation.your-erp')</a>
+                            <a href="{{ route('settingsDatabaseIndexURL') }}" class="nav-link {{ request()->is('settings/database') ? 'active' : '' }}">@lang('translation.your-erp')</a>
                         </li>
                     </ul>
                 </div>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->is('settings/users') ? 'active' : '' }}" href="{{ url('settings/users') }}">
+                <a class="nav-link menu-link {{ request()->is('settings/users') ? 'active' : '' }}" href="{{ route('settingsUsersIndexURL') }}">
                     <i class="ri-admin-fill"></i> <span>@lang('translation.users')</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->is('settings/security') ? 'active' : '' }}" href="{{ url('settings/security') }}">
+                <a class="nav-link menu-link {{ request()->is('settings/security') ? 'active' : '' }}" href="{{-- route('settingsSecurityIndexURL') --}}#">
                     <i class="ri-shield-keyhole-line"></i> <span>@lang('translation.security')</span>
                 </a>
             </li>

@@ -99,7 +99,7 @@
                                                 </td>
                                                 <td class="align-middle input-group input-group-sm">
                                                     <span class="input-group-text">R$</span>
-                                                    <input type="text"class="form-control o-sum-fields-current format-numbers" name="goals[{{$department->department_id}}]" value="{{ $goals[$department->department_id] ?? '' }}" maxlength="50" tabindex="{{$ndx++}}">
+                                                    <input type="text"class="form-control o-sum-fields-current format-numbers" name="goals[{{$department->department_id}}]" value="{{ $goals[$department->department_id] ?? '' }}" maxlength="20" tabindex="{{$ndx++}}">
                                                 </td>
                                             </tr>
                                         @endforeach

@@ -139,7 +139,7 @@ class AuditsController extends Controller
                 AuditMeta::updateAuditMeta($audit->id, 'custom_fields', $customFields);
             }
 
-            //return redirect()->route('audits.show', $audit)->with('success', 'Audit updated successfully');
+            //return redirect()->route('auditsShowURL', $audit)->with('success', 'Audit updated successfully');
             return response()->json(['success' => true, 'message' => 'Audit saved successfully!']);
         } else {
             // Store operation
@@ -181,7 +181,7 @@ class AuditsController extends Controller
         }
 
         // Redirect to the audit's detail page with a success message
-        //return redirect()->route('audits.show', $audit)->with('success', 'Audit task created successfully.');
+        //return redirect()->route('auditsShowURL', $audit)->with('success', 'Audit task created successfully.');
         return response()->json(['success' => true, 'message' => 'Audit updated successfully!']);
     }
 

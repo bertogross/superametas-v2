@@ -47,7 +47,7 @@
                 <div class="col-lg-10">
                     <div class="tab-content text-muted mt-3 mt-lg-0">
                         <div class="tab-pane fade {{ session('active_tab') == 'departments' || session('active_tab') == '' ? 'active show' : '' }}" id="v-pills-departments" role="tabpanel" aria-labelledby="v-pills-departments-tab">
-                            <form action="{{ route('settings.departments.updateDepartments') }}" method="POST" autocomplete="off">
+                            <form action="{{ route('settingsDepartmentsUpdateURL') }}" method="POST" autocomplete="off">
                                 @csrf
                                 @method('PUT')
                                 <button type="submit" class="btn btn-theme float-end">Atualizar Departamentos</button>
@@ -97,7 +97,7 @@
                             </form>
                         </div><!--end tab-pane-->
                         <div class="tab-pane fade {{ session('active_tab') == 'companies' ? 'active show' : '' }}" id="v-pills-companies" role="tabpanel" aria-labelledby="v-pills-companies-tab">
-                            <form action="{{ route('settings.companies.updateCompanies') }}" method="POST" autocomplete="off">
+                            <form action="{{ route('settingsCompaniesUpdateURL') }}" method="POST" autocomplete="off">
                                 @csrf
                                 @method('PUT')
                                 <button type="submit" class="btn btn-theme float-end">Atualizar Empresas</button>

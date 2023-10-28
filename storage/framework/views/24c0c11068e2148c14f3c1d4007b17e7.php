@@ -7,7 +7,7 @@
 <?php $__env->startSection('content'); ?>
     <?php $__env->startComponent('components.breadcrumb'); ?>
         <?php $__env->slot('url'); ?>
-            <?php echo e(route('audits.index')); ?>
+            <?php echo e(route('auditsIndexURL')); ?>
 
         <?php $__env->endSlot(); ?>
         <?php $__env->slot('li_1'); ?>
