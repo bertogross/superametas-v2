@@ -1,163 +1,162 @@
 import { toastAlert } from './helpers.js';
 
-// A flag to track whether the execution is currently in progress or not.
-let isExecutionInProgress = false;
-
-const monthsInPortuguese = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-];
-
-
-// Prevent right-click context menu.
-function preventRightClick(e) {
-    e.preventDefault();
-}
-
-// Update the progress bar's color based on the given percentage.
-function updateProgressBarColor(percent) {
-    const progressBar = document.querySelector('.progress-bar');
-    progressBar.classList.remove('bg-warning-subtle', 'bg-warning', 'bg-info', 'bg-theme');
-    //console.log('progress: ' + percent);
-
-    if (percent < 10) {
-        progressBar.classList.add('bg-warning-subtle');
-    } else if (percent >= 10 && percent < 25) {
-        progressBar.classList.add('bg-warning');
-    } else if (percent >= 25 && percent < 75) {
-        progressBar.classList.add('bg-info');
-    } else if (percent >= 75 && percent < 100) {
-        progressBar.classList.add('bg-primary');
-    } else {
-        progressBar.classList.add('bg-theme');
-    }
-}
-
-// Increment the month of a given date string in "YYYY-mm" format.
-function incrementMonth(dateStr) {
-    const [year, month] = dateStr.split('-').map(Number);
-    return month === 12 ? `${year + 1}-01` : `${year}-${String(month + 1).padStart(2, '0')}`;
-}
-
-// Calculate the month difference between two dates in "YYYY-mm" format.
-function monthDifference(startDate, endDate) {
-    const [startYear, startMonth] = startDate.split('-').map(Number);
-    const [endYear, endMonth] = endDate.split('-').map(Number);
-    return (endYear - startYear) * 12 + endMonth - startMonth;
-}
-
-// Sends a request to the specified URL and returns the JSON response.
-async function sendRequest(url) {
-    const response = await fetch(url);
-    if (!response.ok) {
-        toastAlert(Error(response.statusText), 'error', 10000);
-        throw new Error(response.statusText);
-    }
-    return response.json();
-}
-
-// Recursively makes requests to the API and updates the UI accordingly.
-async function makeRequests(meantime, initialMeantime, completedIterations) {
-    // UI adjustments for synchronization progress
-    document.getElementById('synchronization-progress').classList.remove('d-none');
-    document.getElementById('btn-start-synchronization').classList.add('d-none');
-    toggleCustomBackdrop(true);
-    isExecutionInProgress = true;
-    document.addEventListener('contextmenu', preventRightClick);
-
-    try {
-        //document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">A importação poderá levar algum tempo. Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
-        document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
-
-        const response = await sendRequest(`/api/process-sysmo-api/${meantime}`);
-        if (!response || response.success === false) {
-            finalizeSynchronization('error', response.message, '0%')
-
-            return;
-        }
-
-        // Progress calculations and UI updates
-        const totalMonths = monthDifference(initialMeantime, new Date().toISOString().slice(0, 7));
-        const elapsedMonths = monthDifference(initialMeantime, meantime);
-        const percent = (elapsedMonths / totalMonths) * 100;
-
-        document.querySelector('.progress-bar').style.width = `${percent.toFixed(0)}%`;
-        document.querySelector('.synchronization-percent').innerHTML = `${percent.toFixed(0)}%`;
-
-        updateProgressBarColor(percent);
-
-        // Populate the <li> elements with concluded meantimes
-        const ulElement = document.querySelector('.concluded-meantimes');
-        const liElement = document.createElement('li');
-        liElement.innerHTML = `<i class="ri-check-double-fill text-theme align-bottom me-2"></i>${convertMeantimeToPortuguese(meantime)}`;
-
-        // Insert the new li element at the beginning of the ul element
-        ulElement.insertBefore(liElement, ulElement.firstChild);
-
-        // Determine next steps based on progress
-        const nextMeantime = incrementMonth(meantime);
-        if (new Date(nextMeantime) <= new Date()) {
-            makeRequests(nextMeantime, initialMeantime, completedIterations + 1);
-        } else {
-            finalizeSynchronization('success', 'Concluído', '100%');
-        }
-    } catch (error) {
-        toggleCustomBackdrop(false);
-
-        document.querySelector('.synchronization-time').innerHTML = '';
-
-        isExecutionInProgress = false;
-
-        document.removeEventListener('contextmenu', preventRightClick);
-
-        toastAlert(`Error: ${error.message}`, 'error', 10000);
-
-        document.querySelector('.synchronization-percent-text').innerHTML = '<span class="text-danger">Erro: ' + error.message + '</span>';
-    }
-}
-
-
-// Showing and hiding the custom backdrop based on a boolean parameter
-function toggleCustomBackdrop(show) {
-    var customBackdrop = document.getElementById('custom-backdrop');
-    if (customBackdrop) {
-        if (show) {
-            customBackdrop.classList.remove('d-none');
-            customBackdrop.classList.add('d-block');
-        } else {
-            customBackdrop.classList.remove('d-block');
-            customBackdrop.classList.add('d-none');
-        }
-    } else {
-        console.error("Element with id 'custom-backdrop' not found");
-    }
-}
-
-
-// Finalize the synchronization process and update the UI.
-function finalizeSynchronization(type, message, percentage) {
-    setTimeout(function () {
-        document.querySelector('.progress-bar').style.width = percentage;
-        document.querySelector('.synchronization-percent-text').innerHTML = message;
-        document.querySelector('.synchronization-time').innerHTML = '';
-
-        isExecutionInProgress = false;
-        document.removeEventListener('contextmenu', preventRightClick);
-
-        toggleCustomBackdrop(false);
-        toastAlert(message, type, 100000000);
-    }, 5000);
-}
-
-// Convert 'YYYY-mm' format to human-readable Portuguese format
-function convertMeantimeToPortuguese(meantime) {
-    const [year, month] = meantime.split('-');
-
-    return `${monthsInPortuguese[month - 1]} de ${year}`;
-}
-
 // Event listeners setup
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function () {
+    // A flag to track whether the execution is currently in progress or not.
+    let isExecutionInProgress = false;
+
+    const monthsInPortuguese = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+
+
+    // Prevent right-click context menu.
+    function preventRightClick(e) {
+        e.preventDefault();
+    }
+
+    // Update the progress bar's color based on the given percentage.
+    function updateProgressBarColor(percent) {
+        const progressBar = document.querySelector('.progress-bar');
+        progressBar.classList.remove('bg-warning-subtle', 'bg-warning', 'bg-info', 'bg-theme');
+        //console.log('progress: ' + percent);
+
+        if (percent < 10) {
+            progressBar.classList.add('bg-warning-subtle');
+        } else if (percent >= 10 && percent < 25) {
+            progressBar.classList.add('bg-warning');
+        } else if (percent >= 25 && percent < 75) {
+            progressBar.classList.add('bg-info');
+        } else if (percent >= 75 && percent < 100) {
+            progressBar.classList.add('bg-primary');
+        } else {
+            progressBar.classList.add('bg-theme');
+        }
+    }
+
+    // Increment the month of a given date string in "YYYY-mm" format.
+    function incrementMonth(dateStr) {
+        const [year, month] = dateStr.split('-').map(Number);
+        return month === 12 ? `${year + 1}-01` : `${year}-${String(month + 1).padStart(2, '0')}`;
+    }
+
+    // Calculate the month difference between two dates in "YYYY-mm" format.
+    function monthDifference(startDate, endDate) {
+        const [startYear, startMonth] = startDate.split('-').map(Number);
+        const [endYear, endMonth] = endDate.split('-').map(Number);
+        return (endYear - startYear) * 12 + endMonth - startMonth;
+    }
+
+    // Sends a request to the specified URL and returns the JSON response.
+    async function sendRequest(url) {
+        const response = await fetch(url);
+        if (!response.ok) {
+            toastAlert(Error(response.statusText), 'error', 10000);
+            throw new Error(response.statusText);
+        }
+        return response.json();
+    }
+
+    // Recursively makes requests to the API and updates the UI accordingly.
+    async function makeRequests(meantime, initialMeantime, completedIterations) {
+        // UI adjustments for synchronization progress
+        document.getElementById('synchronization-progress').classList.remove('d-none');
+        document.getElementById('btn-start-synchronization').classList.add('d-none');
+        toggleCustomBackdrop(true);
+        isExecutionInProgress = true;
+        document.addEventListener('contextmenu', preventRightClick);
+
+        try {
+            //document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">A importação poderá levar algum tempo. Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
+            document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
+
+            const response = await sendRequest(`/api/process-sysmo-api/${meantime}`);
+            if (!response || response.success === false) {
+                finalizeSynchronization('error', response.message, '0%')
+
+                return;
+            }
+
+            // Progress calculations and UI updates
+            const totalMonths = monthDifference(initialMeantime, new Date().toISOString().slice(0, 7));
+            const elapsedMonths = monthDifference(initialMeantime, meantime);
+            const percent = (elapsedMonths / totalMonths) * 100;
+
+            document.querySelector('.progress-bar').style.width = `${percent.toFixed(0)}%`;
+            document.querySelector('.synchronization-percent').innerHTML = `${percent.toFixed(0)}%`;
+
+            updateProgressBarColor(percent);
+
+            // Populate the <li> elements with concluded meantimes
+            const ulElement = document.querySelector('.concluded-meantimes');
+            const liElement = document.createElement('li');
+            liElement.innerHTML = `<i class="ri-check-double-fill text-theme align-bottom me-2"></i>${convertMeantimeToPortuguese(meantime)}`;
+
+            // Insert the new li element at the beginning of the ul element
+            ulElement.insertBefore(liElement, ulElement.firstChild);
+
+            // Determine next steps based on progress
+            const nextMeantime = incrementMonth(meantime);
+            if (new Date(nextMeantime) <= new Date()) {
+                makeRequests(nextMeantime, initialMeantime, completedIterations + 1);
+            } else {
+                finalizeSynchronization('success', 'Concluído', '100%');
+            }
+        } catch (error) {
+            toggleCustomBackdrop(false);
+
+            document.querySelector('.synchronization-time').innerHTML = '';
+
+            isExecutionInProgress = false;
+
+            document.removeEventListener('contextmenu', preventRightClick);
+
+            toastAlert(`Error: ${error.message}`, 'error', 10000);
+
+            document.querySelector('.synchronization-percent-text').innerHTML = '<span class="text-danger">Erro: ' + error.message + '</span>';
+        }
+    }
+
+    // Showing and hiding the custom backdrop based on a boolean parameter
+    function toggleCustomBackdrop(show) {
+        var customBackdrop = document.getElementById('custom-backdrop');
+        if (customBackdrop) {
+            if (show) {
+                customBackdrop.classList.remove('d-none');
+                customBackdrop.classList.add('d-block');
+            } else {
+                customBackdrop.classList.remove('d-block');
+                customBackdrop.classList.add('d-none');
+            }
+        } else {
+            console.error("Element with id 'custom-backdrop' not found");
+        }
+    }
+
+    // Finalize the synchronization process and update the UI.
+    function finalizeSynchronization(type, message, percentage) {
+        setTimeout(function () {
+            document.querySelector('.progress-bar').style.width = percentage;
+            document.querySelector('.synchronization-percent-text').innerHTML = message;
+            document.querySelector('.synchronization-time').innerHTML = '';
+
+            isExecutionInProgress = false;
+            document.removeEventListener('contextmenu', preventRightClick);
+
+            toggleCustomBackdrop(false);
+            toastAlert(message, type, 100000000);
+        }, 5000);
+    }
+
+    // Convert 'YYYY-mm' format to human-readable Portuguese format
+    function convertMeantimeToPortuguese(meantime) {
+        const [year, month] = meantime.split('-');
+
+        return `${monthsInPortuguese[month - 1]} de ${year}`;
+    }
+
+
     // Warn the user if they try to leave the page during execution
     window.addEventListener('beforeunload', function(e) {
         if (isExecutionInProgress) {

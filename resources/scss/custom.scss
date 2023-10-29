@@ -420,6 +420,9 @@ pre:empty{
   background-color: var(--vz-theme-hover);
   border-color: var(--vz-theme-hover);
 }
+.btn-ghost-theme{
+    --vz-btn-color: var(--vz-theme) !important;
+}
 .btn-check:focus + .btn-theme, .btn-theme:focus {
   color: var(--vz-gray-dark);
   background-color: var(--vz-theme-hover);

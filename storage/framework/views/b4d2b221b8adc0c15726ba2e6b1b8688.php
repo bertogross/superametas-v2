@@ -30,7 +30,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link menu-link <?php echo e(request()->is('settings/api-keys') || request()->is('settings/files') || request()->is('settings/database') ? 'active' : ''); ?>" href="#sidebarAPIs" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAPIs">
+                <a class="nav-link menu-link <?php echo e(request()->is('settings/api-keys') || request()->is('settings/database') ? 'active' : ''); ?>" href="#sidebarAPIs" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAPIs">
                     <i class="ri-cloud-windy-fill"></i> <span><?php echo app('translator')->get('translation.api-conections'); ?></span>
                 </a>
                 <div class="collapse menu-dropdown" id="sidebarAPIs">
@@ -39,14 +39,19 @@
                             <a href="<?php echo e(route('settingsApiKeysURL')); ?>" class="nav-link <?php echo e(request()->is('settings/api-keys') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.api-keys'); ?></a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?php echo e(route('DropboxFilesURL')); ?>" class="nav-link <?php echo e(request()->is('settings/files') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.file-manager'); ?></a>
-                        </li>
-                        <li class="nav-item">
                             <a href="<?php echo e(route('settingsDatabaseIndexURL')); ?>" class="nav-link <?php echo e(request()->is('settings/database') ? 'active' : ''); ?>"><?php echo app('translator')->get('translation.your-erp'); ?></a>
                         </li>
                     </ul>
                 </div>
             </li>
+
+            <?php if( getDropboxToken() ): ?>
+                <li class="nav-item">
+                    <a class="nav-link menu-link <?php echo e(request()->is('settings/files') ? 'active' : ''); ?>" href="<?php echo e(route('DropboxFilesURL')); ?>">
+                        <i class="ri-dropbox-fill <?php echo e(request()->is('settings/files') ? 'text-primary' : ''); ?>"></i> <span class="<?php echo e(request()->is('settings/files') ? 'text-white' : ''); ?>">Dropbox</span>
+                    </a>
+                </li>
+            <?php endif; ?>
 
             <li class="nav-item">
                 <a class="nav-link menu-link <?php echo e(request()->is('settings/users') ? 'active' : ''); ?>" href="<?php echo e(route('settingsUsersIndexURL')); ?>">

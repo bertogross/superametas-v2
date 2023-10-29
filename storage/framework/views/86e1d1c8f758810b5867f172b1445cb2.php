@@ -1,5 +1,12 @@
+<?php if(session('error')): ?>
+    <div class="alert alert-danger">
+        <?php echo e(session('error')); ?>
+
+    </div>
+<?php endif; ?>
+
 <?php if($errors->any()): ?>
-    <div class="alert alert-danger mb-0">
+    <div class="alert alert-danger">
         <ul class="list-unstyled">
             <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <li><i class="ri-close-fill align-bottom me-1"></i><?php echo e($error); ?></li>

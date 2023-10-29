@@ -1,6 +1,6 @@
 import {toastAlert} from './helpers.js';
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
     // Load the content for the user modal
     function loadUserSettingsModal(userId = null, userName = '') {

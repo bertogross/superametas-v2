@@ -33,7 +33,7 @@
             </h4>
             <div class="page-title-right">
                 <div class="dropstart float-end">
-                    <button type="button" class="btn btn-sm fs-4 pe-0" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" title="Opções"><i class="ri-more-2-line text-theme"></i></button>
+                    <button type="button" class="btn btn-sm btn-ghost-theme fs-4 pe-0" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" title="Opções"><i class="ri-more-2-line"></i></button>
 
                     <ul class="dropdown-menu">
                         @if ($lastUpdate)

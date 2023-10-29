@@ -1,6 +1,6 @@
 import {toastAlert} from './helpers.js';
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Register the plugins
     FilePond.registerPlugin(
         FilePondPluginFileEncode,

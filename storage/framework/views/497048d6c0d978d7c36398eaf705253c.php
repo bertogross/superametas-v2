@@ -73,7 +73,7 @@
                     </div>
                 </div>
                 <div class="col-lg-2 col">
-                    <div class="text-end"> <a href="<?php echo e(url('profile')); ?>/<?php if(isset($id)): ?><?php echo e($id); ?><?php endif; ?>" class="btn btn-light view-btn">Visualizar Perfil</a>
+                    <div class="text-end"> <a href="<?php echo e(route('profileShowURL')); ?><?php if(isset($id)): ?>/<?php echo e($id); ?><?php endif; ?>" class="btn btn-light view-btn">Visualizar Perfil</a>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 import {toastAlert} from './helpers.js';
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btn-login').addEventListener('click', function(event) {
 
         let database = document.getElementById('database').value;

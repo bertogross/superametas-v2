@@ -90,6 +90,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/settings/api-keys', [SettingsApiKeysController::class, 'index'])->name('settingsApiKeysURL');
         //Route::get('/settings/files', [GoogleDriveController::class, 'files'])->name('googleDriveFilesURL');
         Route::get('/settings/files', [DropboxController::class, 'files'])->name('DropboxFilesURL');
+        Route::get('/settings/files/browse/{path}', [DropboxController::class, 'browseFolder'])->name('DropboxBrowseFolderURL');
+
         Route::get('/settings/database', [SettingsDatabaseController::class, 'index'])->name('settingsDatabaseIndexURL');
             Route::put('/settings/departments/store', [SettingsDatabaseController::class, 'updateDepartments'])->name('settingsDepartmentsUpdateURL');
             Route::put('/settings/companies/store', [SettingsDatabaseController::class, 'updateCompanies'])->name('settingsCompaniesUpdateURL');

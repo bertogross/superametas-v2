@@ -30,7 +30,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->is('settings/api-keys') || request()->is('settings/files') || request()->is('settings/database') ? 'active' : '' }}" href="#sidebarAPIs" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAPIs">
+                <a class="nav-link menu-link {{ request()->is('settings/api-keys') || request()->is('settings/database') ? 'active' : '' }}" href="#sidebarAPIs" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAPIs">
                     <i class="ri-cloud-windy-fill"></i> <span>@lang('translation.api-conections')</span>
                 </a>
                 <div class="collapse menu-dropdown" id="sidebarAPIs">
@@ -39,14 +39,19 @@
                             <a href="{{ route('settingsApiKeysURL') }}" class="nav-link {{ request()->is('settings/api-keys') ? 'active' : '' }}">@lang('translation.api-keys')</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('DropboxFilesURL') }}" class="nav-link {{ request()->is('settings/files') ? 'active' : '' }}">@lang('translation.file-manager')</a>
-                        </li>
-                        <li class="nav-item">
                             <a href="{{ route('settingsDatabaseIndexURL') }}" class="nav-link {{ request()->is('settings/database') ? 'active' : '' }}">@lang('translation.your-erp')</a>
                         </li>
                     </ul>
                 </div>
             </li>
+
+            @if ( getDropboxToken() )
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->is('settings/files') ? 'active' : '' }}" href="{{ route('DropboxFilesURL') }}">
+                        <i class="ri-dropbox-fill {{ request()->is('settings/files') ? 'text-primary' : '' }}"></i> <span class="{{ request()->is('settings/files') ? 'text-white' : '' }}">Dropbox</span>
+                    </a>
+                </li>
+            @endif
 
             <li class="nav-item">
                 <a class="nav-link menu-link {{ request()->is('settings/users') ? 'active' : '' }}" href="{{ route('settingsUsersIndexURL') }}">

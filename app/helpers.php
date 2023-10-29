@@ -378,6 +378,17 @@ if (!function_exists('getDropboxToken')) {
     }
 }
 
+if (!function_exists('formatSize')) {
+    function formatSize($size) {
+        $base = log($size, 1024);
+        $suffixes = array('Bytes', 'KB', 'MB', 'GB', 'TB');
+
+        return !empty(onlyNumber($size)) ? round(pow(1024, $base - floor($base)), 2) . ''.$suffixes[floor($base)].'' : 0;
+    }
+}
+
+
+
 if (!function_exists('onlyNumber')) {
     function onlyNumber($number = null) {
         $numericValue = preg_replace('/\D/', '', $number);

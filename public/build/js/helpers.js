@@ -1,13 +1,6 @@
 
 // Toast Notifications
-// -------------------
-/**
- * Display a toast notification using Bootstrap's Toast API with a backdrop.
- *
- * @param {string} message - The message to display in the toast.
- * @param {string} [type='success'] - The type of the toast (e.g., 'success', 'error'). Determines the toast's color.
- * @param {number} [duration] - The duration (in milliseconds) for which the toast should be displayed.
- */
+// Display a toast notification using Bootstrap's Toast API with a backdrop
 export function toastAlert(message, type = 'success', duration = 0) {
     // Remove existing toast containers
     document.querySelectorAll('.toast-container').forEach(element => element.remove());
@@ -58,10 +51,7 @@ export function toastAlert(message, type = 'success', duration = 0) {
 }
 
 // Multiple Modals
-// -------------------
-/**
- * Maintain modal-open when close another modal
- */
+// Maintain modal-open when close another modal
 export function multipleModal() {
     setTimeout(function () {
         document.querySelectorAll('.modal').forEach(function (modal) {
@@ -93,8 +83,6 @@ export function multipleModal() {
         destroyModal();
     }, 500);
 }
-
-
 
 export function formatNumberInput(selector = '.format-numbers', decimals = 0) {
     const numberInputs = document.querySelectorAll(selector);
@@ -137,7 +125,6 @@ export function formatNumberInput(selector = '.format-numbers', decimals = 0) {
     });
 }
 
-
 export function getChartColorsArray(chartId) {
     if (document.getElementById(chartId) !== null) {
       var colors = document.getElementById(chartId).getAttribute("data-colors");
@@ -165,8 +152,7 @@ export function getChartColorsArray(chartId) {
         console.warn('data-colors Attribute not found on:', chartId);
       }
     }
-  }
-
+}
 
 export function onlyNumbers(number){
     if (number === null || number === undefined) {
@@ -176,13 +162,11 @@ export function onlyNumbers(number){
     return parseInt(result);
 }
 
-
 export function formatNumber(number, decimalPlaces = 0){
     number = parseFloat(number.replace(',', '.'));
 
     return Number(number).toLocaleString('pt-BR', { minimumFractionDigits: decimalPlaces, maximumFractionDigits: decimalPlaces });
 }
-
 
 export function sumInputNumbers(from, to, decimal = 0) {
     const inputs = document.querySelectorAll(from);
@@ -220,7 +204,6 @@ export function sumInputNumbers(from, to, decimal = 0) {
     updateSum();
 }
 
-
 export function setCookie(cname, cvalue, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
@@ -232,7 +215,6 @@ export function setCookie(cname, cvalue, exdays) {
     // Set the cookie
     document.cookie = cookieString;
 }
-
 
 export function getCookie(cname) {
     var name = cname + "=";
@@ -250,13 +232,15 @@ export function getCookie(cname) {
     return "";
 };
 
+// Format file size
+function formatSize(bytes) {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    if (bytes === 0) return '0 Byte';
+    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+    return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+}
 
-/**
- * Set a value in the session storage.
- *
- * @param {string} storageName - The name of the storage.
- * @param {string} value - The value to be stored.
- */
+// Set a value in the session storage
 export function setSessionStorage(storageName, value = true) {
     if(value){
         sessionStorage.setItem(storageName, value);
@@ -265,16 +249,10 @@ export function setSessionStorage(storageName, value = true) {
     }
 }
 
-/**
- * Get a value from the session storage.
- *
- * @param {string} storageName - The name of the storage.
- * @returns {string} - The value stored in the session storage.
- */
+// Get a value from the session storage.
 export function getSessionStorage(storageName) {
     return sessionStorage.getItem(storageName);
 }
-
 
 export function toggleZoomInOut() {
     var zoomTarget = document.querySelector('.toogle_zoomInOut');
@@ -337,13 +315,7 @@ export function toggleZoomInOut() {
     }
 }
 
-
-/**
- * This function adds event listeners to show a button when an input field in a form changes.
- */
-/**
- * This function adds event listeners to show a button when an input field in a form changes.
- */
+// Adds event listeners to show a button when an input field in a form changes.
 export function showButtonWhenInputChange() {
     // Helper function to handle showing the button and hiding other elements.
     function handleInputChange(form) {
@@ -379,11 +351,8 @@ export function showButtonWhenInputChange() {
 }
 showButtonWhenInputChange();
 
-
-/**
- * Anchor
- * https://developer.mozilla.org/pt-BR/docs/Web/API/Element/scrollIntoView
- */
+// Anchor
+// https://developer.mozilla.org/pt-BR/docs/Web/API/Element/scrollIntoView
 export function goTo(id, top = 150, block = 'start') {//start, end
     let element = document.getElementById(id);
 
@@ -392,10 +361,7 @@ export function goTo(id, top = 150, block = 'start') {//start, end
     }
 }
 
-
-/**
- * Add percent
- */
+// Add percent
 export function percentageResult(price, percentage, decimal = 0){
     var result = '';
 
@@ -409,12 +375,9 @@ export function percentageResult(price, percentage, decimal = 0){
     //console.log(result);
 
     return result;
-  }
-
-
+}
 
 export function bsPopoverTooltip(){
-
     var toggles = document.querySelectorAll('[data-bs-toggle]');
     toggles.forEach(function(toggle) {
         var toggleType = toggle.getAttribute('data-bs-toggle');
@@ -426,7 +389,6 @@ export function bsPopoverTooltip(){
 
     });
 }
-
 
 export function initFlatpickrRange() {
     const elements = document.querySelectorAll('.flatpickr-range');
@@ -454,8 +416,6 @@ export function initFlatpickr() {
     });
 }
 
-
-
 function destroyModal() {
     document.querySelectorAll('.modal .btn-destroy').forEach(function (btnClose) {
         btnClose.addEventListener('click', function () {
@@ -467,11 +427,7 @@ function destroyModal() {
     });
 }
 
-// Internet Connection Status
-// --------------------------
-/**
- * Check the internet connection status and display a toast notification if offline.
- */
+// Check the internet connection status and display a toast notification if offline
 function checkInternetConnection() {
     function updateConnectionStatus() {
         if (navigator.onLine) {
@@ -506,7 +462,6 @@ checkInternetConnection();
 
 export function maxLengthTextarea() {
     const textareas = document.querySelectorAll('textarea[maxlength]'); // Select all textareas with a maxlength attribute
-
     textareas.forEach(textarea => {
         const maxLength = textarea.getAttribute('maxlength');
         const counter = document.createElement('div');
@@ -522,5 +477,3 @@ export function maxLengthTextarea() {
         textarea.dispatchEvent(new Event('input'));
     });
 }
-
-

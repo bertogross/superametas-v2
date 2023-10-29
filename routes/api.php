@@ -27,9 +27,9 @@ Route::delete('/google-drive/delete/{fileId}', [GoogleDriveController::class, 'd
 Route::get('/dropbox/callback', [DropboxController::class, 'callback'])->name('DropboxCallbackURL');
 Route::get('/dropbox/authorize', [DropboxController::class, 'authorizeDropbox'])->name('DropboxAuthorizeURL');
 Route::get('/dropbox/deauthorize', [DropboxController::class, 'deauthorizeDropbox'])->name('DropboxDeauthorizeURL');
-Route::get('/dropbox/delete/{path}', [DropboxController::class, 'deleteFile'])->name('DropboxDeleteFileURL');
+Route::post('/dropbox/upload', [DropboxController::class, 'uploadFile'])->name('DropboxUploadURL');
+Route::post('/dropbox/delete', [DropboxController::class, 'deleteFile'])->name('DropboxDeleteURL');
+Route::get('/dropbox/delete-folder/{path?}', [DropboxController::class, 'deleteFolder'])->name('DropboxDeleteFolderURL');
 
-
-Route::get('/dropbox/download/{filename}', [DropboxController::class, 'download']);
-Route::post('/dropbox/upload', [DropboxController::class, 'upload']);
+//Route::get('/dropbox/download/{filename}', [DropboxController::class, 'download']);
 
