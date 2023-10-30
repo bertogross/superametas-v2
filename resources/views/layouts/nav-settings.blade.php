@@ -47,8 +47,8 @@
 
             @if ( getDropboxToken() )
                 <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->is('settings/files') ? 'active' : '' }}" href="{{ route('DropboxFilesURL') }}">
-                        <i class="ri-dropbox-fill {{ request()->is('settings/files') ? 'text-primary' : '' }}"></i> <span class="{{ request()->is('settings/files') ? 'text-white' : '' }}">Dropbox</span>
+                    <a class="nav-link menu-link {{ request()->is('settings/dropbox') ? 'active' : '' }}" href="{{ route('DropboxFilesURL') }}">
+                        <i class="ri-dropbox-fill {{ request()->is('settings/dropbox') ? 'text-primary' : '' }}"></i> <span class="{{ request()->is('settings/dropbox') ? 'text-white' : '' }}">Dropbox</span>
                     </a>
                 </li>
             @endif

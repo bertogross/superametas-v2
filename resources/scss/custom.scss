@@ -27,72 +27,14 @@ html * {
     scroll-behavior: smooth;
     scrollbar-color: var(--vz-theme) #d0ecde;
 }
-/*html[data-layout="horizontal"],
-html[data-layout="horizontal"] body {
-    color: var(--vz-body-bg) !important;
-    background-color: var(--vz-body-color) !important;
-}*/
 
-/****************************************************
-* Remove when goals_expenses is finished
-****************************************************/
-/*html[data-layout="horizontal"] body.subdomain_dev .page-content,*/
 
-/*
-html[data-layout="horizontal"] body.subdomain_demo .page-content,
-html[data-layout="horizontal"] body.subdomain_app .page-content{
-  margin-top: 25px;
+input:focus,
+textarea:focus,
+select:focus,
+a:focus {
+  outline: none !important;
 }
-*/
-
-/*html[data-layout="horizontal"] body.subdomain_dev #page-header-user-dropdown .wrap-user-name-cap,
-html[data-layout="horizontal"] body.subdomain_dev #topnav-hamburger-icon,
-html[data-layout="horizontal"] body.subdomain_dev #scrollbar,
-*/
-html[data-layout="horizontal"] body.subdomain_demo #page-header-user-dropdown .wrap-user-name-cap,
-html[data-layout="horizontal"] body.subdomain_demo #topnav-hamburger-icon,
-html[data-layout="horizontal"] body.subdomain_demo #scrollbar,
-html[data-layout="horizontal"] body.subdomain_app #page-header-user-dropdown .wrap-user-name-cap,
-html[data-layout="horizontal"] body.subdomain_app #topnav-hamburger-icon,
-html[data-layout="horizontal"] body.subdomain_app #scrollbar{
-  display: none !important;
-}
-/*html[data-layout="horizontal"] body.subdomain_dev .topbar-user{
-  background-color: transparent !important;
-}*/
-@media (max-width: 767.98px){
-  /*html[data-layout="horizontal"] body.subdomain_dev .navbar-brand-box,*/
-  html[data-layout="horizontal"] body.subdomain_demo .navbar-brand-box,
-  html[data-layout="horizontal"] body.subdomain_app .navbar-brand-box{
-    display: block !important;
-  }
-}
-/****************************************************
-* Remove when goals_expenses is finished
-****************************************************/
-
-
-/*
-html[data-layout="horizontal"] body.is_not_admin_editor #page-header-user-dropdown .wrap-user-name-cap,
-html[data-layout="horizontal"] body.is_not_admin_editor #topnav-hamburger-icon,
-html[data-layout="horizontal"] body.is_not_admin_editor #scrollbar{
-  display: none !important;
-}
-*/
-
-html[data-layout="horizontal"] body.is_not_admin_editor .topbar-user,
-html[data-layout="horizontal"] body.is_not_admin_editor .topbar-user,
-html[data-layout="horizontal"] body.is_not_admin_editor .topbar-user{
-  background-color: transparent !important;
-}
-
-/*
-html[data-layout="horizontal"] body.is_not_admin_editor .page-content,
-html[data-layout="horizontal"] body.is_not_admin_editor .page-content,
-html[data-layout="horizontal"] body.is_not_admin_editor .page-content{
-  margin-top: 25px;
-}
-*/
 
 
 @media(min-width:810px) {
@@ -127,37 +69,6 @@ html[data-layout="horizontal"] body.is_not_admin_editor .page-content{
   }
 }
 
-/*
-@media(min-width:1201px) {
-  .dataTables_scrollBody {
-    scroll-behavior: smooth;
-    scrollbar-color: #d0ecde var(--vz-theme);
-    background-color:#2A2C36;
-    scrollbar-width: thin;
-  }
-  .dataTables_scrollBody::-webkit-scrollbar {
-    background: var(--vz-theme);
-    height: 8px;
-    width: 8px;
-    scrollbar-width: thin;
-  }
-  .dataTables_scrollBody::-webkit-scrollbar-thumb {
-    background: #d0ecde;
-    -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
-    scrollbar-width: thin;
-  }
-  .dataTables_scrollBody::-webkit-scrollbar-corner {
-    background: var(--vz-theme);
-    scrollbar-width: thin;
-  }
-  @supports(scrollbar-width: thin) {
-    .no-support {
-      display: none;
-    }
-  }
-
-}*/
 
 @media (max-width: 767.98px) {
   html[data-layout="horizontal"] body.is_not_admin_editor .navbar-brand-box{
@@ -496,6 +407,13 @@ pre:empty{
 .nav-border-top-success .nav-link.active{
   color: var(--vz-theme) !important;
 
+}
+
+.page-link.active, .active > .page-link {
+    z-index: 3;
+    color: var(--vz-gray-dark) !important;
+    background-color: var(--vz-theme) !important;
+    border-color: var(--vz-theme) !important;
 }
 
 .nav-border-top .nav-link.active {

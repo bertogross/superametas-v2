@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DropboxController;
 use App\Http\Controllers\GoogleDriveController;
+use App\Http\Controllers\ClarifaiImageController;
 use App\Http\Controllers\SettingsDatabaseController;
 
 
@@ -31,5 +32,4 @@ Route::post('/dropbox/upload', [DropboxController::class, 'uploadFile'])->name('
 Route::post('/dropbox/delete', [DropboxController::class, 'deleteFile'])->name('DropboxDeleteURL');
 Route::get('/dropbox/delete-folder/{path?}', [DropboxController::class, 'deleteFolder'])->name('DropboxDeleteFolderURL');
 
-//Route::get('/dropbox/download/{filename}', [DropboxController::class, 'download']);
-
+// Clarifai Edge AI API

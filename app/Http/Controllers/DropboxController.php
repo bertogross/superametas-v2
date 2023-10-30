@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use GuzzleHttp\Client;
 use Spatie\Dropbox\Client as DropboxClient;
 use App\Http\Controllers\SettingsAccountController;
 
@@ -31,7 +32,7 @@ class DropboxController extends Controller
 
         if (!$dropboxToken) {
             //return redirect(route('settingsApiKeysURL'))->with('error', 'Conecte-se ao Dropbox primeiro.');
-            return view('settings.files')->with('error', 'Conecte-se ao Dropbox primeiro.');
+            return view('settings.dropbox')->with('error', 'Conecte-se ao Dropbox primeiro.');
         }
 
         $dropbox = new DropboxClient($dropboxToken);
@@ -136,7 +137,7 @@ class DropboxController extends Controller
 
         $currentFolderPath = $request->input('path', '');
 
-        return view('settings.files', compact('files', 'folders', 'storageInfo', 'fileType', 'page', 'perPage', 'totalFiles', 'currentFolderPath'));
+        return view('settings.dropbox', compact('files', 'folders', 'storageInfo', 'fileType', 'page', 'perPage', 'totalFiles', 'currentFolderPath'));
     }
 
     /**
@@ -218,7 +219,7 @@ class DropboxController extends Controller
 
         $currentFolderPath = $path;
 
-        return view('settings.files', compact('files', 'folders', 'storageInfo', 'page', 'perPage', 'totalFiles', 'path', 'currentFolderPath'));
+        return view('settings.dropbox', compact('files', 'folders', 'storageInfo', 'page', 'perPage', 'totalFiles', 'path', 'currentFolderPath'));
     }
 
     /**
@@ -229,7 +230,7 @@ class DropboxController extends Controller
         $appKey = config('services.dropbox.app_key');
         $appSecret = config('services.dropbox.app_secret');
 
-        $client = new \GuzzleHttp\Client(['verify' => false]);
+        $client = new Client(['verify' => false]);
         $response = $client->post('https://api.dropboxapi.com/oauth2/token', [
             'form_params' => [
                 'grant_type' => 'refresh_token',
@@ -277,7 +278,7 @@ class DropboxController extends Controller
      */
     public function getSpaceUsage($dropboxToken)
     {
-        $client = new \GuzzleHttp\Client(['verify' => false]);
+        $client = new Client(['verify' => false]);
         $response = $client->request('POST', 'https://api.dropboxapi.com/2/users/get_space_usage', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $dropboxToken,
@@ -397,7 +398,7 @@ class DropboxController extends Controller
             return redirect(route('settingsApiKeysURL'))->with('error', 'Falha na autorização. Tente novamente.');
         }
 
-        $client = new \GuzzleHttp\Client(['verify' => false]);
+        $client = new Client(['verify' => false]);
         $response = $client->post('https://api.dropboxapi.com/oauth2/token', [
             'form_params' => [
                 'code' => $request->input('code'),

@@ -8,6 +8,7 @@ use Google_Service_Drive_DriveFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use GuzzleHttp\Client;
 use App\Http\Controllers\SettingsAccountController;
 
 class GoogleDriveController extends Controller
@@ -29,7 +30,7 @@ class GoogleDriveController extends Controller
 
     public function index()
     {
-        return view('googleDriveFilesURL');
+        return view('GoogleDriveFilesURL');
     }
 
     public function files()
@@ -39,7 +40,7 @@ class GoogleDriveController extends Controller
         $files = $service->files->listFiles();
         $folders = [];
         $storageInfo = $this->getStorageInfo();
-        return view('googleDriveFilesURL', compact('files', 'folders', 'storageInfo'));
+        return view('GoogleDriveFilesURL', compact('files', 'folders', 'storageInfo'));
     }
 
     private function getStorageInfo()
@@ -79,7 +80,7 @@ class GoogleDriveController extends Controller
             // Store the token in the database
             $this->settingsAccountController->updateOrInsertSetting('google_token', json_encode($token));
 
-            return redirect()->route('googleDriveFilesURL');
+            return redirect()->route('GoogleDriveFilesURL');
         } catch (Exception $e) {
             Log::error('Google API error: ' . $e->getMessage());
             return redirect()->route('settingsApiKeysURL')->with('error', 'Failed to authenticate with Google. Please try again.');
@@ -105,7 +106,7 @@ class GoogleDriveController extends Controller
             ]
         );
 
-        return redirect()->route('googleDriveFilesURL');
+        return redirect()->route('GoogleDriveFilesURL');
     }
 
     public function delete($fileId)
@@ -113,7 +114,7 @@ class GoogleDriveController extends Controller
         $client = $this->getClient();
         $service = new Google_Service_Drive($client);
         $service->files->delete($fileId);
-        return redirect()->route('googleDriveFilesURL');
+        return redirect()->route('GoogleDriveFilesURL');
     }
 
     private function getClient()
@@ -127,7 +128,7 @@ class GoogleDriveController extends Controller
         $client->setPrompt('select_account consent');
 
         // Disable SSL verification
-        $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
+        $client->setHttpClient(new Client(['verify' => false]));
 
         $token = session('google_token');
         if ($token) {

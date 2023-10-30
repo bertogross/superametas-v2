@@ -47,8 +47,8 @@
 
             <?php if( getDropboxToken() ): ?>
                 <li class="nav-item">
-                    <a class="nav-link menu-link <?php echo e(request()->is('settings/files') ? 'active' : ''); ?>" href="<?php echo e(route('DropboxFilesURL')); ?>">
-                        <i class="ri-dropbox-fill <?php echo e(request()->is('settings/files') ? 'text-primary' : ''); ?>"></i> <span class="<?php echo e(request()->is('settings/files') ? 'text-white' : ''); ?>">Dropbox</span>
+                    <a class="nav-link menu-link <?php echo e(request()->is('settings/dropbox') ? 'active' : ''); ?>" href="<?php echo e(route('DropboxFilesURL')); ?>">
+                        <i class="ri-dropbox-fill <?php echo e(request()->is('settings/dropbox') ? 'text-primary' : ''); ?>"></i> <span class="<?php echo e(request()->is('settings/dropbox') ? 'text-white' : ''); ?>">Dropbox</span>
                     </a>
                 </li>
             <?php endif; ?>

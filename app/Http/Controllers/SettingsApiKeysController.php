@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use GuzzleHttp\Client;
 
 class SettingsApiKeysController extends Controller
 {
@@ -24,7 +25,7 @@ class SettingsApiKeysController extends Controller
      */
     private function DropBoxUserAccountInfo($dropboxToken)
     {
-        $client = new \GuzzleHttp\Client(['verify' => false]);
+        $client = new Client(['verify' => false]);
         try {
             $response = $client->request('POST', 'https://api.dropboxapi.com/2/users/get_current_account', [
                 'headers' => [

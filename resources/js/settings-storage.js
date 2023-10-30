@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>${formattedDate}</td>
             <td class="text-end">
                 <div class="btn-group">
-                    <a href="${file.link}" download class="btn btn-sm btn-outline-dark" title="Download"><i class="ri-download-2-line"></i></a>
+                    <a href="${file.link}" download class="btn btn-sm btn-outline-dark d-none" title="Download"><i class="ri-download-2-line"></i></a>
 
                     <button class="btn btn-sm btn-outline-dark btn-delete-file" data-id="${file.id}" data-path="${file.path_display}" title="Deletar">
                         <i class="ri-delete-bin-5-line text-danger"></i>

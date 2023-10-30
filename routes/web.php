@@ -14,7 +14,8 @@ use App\Http\Controllers\{
     AuditsController,
     SettingsApiKeysController,
     GoogleDriveController,
-    DropboxController
+    DropboxController,
+    ClarifaiImageController
 };
 use App\Http\Middleware\SetDynamicDatabase;
 
@@ -88,9 +89,10 @@ Route::middleware(['auth'])->group(function () {
 
         // API Key, Files Manager, Sinc Database (sales, companies, departments)
         Route::get('/settings/api-keys', [SettingsApiKeysController::class, 'index'])->name('settingsApiKeysURL');
-        //Route::get('/settings/files', [GoogleDriveController::class, 'files'])->name('googleDriveFilesURL');
-        Route::get('/settings/files', [DropboxController::class, 'files'])->name('DropboxFilesURL');
-        Route::get('/settings/files/browse/{path}', [DropboxController::class, 'browseFolder'])->name('DropboxBrowseFolderURL');
+
+        //Route::get('/settings/googledrive', [GoogleDriveController::class, 'files'])->name('GoogleDriveFilesURL');
+        Route::get('/settings/dropbox', [DropboxController::class, 'files'])->name('DropboxFilesURL');
+        Route::get('/settings/dropbox/browse/{path}', [DropboxController::class, 'browseFolder'])->name('DropboxBrowseFolderURL');
 
         Route::get('/settings/database', [SettingsDatabaseController::class, 'index'])->name('settingsDatabaseIndexURL');
             Route::put('/settings/departments/store', [SettingsDatabaseController::class, 'updateDepartments'])->name('settingsDepartmentsUpdateURL');
@@ -104,6 +106,15 @@ Route::middleware(['auth'])->group(function () {
 
         // TODO Security Settings
         //Route::get('/settings/security', [SettingsSecurityController::class, 'index'])->name('settingsSecurityIndexURL');
+
+        // Clarifai Edge AI API
+
+        //Route::get('/audits/clarifai/submit', [ClarifaiImageController::class, 'index'])->name('ClarifaiIndexURL');
+        //Route::post('submit', [ClarifaiImageController::class, 'submit'])->name('ClarifaiSubmitURL');
+        //Route::post('analyze', [ClarifaiImageController::class, 'analyze'])->name('ClarifaiAnalyse');
+        Route::post('/audits/clarifai/submit', [ClarifaiImageController::class, 'submit'])->name('ClarifaiSubmitURL');
+        Route::post('/audits/scenex/submit', [ScenexImageController::class, 'submit'])->name('ScenexSubmitURL');
+
 
     });
 

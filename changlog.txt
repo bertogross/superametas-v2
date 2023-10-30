@@ -7,7 +7,31 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 https://laravel-news.com/openai-for-laravel
 
 
+
+Version 2.0.20 - [2023-10-30]
+- [Tested] Scenex API
+    - https://bestlaravel.com/p/laravel-open-api
+    - https://github.com/jeandormehl/openapi-gen
+
+    - https://scenex.jina.ai/
+        - https://scenex.jina.ai/api
+            - https://github.com/jina-ai/jinaai-js
+
+
+
 Version 2.0.19 - [2023-10-29]
+- [Tested] Clarifai API
+    - https://clarifai.com
+        - https://www.clarifai.com/use-cases/predictive-maintenance
+        - https://www.clarifai.com/solutions/ai-in-manufacturing
+        - https://github.com/Clarifai/clarifai-php-grpc/
+        - https://clarifai.com/explore  [find model general-image-recognition]
+        - https://docs.clarifai.com/api-guide/api-overview/api-clients/
+        - https://docs.clarifai.com/api-guide/predict/images/#visual-detection
+        - https://github.com/Rob--W/cors-anywhere
+        - https://github.com/Clarifai/clarifai-php-grpc/
+
+        - https://platform.openai.com/account/api-keys [login contact@upididu.com Google Account]
 
 
 
