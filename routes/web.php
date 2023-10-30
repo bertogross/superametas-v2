@@ -15,7 +15,8 @@ use App\Http\Controllers\{
     SettingsApiKeysController,
     GoogleDriveController,
     DropboxController,
-    ClarifaiImageController
+    ClarifaiImageController,
+    ScenexImageController
 };
 use App\Http\Middleware\SetDynamicDatabase;
 

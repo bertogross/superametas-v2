@@ -9,14 +9,14 @@
         @endslot
         @slot('title') Scenex  @endslot
     @endcomponent
-    
+
     <form enctype="multipart/form-data">
         @csrf
         <input type="file" id="imageInput">
         <br>
-        <textarea id="textInput"></textarea>
+        <textarea id="textInput" style="width: 500px;" rows="4"></textarea>
         <br>
-        <button id="submitButton">Submit</button>
+        <button id="submitButton" style="display: none;">Submit</button>
     </form>
 
     <div id="results" style="width: 700px; height: 700px;"></div>
@@ -67,7 +67,7 @@
                     canvas.toBlob(function(blob) {
                         const formData = new FormData();
                         formData.append('file', blob, file.name);
-                        formData.append('text', inputText);
+                        formData.append('text', inputText.value);
 
                         //console.log("Blob size:", blob.size);
 
@@ -92,16 +92,8 @@
                             if (response.message) {
                                 resultsDiv.innerHTML = '<p>' + response.message + '</p>';
                             }
-                            if (response.results && response.results.outputs) {
-                                const concepts = response.results.outputs[0].data.concepts;
-                                const conceptList = concepts.map(concept => {
-                                    return '<li>' + concept.name + ': ' + (concept.value * 100).toFixed(2) + '%</li>';
-                                }).join('');
-                                resultsDiv.innerHTML += '<ul>' + conceptList + '</ul>';
-                            }
-
-                            if (response.interpretation) {
-                                resultsDiv.innerHTML += '<p>' + response.interpretation + '</p>';
+                            if (response.results) {
+                                resultsDiv.innerHTML += '<p><img src="' + response.results.result[0]['image'] + '" width="500">' + response.results.result[0]['i18n']['pt'] + '</p>';
                             }
                         })
                         .catch(error => {
@@ -116,14 +108,6 @@
                 reader.readAsDataURL(file);
             }
         });
-
-        function interpretConcepts(concepts) {
-            // Process the concepts and generate an interpretation
-            // This is just an example, you can customize this function according to your needs
-            const mainConcept = concepts[0].name;
-            const value = concepts[0].value;
-            return `The main concept identified in the image is ${mainConcept} with a confidence of ${(value * 100).toFixed(2)}%.`;
-        }
 
     }
     </script>

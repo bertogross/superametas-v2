@@ -65,7 +65,7 @@ class UploadController extends Controller
                 $config = config("database.connections.{$this->connection}");
                 $dbName = $config['database'];
 
-                $path = "{$dbName}/" . date('Y') . '/' . date('m') . '/' . $folder;
+                $path = "{$dbName}/" . $folder . '/' . date('Y') . '/' . date('m');
 
                 $filePath = $file->store($path, 'public');
 
@@ -111,7 +111,7 @@ class UploadController extends Controller
             $config = config("database.connections.{$this->connection}");
             $dbName = $config['database'];
 
-            $path = "{$dbName}/" . date('Y') . '/' . date('m') . '/logo';
+            $path = "{$dbName}/" . '/logo' . '/' . date('Y') . '/' . date('m');
 
             // Store the uploaded file
             $file = $request->file('logo');

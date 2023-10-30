@@ -53,7 +53,7 @@ class ClarifaiImageController extends Controller
                 $dbName = $config['database'];
                 $folder = 'clarifai';
 
-                $path = "{$dbName}/" . date('Y') . '/' . date('m') . '/' . $folder;
+                $path = "{$dbName}/" . $folder . '/' . date('Y') . '/' . date('m');
 
                 // Ensure the directory exists
                 if (!Storage::disk('public')->exists($path)) {

@@ -27,7 +27,7 @@ class ClarifaiImageController extends Controller
 
         $folder = 'clarify';
 
-        $path = "{$dbName}/" . date('Y') . '/' . date('m') . '/' . $folder;
+        $path = "{$dbName}/" . $folder . '/' . date('Y') . '/' . date('m');
 
         // Ensure the directory exists
         if (!Storage::disk('public')->exists($path)) {

@@ -11,11 +11,11 @@ class ScenexImageController extends Controller
 {
     protected $connection = 'smAppTemplate';
 
-    protected $pat = '6140cf7a828c4eddaaf46ed2bdb5bea0';
-    protected $userId = 'clarifai';
-    protected $appId = 'main';
-    protected $modelId = 'general-image-recognition';
-    protected $modelVersionId = 'aa7f35c01e0642fda5cf400f543e7c40';
+    protected $promptperfectSecret = 'XXXXXX';
+    protected $scenexApiKey = 'R5fwQsUd7HNrJ5Ke2wIn:f2c609ed87307559538f5aa8fb2dcdaefb675f43e6c0e278bc421198e6d800b0';
+    protected $rationaleSecret = 'XXXXXX';
+    protected $jinachatSecret = 'XXXXXX';
+    protected $bestbannerSecret = 'XXXXXX';
 
     public function submit(Request $request)
     {
@@ -25,8 +25,6 @@ class ScenexImageController extends Controller
             ]);
 
             if ($request->hasFile('file')) {
-                $result = '';
-
                 $file = $request->file('file');
                 $text = $request->input('text');
 
@@ -37,16 +35,13 @@ class ScenexImageController extends Controller
                 if (!$text) {
                     return response()->json(['message' => 'Please enter some text.'], 400);
                 }
-                // \Log::info("File object: " . print_r($file, true));  // Log the file object for debugging
 
-                // Get the database name from the connection configuration
                 $config = config("database.connections.{$this->connection}");
                 $dbName = $config['database'];
-                $folder = 'clarifai';
+                $folder = 'scenex';
 
                 $path = "{$dbName}/" . date('Y') . '/' . date('m') . '/' . $folder;
 
-                // Ensure the directory exists
                 if (!Storage::disk('public')->exists($path)) {
                     Storage::disk('public')->makeDirectory($path);
                 }
@@ -59,29 +54,25 @@ class ScenexImageController extends Controller
                     return response()->json(['message' => 'File does not exist.'], 400);
                 }
 
-                $base64Image = base64_encode(file_get_contents($absoluteFilePath));
+                //$imageUrl = asset("storage/{$filePath}");
+                $imageUrl = 'https://app.superametas.com/media/uploads/1/2023/10/29d3ef7d.jpg';
 
                 $client = new Client();
-                $response = $client->post('https://api.clarifai.com/v2/models/' . $this->modelId . '/versions/' . $this->modelVersionId . '/outputs', [
+                $response = $client->post('https://api.scenex.jina.ai/v1/describe', [
                     'headers' => [
-                        'Authorization' => 'Key ' . $this->pat,
-                        'Accept' => 'application/json',
+                        'x-api-key' => $this->scenexApiKey,
+                        'content-type' => 'application/json',
                     ],
                     'json' => [
-                        'user_app_id' => [
-                            'user_id' => $this->userId,
-                            'app_id' => $this->appId,
+                        'data' => [
+                            'image' => $imageUrl,
+                            'algorithm' => 'Jelly',
+                            'features' => ['high_quality', 'question_answer'],
+                            'question' => $text,
+                            'languages' => ['pt'],
+                            'style' => 'Concise'
                         ],
-                        'inputs' => [
-                            [
-                                'data' => [
-                                    'image' => [
-                                        'base64' => $base64Image,
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
+                    ]
                 ]);
 
                 $result = json_decode($response->getBody(), true);
@@ -97,4 +88,5 @@ class ScenexImageController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
 }

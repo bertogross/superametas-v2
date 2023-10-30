@@ -1,28 +1,27 @@
-@extends('layouts.master')
-@section('title')
-    Clarifai
-@endsection
-@section('content')
-    @component('components.breadcrumb')
-        @slot('li_1')
-            @lang('translation.session')
-        @endslot
-        @slot('title') Clarifai  @endslot
-    @endcomponent
+<?php $__env->startSection('title'); ?>
+    Scenex
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
+    <?php $__env->startComponent('components.breadcrumb'); ?>
+        <?php $__env->slot('li_1'); ?>
+            <?php echo app('translator')->get('translation.session'); ?>
+        <?php $__env->endSlot(); ?>
+        <?php $__env->slot('title'); ?> Scenex  <?php $__env->endSlot(); ?>
+    <?php echo $__env->renderComponent(); ?>
 
     <form enctype="multipart/form-data">
-        @csrf
+        <?php echo csrf_field(); ?>
         <input type="file" id="imageInput">
         <br>
-        <textarea id="textInput"></textarea>
+        <textarea id="textInput" style="width: 500px;" rows="4"></textarea>
         <br>
         <button id="submitButton" style="display: none;">Submit</button>
     </form>
 
     <div id="results" style="width: 700px; height: 700px;"></div>
 
-@endsection
-@section('script')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('script'); ?>
     <script>
     const resultsDiv = document.getElementById('results');
     const inputFile = document.getElementById('imageInput');
@@ -71,7 +70,7 @@
 
                         //console.log("Blob size:", blob.size);
 
-                        fetch('{{ route('ClarifaiSubmitURL') }}', {
+                        fetch('<?php echo e(route('ScenexSubmitURL')); ?>', {
                             method: 'POST',
                             body: formData,
                             headers: {
@@ -92,16 +91,8 @@
                             if (response.message) {
                                 resultsDiv.innerHTML = '<p>' + response.message + '</p>';
                             }
-                            if (response.results && response.results.outputs) {
-                                const concepts = response.results.outputs[0].data.concepts;
-                                const conceptList = concepts.map(concept => {
-                                    return '<li>' + concept.name + ': ' + (concept.value * 100).toFixed(2) + '%</li>';
-                                }).join('');
-                                resultsDiv.innerHTML += '<ul>' + conceptList + '</ul>';
-                            }
-
-                            if (response.interpretation) {
-                                resultsDiv.innerHTML += '<p>' + response.interpretation + '</p>';
+                            if (response.results) {
+                                resultsDiv.innerHTML += '<p><img src="' + response.results.result[0]['image'] + '" width="500">' + response.results.result[0]['i18n']['pt'] + '</p>';
                             }
                         })
                         .catch(error => {
@@ -117,14 +108,8 @@
             }
         });
 
-        function interpretConcepts(concepts) {
-            // Process the concepts and generate an interpretation
-            // This is just an example, you can customize this function according to your needs
-            const mainConcept = concepts[0].name;
-            const value = concepts[0].value;
-            return `The main concept identified in the image is ${mainConcept} with a confidence of ${(value * 100).toFixed(2)}%.`;
-        }
-
     }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\application\development.superametas.com\public_html\resources\views/audits/scenex/submit.blade.php ENDPATH**/ ?>
