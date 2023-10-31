@@ -471,7 +471,7 @@ class GoalSalesController extends Controller
      */
     public function getGoalSalesEditModalContent(Request $request) {
 
-        $getActiveDepartments = getActiveDepartments();
+        $getDepartmentsActive = getDepartmentsActive();
 
         //$meantime = $request->input('meantime');
         $meantime = request('meantime', date('Y-m'));
@@ -524,7 +524,7 @@ class GoalSalesController extends Controller
                 'meantime',
                 'previousMeantimeYearBefore',
                 'previousMeantimeMonthBefore',
-                'getActiveDepartments',
+                'getDepartmentsActive',
                 'getIPCA',
                 'companyId'
             )

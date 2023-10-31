@@ -25,7 +25,7 @@
             <form id="auditsForm" method="POST" autocomplete="off" class="needs-validation" novalidate>
                 @csrf
 
-                @if (!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && count($getAuthorizedCompanies) > 0)
+                @if (!empty($getCompaniesAuthorized) && is_array($getCompaniesAuthorized) && count($getCompaniesAuthorized) > 0)
                     <div class="modal-body">
 
                         <input type="hidden" name="id" value="{{ $auditId }}" />
@@ -39,7 +39,7 @@
                                 <label for="assigned_to" class="form-label">Loja</label>
                                 <select class="form-select" name="assigned_to" id="assigned_to" required>
                                     <option {{ empty($assigned_to) ? 'selected' : '' }} value="">- Selecione -</option>
-                                    @foreach ($getAuthorizedCompanies as $companyId)
+                                    @foreach ($getCompaniesAuthorized as $companyId)
                                         <option value="{{ $companyId }}" @selected(old('assigned_to', $assigned_to) == $companyId)>{{ getCompanyAlias(intval($companyId)) }}</option>
                                     @endforeach
                                 </select>

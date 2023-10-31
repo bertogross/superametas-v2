@@ -35,7 +35,7 @@
                 </div>
             @endforeach
 
-            @if (count($getActiveDepartments) > 1)
+            @if (count($getDepartmentsActive) > 1)
                 <div class="col-12 m-4 text-center text-uppercase @if (!empty($filterDepartments) && count($filterDepartments) == 1) d-none @endif">
                     {{--
                     <div>Sales: {{ numberFormat($totalSales[$companyId], 2) }}</div>

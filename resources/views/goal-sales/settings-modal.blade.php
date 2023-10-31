@@ -3,12 +3,12 @@ use App\Models\User;
 
 $type = 'sales';
 
-$getAuthorizedCompanies = getAuthorizedCompanies();
-//APP_print_r($getAuthorizedCompanies);
+$getCompaniesAuthorized = getCompaniesAuthorized();
+//APP_print_r($getCompaniesAuthorized);
 $getActiveCompanies = getActiveCompanies();
 //APP_print_r($getActiveCompanies);
-$getActiveDepartments = getActiveDepartments();
-//APP_print_r($getActiveDepartments);
+$getDepartmentsActive = getDepartmentsActive();
+//APP_print_r($getDepartmentsActive);
 
 $dateRange = getSaleDateRange();
 $firstDate = $dateRange['first_date'];
@@ -36,9 +36,9 @@ $endYear = intval($currentMonth) >= (intval(date('Y'))+11) ? date('Y', strtotime
                 @endunless
                 --}}
 
-                @if (!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies))
+                @if (!empty($getCompaniesAuthorized) && is_array($getCompaniesAuthorized))
                     <ul class="nav nav-tabs nav-border-top nav-justified" role="tablist">
-                        @foreach ($getAuthorizedCompanies as $key => $company)
+                        @foreach ($getCompaniesAuthorized as $key => $company)
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link {{ $key == 0 ? 'active' : '' }} text-uppercase" id="company-{{ $company }}-tab" data-bs-toggle="tab" data-bs-target="#company-{{ $company }}" type="button" role="tab" aria-controls="company-{{ $company }}" aria-selected="true">{{ getCompanyAlias(intval($company)) }}</button>
                             </li>
@@ -46,7 +46,7 @@ $endYear = intval($currentMonth) >= (intval(date('Y'))+11) ? date('Y', strtotime
                     </ul>
 
                     <div class="tab-content p-3 bg-light">
-                        @foreach ($getAuthorizedCompanies as $key => $company)
+                        @foreach ($getCompaniesAuthorized as $key => $company)
                             <div class="tab-pane fade show {{ $key == 0 ? 'active' : '' }}" id="company-{{ $company }}" role="tabpanel" aria-labelledby="company-{{ $company }}-tab">
                                 <div id="load-emp-{{ $company }}">
                                     <div class="accordion custom-accordionwithicon custom-accordion-border accordion-border-box mt-1" id="accordion-{{ $company }}">

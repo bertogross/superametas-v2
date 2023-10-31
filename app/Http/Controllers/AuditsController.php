@@ -213,7 +213,7 @@ class AuditsController extends Controller
 
         $usersByRole = getUsersByRole(User::ROLE_AUDIT);
 
-        $getAuthorizedCompanies = getAuthorizedCompanies();
+        $getCompaniesAuthorized = getCompaniesAuthorized();
 
         $getAuditStatusTranslations = Audit::getAuditStatusTranslations();
 
@@ -224,12 +224,60 @@ class AuditsController extends Controller
             'data',
             'users',
             'usersByRole',
-            'getAuthorizedCompanies',
+            'getCompaniesAuthorized',
             'getAuditStatusTranslations',
             'customFields',
             )
         );
      }
+
+
+     public function compose()
+    {
+        $getDepartmentsActive = getDepartmentsActive();
+
+        $auditElements = array(
+            array(
+                'id' => 1,
+                'label' => 'Caixa de Texto',
+                'type' => 'text',
+                'name' => 'component_x',
+            ),
+            array(
+                'id' => 2,
+                'label' => 'Área de Texto',
+                'type' => 'text',
+                'name' => 'component_x',
+            ),
+            array(
+                'id' => 3,
+                'label' => 'Botões de Verificação',
+                'type' => 'checkbox',
+                'name' => 'component_x',
+            ),
+            array(
+                'id' => 4,
+                'label' => 'Botões de Opção',
+                'type' => 'radio',
+                'name' => 'component_x',
+            ),
+            array(
+                'id' => 5,
+                'label' => 'Caixa de Seleção',
+                'type' => 'select',
+                'name' => 'component_y',
+            ),
+            array(
+                'id' => 5,
+                'label' => 'Upload',
+                'type' => 'file',
+                'name' => 'component_y',
+            )
+        );
+
+
+        return view('audits.compose', compact('getDepartmentsActive', 'auditElements'));
+    }
 
 
 }

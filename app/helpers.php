@@ -243,6 +243,22 @@ if (!function_exists('formatBrazilianReal')) {
 }
 
 
+if (!function_exists('getCompaniesAuthorized')) {
+    /**
+     * Get authorized companies from the user_metas table
+     */
+    function getCompaniesAuthorized($userId = null) {
+
+        $userId = $userId ?? Auth::user()->id;
+
+        $AuthorizedCompanies = getUserMeta($userId, 'companies');
+
+        $AuthorizedCompanies = $AuthorizedCompanies ? json_decode($AuthorizedCompanies, true) : array();
+
+        return empty($AuthorizedCompanies) ? getActiveCompanies() : $AuthorizedCompanies;
+    }
+}
+
 if (!function_exists('getCompanyAlias')) {
     /**
      * Get the company alias based on the company ID.
@@ -262,6 +278,20 @@ if (!function_exists('getCompanyAlias')) {
     }
 }
 
+
+
+if (!function_exists('getDepartmentsActive')) {
+    /**
+     * Get active departments from the wlsm_departments table.
+     */
+    function getDepartmentsActive() {
+        return DB::connection('smAppTemplate')
+        ->table('wlsm_departments')
+            ->where('status', 1)
+            ->orderBy('department_alias')
+            ->get();
+    }
+}
 
 if (!function_exists('getDepartmentAlias')) {
     /**
@@ -313,36 +343,6 @@ if (!function_exists('getActiveCompanies')) {
     }
 }
 
-
-if (!function_exists('getAuthorizedCompanies')) {
-    /**
-     * Get authorized companies from the user_metas table
-     */
-    function getAuthorizedCompanies($userId = null) {
-
-        $userId = $userId ?? Auth::user()->id;
-
-        $AuthorizedCompanies = getUserMeta($userId, 'companies');
-
-        $AuthorizedCompanies = $AuthorizedCompanies ? json_decode($AuthorizedCompanies, true) : array();
-
-        return empty($AuthorizedCompanies) ? getActiveCompanies() : $AuthorizedCompanies;
-    }
-}
-
-
-if (!function_exists('getActiveDepartments')) {
-    /**
-     * Get active departments from the wlsm_departments table.
-     */
-    function getActiveDepartments() {
-        return DB::connection('smAppTemplate')
-        ->table('wlsm_departments')
-            ->where('status', 1)
-            ->orderBy('department_alias')
-            ->get();
-    }
-}
 
 
 if (!function_exists('getSettings')) {

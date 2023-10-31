@@ -73,6 +73,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/audits/form/{id?}', [AuditsController::class, 'getAuditEditModalContent']);// view form
     Route::post('/audits/post/{id?}', [AuditsController::class, 'update']); // update or store
 
+    Route::get('/audits/compose', [AuditsController::class, 'compose'])->name('auditsComposeURL');
+
     // User Profile
     Route::get('/profile/{id?}', [SettingsUserController::class, 'show'])->name('profileShowURL');
 

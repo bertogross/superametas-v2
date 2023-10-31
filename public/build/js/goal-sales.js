@@ -15,7 +15,7 @@ import {
     getChartColorsArray
 } from './helpers.js';
 
-window.addEventListener('load', function () {
+document.addEventListener('DOMContentLoaded', function () {
 
     /**
      * Toggle the display of the custom meantime input field based on the selected option in the meantime select dropdown.

@@ -25,7 +25,7 @@
             <form id="auditsForm" method="POST" autocomplete="off" class="needs-validation" novalidate>
                 <?php echo csrf_field(); ?>
 
-                <?php if(!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && count($getAuthorizedCompanies) > 0): ?>
+                <?php if(!empty($getCompaniesAuthorized) && is_array($getCompaniesAuthorized) && count($getCompaniesAuthorized) > 0): ?>
                     <div class="modal-body">
 
                         <input type="hidden" name="id" value="<?php echo e($auditId); ?>" />
@@ -39,7 +39,7 @@
                                 <label for="assigned_to" class="form-label">Loja</label>
                                 <select class="form-select" name="assigned_to" id="assigned_to" required>
                                     <option <?php echo e(empty($assigned_to) ? 'selected' : ''); ?> value="">- Selecione -</option>
-                                    <?php $__currentLoopData = $getAuthorizedCompanies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $companyId): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php $__currentLoopData = $getCompaniesAuthorized; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $companyId): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <option value="<?php echo e($companyId); ?>" <?php if(old('assigned_to', $assigned_to) == $companyId): echo 'selected'; endif; ?>><?php echo e(getCompanyAlias(intval($companyId))); ?></option>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>

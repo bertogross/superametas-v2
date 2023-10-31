@@ -4,8 +4,8 @@ use App\Models\User;
 $getActiveCompanies = getActiveCompanies();
 //APP_print_r($getActiveCompanies);
 
-$getAuthorizedCompanies = $user ? getAuthorizedCompanies($user->id) : $getActiveCompanies;
-//APP_print_r($getAuthorizedCompanies);
+$getCompaniesAuthorized = $user ? getCompaniesAuthorized($user->id) : $getActiveCompanies;
+//APP_print_r($getCompaniesAuthorized);
 
 if (is_object($getActiveCompanies)) {
     $extractCompanyIds = $getActiveCompanies->pluck('company_id')->map(function ($value) {
@@ -175,7 +175,7 @@ if (is_object($getActiveCompanies)) {
                                                         class="form-check-input"
                                                         type="checkbox"
                                                         role="switch"
-                                                        {{ !empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && in_array(intval($company->company_id), $getAuthorizedCompanies) ? 'checked' : '' }}
+                                                        {{ !empty($getCompaniesAuthorized) && is_array($getCompaniesAuthorized) && in_array(intval($company->company_id), $getCompaniesAuthorized) ? 'checked' : '' }}
                                                         id="company-{{ $company->company_id }}"
                                                         name="companies[]"
                                                         value="{{ $company->company_id }}">

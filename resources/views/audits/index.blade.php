@@ -62,7 +62,11 @@
                         <h5 class="card-title mb-0 flex-grow-1">Auditorias</h5>
                         <div class="flex-shrink-0">
                             <div class="d-flex flex-wrap gap-2">
-                                <button class="btn btn-outline-theme btn-audit-edit"><i class="ri-add-line align-bottom me-1"></i> Compor</button>
+                                @component('components.audits-nav')
+                                    @slot('url')
+                                        {{ route('auditsIndexURL') }}
+                                    @endslot
+                                @endcomponent
                             </div>
                         </div>
                     </div>
@@ -226,8 +230,6 @@
     <script src="{{ URL::asset('build/libs/flatpickr/l10n/pt.js') }}"></script>
     <script src="{{ URL::asset('build/libs/flatpickr/plugins/monthSelect/index.js') }}"></script>
     <script src="{{ URL::asset('build/libs/flatpickr/plugins/confirmDate/confirmDate.js') }}"></script>
-
-    <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
 
     <script src="{{ URL::asset('build/js/audits.js') }}" type="module"></script>
 @endsection

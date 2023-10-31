@@ -11,7 +11,7 @@ import {
 
 
 
-window.addEventListener('load', function () {
+document.addEventListener('DOMContentLoaded', function () {
 
 
     initFlatpickrRange();
@@ -57,11 +57,11 @@ window.addEventListener('load', function () {
             preventCustomFieldsWhiteSpace();
 
             if(auditId){
-                document.querySelector("#auditsEditModal .modal-title").innerHTML = `<u>Editar</u> Auditoria ID: <span class="text-theme">${auditId}</span>`;
+                document.querySelector("#auditsEditModal .modal-title").innerHTML = `<u>Editar</u> Vistoria ID: <span class="text-theme">${auditId}</span>`;
 
                 document.querySelector("#auditsEditModal #btn-audits-update").innerHTML = 'Atualizar';
             }else{
-                document.querySelector("#auditsEditModal .modal-title").innerHTML = `<u>Compor</u> Auditoria</span>`;
+                document.querySelector("#auditsEditModal .modal-title").innerHTML = `<u>Adicionar</u> Vistoria</span>`;
                 document.querySelector("#auditsEditModal #btn-audits-update").innerHTML = 'Salvar';
             }
 
@@ -231,6 +231,105 @@ window.addEventListener('load', function () {
     preventCustomFieldsWhiteSpace();
 
 
+
+    // Nested sortable
+    // https://sortablejs.github.io/Sortable/
+    function attachNestedListeners(){
+        var nestedReceiver = [].slice.call(document.querySelectorAll('.nested-receiver'));
+        if (nestedReceiver){
+            // Loop through each nested sortable element
+            Array.from(nestedReceiver).forEach(function (nestedSortReceiver){
+                new Sortable(nestedSortReceiver, {
+                    animation: 150,
+                    fallbackOnBody: true,
+                    swapThreshold: 0.65,
+                    sort: true,
+                    group: 'shared'
+                });
+            });
+        }
+
+        var nestedElements = [].slice.call(document.querySelectorAll('.nested-element'));
+        if (nestedElements){
+            // Loop through each nested sortable element
+            Array.from(nestedElements).forEach(function (nestedSortElements){
+                new Sortable(nestedSortElements, {
+                    group: {
+                        name: 'shared',
+                        pull: 'clone',
+                        put: false // Do not allow items to be put into this list
+                    },
+                    sort: false,
+                    animation: 150,
+                    fallbackOnBody: true,
+                    swapThreshold: 0.65,
+                });
+            });
+        }
+
+        var nestedReceiverBlock = [].slice.call(document.querySelectorAll('.nested-receiver-block'));
+        if (nestedReceiverBlock){
+            // Loop through each nested sortable element
+            Array.from(nestedReceiverBlock).forEach(function (nestedSortReceiverBlock){
+                new Sortable(nestedSortReceiverBlock, {
+                    animation: 150,
+                    fallbackOnBody: true,
+                    swapThreshold: 0.65,
+                    sort: true,
+                    group: 'shared2'
+                });
+            });
+        }
+
+        var nestedElementsBlock = [].slice.call(document.querySelectorAll('.nested-element-to-block'));
+        if (nestedElementsBlock){
+            // Loop through each nested sortable element
+            Array.from(nestedElementsBlock).forEach(function (nestedSortElementsBlock){
+                new Sortable(nestedSortElementsBlock, {
+                    group: {
+                        name: 'shared2',
+                        pull: 'clone',
+                        put: false // Do not allow items to be put into this list
+                    },
+                    sort: false,
+                    animation: 150,
+                    fallbackOnBody: true,
+                    swapThreshold: 0.65,
+                });
+            });
+        }
+    }
+    attachNestedListeners();
+
+
+    function attachElementButtonListeners(){
+        var removeElementButtons = document.querySelectorAll('.btn-remove-element');
+        if (removeElementButtons) {
+            removeElementButtons.forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    var parentElement = this.closest('.list-group-item');
+                    if (parentElement) {
+                        parentElement.remove();
+                    }
+
+                    //reload
+                    attachElementButtonListeners();
+                });
+            });
+        }
+    }
+    attachElementButtonListeners();
+
+
+    ['drop'].forEach(eventType => { // 'dragstart', 'dragover', 'dragend',
+        document.addEventListener(eventType, function () {
+
+          attachNestedListeners();
+
+          attachElementButtonListeners();
+        });
+    });
 
 
 });

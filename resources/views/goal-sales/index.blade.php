@@ -3,12 +3,12 @@
 
     $totalPercentAccrued = $ndxChartId = 0;
 
-    $getAuthorizedCompanies = getAuthorizedCompanies();
-    //APP_print_r($getAuthorizedCompanies);
+    $getCompaniesAuthorized = getCompaniesAuthorized();
+    //APP_print_r($getCompaniesAuthorized);
     $getActiveCompanies = getActiveCompanies();
     //APP_print_r($getActiveCompanies);
-    $getActiveDepartments = getActiveDepartments();
-    //APP_print_r($getActiveDepartments);
+    $getDepartmentsActive = getDepartmentsActive();
+    //APP_print_r($getDepartmentsActive);
 
     //$getMeantime = request('meantime', date('Y-m'));
     //$getCustomMeantime = request('getCustomMeantime');
@@ -49,7 +49,7 @@
 @section('content')
     @component('components.goal-sales-nav')
         @slot('url')
-            {{ url('goal-sales') }}
+            {{ route('goalSalesIndexURL') }}
         @endslot
         @slot('title')
             @lang('translation.goal-sales')
@@ -84,20 +84,20 @@
                 data-max-date="{{ $lastDate }}" value="@if($getMeantime == 'custom'){{ $getCustomMeantime}}@endif" placeholder="Selecione o Período">
             </div>
 
-            @if (!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && count($getAuthorizedCompanies) > 1)
+            @if (!empty($getCompaniesAuthorized) && is_array($getCompaniesAuthorized) && count($getCompaniesAuthorized) > 1)
                 <div class="col-sm-12 col-md col-lg" title="Exibir somente Lojas selecionadas">
                     <select class="form-control" data-choices data-choices-removeItem name="companies[]" id="filter-companies" multiple data-placeholder="Loja">
-                        @foreach ($getAuthorizedCompanies as $company)
+                        @foreach ($getCompaniesAuthorized as $company)
                             <option {{ in_array($company, $filterCompanies) ? 'selected' : '' }} value="{{ $company }}">{{ getCompanyAlias(intval($company)) }}</option>
                         @endforeach
                     </select>
                 </div>
             @endif
 
-            @if (!empty($getActiveDepartments) && is_object($getActiveDepartments) && count($getActiveDepartments) > 1)
+            @if (!empty($getDepartmentsActive) && is_object($getDepartmentsActive) && count($getDepartmentsActive) > 1)
                 <div class="col-sm-12 col-md col-lg" title="Exibir somente Departamentos selecionados">
                     <select class="form-control" data-choices data-choices-removeItem name="departments[]" multiple data-placeholder="Departamento">
-                        @foreach ($getActiveDepartments as $department)
+                        @foreach ($getDepartmentsActive as $department)
                             <option {{ in_array($department->department_id, $filterDepartments) ? 'selected' : '' }} value="{{ $department->department_id }}">{{ $department->department_alias }}</option>
                         @endforeach
                     </select>
@@ -119,13 +119,13 @@
     @if (getUserMeta($userId, 'analytic-mode') == 'on')
         @include('goal-sales/analytic')
     @elseif (getUserMeta($userId, 'slide-mode') == 'on')
-        @if (count($filterCompanies) == 1 || count($getAuthorizedCompanies) == 1)
+        @if (count($filterCompanies) == 1 || count($getCompaniesAuthorized) == 1)
             @include('goal-sales/single')
         @else
             @include('goal-sales/slide')
         @endif
     @else
-        @if (count($filterCompanies) == 1 || count($getAuthorizedCompanies) == 1)
+        @if (count($filterCompanies) == 1 || count($getCompaniesAuthorized) == 1)
             @include('goal-sales/single')
         @else
             @include('goal-sales/table')

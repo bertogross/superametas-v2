@@ -7,9 +7,13 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 https://laravel-news.com/openai-for-laravel
 
 
+Version 2.0.21 - [2023-10-30]
+- [Started] HTML: blade page (/audits/compose) to Composition of the Inspection Form
+
+
 
 Version 2.0.20 - [2023-10-30]
-- [Added] Scenex API
+- [Added] Scenex API [ http://localhost:8000/audits/scenex/submit ]
     - https://bestlaravel.com/p/laravel-open-api
     - https://github.com/jeandormehl/openapi-gen
 
@@ -20,7 +24,7 @@ Version 2.0.20 - [2023-10-30]
 
 
 Version 2.0.19 - [2023-10-29]
-- [Tested] Clarifai API
+- [Tested] Clarifai API [ http://localhost:8000/audits/clarifai/submit ]
     - https://clarifai.com
         - https://www.clarifai.com/use-cases/predictive-maintenance
         - https://www.clarifai.com/solutions/ai-in-manufacturing

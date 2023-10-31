@@ -88,7 +88,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($getActiveDepartments as $department)
+                                        @foreach ($getDepartmentsActive as $department)
                                             <tr>
                                                 <td class="text-end align-middle" data-dep="{{$department->department_id}}">{{ $department->department_alias }}</td>
                                                 <td class="text-center align-middle o-sum-fields-previous-year">
