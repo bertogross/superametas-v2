@@ -1,3 +1,13 @@
+<?php
+/*
+$stepData = '{"0":{"stepData":{"item[0][\'step_name\']":"item[0][\'step_name\']","item[0][\'original_position\']":"0","item[0][\'new_position\']":"0"},"topics":[{"item[0][\'step_name\'][\'topic_name\'][0]":"item[0][\'step_name\'][\'topic_name\'][0]","item[0][\'step_name\'][\'topic_name\'][0][\'original_position\']":"0","item[0][\'step_name\'][\'topic_name\'][0][\'new_position\']":"0"},{"item[0][\'step_name\'][\'topic_name\'][1]":"item[0][\'step_name\'][\'topic_name\'][1]","item[0][\'step_name\'][\'topic_name\'][1][\'original_position\']":"1","item[0][\'step_name\'][\'topic_name\'][1][\'new_position\']":"1"},{"item[0][\'step_name\'][\'topic_name\'][2]":"item[0][\'step_name\'][\'topic_name\'][2]","item[0][\'step_name\'][\'topic_name\'][2][\'original_position\']":"2","item[0][\'step_name\'][\'topic_name\'][2][\'new_position\']":"2"}]},"1":{"stepData":{"item[1][\'step_name\']":"item[1][\'step_name\']","item[1][\'original_position\']":"1","item[1][\'new_position\']":"1"},"topics":[{"item[1][\'step_name\'][\'topic_name\'][0]":"item[1][\'step_name\'][\'topic_name\'][0]","item[1][\'step_name\'][\'topic_name\'][0][\'original_position\']":"0","item[1][\'step_name\'][\'topic_name\'][0][\'new_position\']":"0"},{"item[1][\'step_name\'][\'topic_name\'][1]":"item[1][\'step_name\'][\'topic_name\'][1]","item[1][\'step_name\'][\'topic_name\'][1][\'original_position\']":"1","item[1][\'step_name\'][\'topic_name\'][1][\'new_position\']":"1"},{"item[1][\'step_name\'][\'topic_name\'][2]":"item[1][\'step_name\'][\'topic_name\'][2]","item[1][\'step_name\'][\'topic_name\'][2][\'original_position\']":"2","item[1][\'step_name\'][\'topic_name\'][2][\'new_position\']":"2"}]},"2":{"stepData":{"item[2][\'step_name\']":"item[2][\'step_name\']","item[2][\'original_position\']":"2","item[2][\'new_position\']":"2"},"topics":[{"item[2][\'step_name\'][\'topic_name\'][0]":"item[2][\'step_name\'][\'topic_name\'][0]","item[2][\'step_name\'][\'topic_name\'][0][\'original_position\']":"0","item[2][\'step_name\'][\'topic_name\'][0][\'new_position\']":"0"},{"item[2][\'step_name\'][\'topic_name\'][1]":"item[2][\'step_name\'][\'topic_name\'][1]","item[2][\'step_name\'][\'topic_name\'][1][\'original_position\']":"1","item[2][\'step_name\'][\'topic_name\'][1][\'new_position\']":"2"},{"item[2][\'step_name\'][\'topic_name\'][2]":"item[2][\'step_name\'][\'topic_name\'][2]","item[2][\'step_name\'][\'topic_name\'][2][\'original_position\']":"2","item[2][\'step_name\'][\'topic_name\'][2][\'new_position\']":"1"}]},"_token":"ZY9PWHlowYl0C8THSAD4JAJmgSMkUfjDHo1bzMHC","title":"Title"}';
+$stepDataArray = json_decode($stepData, true);
+echo '<pre>';
+print_r($stepDataArray);
+echo '</pre>';
+*/
+?>
+
 <?php $__env->startSection('title'); ?>
     <?php echo app('translator')->get('translation.audits'); ?>
 <?php $__env->stopSection(); ?>
@@ -18,111 +28,68 @@
         <?php $__env->endSlot(); ?>
     <?php echo $__env->renderComponent(); ?>
 
-        <div class="row">
-            <div class="col-xxl-9">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title mb-0"><i class="ri-drag-drop-line fs-16 align-middle text-theme me-2"></i>Área do Formulário</h4>
-                    </div><!-- end card header -->
+        <?php echo $__env->make('components.alert-errors', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-                    <div id="nested-compose-area" class="card-body">
-                        <p class="text-muted">
-                            Componha o formulário arrastando os elementos para esta área.
-                        </p>
-                        <div class="list-group nested-list nested-receiver">
+        <?php echo $__env->make('components.alert-success', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-                            <?php $__currentLoopData = $getDepartmentsActive; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $department): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <div class="list-group-item nested-1 bg-dark-subtle" data-dep="<?php echo e($department->department_id); ?>" draggable="false">
-                                    <?php echo e($department->department_alias); ?>
+        <div class="row mb-3">
+            <div class="col-xxl-7">
+                <div class="card h-100">
+                    <form id="auditsComposeForm" method="POST" autocomplete="off" class="needs-validation" novalidate>
+                        <?php echo csrf_field(); ?>
 
-                                    <div class="list-group nested-list">
-                                        <div class="list-group-item nested-2">Analytics</div>
-                                        <div class="list-group-item nested-2">CRM</div>
-                                    </div>
-                                </div>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <div class="card-header">
+                            <div class="btn-group float-end">
+                                <button type="button" class="btn btn-sm btn-outline-theme" id="btn-audits-compose-store" tabindex="0">Salvar</button>
 
+                                <a class="btn btn-sm btn-outline-warning" id="tn-audits-compose-disable" tabindex="0">Desativar</a>
+                            </div>
+
+                            <h4 class="card-title mb-0"><i class="ri-drag-drop-line fs-16 align-middle text-theme me-2"></i>Formulário</h4>
                         </div>
-                    </div><!-- end card-body -->
-                </div><!-- end card -->
+
+                        <div id="nested-compose-area" class="card-body pb-0" style="min-height: 250px;">
+                            <p class="text-muted">
+                                Esta é a área de composição
+                            </p>
+                            <div class="form-floating">
+                                <input type="text" name="title" class="form-control" id="floatingInput" required autocomplete="off" maxlength="100">
+                                <label for="floatingInput">Título do Formulário</label>
+                            </div>
+                            <div class="form-text">Necessário para posterior identificação do modelo</div>
+
+                            <div class="accordion list-group nested-list nested-receiver rounded rounded-1 p-0 mt-3"></div>
+
+                            <div class="clearfix">
+                                <button type="button" class="btn btn-sm btn-outline-theme float-end cursor-crosshair" id="btn-add-block" tabindex="0">Adicionar Bloco</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
 
-            <div class="col-xxl-3">
-                <div class="card">
+            <div class="col-xxl-5">
+                <div class="card h-100">
                     <div class="card-header">
-                        <h4 class="card-title mb-0"><i class="ri-bring-to-front fs-16 align-middle text-theme me-2"></i>Elementos</h4>
-                    </div><!-- end card header -->
+                        <h4 class="card-title mb-0"><i class="ri-eye-2-fill fs-16 align-middle text-theme me-2"></i>Pré-visualização</h4>
+                    </div>
 
-                    <div id="nested-elements-area" class="card-body">
-                        <p class="text-muted">
-                            Aqui estão os elementos de composição.<br>
-                            Você poderá complementar o formulário arrastando para a posição desejada.
-                        </p>
-
-                        <div class="list-group nested-list">
-                            <div class="nested-element">
-                                <div class="list-group-item bg-light-subtle nested-1">
-                                    <div class="clearfix">
-                                        <button type="button" class="btn btn-ghost-danger float-end btn-remove-element pt-0 pb-0"><i class="ri-delete-bin-2-line"></i></button>
-                                        <span class="label-element">
-                                            Bloco dos Elementos
-                                        </span>
-                                        <input type="text" class="form-control" name="audit_compose[]['title']" placeholder="Informe o Título / Setor / Departamento">
-                                    </div>
-
-                                    <div class="list-group-item nested-1 nested-receiver-block-fake" style="min-height: 50px;"></div>
-
-                                    <div class="list-group-item nested-1 nested-receiver-block" style="min-height: 50px;"></div>
-                                </div>
-                            </div>
-
-                            <hr>
-
-                            <div class="row">
-                                <?php $__currentLoopData = $auditElements; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $element): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <div class="col-xxl-6 col-md-12 nested-element-to-block">
-                                        <div class="list-group-item bg-light-subtle nested-1">
-                                            <div class="clearfix">
-                                                <button type="button" class="btn btn-ghost-danger float-end btn-remove-element pt-0 pb-0"><i class="ri-delete-bin-2-line"></i></button>
-
-                                                <?php echo e($element['label']); ?>
-
-                                            </div>
-
-                                            <div class="list-group nested-list">
-                                                <div class="list-group-item nested-2">
-                                                    <?php echo e($element['type']); ?>
-
-                                                </div>
-                                                <div class="list-group-item nested-2">
-                                                    <?php echo e($element['name']); ?>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </div>
-                        </div>
-                    </div><!-- end card-body -->
-                </div><!-- end card -->
+                    <div class="card-body">
+                        
+                    </div>
+                </div>
             </div>
         </div>
 
     <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
-    <script src="<?php echo e(URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js')); ?>"></script>
-
-    <script src="<?php echo e(URL::asset('build/libs/sweetalert2/sweetalert2.min.js')); ?>"></script>
-
-    <script src="<?php echo e(URL::asset('build/libs/flatpickr/flatpickr.min.js')); ?>"></script>
-    <script src="<?php echo e(URL::asset('build/libs/flatpickr/l10n/pt.js')); ?>"></script>
-    <script src="<?php echo e(URL::asset('build/libs/flatpickr/plugins/monthSelect/index.js')); ?>"></script>
-    <script src="<?php echo e(URL::asset('build/libs/flatpickr/plugins/confirmDate/confirmDate.js')); ?>"></script>
-
     <script src="<?php echo e(URL::asset('build/libs/sortablejs/Sortable.min.js')); ?>"></script>
 
-    <script src="<?php echo e(URL::asset('build/js/audits.js')); ?>" type="module"></script>
+    <script>
+        var auditsComposeStoreURL = "<?php echo e(route('auditsComposeStoreURL')); ?>";
+        var auditsComposeUpdateURL = "<?php echo e(route('auditsComposeUpdateURL')); ?>";
+    </script>
+    <script src="<?php echo e(URL::asset('build/js/audits-compose.js')); ?>" type="module"></script>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\application\development.superametas.com\public_html\resources\views/audits/compose.blade.php ENDPATH**/ ?>

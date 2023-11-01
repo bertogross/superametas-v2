@@ -231,7 +231,6 @@ class AuditsController extends Controller
         );
      }
 
-
      public function compose()
     {
         $getDepartmentsActive = getDepartmentsActive();
@@ -239,45 +238,64 @@ class AuditsController extends Controller
         $auditElements = array(
             array(
                 'id' => 1,
-                'label' => 'Caixa de Texto',
+                'label' => 'Tópico',
                 'type' => 'text',
-                'name' => 'component_x',
+                'name' => 'topic',
+                'icon' => 'ri-input-cursor-move',
+                'placeholder' => 'Exemplo: "Este setor/departamento está organizado?"... "O abastecimento de produtos/insumos está em dia?"',
+                'maxlenght' => '100',
             ),
-            array(
+            /*array(
                 'id' => 2,
-                'label' => 'Área de Texto',
-                'type' => 'text',
-                'name' => 'component_x',
-            ),
-            array(
+                'label' => 'Texto',
+                'type' => 'textarea',
+                'name' => 'description',
+                'icon' => 'ri-file-text-line',
+                'placeholder' => 'Efetue comentários/observações',
+                'maxlenght' => '1000',
+            ),*/
+            /*array(
                 'id' => 3,
-                'label' => 'Botões de Verificação',
+                'label' => 'Checagem',
                 'type' => 'checkbox',
-                'name' => 'component_x',
-            ),
+                'name' => 'check',
+                'icon' => 'ri-checkbox-fill',
+                'placeholder' => 'Marque as opções',
+                'maxlenght' => '',
+            ),*/
             array(
                 'id' => 4,
-                'label' => 'Botões de Opção',
+                'label' => 'Opções',
                 'type' => 'radio',
-                'name' => 'component_x',
+                'name' => 'options',
+                'icon' => 'ri-radio-button-line',
+                'placeholder' => 'Escolha uma opção',
+                'maxlenght' => '',
             ),
-            array(
+            /*array(
                 'id' => 5,
-                'label' => 'Caixa de Seleção',
+                'label' => 'Seletor',
                 'type' => 'select',
-                'name' => 'component_y',
-            ),
-            array(
+                'name' => 'selected',
+                'icon' => 'ri-list-check',
+                'placeholder' => '- Selecione -',
+                'maxlenght' => '',
+            ),*/
+            /*array(
                 'id' => 5,
                 'label' => 'Upload',
                 'type' => 'file',
-                'name' => 'component_y',
-            )
+                'name' => 'attachment',
+                'icon' => 'ri-upload-cloud-2-fill',
+                'placeholder' => 'Envie arquivos de imagem',
+                'maxlenght' => '',
+            )*/
         );
 
 
         return view('audits.compose', compact('getDepartmentsActive', 'auditElements'));
     }
+
 
 
 }

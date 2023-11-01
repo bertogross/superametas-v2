@@ -6,7 +6,7 @@ export function toastAlert(message, type = 'success', duration = 0) {
     document.querySelectorAll('.toast-container').forEach(element => element.remove());
 
     // Define the HTML template for the toast
-    const icon = type === 'success' ? 'ri-checkbox-circle-fill text-success' : 'ri-alert-fill text-danger';
+    const icon = type === 'success' ? 'ri-checkbox-circle-fill text-success' : 'ri-alert-fill text-' + type;
     const ToastHtml = `
         <div class="toast-container position-fixed bottom-0 end-0 p-3">
             <div class="toast fade show toast-border-${type} overflow-hidden mt-3" role="alert" aria-live="assertive" aria-atomic="true">

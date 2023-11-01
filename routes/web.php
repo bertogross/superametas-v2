@@ -12,6 +12,7 @@ use App\Http\Controllers\{
     SettingsAccountController,
     GoalSalesController,
     AuditsController,
+    AuditsComposeController,
     SettingsApiKeysController,
     GoogleDriveController,
     DropboxController,
@@ -71,9 +72,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/audit/{id?}', [AuditsController::class, 'show'])->name('auditsShowURL');
     //Route::post('/audits', [AuditsController::class, 'store']);
     Route::get('/audits/form/{id?}', [AuditsController::class, 'getAuditEditModalContent']);// view form
-    Route::post('/audits/post/{id?}', [AuditsController::class, 'update']); // update or store
+    Route::post('/audits/store/{id?}', [AuditsController::class, 'update']); // update or store
 
-    Route::get('/audits/compose', [AuditsController::class, 'compose'])->name('auditsComposeURL');
+        // Compose/edit the custom form
+        Route::get('/audits/compose/', [AuditsComposeController::class, 'index'])->name('auditsComposeIndexURL');
+        Route::get('/audits/compose/{id?}', [AuditsComposeController::class, 'show'])->name('auditsComposeShowURL');
+        // Save and view the custom form
+        Route::post('/audits/compose/store', [AuditsComposeController::class, 'store'])->name('auditsComposeStoreURL');
+        Route::post('/audits/compose/update/{id?}', [AuditsComposeController::class, 'update'])->name('auditsComposeUpdateURL');
+
 
     // User Profile
     Route::get('/profile/{id?}', [SettingsUserController::class, 'show'])->name('profileShowURL');

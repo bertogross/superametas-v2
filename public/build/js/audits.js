@@ -11,9 +11,7 @@ import {
 
 
 
-document.addEventListener('DOMContentLoaded', function () {
-
-
+window.addEventListener('load', function() {
     initFlatpickrRange();
     initFlatpickr();
 
@@ -50,11 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             initFlatpickr();
 
-            attachCustomFieldListeners();
-
             maxLengthTextarea();
-
-            preventCustomFieldsWhiteSpace();
 
             if(auditId){
                 document.querySelector("#auditsEditModal .modal-title").innerHTML = `<u>Editar</u> Vistoria ID: <span class="text-theme">${auditId}</span>`;
@@ -94,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let formData = new FormData(form);
 
             try {
-                let url = auditId ? `/audits/post/${auditId}` : `/audits/post/`;
+                let url = auditId ? `/audits/store/${auditId}` : `/audits/store/`;
 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -149,187 +143,5 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     attachModalEventListeners();
-
-
-    function attachCustomFieldListeners() {
-        if(document.getElementById('add-custom-field')){
-            document.getElementById('add-custom-field').addEventListener('click', function() {
-                const container = document.getElementById('custom-fields-container');
-                const index = container.children.length;
-                const field = document.createElement('div');
-                field.innerHTML = `
-                    <div class="custom-field row mb-2">
-                        <div class="col">
-                            <select name="custom_fields[${index}][type]" class="form-select" required>
-                                <option value="">Tipo</option>
-                                <option value="text">Texto</option>
-                                <option value="date">Data</option>
-                                <option value="textarea">Área de texto</option>
-                                <option value="file">Carregar arquivo</option>
-                                <option value="checkbox">Checkbox</option>
-                                <option value="radio">Radio Button</option>
-                                <option value="select">Selecionador</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <input type="text" name="custom_fields[${index}][name]" placeholder="nome_do_campo" class="form-control" maxlength="30" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Digite somente letras minúsculas e sem espaços" required>
-                        </div>
-                        <div class="col">
-                            <input type="text" name="custom_fields[${index}][label]" value="{${index}" placeholder="Título do Campo" class="form-control" maxlength="50" required>
-                        </div>
-                        <div class="col-auto">
-                            <button type="button" class="btn btn-ghost-danger btn-remove-custom-field"><i class="ri-delete-bin-3-line"></i></button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(field);
-
-                // Reattach the event listeners to include the new remove button
-                removeCustomField();
-
-                bsPopoverTooltip();
-
-                preventCustomFieldsWhiteSpace();
-
-            });
-        }
-    }
-
-    function removeCustomField() {
-        // Get all elements with the class '.btn-remove-custom-field'
-        const removeButtons = document.querySelectorAll('.btn-remove-custom-field');
-
-        // Add a click event listener to each button
-        removeButtons.forEach(function(button) {
-            // First, remove any existing event listeners to prevent duplicates
-            button.removeEventListener('click', removeFieldHandler);
-
-            // Then, add the new event listener
-            button.addEventListener('click', removeFieldHandler);
-        });
-    }
-
-    function removeFieldHandler() {
-        // Get the nearest ancestor of the clicked button with the class '.custom-field'
-        const customFieldElement = this.closest('.custom-field');
-
-        // Remove the custom field element from the DOM
-        if (customFieldElement) {
-            customFieldElement.remove();
-        }
-    }
-
-
-    // Prevent all characters except alpha and underscore for the custom input field name... and only lowercase
-    function preventCustomFieldsWhiteSpace(){
-        document.addEventListener('input', function (event) {
-            if (event.target.name && event.target.name.match(/^custom_fields\[\d+\]\[name\]$/)) {
-                event.target.value = event.target.value.replace(/[^a-z_]/g, '');
-            }
-        });
-    }
-    preventCustomFieldsWhiteSpace();
-
-
-
-    // Nested sortable
-    // https://sortablejs.github.io/Sortable/
-    function attachNestedListeners(){
-        var nestedReceiver = [].slice.call(document.querySelectorAll('.nested-receiver'));
-        if (nestedReceiver){
-            // Loop through each nested sortable element
-            Array.from(nestedReceiver).forEach(function (nestedSortReceiver){
-                new Sortable(nestedSortReceiver, {
-                    animation: 150,
-                    fallbackOnBody: true,
-                    swapThreshold: 0.65,
-                    sort: true,
-                    group: 'shared'
-                });
-            });
-        }
-
-        var nestedElements = [].slice.call(document.querySelectorAll('.nested-element'));
-        if (nestedElements){
-            // Loop through each nested sortable element
-            Array.from(nestedElements).forEach(function (nestedSortElements){
-                new Sortable(nestedSortElements, {
-                    group: {
-                        name: 'shared',
-                        pull: 'clone',
-                        put: false // Do not allow items to be put into this list
-                    },
-                    sort: false,
-                    animation: 150,
-                    fallbackOnBody: true,
-                    swapThreshold: 0.65,
-                });
-            });
-        }
-
-        var nestedReceiverBlock = [].slice.call(document.querySelectorAll('.nested-receiver-block'));
-        if (nestedReceiverBlock){
-            // Loop through each nested sortable element
-            Array.from(nestedReceiverBlock).forEach(function (nestedSortReceiverBlock){
-                new Sortable(nestedSortReceiverBlock, {
-                    animation: 150,
-                    fallbackOnBody: true,
-                    swapThreshold: 0.65,
-                    sort: true,
-                    group: 'shared2'
-                });
-            });
-        }
-
-        var nestedElementsBlock = [].slice.call(document.querySelectorAll('.nested-element-to-block'));
-        if (nestedElementsBlock){
-            // Loop through each nested sortable element
-            Array.from(nestedElementsBlock).forEach(function (nestedSortElementsBlock){
-                new Sortable(nestedSortElementsBlock, {
-                    group: {
-                        name: 'shared2',
-                        pull: 'clone',
-                        put: false // Do not allow items to be put into this list
-                    },
-                    sort: false,
-                    animation: 150,
-                    fallbackOnBody: true,
-                    swapThreshold: 0.65,
-                });
-            });
-        }
-    }
-    attachNestedListeners();
-
-
-    function attachElementButtonListeners(){
-        var removeElementButtons = document.querySelectorAll('.btn-remove-element');
-        if (removeElementButtons) {
-            removeElementButtons.forEach(function (button) {
-                button.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    var parentElement = this.closest('.list-group-item');
-                    if (parentElement) {
-                        parentElement.remove();
-                    }
-
-                    //reload
-                    attachElementButtonListeners();
-                });
-            });
-        }
-    }
-    attachElementButtonListeners();
-
-
-    ['drop'].forEach(eventType => { // 'dragstart', 'dragover', 'dragend',
-        document.addEventListener(eventType, function () {
-
-          attachNestedListeners();
-
-          attachElementButtonListeners();
-        });
-    });
-
 
 });

@@ -15,9 +15,9 @@
         @endslot
     @endcomponent
 
-    @include('error.alert-errors')
+    @include('components.alert-errors')
 
-    @include('error.alert-success')
+    @include('components.alert-success')
 
     <div class="card">
         <div class="card-body">

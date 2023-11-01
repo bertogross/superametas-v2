@@ -17,9 +17,9 @@
         @endslot
     @endcomponent
 
-    @include('error.alert-errors')
+    @include('components.alert-errors')
 
-    @include('error.alert-success')
+    @include('components.alert-success')
 
     <div class="table-responsive border border-1 border-light rounded">
         <table class="table align-middle table-hover table-striped table-nowrap mb-0">

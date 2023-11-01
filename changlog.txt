@@ -7,6 +7,19 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 https://laravel-news.com/openai-for-laravel
 
 
+
+Version 2.0.23 - [2023-11-01]
+- [Updated] HTML: blade page (/audits/compose) to Composition of the Inspection Form
+- [Added] AuditsComposeController and model/AuditCompose
+- [Added] audits-compose.js
+
+
+
+Version 2.0.22 - [2023-10-31]
+- [Added] HTML: blade page (/audits/compose) to Composition of the Inspection Form
+
+
+
 Version 2.0.21 - [2023-10-30]
 - [Started] HTML: blade page (/audits/compose) to Composition of the Inspection Form
 

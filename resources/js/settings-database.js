@@ -1,7 +1,7 @@
 import { toastAlert } from './helpers.js';
 
 // Event listeners setup
-document.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('load', function() {
     // A flag to track whether the execution is currently in progress or not.
     let isExecutionInProgress = false;
 
