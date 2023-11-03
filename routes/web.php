@@ -72,14 +72,26 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/audit/{id?}', [AuditsController::class, 'show'])->name('auditsShowURL');
     //Route::post('/audits', [AuditsController::class, 'store']);
     Route::get('/audits/form/{id?}', [AuditsController::class, 'getAuditEditModalContent']);// view form
-    Route::post('/audits/store/{id?}', [AuditsController::class, 'update']); // update or store
 
-        // Compose/edit the custom form
-        Route::get('/audits/compose/', [AuditsComposeController::class, 'index'])->name('auditsComposeIndexURL');
-        Route::get('/audits/compose/{id?}', [AuditsComposeController::class, 'show'])->name('auditsComposeShowURL');
-        // Save and view the custom form
+    // Ajax Store / Update audit
+    Route::post('/audits/store/{id?}', [AuditsController::class, 'update']);
+
+        // Talbe listing forms
+        Route::get('/audits/compose', [AuditsComposeController::class, 'index'])->name('auditsComposeIndexURL');
+
+        // Create the custom form
+        Route::get('/audits/compose/add', [AuditsComposeController::class, 'add'])->name('auditsComposeAddURL');
+        // Edit the custom form
+        Route::get('/audits/compose/edit/{id?}', [AuditsComposeController::class, 'edit'])->name('auditsComposeEditURL');
+        // Show the custom form
+        Route::get('/audits/compose/show/{id?}', [AuditsComposeController::class, 'show'])->name('auditsComposeShowURL');
+
+        // Ajax Store and Update the custom form
         Route::post('/audits/compose/store', [AuditsComposeController::class, 'store'])->name('auditsComposeStoreURL');
         Route::post('/audits/compose/update/{id?}', [AuditsComposeController::class, 'update'])->name('auditsComposeUpdateURL');
+
+        // Ajax toggle status
+        Route::post('/audit/compose/toggle-status/{id?}/{status?}', [AuditsComposeController::class, 'toggleStatus'])->name('auditsComposeToggleStatusURL');
 
 
     // User Profile

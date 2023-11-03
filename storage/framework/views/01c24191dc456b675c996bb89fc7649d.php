@@ -1,4 +1,4 @@
-@php
+<?php
 /*
 $stepData = '{"0":{"stepData":{"item[0][\'step_name\']":"item[0][\'step_name\']","item[0][\'original_position\']":"0","item[0][\'new_position\']":"0"},"topics":[{"item[0][\'step_name\'][\'topic_name\'][0]":"item[0][\'step_name\'][\'topic_name\'][0]","item[0][\'step_name\'][\'topic_name\'][0][\'original_position\']":"0","item[0][\'step_name\'][\'topic_name\'][0][\'new_position\']":"0"},{"item[0][\'step_name\'][\'topic_name\'][1]":"item[0][\'step_name\'][\'topic_name\'][1]","item[0][\'step_name\'][\'topic_name\'][1][\'original_position\']":"1","item[0][\'step_name\'][\'topic_name\'][1][\'new_position\']":"1"},{"item[0][\'step_name\'][\'topic_name\'][2]":"item[0][\'step_name\'][\'topic_name\'][2]","item[0][\'step_name\'][\'topic_name\'][2][\'original_position\']":"2","item[0][\'step_name\'][\'topic_name\'][2][\'new_position\']":"2"}]},"1":{"stepData":{"item[1][\'step_name\']":"item[1][\'step_name\']","item[1][\'original_position\']":"1","item[1][\'new_position\']":"1"},"topics":[{"item[1][\'step_name\'][\'topic_name\'][0]":"item[1][\'step_name\'][\'topic_name\'][0]","item[1][\'step_name\'][\'topic_name\'][0][\'original_position\']":"0","item[1][\'step_name\'][\'topic_name\'][0][\'new_position\']":"0"},{"item[1][\'step_name\'][\'topic_name\'][1]":"item[1][\'step_name\'][\'topic_name\'][1]","item[1][\'step_name\'][\'topic_name\'][1][\'original_position\']":"1","item[1][\'step_name\'][\'topic_name\'][1][\'new_position\']":"1"},{"item[1][\'step_name\'][\'topic_name\'][2]":"item[1][\'step_name\'][\'topic_name\'][2]","item[1][\'step_name\'][\'topic_name\'][2][\'original_position\']":"2","item[1][\'step_name\'][\'topic_name\'][2][\'new_position\']":"2"}]},"2":{"stepData":{"item[2][\'step_name\']":"item[2][\'step_name\']","item[2][\'original_position\']":"2","item[2][\'new_position\']":"2"},"topics":[{"item[2][\'step_name\'][\'topic_name\'][0]":"item[2][\'step_name\'][\'topic_name\'][0]","item[2][\'step_name\'][\'topic_name\'][0][\'original_position\']":"0","item[2][\'step_name\'][\'topic_name\'][0][\'new_position\']":"0"},{"item[2][\'step_name\'][\'topic_name\'][1]":"item[2][\'step_name\'][\'topic_name\'][1]","item[2][\'step_name\'][\'topic_name\'][1][\'original_position\']":"1","item[2][\'step_name\'][\'topic_name\'][1][\'new_position\']":"2"},{"item[2][\'step_name\'][\'topic_name\'][2]":"item[2][\'step_name\'][\'topic_name\'][2]","item[2][\'step_name\'][\'topic_name\'][2][\'original_position\']":"2","item[2][\'step_name\'][\'topic_name\'][2][\'new_position\']":"1"}]},"_token":"ZY9PWHlowYl0C8THSAD4JAJmgSMkUfjDHo1bzMHC","title":"Title"}';
 $stepDataArray = json_decode($stepData, true);
@@ -6,36 +6,36 @@ echo '<pre>';
 print_r($stepDataArray);
 echo '</pre>';
 */
-@endphp
-@extends('layouts.master')
-@section('title')
-    @lang('translation.audits')
-@endsection
-@section('css')
-    <link href="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
-@endsection
-@section('content')
-    @component('components.breadcrumb')
-        @slot('url')
-            {{ route('auditsIndexURL') }}
-        @endslot
-        @slot('li_1')
-            @lang('translation.audits')
-        @endslot
-        @slot('title')
+?>
+
+<?php $__env->startSection('title'); ?>
+    <?php echo app('translator')->get('translation.audits'); ?>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('css'); ?>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
+    <?php $__env->startComponent('components.breadcrumb'); ?>
+        <?php $__env->slot('url'); ?>
+            <?php echo e(route('auditsIndexURL')); ?>
+
+        <?php $__env->endSlot(); ?>
+        <?php $__env->slot('li_1'); ?>
+            <?php echo app('translator')->get('translation.audits'); ?>
+        <?php $__env->endSlot(); ?>
+        <?php $__env->slot('title'); ?>
             Composição
-        @endslot
-    @endcomponent
+        <?php $__env->endSlot(); ?>
+    <?php echo $__env->renderComponent(); ?>
 
-        @include('components.alert-errors')
+        <?php echo $__env->make('components.alert-errors', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-        @include('components.alert-success')
+        <?php echo $__env->make('components.alert-success', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
         <div class="row mb-3">
             <div class="col-xxl-7">
                 <div class="card h-100">
                     <form id="auditsComposeForm" method="POST" autocomplete="off" class="needs-validation" novalidate>
-                        @csrf
+                        <?php echo csrf_field(); ?>
 
                         <div class="card-header">
                             <div class="btn-group float-end">
@@ -74,21 +74,21 @@ echo '</pre>';
                     </div>
 
                     <div class="card-body">
-                        {{--
-                        TODO get the final form HTML from Ajax
-                        --}}
+                        
                     </div>
                 </div>
             </div>
         </div>
 
-    @endsection
-@section('script')
-    <script src="{{ URL::asset('build/libs/sortablejs/Sortable.min.js') }}"></script>
+    <?php $__env->stopSection(); ?>
+<?php $__env->startSection('script'); ?>
+    <script src="<?php echo e(URL::asset('build/libs/sortablejs/Sortable.min.js')); ?>"></script>
 
     <script>
-        var auditsComposeStoreURL = "{{ route('auditsComposeStoreURL') }}";
-        var auditsComposeUpdateURL = "{{ route('auditsComposeUpdateURL') }}";
+        var auditsComposeStoreURL = "<?php echo e(route('auditsComposeStoreURL')); ?>";
+        var auditsComposeUpdateURL = "<?php echo e(route('auditsComposeUpdateURL')); ?>";
     </script>
-    <script src="{{ URL::asset('build/js/audits-compose.js') }}" type="module"></script>
-@endsection
+    <script src="<?php echo e(URL::asset('build/js/audits-compose.js')); ?>" type="module"></script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\application\development.superametas.com\public_html\resources\views/audits/compose/add.blade.php ENDPATH**/ ?>

@@ -3,12 +3,12 @@ use App\Models\User;
 
 $type = 'sales';
 
-$getAuthorizedCompanies = getAuthorizedCompanies();
-//APP_print_r($getAuthorizedCompanies);
+$getCompaniesAuthorized = getCompaniesAuthorized();
+//appPrintR($getCompaniesAuthorized);
 $getActiveCompanies = getActiveCompanies();
-//APP_print_r($getActiveCompanies);
-$getActiveDepartments = getActiveDepartments();
-//APP_print_r($getActiveDepartments);
+//appPrintR($getActiveCompanies);
+$getDepartmentsActive = getDepartmentsActive();
+//appPrintR($getDepartmentsActive);
 
 $dateRange = getSaleDateRange();
 $firstDate = $dateRange['first_date'];
@@ -31,9 +31,9 @@ $endYear = intval($currentMonth) >= (intval(date('Y'))+11) ? date('Y', strtotime
 
                 
 
-                <?php if(!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies)): ?>
+                <?php if(!empty($getCompaniesAuthorized) && is_array($getCompaniesAuthorized)): ?>
                     <ul class="nav nav-tabs nav-border-top nav-justified" role="tablist">
-                        <?php $__currentLoopData = $getAuthorizedCompanies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $company): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php $__currentLoopData = $getCompaniesAuthorized; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $company): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link <?php echo e($key == 0 ? 'active' : ''); ?> text-uppercase" id="company-<?php echo e($company); ?>-tab" data-bs-toggle="tab" data-bs-target="#company-<?php echo e($company); ?>" type="button" role="tab" aria-controls="company-<?php echo e($company); ?>" aria-selected="true"><?php echo e(getCompanyAlias(intval($company))); ?></button>
                             </li>
@@ -41,7 +41,7 @@ $endYear = intval($currentMonth) >= (intval(date('Y'))+11) ? date('Y', strtotime
                     </ul>
 
                     <div class="tab-content p-3 bg-light">
-                        <?php $__currentLoopData = $getAuthorizedCompanies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $company): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php $__currentLoopData = $getCompaniesAuthorized; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $company): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="tab-pane fade show <?php echo e($key == 0 ? 'active' : ''); ?>" id="company-<?php echo e($company); ?>" role="tabpanel" aria-labelledby="company-<?php echo e($company); ?>-tab">
                                 <div id="load-emp-<?php echo e($company); ?>">
                                     <div class="accordion custom-accordionwithicon custom-accordion-border accordion-border-box mt-1" id="accordion-<?php echo e($company); ?>">

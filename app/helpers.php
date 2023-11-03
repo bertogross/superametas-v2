@@ -387,7 +387,20 @@ if (!function_exists('formatSize')) {
     }
 }
 
-
+if (!function_exists('statusBadge')) {
+    function statusBadge($status) {
+        switch ($status) {
+            case 'active':
+                return '<span class="badge bg-success-subtle text-success text-uppercase" title="Registro de Status Ativo">Ativo</span>';
+            case 'trash':
+                return '<span class="badge bg-danger-subtle text-danger text-uppercase" title="Registro de Status Deletado">Deletado</span>';
+            case 'disabled':
+                return '<span class="badge bg-warning-subtle text-warning text-uppercase" title="Registro de Status Desativado">Desativado</span>';
+            default:
+                return '<span class="badge bg-info-primary text-primary text-uppercase" title="Registro de Status NÃO INFORMADO">Unknown</span>';
+        }
+    }
+}
 
 if (!function_exists('onlyNumber')) {
     function onlyNumber($number = null) {
@@ -440,8 +453,13 @@ if (!function_exists('getLastUpdate')) {
 
             // Check if there is a result
             if ($lastUpdate) {
-                // Format the date and return it
-                return date($dateFormat, strtotime($lastUpdate));
+
+                // Set the locale to Brazilian Portuguese
+                \Carbon\Carbon::setLocale('pt_BR');
+
+                // Parse the date using Carbon, format it, and return it
+                return \Carbon\Carbon::parse($lastUpdate)->isoFormat('D [de] MMMM, YYYY - HH:mm:ss') . 'hs';
+
             } else {
                 return '';
             }
@@ -505,7 +523,6 @@ if( !function_exists('goalsEmojiChart') ){
 
 
 
-
 if (!function_exists('getCookie')) {
     /**
      * Get the value of a specific cookie by its name.
@@ -520,16 +537,28 @@ if (!function_exists('getCookie')) {
     }
 }
 
+if (!function_exists('limitChars')) {
+    function limitChars($text, $number) {
+        return $text ? \Illuminate\Support\Str::limit($text, $number) : '';
+    }
+}
 
-
-
-
-if(!function_exists('APP_print_r')){
-	function APP_print_r($data){
+//Useful to see on the bottom left side fixed smotth fixed div
+if(!function_exists('appPrintR')){
+	function appPrintR($data){
 		if( !empty($data) ){
 			print '<pre>';
 				print_r( $data );
 			print '</pre>';
+		}
+	}
+}
+
+//Useful to print inside the content body
+if(!function_exists('appPrintR2')){
+	function appPrintR2($data){
+		if( !empty($data) ){
+			print '<div style="font-family: inherit; white-space: pre-wrap; color: #87DF01;">'.var_export( $data, true).'</div>';
 		}
 	}
 }

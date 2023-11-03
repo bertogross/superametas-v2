@@ -4,11 +4,11 @@
     $totalPercentAccrued = $ndxChartId = 0;
 
     $getCompaniesAuthorized = getCompaniesAuthorized();
-    //APP_print_r($getCompaniesAuthorized);
+    //appPrintR($getCompaniesAuthorized);
     $getActiveCompanies = getActiveCompanies();
-    //APP_print_r($getActiveCompanies);
+    //appPrintR($getActiveCompanies);
     $getDepartmentsActive = getDepartmentsActive();
-    //APP_print_r($getDepartmentsActive);
+    //appPrintR($getDepartmentsActive);
 
     //$getMeantime = request('meantime', date('Y-m'));
     //$getCustomMeantime = request('getCustomMeantime');

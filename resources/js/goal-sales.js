@@ -253,7 +253,9 @@ window.addEventListener('load', function() {
 
             // Send AJAX request to toggle analytics mode in the database
             var xhr = new XMLHttpRequest();
+
             xhr.open('POST', '/goal-sales/analytic-mode', true);
+            xhr.setRequestHeader('Cache-Control', 'no-cache'); // Set the Cache-Control header to no-cache
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.onload = function() {
@@ -279,7 +281,9 @@ window.addEventListener('load', function() {
 
             // Send AJAX request to toggle analytics mode in the database
             var xhr = new XMLHttpRequest();
+
             xhr.open('POST', '/goal-sales/slide-mode', true);
+            xhr.setRequestHeader('Cache-Control', 'no-cache'); // Set the Cache-Control header to no-cache
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.onload = function() {
@@ -308,7 +312,10 @@ window.addEventListener('load', function() {
 
             // Send AJAX request to remove analytics and slide mode from database
             var xhr = new XMLHttpRequest();
+
+
             xhr.open('POST', '/goal-sales/default-mode', true);
+            xhr.setRequestHeader('Cache-Control', 'no-cache'); // Set the Cache-Control header to no-cache
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.onload = function() {

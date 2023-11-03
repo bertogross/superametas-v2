@@ -54,7 +54,7 @@
                                 @php
                                 $ndxChartId++;
 
-                                //APP_print_r($totalPercent);
+                                //appPrintR($totalPercent);
                                 $totalPercentValue = numberFormat($totalPercent[$companyId], 2);
                                 $totalPercentAccrued = ($totalPercentValue / $metric) * 100;
 

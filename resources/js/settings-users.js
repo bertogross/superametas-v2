@@ -5,11 +5,13 @@ window.addEventListener('load', function() {
     // Load the content for the user modal
     function loadUserSettingsModal(userId = null, userName = '') {
         var xhr = new XMLHttpRequest();
+
         var url = '/settings/users/modal-form';
         if (userId) {
             url += '/' + userId;
         }
         xhr.open('GET', url, true);
+        xhr.setRequestHeader('Cache-Control', 'no-cache'); // Set the Cache-Control header to no-cache
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 if(xhr.responseText){

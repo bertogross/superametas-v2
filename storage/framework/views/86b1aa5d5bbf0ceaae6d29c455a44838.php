@@ -1,9 +1,9 @@
 <?php
-    //APP_print_r($data);
-    //APP_print_r($departments);
-    //APP_print_r($resultsSales);
-    //APP_print_r($resultsGoals);
-    //APP_print_r($dateTickLabels);
+    //appPrintR($data);
+    //appPrintR($departments);
+    //appPrintR($resultsSales);
+    //appPrintR($resultsGoals);
+    //appPrintR($dateTickLabels);
     /**
      * Split Goals for daily view
      */
@@ -38,8 +38,8 @@
         $missingSales = array_fill_keys(array_keys($missingSalesKeys), 0);
         $totalSalesByMonth = array_merge($missingSales, $totalSalesByMonth);
     }
-    //APP_print_r($totalGoalsByMonth);
-    //APP_print_r($totalSalesByMonth);
+    //appPrintR($totalGoalsByMonth);
+    //appPrintR($totalSalesByMonth);
 ?>
 <div class="row" id="load-listing">
     <div class="col-xxl-3">

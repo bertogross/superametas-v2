@@ -179,9 +179,9 @@
                                         <td>{{ $formattedDate ?? '' }}</td>
                                         <td class="text-end">
                                             <div class="btn-group">
-                                                <a href="{{ $file['link'] ?? '#' }}" download class="btn btn-sm btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-original-title="Download"><i class="ri-download-2-line"></i></a>
+                                                <a href="{{ $file['link'] ?? '#' }}" download class="btn btn-sm btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Download"><i class="ri-download-2-line"></i></a>
 
-                                                <button class="btn btn-sm btn-outline-dark btn-delete-file" data-path="{{ $file['path_display'] }}" data-id="{{$file['id']}}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-original-title="Deletar">
+                                                <button class="btn btn-sm btn-outline-dark btn-delete-file" data-path="{{ $file['path_display'] }}" data-id="{{$file['id']}}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Deletar">
                                                     <i class="ri-delete-bin-5-line text-danger"></i>
                                                 </button>
                                             </div>

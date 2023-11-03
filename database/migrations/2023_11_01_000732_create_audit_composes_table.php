@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->string('title')->nullable();
             $table->text('jsondata')->nullable();
-            $table->enum('status', ['publish', 'trash', 'disable']);
+            $table->enum('status', ['active','trash','disabled']);
             $table->timestamps();
         });
     }

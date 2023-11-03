@@ -10,9 +10,9 @@
     $buttonIPCAtext .= !empty($getIPCA) && !empty($goals) ? "<div class='alert alert-warning alert-border-left alert-dismissible fade show p-1 mt-2 mb-1 small'>Campos outrora preenchidos terão seus valores substituídos</div>" : '';
 
 
-    //APP_print_r($goals);
-    //APP_print_r($salesYearBefore);
-    //APP_print_r($salesMonthBefore);
+    //appPrintR($goals);
+    //appPrintR($salesYearBefore);
+    //appPrintR($salesMonthBefore);
 @endphp
 <div class="modal flip" id="goalSalesEditModal" tabindex="-1" data-bs-backdrop="static" data-bs-focus="false">
     <div class="modal-dialog modal-xl">

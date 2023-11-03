@@ -18,7 +18,7 @@ class AuditCompose extends Model
         'user_id',
         'title',
         'jsondata',
-        'status',
+        //'status',
     ];
 
     protected $casts = [

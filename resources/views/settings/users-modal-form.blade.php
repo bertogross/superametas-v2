@@ -2,16 +2,16 @@
 use App\Models\User;
 
 $getActiveCompanies = getActiveCompanies();
-//APP_print_r($getActiveCompanies);
+//appPrintR($getActiveCompanies);
 
 $getCompaniesAuthorized = $user ? getCompaniesAuthorized($user->id) : $getActiveCompanies;
-//APP_print_r($getCompaniesAuthorized);
+//appPrintR($getCompaniesAuthorized);
 
 if (is_object($getActiveCompanies)) {
     $extractCompanyIds = $getActiveCompanies->pluck('company_id')->map(function ($value) {
         return (int) $value;
     })->all();
-    //APP_print_r($extractCompanyIds);
+    //appPrintR($extractCompanyIds);
 }
 @endphp
 <!-- Modal -->

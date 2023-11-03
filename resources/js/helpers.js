@@ -477,3 +477,25 @@ export function maxLengthTextarea() {
         textarea.dispatchEvent(new Event('input'));
     });
 }
+
+
+/**
+ * Removes the 'was-validated' class from a form when any input changes.
+ * @param {string} formSelector - The selector for the form.
+ */
+export function enableRevalidationOnInput(formSelector = '.needs-validation') {
+    const form = document.querySelector(formSelector);
+    if (!form) {
+      console.warn('Form not found:', formSelector);
+      return;
+    }
+
+    function removeValidationClass() {
+      form.classList.remove('was-validated');
+    }
+
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(function(input) {
+      input.addEventListener('input', removeValidationClass);
+    });
+  }
