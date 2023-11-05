@@ -1,7 +1,7 @@
 <?php
     $data = $data[0] ?? '';
-    //APP_print_r($data);
-    //APP_print_r($customFields);
+    //appPrintR($data);
+    //appPrintR($customFields);
 
     $auditId = $data->id ?? '';
     $created_by = $data->created_by ?? auth()->id();

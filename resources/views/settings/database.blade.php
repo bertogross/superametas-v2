@@ -22,9 +22,7 @@
         @endslot
     @endcomponent
 
-    @include('components.alert-errors')
-
-    @include('components.alert-success')
+    @include('components.alerts')
 
     <!-- resources/views/settings/database.blade.php -->
 
@@ -54,19 +52,22 @@
 
                                 <h2 class="text-body mb-2 h4">Departamentos</h2>
                                 <p>Renomeie cada dos departamentos caso entenda que será necessário para fins de exibição em relatórios </p>
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-hover table-bordered table-sm mb-0">
+                                <div class="table-responsive border border-1 border-dark rounded rounded-2">
+                                    <table class="table table-striped mb-0">
                                         <thead class="table-light text-uppercase">
                                             <tr>
                                                 <th width="65" class="text-center"></th>
                                                 <th width="130">ID</th>
                                                 <th>Departamento</th>
                                                 <th>Alias</th>
+                                                {{--
+                                                <th></th>
+                                                --}}
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach($departments as $department)
-                                                <tr>
+                                                <tr class="main-row" data-id="{{ $department->id }}">
                                                     <td class="align-middle">
                                                         <!-- Checkbox for Status Update -->
                                                         <div class="form-check form-switch form-switch-md form-switch-theme text-end">
@@ -89,7 +90,22 @@
                                                     <td class="align-middle">
                                                         <input type="text" name="aliases[{{ $department->id }}]" value="{{ empty($department->department_alias) ? e(strip_tags($department->department_description )) : e(strip_tags($department->department_alias)) }}" maxlength="100" class="form-control">
                                                     </td>
+                                                    {{--
+                                                    <td class="text-end" width="30">
+                                                        <button type="button" class="btn btn-outline-theme btn-toggle-row-detail" data-id="{{ $department->id }}" title="Expand/Collapse this row">
+                                                            <i class="ri-folder-line"></i>
+                                                            <i class="ri-folder-open-line d-none"></i>
+                                                        </button>
+                                                    </td>
+                                                    --}}
                                                 </tr>
+                                                {{--
+                                                <tr class="details-row d-none" data-details-for="{{ $department->id }}">
+                                                    <td colspan="5">
+                                                        content here
+                                                    </td>
+                                                </tr>
+                                                --}}
                                             @endforeach
                                         </tbody>
                                     </table>
@@ -104,8 +120,8 @@
 
                                 <h2 class="text-body mb-2 h4">Empresas</h2>
                                 <p>Renomeie cada das empresas caso entenda que será necessário para fins de exibição em relatórios </p>
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-hover table-bordered table-sm mb-0">
+                                <div class="table-responsive border border-1 border-dark rounded rounded-2">
+                                    <table class="table table-striped mb-0">
                                         <thead class="table-light text-uppercase">
                                             <tr>
                                                 <th width="65" class="text-center"></th>

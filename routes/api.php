@@ -32,4 +32,5 @@ Route::post('/dropbox/upload', [DropboxController::class, 'uploadFile'])->name('
 Route::post('/dropbox/delete', [DropboxController::class, 'deleteFile'])->name('DropboxDeleteURL');
 Route::get('/dropbox/delete-folder/{path?}', [DropboxController::class, 'deleteFolder'])->name('DropboxDeleteFolderURL');
 
-// Clarifai Edge AI API
+// Clarifai API
+// SceneX API

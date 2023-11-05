@@ -78,8 +78,6 @@ window.addEventListener('load', function() {
         document.body.appendChild(script);
     }
 
-
-
     // Search functionality for the user list
     var searchInput = document.getElementById('searchMemberList');
     searchInput.addEventListener('keyup', function() {
@@ -265,8 +263,6 @@ window.addEventListener('load', function() {
             });
         }
     }
-
-
 
     // Filter functionality for switching between list and grid views
     var list = document.querySelectorAll(".team-list");

@@ -2,9 +2,10 @@
     <link href="<?php echo e(URL::asset('build/libs/swiper/swiper-bundle.min.css')); ?>" rel="stylesheet">
     <link href="<?php echo e(URL::asset('build/libs/swiper/swiper.min.css')); ?>" rel="stylesheet" type="text/css" />
 <?php $__env->stopSection(); ?>
+
 <div id="load-listing" class="mb-4 rounded position-relative toogle_zoomInOut ribbon-box border ribbon-fill shadow-none <?php if(!$data): ?> d-none <?php endif; ?>">
     <div class="ribbon ribbon-info bg-theme text-black fs-12 <?php if(empty($data)): ?> d-none <?php endif; ?>" style="z-index: 2; scale: 1.5; top: -10px; left: -30px;">
-        <?php echo e($metric . '%'); ?>
+        <?php echo e(is_numeric($metric) ? $metric . '%' : '0%'); ?>
 
     </div>
 
@@ -19,39 +20,47 @@
                             <?php
                                 $ndxChartId++;
 
+                                // Ensure sales and goal are numbers
                                 $sales = floatval($values['sales'] ?? 0);
                                 $goal = floatval($values['goal'] ?? 0);
 
-                                $percent = $sales > 0 && $goal > 0 ? ($sales / $goal) * 100 : 0;
+                                // Calculate percentage, ensuring not to divide by zero
+                                $percent = $goal > 0 ? ($sales / $goal) * 100 : 0;
 
-                                $percentAccrued = $percent > 0 && $metric > 0 ? ($percent/$metric) * 100 : 0;
+                                // Calculate accrued percent, ensuring not to divide by zero and that $metric is numeric
+                                $percentAccrued = ($percent > 0 && is_numeric($metric) && $metric > 0) ? ($percent / $metric) * 100 : 0;
 
-                                // Calculate the sum of sales and goals for each company
-                                $totalSales[$companyId] = floatval($totalSales[$companyId] ?? 0) + $sales;
-                                $totalGoals[$companyId] = floatval($totalGoals[$companyId] ?? 0) + $goal;
+                                // Initialize total sales and goals for each company if not already set
+                                $totalSales[$companyId] = $totalSales[$companyId] ?? 0;
+                                $totalGoals[$companyId] = $totalGoals[$companyId] ?? 0;
 
-                                $totalPercent[$companyId] = $totalSales[$companyId] > 1 && $totalGoals[$companyId] > 1 ? ($totalSales[$companyId] / $totalGoals[$companyId]) * 100 : 0;
+                                // Add current sales and goals to the total
+                                $totalSales[$companyId] += $sales;
+                                $totalGoals[$companyId] += $goal;
+
+                                // Calculate total percent, ensuring not to divide by zero
+                                $totalPercent[$companyId] = $totalGoals[$companyId] > 0 ? ($totalSales[$companyId] / $totalGoals[$companyId]) * 100 : 0;
                             ?>
                             <div class="col m-4 text-center text-uppercase">
-
                                 <?php
-                                    echo goalsEmojiChart($ndxChartId, $goal, $sales, $departmentId, getDepartmentAlias($departmentId), getCompanyAlias($companyId), $percent, $percentAccrued);
+                                    // Use number_format for display, not for calculations
+                                    echo goalsEmojiChart($ndxChartId, $goal, $sales, $departmentId, getDepartmentAlias($departmentId), getCompanyAlias($companyId), number_format($percent, 2), number_format($percentAccrued, 2));
                                 ?>
                                 <div class="chart-label fw-bold"><?php echo e(getDepartmentAlias($departmentId)); ?></div>
                             </div>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                        <?php if(count($getActiveDepartments) > 1): ?>
-                            <div class="col-12 m-4 text-center text-uppercase <?php if(!empty($filterDepartments) && count($filterDepartments) == 1): ?>  d-none <?php endif; ?>">
-
+                        <?php if(count($getDepartmentsActive) > 1): ?>
+                            <div class="col-12 m-4 text-center text-uppercase <?php if(!empty($filterDepartments) && count($filterDepartments) == 1): ?> d-none <?php endif; ?>">
                                 <?php
                                 $ndxChartId++;
 
-                                //APP_print_r($totalPercent);
-                                $totalPercentValue = number_format($totalPercent[$companyId] ?? 0, 2, '.', '');
-                                $totalPercentAccrued = ($totalPercentValue / $metric) * 100;
+                                // Calculate total percent value and accrued percent, ensuring not to divide by zero and that $metric is numeric
+                                $totalPercentValue = $totalGoals[$companyId] > 0 ? ($totalSales[$companyId] / $totalGoals[$companyId]) * 100 : 0;
+                                $totalPercentAccrued = (is_numeric($metric) && $metric > 0) ? ($totalPercentValue / $metric) * 100 : 0;
 
-                                echo goalsEmojiChart($ndxChartId, number_format($totalGoals[$companyId] ?? 0, 2, '.', ''), number_format($totalSales[$companyId] ?? 0, 2, '.', ''), 'general', 'Geral', getCompanyAlias($companyId), $totalPercentValue, $totalPercentAccrued, 'general');
+                                // Use number_format for display, not for calculations
+                                echo goalsEmojiChart($ndxChartId, number_format($totalGoals[$companyId], 2), number_format($totalSales[$companyId], 2), 'general', 'Geral', getCompanyAlias($companyId), number_format($totalPercentValue, 2), number_format($totalPercentAccrued, 2), 'general');
                                 ?>
                                 <div class="chart-label fw-bold fs-4">Geral</div>
                             </div>
@@ -69,7 +78,7 @@
 <?php $__env->startSection('script-bottom'); ?>
     <script src="<?php echo e(URL::asset('build/libs/swiper/swiper-bundle.min.js')); ?>"></script>
     <script>
-    // Scrollbar Swiper
+    // Initialize Swiper
     var swiper = new Swiper(".pagination-scrollbar-swiper", {
         loop: true,
         autoplay: {

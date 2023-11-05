@@ -415,8 +415,8 @@ pre:empty{
   background: linear-gradient(to top, #171e32, #87df0138);
 }
 
-.nav-success.nav-custom-outline .nav-link.active,
-.nav-success.nav-tabs-custom .nav-link.active,
+.nav-theme.nav-custom-outline .nav-link.active,
+.nav-theme.nav-tabs-custom .nav-link.active,
 .nav-border-top-success .nav-link.active{
   color: var(--vz-theme) !important;
 
@@ -433,7 +433,8 @@ pre:empty{
   border-top-color: var(--vz-theme);
 }
 
-.nav-success.nav-tabs-custom .nav-link.active::after {
+
+.nav-theme.nav-tabs-custom .nav-link.active::after {
   background-color: var(--vz-theme);
 }
 
@@ -867,3 +868,4 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
         visibility: hidden;
     }
 }
+

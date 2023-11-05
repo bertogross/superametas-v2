@@ -15,7 +15,7 @@
                             <a href="<?php echo e(route('goalSalesIndexURL')); ?>" class="nav-link"><?php echo app('translator')->get('translation.goal-sales'); ?></a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?php echo e(route('auditsIndexURL')); ?>" class="nav-link"><?php echo app('translator')->get('translation.audits'); ?></a>
+                            <a href="<?php echo e(route('surveysIndexURL')); ?>" class="nav-link"><?php echo app('translator')->get('translation.surveys'); ?></a>
                         </li>
                     </ul>
                 </div>
@@ -47,7 +47,7 @@
 
             <?php if( getDropboxToken() ): ?>
                 <li class="nav-item">
-                    <a class="nav-link menu-link <?php echo e(request()->is('settings/dropbox') ? 'active' : ''); ?>" href="<?php echo e(route('DropboxFilesURL')); ?>">
+                    <a class="nav-link menu-link <?php echo e(request()->is('settings/dropbox') ? 'active' : ''); ?>" href="<?php echo e(route('DropboxIndexURL')); ?>">
                         <i class="ri-dropbox-fill <?php echo e(request()->is('settings/dropbox') ? 'text-primary' : ''); ?>"></i> <span class="<?php echo e(request()->is('settings/dropbox') ? 'text-white' : ''); ?>">Dropbox</span>
                     </a>
                 </li>

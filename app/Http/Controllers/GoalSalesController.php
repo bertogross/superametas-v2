@@ -72,6 +72,152 @@ class GoalSalesController extends Controller
         }
     }
 
+    /**
+     * Get the content for the modal settings.
+     *
+     * @param int|null
+     * @return \Illuminate\View\View
+     */
+    public function settings() {
+
+        return view('goal-sales.settings-edit');
+
+    }
+
+    /**
+     * Get the content for the modal edit.
+     *
+     * @param int|null
+     * @return \Illuminate\View\View
+     */
+    public function edit(Request $request) {
+
+        $getActiveDepartments = getActiveDepartments();
+
+        //$meantime = $request->input('meantime');
+        $meantime = request('meantime', date('Y-m'));
+        //$companyId = $request->input('companyId');
+        $companyId = request('companyId');
+
+        $previousMeantimeMonthBefore = date('Y-m', strtotime($meantime." -1 months"));
+
+        $previousMeantimeYearBefore = date('Y-m', strtotime($meantime." -12 months"));
+
+        $getIPCA = getIPCAdata($meantime);
+
+        // Query the wlsm_goals table to get the goals for the given companyId and meantime
+        $goals = DB::connection($this->connection)
+            ->table('wlsm_goals')
+            ->where('company_id', $companyId)
+            ->where('meantime', $meantime)
+            ->where('type', 'sales')
+            ->get()
+            ->pluck('goal_value', 'department_id')
+            ->toArray();
+
+        // Query the wlsm_sales table to get the sales for the given companyId and meantime
+        $salesYearBefore = DB::connection($this->connection)
+            ->table('wlsm_sales')
+            ->where('company_id', $companyId)
+            ->where('date_sale', 'LIKE', $previousMeantimeYearBefore . '%')
+            ->selectRaw('department_id, SUM(net_value) as total_net_value')
+            ->groupBy('department_id')
+            ->get()
+            ->pluck('total_net_value', 'department_id')
+            ->toArray();
+
+
+        // Query the wlsm_sales table to get the sales for the given companyId and meantime
+        $salesMonthBefore = DB::connection($this->connection)
+            ->table('wlsm_sales')
+            ->where('company_id', $companyId)
+            ->where('date_sale', 'LIKE', $previousMeantimeMonthBefore . '%')
+            ->selectRaw('department_id, SUM(net_value) as total_net_value')
+            ->groupBy('department_id')
+            ->get()
+            ->pluck('total_net_value', 'department_id')
+            ->toArray();
+
+        return view('goal-sales.edit', compact(
+                'goals',
+                'salesYearBefore',
+                'salesMonthBefore',
+                'meantime',
+                'previousMeantimeYearBefore',
+                'previousMeantimeMonthBefore',
+                'getActiveDepartments',
+                'getIPCA',
+                'companyId'
+            )
+        );
+
+    }
+
+    /**
+     * GStore or Update Goals
+     */
+    public function createOrUpdate(Request $request)
+    {
+        $data = $request->all();
+
+        $companyId = $data['company'];
+        $meantime = $data['meantime'];
+        $type = $data['type'];
+        $goals = $data['goals'];
+        $userId = auth()->id();
+
+        $now = now();
+
+        foreach ($goals as $departmentId => $goalData) {
+            $goalValue = onlyNumber($goalData);
+
+            $exists = DB::connection($this->connection)->table('wlsm_goals')
+                ->where('company_id', $companyId)
+                ->where('department_id', $departmentId)
+                ->where('meantime', $meantime)
+                ->where('type', $type)
+                ->exists();
+
+            if ($goalValue <= 0) {
+                if ($exists) {
+                    // Delete existing record
+                    DB::connection($this->connection)->table('wlsm_goals')
+                        ->where('company_id', $companyId)
+                        ->where('department_id', $departmentId)
+                        ->where('meantime', $meantime)
+                        ->where('type', $type)
+                        ->delete();
+                }
+            } else {
+                if ($exists) {
+                    // Update existing record
+                    DB::connection($this->connection)->table('wlsm_goals')
+                        ->where('company_id', $companyId)
+                        ->where('department_id', $departmentId)
+                        ->where('meantime', $meantime)
+                        ->where('type', $type)
+                        ->update([
+                            'user_id' => $userId,
+                            'goal_value' => $goalValue,
+                        ]);
+                } else {
+                    // Insert new record
+                    DB::connection($this->connection)->table('wlsm_goals')->insert([
+                        'user_id' => $userId,
+                        'company_id' => $companyId,
+                        'department_id' => $departmentId,
+                        'meantime' => $meantime,
+                        'type' => $type,
+                        'goal_value' => $goalValue,
+                        'created_at' => $now,
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Goals updated successfully!']);
+    }
+
     private function calculateStartAndEndDate($meantime)
     {
         if ($meantime == 'today') {
@@ -375,7 +521,7 @@ class GoalSalesController extends Controller
                     // If the department is already in the array, update the values.
                     $departments[$departmentId]->sales += $sales;
                     $departments[$departmentId]->goal += $goal;
-                    $departments[$departmentId]->progress = ($departments[$departmentId]->sales / $departments[$departmentId]->goal) * 100;
+                    $departments[$departmentId]->progress = intval($departments[$departmentId]->sales) > 0 && intval($departments[$departmentId]->goal) > 0 ? ($departments[$departmentId]->sales / $departments[$departmentId]->goal) * 100 : 0;
                     $departments[$departmentId]->tooltip = "Meta: " . formatBrazilianReal($departments[$departmentId]->goal, 0) . "<br>Vendas: " . formatBrazilianReal($departments[$departmentId]->sales, 0) . "<br>Progresso: " . numberFormat($departments[$departmentId]->progress, 2) . '%';
                 }
             }// foreach
@@ -383,153 +529,6 @@ class GoalSalesController extends Controller
 
         // Return the processed department data.
         return $departments;
-    }
-
-
-    /**
-     * GStore or Update Goals
-     */
-    public function storeOrUpdateGoals(Request $request)
-    {
-        $data = $request->all();
-
-        $companyId = $data['company'];
-        $meantime = $data['meantime'];
-        $type = $data['type'];
-        $goals = $data['goals'];
-        $userId = auth()->id();
-
-        $now = now();
-
-        foreach ($goals as $departmentId => $goalData) {
-            $goalValue = onlyNumber($goalData);
-
-            $exists = DB::connection($this->connection)->table('wlsm_goals')
-                ->where('company_id', $companyId)
-                ->where('department_id', $departmentId)
-                ->where('meantime', $meantime)
-                ->where('type', $type)
-                ->exists();
-
-            if ($goalValue <= 0) {
-                if ($exists) {
-                    // Delete existing record
-                    DB::connection($this->connection)->table('wlsm_goals')
-                        ->where('company_id', $companyId)
-                        ->where('department_id', $departmentId)
-                        ->where('meantime', $meantime)
-                        ->where('type', $type)
-                        ->delete();
-                }
-            } else {
-                if ($exists) {
-                    // Update existing record
-                    DB::connection($this->connection)->table('wlsm_goals')
-                        ->where('company_id', $companyId)
-                        ->where('department_id', $departmentId)
-                        ->where('meantime', $meantime)
-                        ->where('type', $type)
-                        ->update([
-                            'user_id' => $userId,
-                            'goal_value' => $goalValue,
-                        ]);
-                } else {
-                    // Insert new record
-                    DB::connection($this->connection)->table('wlsm_goals')->insert([
-                        'user_id' => $userId,
-                        'company_id' => $companyId,
-                        'department_id' => $departmentId,
-                        'meantime' => $meantime,
-                        'type' => $type,
-                        'goal_value' => $goalValue,
-                        'created_at' => $now,
-                    ]);
-                }
-            }
-        }
-
-        return response()->json(['success' => true, 'message' => 'Goals updated successfully!']);
-    }
-
-    /**
-     * Get the content for the modal settings.
-     *
-     * @param int|null
-     * @return \Illuminate\View\View
-     */
-    public function getGoalSalesSettingsModalContent() {
-
-        return view('goal-sales.settings-modal');
-
-    }
-
-    /**
-     * Get the content for the modal edit.
-     *
-     * @param int|null
-     * @return \Illuminate\View\View
-     */
-    public function getGoalSalesEditModalContent(Request $request) {
-
-        $getDepartmentsActive = getDepartmentsActive();
-
-        //$meantime = $request->input('meantime');
-        $meantime = request('meantime', date('Y-m'));
-        //$companyId = $request->input('companyId');
-        $companyId = request('companyId');
-
-        $previousMeantimeMonthBefore = date('Y-m', strtotime($meantime." -1 months"));
-
-        $previousMeantimeYearBefore = date('Y-m', strtotime($meantime." -12 months"));
-
-        $getIPCA = getIPCAdata($meantime);
-
-        // Query the wlsm_goals table to get the goals for the given companyId and meantime
-        $goals = DB::connection($this->connection)
-            ->table('wlsm_goals')
-            ->where('company_id', $companyId)
-            ->where('meantime', $meantime)
-            ->where('type', 'sales')
-            ->get()
-            ->pluck('goal_value', 'department_id')
-            ->toArray();
-
-        // Query the wlsm_sales table to get the sales for the given companyId and meantime
-        $salesYearBefore = DB::connection($this->connection)
-            ->table('wlsm_sales')
-            ->where('company_id', $companyId)
-            ->where('date_sale', 'LIKE', $previousMeantimeYearBefore . '%')
-            ->selectRaw('department_id, SUM(net_value) as total_net_value')
-            ->groupBy('department_id')
-            ->get()
-            ->pluck('total_net_value', 'department_id')
-            ->toArray();
-
-
-        // Query the wlsm_sales table to get the sales for the given companyId and meantime
-        $salesMonthBefore = DB::connection($this->connection)
-            ->table('wlsm_sales')
-            ->where('company_id', $companyId)
-            ->where('date_sale', 'LIKE', $previousMeantimeMonthBefore . '%')
-            ->selectRaw('department_id, SUM(net_value) as total_net_value')
-            ->groupBy('department_id')
-            ->get()
-            ->pluck('total_net_value', 'department_id')
-            ->toArray();
-
-        return view('goal-sales.edit-modal', compact(
-                'goals',
-                'salesYearBefore',
-                'salesMonthBefore',
-                'meantime',
-                'previousMeantimeYearBefore',
-                'previousMeantimeMonthBefore',
-                'getDepartmentsActive',
-                'getIPCA',
-                'companyId'
-            )
-        );
-
     }
 
     /**

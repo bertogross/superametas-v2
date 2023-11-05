@@ -46,8 +46,6 @@ window.addEventListener('load', function() {
             toastAlert('Input element not found!', 'error');
         }
     }
-    // Start the FilePond instance
-    attachFilePondToLogo();
 
 
     // Mask for input phone
@@ -78,7 +76,9 @@ window.addEventListener('load', function() {
         });
     }
 
-    // Start the formatPhoneNumber instance
+    // Call the functions when the DOM is fully loaded
     formatPhoneNumber();
-
+    attachFilePondToLogo();
 });
+
+

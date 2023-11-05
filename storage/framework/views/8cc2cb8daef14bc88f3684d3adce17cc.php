@@ -23,9 +23,7 @@
         <?php $__env->endSlot(); ?>
     <?php echo $__env->renderComponent(); ?>
 
-    <?php echo $__env->make('error.alert-errors', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-
-    <?php echo $__env->make('error.alert-success', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php echo $__env->make('components.alerts', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
     <!-- resources/views/settings/database.blade.php -->
 
@@ -55,19 +53,20 @@
 
                                 <h2 class="text-body mb-2 h4">Departamentos</h2>
                                 <p>Renomeie cada dos departamentos caso entenda que será necessário para fins de exibição em relatórios </p>
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-hover table-bordered table-sm mb-0">
+                                <div class="table-responsive border border-1 border-dark rounded rounded-2">
+                                    <table class="table table-striped mb-0">
                                         <thead class="table-light text-uppercase">
                                             <tr>
                                                 <th width="65" class="text-center"></th>
                                                 <th width="130">ID</th>
                                                 <th>Departamento</th>
                                                 <th>Alias</th>
+                                                
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php $__currentLoopData = $departments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $department): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <tr>
+                                                <tr class="main-row" data-id="<?php echo e($department->id); ?>">
                                                     <td class="align-middle">
                                                         <!-- Checkbox for Status Update -->
                                                         <div class="form-check form-switch form-switch-md form-switch-theme text-end">
@@ -92,7 +91,9 @@
                                                     <td class="align-middle">
                                                         <input type="text" name="aliases[<?php echo e($department->id); ?>]" value="<?php echo e(empty($department->department_alias) ? e(strip_tags($department->department_description )) : e(strip_tags($department->department_alias))); ?>" maxlength="100" class="form-control">
                                                     </td>
+                                                    
                                                 </tr>
+                                                
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </tbody>
                                     </table>
@@ -107,8 +108,8 @@
 
                                 <h2 class="text-body mb-2 h4">Empresas</h2>
                                 <p>Renomeie cada das empresas caso entenda que será necessário para fins de exibição em relatórios </p>
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-hover table-bordered table-sm mb-0">
+                                <div class="table-responsive border border-1 border-dark rounded rounded-2">
+                                    <table class="table table-striped mb-0">
                                         <thead class="table-light text-uppercase">
                                             <tr>
                                                 <th width="65" class="text-center"></th>

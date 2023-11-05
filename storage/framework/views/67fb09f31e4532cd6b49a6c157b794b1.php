@@ -20,7 +20,7 @@
             <span class="align-middle">Auditorias</span>
         </a>
 
-        <a class="dropdown-item btn-audit-edit <?php echo e(request()->is('audits/compose') ? 'd-none' : ''); ?>" href="javascript:void(0);" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Tarefa de Vistoria">
+        <a class="dropdown-item <?php echo e(request()->is('audits/compose') ? 'd-none' : ''); ?>" href="<?php echo e(route('auditsAddURL')); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Tarefa de Vistoria">
             <i class="ri-add-line text-muted fs-16 align-middle me-1"></i>
             <span class="align-middle">Auditoria</span>
         </a>

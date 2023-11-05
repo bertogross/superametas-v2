@@ -1,15 +1,13 @@
-import { toastAlert } from './helpers.js';
+import {
+    toastAlert,
+    toggleTableRows,
+    monthsInPortuguese
+} from './helpers.js';
 
 // Event listeners setup
 window.addEventListener('load', function() {
     // A flag to track whether the execution is currently in progress or not.
     let isExecutionInProgress = false;
-
-    const monthsInPortuguese = [
-        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-    ];
-
 
     // Prevent right-click context menu.
     function preventRightClick(e) {
@@ -156,7 +154,6 @@ window.addEventListener('load', function() {
         return `${monthsInPortuguese[month - 1]} de ${year}`;
     }
 
-
     // Warn the user if they try to leave the page during execution
     window.addEventListener('beforeunload', function(e) {
         if (isExecutionInProgress) {
@@ -220,4 +217,9 @@ window.addEventListener('load', function() {
             }
         });
     });
+
+    // Call the function when the DOM is fully loaded
+    toggleTableRows();
+
 });
+

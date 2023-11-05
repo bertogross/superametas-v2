@@ -5,7 +5,7 @@
 @section('content')
     @component('components.breadcrumb')
         @slot('url')
-        {{ url('settings') }}
+            {{ url('settings') }}
         @endslot
         @slot('li_1')
             @lang('translation.settings')
@@ -15,9 +15,7 @@
         @endslot
     @endcomponent
 
-    @include('components.alert-errors')
-
-    @include('components.alert-success')
+    @include('components.alerts')
 
     <div class="card">
         <div class="card-body">
@@ -201,15 +199,15 @@
                             <div class="col-sm-auto">
                                 <ul class="pagination pagination-separated pagination-sm justify-content-center justify-content-sm-start mb-0">
                                     <li class="page-item {{ $page == 1 ? 'disabled' : '' }}">
-                                        <a href="{{ route('DropboxFilesURL', ['page' => $page - 1]) }}" class="page-link">←</a>
+                                        <a href="{{ route('DropboxIndexURL', ['page' => $page - 1]) }}" class="page-link">←</a>
                                     </li>
                                     @for ($i = 1; $i <= ceil($totalFiles / $perPage); $i++)
                                         <li class="page-item {{ $page == $i ? 'active' : '' }}">
-                                            <a href="{{ route('DropboxFilesURL', ['page' => $i]) }}" class="page-link">{{ $i }}</a>
+                                            <a href="{{ route('DropboxIndexURL', ['page' => $i]) }}" class="page-link">{{ $i }}</a>
                                         </li>
                                     @endfor
                                     <li class="page-item {{ $page == ceil($totalFiles / $perPage) ? 'disabled' : '' }}">
-                                        <a href="{{ route('DropboxFilesURL', ['page' => $page + 1]) }}" class="page-link">→</a>
+                                        <a href="{{ route('DropboxIndexURL', ['page' => $page + 1]) }}" class="page-link">→</a>
                                     </li>
                                 </ul>
                             </div>

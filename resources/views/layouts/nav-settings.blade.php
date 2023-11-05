@@ -15,7 +15,7 @@
                             <a href="{{ route('goalSalesIndexURL') }}" class="nav-link">@lang('translation.goal-sales')</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('auditsIndexURL') }}" class="nav-link">@lang('translation.audits')</a>
+                            <a href="{{ route('surveysIndexURL') }}" class="nav-link">@lang('translation.surveys')</a>
                         </li>
                     </ul>
                 </div>
@@ -47,7 +47,7 @@
 
             @if ( getDropboxToken() )
                 <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->is('settings/dropbox') ? 'active' : '' }}" href="{{ route('DropboxFilesURL') }}">
+                    <a class="nav-link menu-link {{ request()->is('settings/dropbox') ? 'active' : '' }}" href="{{ route('DropboxIndexURL') }}">
                         <i class="ri-dropbox-fill {{ request()->is('settings/dropbox') ? 'text-primary' : '' }}"></i> <span class="{{ request()->is('settings/dropbox') ? 'text-white' : '' }}">Dropbox</span>
                     </a>
                 </li>

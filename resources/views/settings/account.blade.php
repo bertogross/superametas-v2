@@ -20,9 +20,7 @@
         @endslot
     @endcomponent
 
-    @include('components.alert-errors')
-
-    @include('components.alert-success')
+    @include('components.alerts')
 
     <!-- resources/views/settings/database.blade.php -->
 

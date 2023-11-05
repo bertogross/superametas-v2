@@ -349,7 +349,6 @@ export function showButtonWhenInputChange() {
         }
     });
 }
-showButtonWhenInputChange();
 
 // Anchor
 // https://developer.mozilla.org/pt-BR/docs/Web/API/Element/scrollIntoView
@@ -457,8 +456,6 @@ function checkInternetConnection() {
     // Set up an interval to check the connection status periodically
     setInterval(updateConnectionStatus, 10000); // Check every 10 seconds
 }
-checkInternetConnection();
-
 
 export function maxLengthTextarea() {
     const textareas = document.querySelectorAll('textarea[maxlength]'); // Select all textareas with a maxlength attribute
@@ -477,7 +474,6 @@ export function maxLengthTextarea() {
         textarea.dispatchEvent(new Event('input'));
     });
 }
-
 
 /**
  * Removes the 'was-validated' class from a form when any input changes.
@@ -498,4 +494,95 @@ export function enableRevalidationOnInput(formSelector = '.needs-validation') {
     inputs.forEach(function(input) {
       input.addEventListener('input', removeValidationClass);
     });
-  }
+}
+
+export function toggleTableRows() {
+    // Get all the expand/collapse buttons
+    var expandCollapseButtons = document.querySelectorAll('.btn-toggle-row-detail');
+
+    if(expandCollapseButtons){
+        // Function to close all detail rows
+        function closeAllDetailRows() {
+            document.querySelectorAll('.details-row').forEach(function(detailRow) {
+                detailRow.classList.add('d-none'); // Hide all detail rows
+            });
+            document.querySelectorAll('.ri-folder-open-line').forEach(function(icon) {
+                icon.classList.add('d-none'); // Hide all collapse icons
+            });
+            document.querySelectorAll('.ri-folder-line').forEach(function(icon) {
+                icon.classList.remove('d-none'); // Show all expand icons
+            });
+        }
+
+        // Add click event listener to each button
+        expandCollapseButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                var rowId = this.dataset.id;
+                var detailsRow = document.querySelector('tr.details-row[data-details-for="' + rowId + '"]');
+                var isCurrentlyOpen = !detailsRow.classList.contains('d-none');
+
+                // Close all detail rows first
+                closeAllDetailRows();
+
+                // If the clicked row was not already open, toggle it
+                if (!isCurrentlyOpen) {
+                    detailsRow.classList.remove('d-none'); // Show the clicked detail row
+
+                    // Toggle the icons for the clicked row
+                    var iconExpand = this.querySelector('.ri-folder-line');
+                    var iconCollapse = this.querySelector('.ri-folder-open-line');
+                    iconExpand.classList.add('d-none');
+                    iconCollapse.classList.remove('d-none');
+                }
+            });
+        });
+    }
+}
+
+
+// Make the preview URL request
+export function makeFormPreviewRequest(idValue, url) {
+    if (idValue) {
+        var xhrPreview = new XMLHttpRequest();
+
+        //xhrPreview.open('GET', url + '/' + idValue + '&preview=ture', true);
+        xhrPreview.open('GET', url + '/' + encodeURIComponent(idValue) + '?preview=true', true);
+        xhrPreview.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); // Prevents caching
+        xhrPreview.setRequestHeader('Pragma', 'no-cache'); // For legacy HTTP 1.0 servers
+        xhrPreview.setRequestHeader('Expires', '0'); // Proxies
+        xhrPreview.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhrPreview.onreadystatechange = function () {
+            if (xhrPreview.readyState === 4) {
+                if (xhrPreview.status === 200) {
+                    // Parse the response HTML
+                    var parser = new DOMParser();
+                    var doc = parser.parseFromString(xhrPreview.responseText, 'text/html');
+
+                    // Extract the content of the div with the ID 'content'
+                    var contentDiv = doc.getElementById('content');
+                    var contentHtml = contentDiv ? contentDiv.innerHTML : '';
+
+                    // Update the preview div with the extracted content
+                    if(contentHtml){
+                        document.getElementById('load-preview').innerHTML = contentHtml;
+
+                        bsPopoverTooltip();
+                    }
+                } else {
+                    // Handle error
+                    toastAlert('Error loading preview', 'danger', 10000);
+                }
+            }
+        };
+        xhrPreview.send();
+    }
+}
+
+export const monthsInPortuguese = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+];
+
+// Call the functions when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', checkInternetConnection);
+document.addEventListener('DOMContentLoaded', showButtonWhenInputChange);

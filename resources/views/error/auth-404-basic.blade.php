@@ -1,7 +1,7 @@
 @extends('layouts.master-without-nav')
 
 @section('title')
-@lang('translation.Error_404')
+    @lang('translation.error')
 @endsection
 
 @section('body')
@@ -31,9 +31,9 @@
                                 </div>
                                 <div class="mt-n4">
                                     <h1 class="display-1 fw-medium">404</h1>
-                                    <h3 class="text-uppercase">Sorry, Page not Found 😭</h3>
-                                    <p class="text-muted mb-4">The page you are looking for not available!</p>
-                                    <a href="{{ url('/') }}" class="btn btn-success"><i class="mdi mdi-home me-1"></i>Back to start</a>
+                                    <h3 class="text-uppercase">Desculpe, 😭</h3>
+                                    <p class="text-muted mb-4">A sessão que você está procurando não está disponível!</p>
+                                    <a href="{{ url('/') }}" class="btn btn-success"><i class="mdi mdi-home me-1"></i>Voltar ao início</a>
                                 </div>
                             </div>
                         </div>

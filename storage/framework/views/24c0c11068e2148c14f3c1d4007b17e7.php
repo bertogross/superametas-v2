@@ -768,6 +768,10 @@
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
+    <script>
+        var auditsEditFormURL = "<?php echo e(route('auditsEditFormURL')); ?>";
+        var auditsStoreOrUpdateURL = "<?php echo e(route('auditsStoreOrUpdateURL')); ?>";
+    </script>
     <script src="<?php echo e(URL::asset('build/js/audits.js')); ?>" type="module"></script>
 <?php $__env->stopSection(); ?>
 

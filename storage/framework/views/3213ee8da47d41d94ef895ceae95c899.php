@@ -2,16 +2,16 @@
 use App\Models\User;
 
 $getActiveCompanies = getActiveCompanies();
-//APP_print_r($getActiveCompanies);
+//appPrintR($getActiveCompanies);
 
-$getAuthorizedCompanies = $user ? getAuthorizedCompanies($user->id) : $getActiveCompanies;
-//APP_print_r($getAuthorizedCompanies);
+$getCompaniesAuthorized = $user ? getCompaniesAuthorized($user->id) : $getActiveCompanies;
+//appPrintR($getCompaniesAuthorized);
 
 if (is_object($getActiveCompanies)) {
     $extractCompanyIds = $getActiveCompanies->pluck('company_id')->map(function ($value) {
         return (int) $value;
     })->all();
-    //APP_print_r($extractCompanyIds);
+    //appPrintR($extractCompanyIds);
 }
 ?>
 <!-- Modal -->
@@ -175,7 +175,7 @@ if (is_object($getActiveCompanies)) {
                                                         class="form-check-input"
                                                         type="checkbox"
                                                         role="switch"
-                                                        <?php echo e(!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && in_array(intval($company->company_id), $getAuthorizedCompanies) ? 'checked' : ''); ?>
+                                                        <?php echo e(!empty($getCompaniesAuthorized) && is_array($getCompaniesAuthorized) && in_array(intval($company->company_id), $getCompaniesAuthorized) ? 'checked' : ''); ?>
 
                                                         id="company-<?php echo e($company->company_id); ?>"
                                                         name="companies[]"

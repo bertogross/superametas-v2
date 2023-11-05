@@ -3,27 +3,26 @@
 
     $totalPercentAccrued = $ndxChartId = 0;
 
-    $getCompaniesAuthorized = getCompaniesAuthorized();
-    //appPrintR($getCompaniesAuthorized);
+    $getAuthorizedCompanies = getAuthorizedCompanies();
     $getActiveCompanies = getActiveCompanies();
-    //appPrintR($getActiveCompanies);
-    $getDepartmentsActive = getDepartmentsActive();
-    //appPrintR($getDepartmentsActive);
+    $getActiveDepartments = getActiveDepartments();
 
-    //$getMeantime = request('meantime', date('Y-m'));
-    //$getCustomMeantime = request('getCustomMeantime');
+    $getMeantime = request('meantime', date('Y-m'));
+    $getCustomMeantime = request('custom_meantime', '');
 
-    $getMeantime = !empty($_REQUEST['meantime']) ? $_REQUEST['meantime'] : date('Y-m');
-    $getCustomMeantime = !empty($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : '';
-    $getMeantime = $getMeantime == 'custom' && empty($getCustomMeantime) ? date('Y-m') : $getMeantime;
+    // Ensure 'meantime' is a valid value
+    $validMeantimes = ['today', 'custom', date('Y-m'), now()->subMonth()->format('Y-m')];
+    if (!in_array($getMeantime, $validMeantimes)) {
+        $getMeantime = date('Y-m');
+    }
 
-    $explode = !empty($getCustomMeantime) ? explode(' até ', $getCustomMeantime) : '';
-    $explodeMeantime = !empty($explode) && is_array($explode) && count($explode) > 1 ? $explode : $getCustomMeantime;
+    $getMeantime = $getMeantime === 'custom' && empty($getCustomMeantime) ? date('Y-m') : $getMeantime;
 
-    //$filterCompanies = request('companies', array());
-    $filterCompanies = isset($_REQUEST['companies']) ? $_REQUEST['companies'] : array();
-    //$filterDepartments = request('departments', array());
-    $filterDepartments = isset($_REQUEST['departments']) ? $_REQUEST['departments'] : array();
+    $explode = !empty($getCustomMeantime) ? explode(' até ', $getCustomMeantime) : [];
+    $explodeMeantime = count($explode) === 2 ? $explode : $getCustomMeantime;
+
+    $filterCompanies = request('companies', []);
+    $filterDepartments = request('departments', []);
 
     $metric = metricGoalSales($getMeantime);
     $metricNumber = convertToNumeric($metric);
@@ -47,7 +46,7 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
-    <?php $__env->startComponent('components.goal-sales-nav'); ?>
+    <?php $__env->startComponent('goal-sales.components.nav'); ?>
         <?php $__env->slot('url'); ?>
             <?php echo e(route('goalSalesIndexURL')); ?>
 
@@ -87,20 +86,20 @@
                 data-max-date="<?php echo e($lastDate); ?>" value="<?php if($getMeantime == 'custom'): ?><?php echo e($getCustomMeantime); ?><?php endif; ?>" placeholder="Selecione o Período">
             </div>
 
-            <?php if(!empty($getCompaniesAuthorized) && is_array($getCompaniesAuthorized) && count($getCompaniesAuthorized) > 1): ?>
+            <?php if(!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && count($getAuthorizedCompanies) > 1): ?>
                 <div class="col-sm-12 col-md col-lg" title="Exibir somente Lojas selecionadas">
                     <select class="form-control" data-choices data-choices-removeItem name="companies[]" id="filter-companies" multiple data-placeholder="Loja">
-                        <?php $__currentLoopData = $getCompaniesAuthorized; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $company): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php $__currentLoopData = $getAuthorizedCompanies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $company): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option <?php echo e(in_array($company, $filterCompanies) ? 'selected' : ''); ?> value="<?php echo e($company); ?>"><?php echo e(getCompanyAlias(intval($company))); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
             <?php endif; ?>
 
-            <?php if(!empty($getDepartmentsActive) && is_object($getDepartmentsActive) && count($getDepartmentsActive) > 1): ?>
+            <?php if(!empty($getActiveDepartments) && is_object($getActiveDepartments) && count($getActiveDepartments) > 1): ?>
                 <div class="col-sm-12 col-md col-lg" title="Exibir somente Departamentos selecionados">
                     <select class="form-control" data-choices data-choices-removeItem name="departments[]" multiple data-placeholder="Departamento">
-                        <?php $__currentLoopData = $getDepartmentsActive; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $department): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php $__currentLoopData = $getActiveDepartments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $department): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option <?php echo e(in_array($department->department_id, $filterDepartments) ? 'selected' : ''); ?> value="<?php echo e($department->department_id); ?>"><?php echo e($department->department_alias); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
@@ -122,13 +121,13 @@
     <?php if(getUserMeta($userId, 'analytic-mode') == 'on'): ?>
         <?php echo $__env->make('goal-sales/analytic', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
     <?php elseif(getUserMeta($userId, 'slide-mode') == 'on'): ?>
-        <?php if(count($filterCompanies) == 1 || count($getCompaniesAuthorized) == 1): ?>
+        <?php if(count($filterCompanies) == 1 || count($getAuthorizedCompanies) == 1): ?>
             <?php echo $__env->make('goal-sales/single', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
         <?php else: ?>
             <?php echo $__env->make('goal-sales/slide', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
         <?php endif; ?>
     <?php else: ?>
-        <?php if(count($filterCompanies) == 1 || count($getCompaniesAuthorized) == 1): ?>
+        <?php if(count($filterCompanies) == 1 || count($getAuthorizedCompanies) == 1): ?>
             <?php echo $__env->make('goal-sales/single', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
         <?php else: ?>
             <?php echo $__env->make('goal-sales/table', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
@@ -149,6 +148,14 @@
 
     <script src="<?php echo e(URL::asset('build/libs/apexcharts/apexcharts.min.js')); ?>"></script>
 
+    <script>
+        var goalSalesCreateOrUpdateURL = "<?php echo e(route('goalSalesCreateOrUpdateURL')); ?>";
+        var goalSalesEditURL = "<?php echo e(route('goalSalesEditURL')); ?>";
+        var goalSalesSettingsEditURL = "<?php echo e(route('goalSalesSettingsEditURL')); ?>";
+        var goalSalesAnalyticModeURL = "<?php echo e(route('goalSalesAnalyticModeURL')); ?>";
+        var goalSalesslideModeURL = "<?php echo e(route('goalSalesslideModeURL')); ?>";
+        var goalSalesDefaultModeURL = "<?php echo e(route('goalSalesDefaultModeURL')); ?>";
+    </script>
     <script src="<?php echo e(URL::asset('build/js/goal-sales.js')); ?>" type="module"></script>
 <?php $__env->stopSection(); ?>
 

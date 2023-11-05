@@ -1,0 +1,44 @@
+{
+    "topics": [
+        {
+            "topic_name": "Limpeza do Departamento",
+            "original_position": 0,
+            "new_position": 0
+        },
+        {
+            "topic_name": "Organização do Departamento",
+            "original_position": 1,
+            "new_position": 1
+        },
+        {
+            "topic_name": "Produtos Dentro do Prazo de Validade",
+            "original_position": 2,
+            "new_position": 2
+        },
+        {
+            "topic_name": "Data de Validade dos Produtos",
+            "original_position": 3,
+            "new_position": 3
+        },
+        {
+            "topic_name": "Abastecimento",
+            "original_position": 4,
+            "new_position": 4
+        },
+        {
+            "topic_name": "Precificações",
+            "original_position": 5,
+            "new_position": 5
+        },
+        {
+            "topic_name": "Rastreabilidade",
+            "original_position": 6,
+            "new_position": 6
+        },
+        {
+            "topic_name": "Excesso de Produtos em Exibição",
+            "original_position": 7,
+            "new_position": 7
+        }
+    ]
+}

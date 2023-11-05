@@ -4,34 +4,38 @@ use App\Models\User;
 use App\Models\UserMeta;
 use Illuminate\Support\Facades\DB;
 
-
+// Get all users with status = 1, ordered by name
 if (!function_exists('getUsers')) {
-    /**
-     * Get all users with status = 1, ordered by name.
-     *
-     * @return \Illuminate\Support\Collection
-     */
     function getUsers() {
-        return DB::connection('smAppTemplate')
+        $getUsers = DB::connection('smAppTemplate')
             ->table('users')
             ->where('status', 1)
             ->orderBy('name')
             ->get();
+
+        $getUsers = $getUsers ?? null;
+        return is_string($getUsers) ? json_decode($getUsers, true) : $getUsers;
     }
 }
 
 if (!function_exists('getUsersByRole')) {
     function getUsersByRole($role)
     {
-        return DB::connection('smAppTemplate')
-            ->table('users')
-            ->where('role', $role)
-            ->where('status', 1) // Assuming you want to get only active users
-            ->orderBy('name')
-            ->get();
+        if($role){
+            $getUsersByRole = DB::connection('smAppTemplate')
+                ->table('users')
+                ->where('role', $role)
+                ->where('status', 1) // Assuming you want to get only active users
+                ->orderBy('name')
+                ->get();
+
+            $getUsersByRole = $getUsersByRole ?? null;
+            return is_string($getUsersByRole) ? json_decode($getUsersByRole, true) : $getUsersByRole;
+        }
+
+        return null;
     }
 }
-
 
 if( !function_exists('getUserData') ){
     function getUserData($userId = null) {
@@ -56,6 +60,7 @@ if( !function_exists('getUserData') ){
 if (!function_exists('canManageGoalSales')) {
     function canManageGoalSales() {
         $user = auth()->user();
+
         return $user && $user->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) && request()->is('goal-sales');
     }
 }
@@ -77,10 +82,6 @@ if (!function_exists('getUserMeta')) {
 
 // Format a phone number to the pattern (XX) X XXXX-XXXX.
 if (!function_exists('formatPhoneNumber')) {
-    /**
-     * @param string $phoneNumber The phone number to be formatted.
-     * @return string The formatted phone number or an empty string if the input is empty.
-     */
     function formatPhoneNumber($phoneNumber) {
         // Remove all non-numeric characters from the phone number.
         $phoneNumber = onlyNumber($phoneNumber);
@@ -132,11 +133,10 @@ if (!function_exists('getERPdata')) {
     }
 }
 
+// Get IPCA data
 if (!function_exists('getIPCAdata')) {
     function getIPCAdata($meantime)
     {
-        $return = '';
-
         try {
             $OnboardConnection = DB::connection('smOnboard');
             $result = $OnboardConnection->table('app_api')->where('api_origin', 'ipca')->first();
@@ -171,84 +171,72 @@ if (!function_exists('getIPCAdata')) {
             return '';
         }
 
-        return $return;
+        return null;
     }
 }
 
+// Logic to get the ID of the current database connection
 if (!function_exists('extractDatabaseId')) {
     function extractDatabaseId($databaseConnection)
     {
-        // Logic to get the ID of the current database connection
         // This depends on how you have structured your database names and IDs
         // If your database names are smApp1, smApp2, etc., and IDs are 1, 2, etc.
         return onlyNumber($databaseConnection);
     }
 }
 
-
+// Get the list of other smApp databases from smOnboard
 if (!function_exists('getOtherDatabases')) {
-    /**
-     * Get the list of other smApp databases from smOnboard.
-     *
-     * @return array The list of other smApp databases.
-     */
     function getOtherDatabases($email)
     {
-        $OnboardConnection = DB::connection('smOnboard');
+        if($email){
+            $OnboardConnection = DB::connection('smOnboard');
 
-        $otherDatabases = [];
+            $otherDatabases = [];
 
-        // Get the list of database names from app_users
-        $app_usersTable = $OnboardConnection->table('app_users')
-            ->where('user_email', $email)
-            ->value('ID');
+            // Get the list of database names from app_users
+            $app_usersTable = $OnboardConnection->table('app_users')
+                ->where('user_email', $email)
+                ->value('ID');
 
-        // Add the database names to the list of other databases
-        if ($app_usersTable) {
-            $otherDatabases[] = 'smApp' . $app_usersTable;
-        }
-
-        // Get the list of app_IDs from app_subusers where sub_user_email is the given email
-        $app_subusersTable = $OnboardConnection->table('app_subusers')
-            ->where('sub_user_email', $email)
-            ->value('app_IDs');
-
-        // Convert the app_IDs from JSON to array
-        if ($app_subusersTable) {
-            $appIds = json_decode($app_subusersTable, true);
-            foreach ($appIds as $appId) {
-                $otherDatabases[] = 'smApp' . $appId;
+            // Add the database names to the list of other databases
+            if ($app_usersTable) {
+                $otherDatabases[] = 'smApp' . $app_usersTable;
             }
+
+            // Get the list of app_IDs from app_subusers where sub_user_email is the given email
+            $app_subusersTable = $OnboardConnection->table('app_subusers')
+                ->where('sub_user_email', $email)
+                ->value('app_IDs');
+
+            // Convert the app_IDs from JSON to array
+            if ($app_subusersTable) {
+                $appIds = json_decode($app_subusersTable, true);
+                foreach ($appIds as $appId) {
+                    $otherDatabases[] = 'smApp' . $appId;
+                }
+            }
+
+            // Remove duplicates and filter out empty values
+            $otherDatabases = array_unique($otherDatabases);
+            $otherDatabases = array_filter($otherDatabases);
+
+            return $otherDatabases;
         }
-
-        // Remove duplicates and filter out empty values
-        $otherDatabases = array_unique($otherDatabases);
-        $otherDatabases = array_filter($otherDatabases);
-
-        return $otherDatabases;
+        return null;
     }
 }
 
-
+// Format a number as Brazilian Real
 if (!function_exists('formatBrazilianReal')) {
-    /**
-     * Format a number as Brazilian Real.
-     *
-     * @param float $number The number to be formatted.
-     * @return string The formatted number.
-     */
     function formatBrazilianReal($number, $decimalPlaces = 2): string {
         return !empty($number) && intval($number) > 0 ? 'R$ ' . numberFormat( $number, $decimalPlaces ) : 'R$ 0,00';
     }
 }
 
-
-if (!function_exists('getCompaniesAuthorized')) {
-    /**
-     * Get authorized companies from the user_metas table
-     */
-    function getCompaniesAuthorized($userId = null) {
-
+// Get authorized companies from the user_metas table
+if (!function_exists('getAuthorizedCompanies')) {
+    function getAuthorizedCompanies($userId = null) {
         $userId = $userId ?? Auth::user()->id;
 
         $AuthorizedCompanies = getUserMeta($userId, 'companies');
@@ -259,47 +247,40 @@ if (!function_exists('getCompaniesAuthorized')) {
     }
 }
 
+// Get the company alias based on the company ID
 if (!function_exists('getCompanyAlias')) {
-    /**
-     * Get the company alias based on the company ID.
-     *
-     * @param int $companyId The ID of the company.
-     * @return string|null The company alias or null if not found.
-     */
     function getCompanyAlias($companyId){
-        $companyId = intval($companyId);
+        if($companyId){
+            $companyId = intval($companyId);
 
-        $companyAlias = DB::connection('smAppTemplate')
-            ->table('wlsm_companies') // replace with your companies table name
-            ->where('company_id', $companyId)
-            ->value('company_alias'); // replace with the column name that stores the company alias
+            $companyAlias = DB::connection('smAppTemplate')
+                ->table('wlsm_companies') // replace with your companies table name
+                ->where('company_id', $companyId)
+                ->value('company_alias'); // replace with the column name that stores the company alias
 
-        return $companyAlias ?: null;
+            return $companyAlias ?: null;
+        }
+        return null;
     }
 }
 
 
-
-if (!function_exists('getDepartmentsActive')) {
-    /**
-     * Get active departments from the wlsm_departments table.
-     */
-    function getDepartmentsActive() {
-        return DB::connection('smAppTemplate')
+// Get active departments from the wlsm_departments table.
+if (!function_exists('getActiveDepartments')) {
+    function getActiveDepartments() {
+        $getActiveDepartments = DB::connection('smAppTemplate')
         ->table('wlsm_departments')
             ->where('status', 1)
             ->orderBy('department_alias')
             ->get();
+
+        $getActiveDepartments = $getActiveDepartments ?? null;
+        return is_string($getActiveDepartments) ? json_decode($getActiveDepartments, true) : $getActiveDepartments;
     }
 }
 
+// Get the department alias based on the department ID
 if (!function_exists('getDepartmentAlias')) {
-    /**
-     * Get the department alias based on the department ID.
-     *
-     * @param int $departmentId The ID of the department.
-     * @return string|null The department alias or null if not found.
-     */
     function getDepartmentAlias($departmentId){
         $departmentId = intval($departmentId);
 
@@ -312,16 +293,15 @@ if (!function_exists('getDepartmentAlias')) {
     }
 }
 
-
 if (!function_exists('metricGoalSales')) {
     function metricGoalSales($meantime = null){
         $daysInMonth = intval(date('t'));
 
+        $metric = 100;
+
         if( empty($meantime) || $meantime == date('Y-m') ){
             $metric = numberFormat( ( ( 100/$daysInMonth ) * intval(date('d') ) ), 1);
         } elseif (is_string($meantime) && strtotime($meantime) !== false && date('Y-m', strtotime($meantime)) < date('Y-m')) {
-            $metric = 100;
-        } else{
             $metric = 100;
         }
 
@@ -329,28 +309,28 @@ if (!function_exists('metricGoalSales')) {
     }
 }
 
-
+// Get active companies from the wlsm_companies table.
 if (!function_exists('getActiveCompanies')) {
-    /**
-     * Get active companies from the wlsm_companies table.
-     */
     function getActiveCompanies() {
-        return DB::connection('smAppTemplate')
+        $activeCompanies = DB::connection('smAppTemplate')
             ->table('wlsm_companies')
             ->where('status', 1)
             ->orderBy('company_id')
             ->get();
+
+        $activeCompanies = $activeCompanies ?? null;
+        return is_string($activeCompanies) ? json_decode($activeCompanies, true) : $activeCompanies;
     }
 }
 
-
-
 if (!function_exists('getSettings')) {
     function getSettings($key) {
-        if(!empty($key)){
+        if($key){
             $settings = DB::connection('smAppTemplate')->table('settings')->pluck('value', 'key')->toArray();
             return isset($settings[$key]) ? $settings[$key] : '';
         }
+
+        return null;
     }
 }
 
@@ -380,10 +360,13 @@ if (!function_exists('getDropboxToken')) {
 
 if (!function_exists('formatSize')) {
     function formatSize($size) {
-        $base = log($size, 1024);
-        $suffixes = array('Bytes', 'KB', 'MB', 'GB', 'TB');
+        if($size){
+            $base = log($size, 1024);
+            $suffixes = array('Bytes', 'KB', 'MB', 'GB', 'TB');
 
-        return !empty(onlyNumber($size)) ? round(pow(1024, $base - floor($base)), 2) . ''.$suffixes[floor($base)].'' : 0;
+            return !empty(onlyNumber($size)) ? round(pow(1024, $base - floor($base)), 2) . ''.$suffixes[floor($base)].'' : 0;
+        }
+        return 0;
     }
 }
 
@@ -393,9 +376,9 @@ if (!function_exists('statusBadge')) {
             case 'active':
                 return '<span class="badge bg-success-subtle text-success text-uppercase" title="Registro de Status Ativo">Ativo</span>';
             case 'trash':
-                return '<span class="badge bg-danger-subtle text-danger text-uppercase" title="Registro de Status Deletado">Deletado</span>';
+                return '<span class="badge bg-danger text-theme text-uppercase" title="Registro de Status Deletado">Deletado</span>';
             case 'disabled':
-                return '<span class="badge bg-warning-subtle text-warning text-uppercase" title="Registro de Status Desativado">Desativado</span>';
+                return '<span class="badge bg-danger-subtle text-danger text-uppercase" title="Registro de Status Desativado">Desativado</span>';
             default:
                 return '<span class="badge bg-info-primary text-primary text-uppercase" title="Registro de Status NÃO INFORMADO">Unknown</span>';
         }
@@ -404,21 +387,30 @@ if (!function_exists('statusBadge')) {
 
 if (!function_exists('onlyNumber')) {
     function onlyNumber($number = null) {
-        $numericValue = preg_replace('/\D/', '', $number);
-        return is_numeric($numericValue) ? intval($numericValue) : 0;
+        if($number){
+            $numericValue = preg_replace('/\D/', '', $number);
+            return is_numeric($numericValue) ? intval($numericValue) : 0;
+        }
+        return 0;
     }
 }
 
 if (!function_exists('numberFormat')) {
     function numberFormat($number, $decimalPlaces = 0) {
-        $numericValue = is_numeric($number) ? floatval($number) : 0;
-        return number_format($numericValue, $decimalPlaces, ',', '.');
+        if($number){
+            $numericValue = is_numeric($number) ? floatval($number) : 0;
+            return number_format($numericValue, $decimalPlaces, ',', '.');
+        }
+        return 0;
     }
 }
 
 if (!function_exists('convertToNumeric')) {
     function convertToNumeric($number) {
-        return floatval(str_replace(',', '.', str_replace('.', '', $number)));
+        if($number){
+            return floatval(str_replace(',', '.', str_replace('.', '', $number)));
+        }
+        return 0;
     }
 }
 
@@ -439,7 +431,6 @@ if (!function_exists('getSaleDateRange')) {
         ];
     }
 }
-
 
 if (!function_exists('getLastUpdate')) {
     function getLastUpdate($tableName, $dateFormat = "Y-m-d") {
@@ -522,14 +513,8 @@ if( !function_exists('goalsEmojiChart') ){
 }
 
 
-
+// Get the value of a specific cookie by its name
 if (!function_exists('getCookie')) {
-    /**
-     * Get the value of a specific cookie by its name.
-     *
-     * @param string $cookieName The name of the cookie.
-     * @return mixed The value of the cookie or null if the cookie does not exist.
-     */
     function getCookie($cookieName) {
         $cookieValue = request()->cookie($cookieName);
         //dd($cookieValue);

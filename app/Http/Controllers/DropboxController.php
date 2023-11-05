@@ -26,7 +26,7 @@ class DropboxController extends Controller
     /**
      * Display files and folders in the root directory of Dropbox.
      */
-    public function files(Request $request)
+    public function index(Request $request)
     {
         $dropboxToken = getDropboxToken('dropbox_token');
 
@@ -39,7 +39,10 @@ class DropboxController extends Controller
 
         try {
             $response = $dropbox->listFolder('/');
-        } catch (ClientException $e) {
+        } catch (\Exception $e) {
+            return redirect(route('settingsApiKeysURL'))->with('error', 'Falha ao atualizar o token de acesso. Clique em Conectar ao Dropbox');
+
+            /*
             if ($e->getResponse()->getStatusCode() == 401) {
                 // Handle the 401 Unauthorized error
                 if ($refreshToken) {
@@ -54,22 +57,23 @@ class DropboxController extends Controller
                         try {
                             $response = $dropbox->listFolder('/');
                         } catch (ClientException $e) {
-                            return redirect(route('DropboxFilesURL'))->with('error', 'Falha ao recuperar arquivos e pastas do Dropbox.');
+                            return redirect(route('settingsApiKeysURL'))->with('error', 'Falha ao recuperar arquivos e pastas do Dropbox.');
                         }
                     } else {
-                        return redirect(route('DropboxFilesURL'))->with('error', 'Falha ao atualizar o token de acesso.');
+                        return redirect(route('settingsApiKeysURL'))->with('error', 'Falha ao atualizar o token de acesso.');
                     }
                 } else {
-                    return redirect(route('DropboxFilesURL'))->with('error', 'Sua conexão com o Dropbox expirou. Reconecte-se.');
+                    return redirect(route('settingsApiKeysURL'))->with('error', 'Sua conexão com o Dropbox expirou. Reconecte-se.');
                 }
             } else {
                 // Handle other 4xx errors
-                return redirect(route('DropboxFilesURL'))->with('error', 'Falha ao recuperar arquivos e pastas do Dropbox.');
+                return redirect(route('settingsApiKeysURL'))->with('error', 'Falha ao recuperar arquivos e pastas do Dropbox.');
             }
+            */
         }
 
         if (!isset($response['entries'])) {
-            return redirect(route('DropboxFilesURL'))->with('error', 'Falha ao recuperar arquivos e pastas do Dropbox.');
+            return redirect(route('settingsApiKeysURL'))->with('error', 'Falha ao recuperar arquivos e pastas do Dropbox.');
         }
 
         $items = $response['entries'];
@@ -175,14 +179,14 @@ class DropboxController extends Controller
         $dropboxToken = getDropboxToken('dropbox_token');
 
         if (!$dropboxToken) {
-            return redirect(route('DropboxFilesURL'))->with('error', 'Conecte-se ao Dropbox primeiro.');
+            return redirect(route('DropboxIndexURL'))->with('error', 'Conecte-se ao Dropbox primeiro.');
         }
 
         $dropbox = new DropboxClient($dropboxToken);
         $response = $dropbox->listFolder('/' . $path);
 
         if (!isset($response['entries'])) {
-            return redirect(route('DropboxFilesURL'))->with('error', 'Falha ao recuperar arquivos e pastas do Dropbox.');
+            return redirect(route('DropboxIndexURL'))->with('error', 'Falha ao recuperar arquivos e pastas do Dropbox.');
         }
 
         $items = $response['entries'];
@@ -328,7 +332,7 @@ class DropboxController extends Controller
         $dropboxToken = getDropboxToken('dropbox_token');
 
         if (!$dropboxToken) {
-            return redirect(route('DropboxFilesURL'))->with('error', 'Conecte-se ao Dropbox primeiro.');
+            return redirect(route('DropboxIndexURL'))->with('error', 'Conecte-se ao Dropbox primeiro.');
         }
 
         $dropbox = new DropboxClient($dropboxToken);
@@ -353,9 +357,9 @@ class DropboxController extends Controller
             // Delete the folder itself
             $dropbox->delete('/' . $path);
 
-            return redirect(route('DropboxFilesURL'))->with('success', 'Pasta excluída com êxito');
+            return redirect(route('DropboxIndexURL'))->with('success', 'Pasta excluída com êxito');
         } catch (\Exception $e) {
-            return redirect(route('DropboxFilesURL'))->with('error', 'Falha ao excluir pasta: ' . $e->getMessage());
+            return redirect(route('DropboxIndexURL'))->with('error', 'Falha ao excluir pasta: ' . $e->getMessage());
         }
     }
 

@@ -20,7 +20,7 @@ window.addEventListener('load', function() {
         if(!database){
             event.preventDefault();
 
-            fetch('/check-databases', {
+            fetch('/login/check-databases', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

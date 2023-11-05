@@ -192,7 +192,7 @@
                                                     Date</label>
                                                 <input type="text" class="form-control" data-provider="flatpickr"
                                                     id="JoiningdatInput" data-date-format="d M, Y"
-                                                    data-deafult-date="24 Nov, 2021" placeholder="Select date" />
+                                                    data-default-date="24 Nov, 2021" placeholder="Select date" />
                                             </div>
                                         </div>
                                         <!--end col-->

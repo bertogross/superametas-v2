@@ -11,8 +11,8 @@ use App\Http\Controllers\{
     SettingsDatabaseController,
     SettingsAccountController,
     GoalSalesController,
-    AuditsController,
-    AuditsComposeController,
+    SurveysController,
+    SurveysComposeController,
     SettingsApiKeysController,
     GoogleDriveController,
     DropboxController,
@@ -21,11 +21,9 @@ use App\Http\Controllers\{
 };
 use App\Http\Middleware\SetDynamicDatabase;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
+/*/****************************************************
+ * Web Routes
+/*****************************************************/
 
 // Authentication Routes
 Auth::routes();
@@ -33,88 +31,112 @@ Auth::routes();
 // Language Translation
 Route::get('index/{locale}', [HomeController::class, 'lang']);
 
-// Root & Dashboard
+// Root
 Route::get('/', [HomeController::class, 'root'])->name('root');
 
-// User Profile & Password Update
-/*Route::prefix('user')->middleware('auth')->group(function () {
-    Route::post('update-profile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfileURL');
-    Route::post('update-password/{id}', [HomeController::class, 'updatePassword'])->name('updatePasswordURL');
-});*/
 
-// Post routes
+/****************************************************
+ * START Auth routes
+****************************************************/
 Route::middleware(['auth'])->group(function () {
-
-    // User Profile & Password Update
+    /****************************************************
+     * START User Profile & Password Update
+    ****************************************************/
     Route::prefix('user')->group(function () {
+        Route::post('/update-profile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfileURL');
+        Route::post('/update-password/{id}', [HomeController::class, 'updatePassword'])->name('updatePasswordURL');
+    });
+    Route::get('/profile/{id?}', [SettingsUserController::class, 'show'])->name('profileShowURL');
+    /*Route::prefix('user')->middleware('auth')->group(function () {
         Route::post('update-profile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfileURL');
         Route::post('update-password/{id}', [HomeController::class, 'updatePassword'])->name('updatePasswordURL');
-    });
-
-
-    // Goal Sales Routes
-    Route::get('/goal-sales', [GoalSalesController::class, 'index'])->name('goalSalesIndexURL');
-    Route::get('/goal-sales/settings', [GoalSalesController::class, 'getGoalSalesSettingsModalContent']);
-    Route::get('/goal-sales/form/{meantime?}/{companyId?}/{purpose?}', [GoalSalesController::class, 'getGoalSalesEditModalContent']);// view form
-
-    Route::post('/goal-sales/post/{meantime?}/{companyId?}', [GoalSalesController::class, 'storeOrUpdateGoals']); // update or store
-
-    Route::post('/goal-sales/analytic-mode', [GoalSalesController::class, 'analyticMode']);
-    Route::post('/goal-sales/slide-mode', [GoalSalesController::class, 'slideMode']);
-    Route::post('/goal-sales/default-mode', [GoalSalesController::class, 'defaultMode']);
-
-    // Goal Results Routes
-    //Route::get('/goal-results', [GoalResultsController::class, 'index'])->name('goalResultsIndexURL');
-
-
-    // Audits Routes
-    Route::get('/audits', [AuditsController::class, 'index'])->name('auditsIndexURL');
-    Route::get('/audit/{id?}', [AuditsController::class, 'show'])->name('auditsShowURL');
-    //Route::post('/audits', [AuditsController::class, 'store']);
-    Route::get('/audits/form/{id?}', [AuditsController::class, 'getAuditEditModalContent']);// view form
-
-    // Ajax Store / Update audit
-    Route::post('/audits/store/{id?}', [AuditsController::class, 'update']);
-
-        // Talbe listing forms
-        Route::get('/audits/compose', [AuditsComposeController::class, 'index'])->name('auditsComposeIndexURL');
-
-        // Create the custom form
-        Route::get('/audits/compose/add', [AuditsComposeController::class, 'add'])->name('auditsComposeAddURL');
-        // Edit the custom form
-        Route::get('/audits/compose/edit/{id?}', [AuditsComposeController::class, 'edit'])->name('auditsComposeEditURL');
-        // Show the custom form
-        Route::get('/audits/compose/show/{id?}', [AuditsComposeController::class, 'show'])->name('auditsComposeShowURL');
-
-        // Ajax Store and Update the custom form
-        Route::post('/audits/compose/store', [AuditsComposeController::class, 'store'])->name('auditsComposeStoreURL');
-        Route::post('/audits/compose/update/{id?}', [AuditsComposeController::class, 'update'])->name('auditsComposeUpdateURL');
-
-        // Ajax toggle status
-        Route::post('/audit/compose/toggle-status/{id?}/{status?}', [AuditsComposeController::class, 'toggleStatus'])->name('auditsComposeToggleStatusURL');
-
-
-    // User Profile
-    Route::get('/profile/{id?}', [SettingsUserController::class, 'show'])->name('profileShowURL');
+    });*/
 
     // TODO profile-settings.blade.php
     //Route::get('/profile/settings', [ProfileController::class, 'settings'])->middleware('auth');
+    /****************************************************
+     * END User Profile & Password Update
+    ****************************************************/
 
+    /****************************************************
+     * START Goal Sales Routes
+    ****************************************************/
+    Route::get('/goal-sales', [GoalSalesController::class, 'index'])->name('goalSalesIndexURL');
+    Route::get('/goal-sales/settings', [GoalSalesController::class, 'settings'])->name('goalSalesSettingsEditURL');
+    Route::get('/goal-sales/form/{meantime?}/{companyId?}/{purpose?}', [GoalSalesController::class, 'edit'])->name('goalSalesEditURL');// view form
 
-    // Admin Settings
+    Route::post('/goal-sales/post/{meantime?}/{companyId?}', [GoalSalesController::class, 'createOrUpdate'])->name('goalSalesCreateOrUpdateURL'); // update or store
+
+    Route::post('/goal-sales/analytic-mode', [GoalSalesController::class, 'analyticMode'])->name('goalSalesAnalyticModeURL');
+    Route::post('/goal-sales/slide-mode', [GoalSalesController::class, 'slideMode'])->name('goalSalesslideModeURL');
+    Route::post('/goal-sales/default-mode', [GoalSalesController::class, 'defaultMode'])->name('goalSalesDefaultModeURL');
+    /****************************************************
+     * END Goal Sales Routes
+    ****************************************************/
+
+    /****************************************************
+     * START Goal Results Routes
+    ****************************************************/
+    // TODO
+    //Route::get('/goal-results', [GoalResultsController::class, 'index'])->name('goalResultsIndexURL');
+    /****************************************************
+     * END Goal Results Routes
+    ****************************************************/
+
+    /****************************************************
+     * START Surveys Routes
+    ****************************************************/
+    Route::get('/surveys/listing', [SurveysController::class, 'index'])->name('surveysIndexURL');
+    Route::get('/surveys/{id?}', [SurveysController::class, 'show'])->name('surveysShowURL');
+
+    // Form url to create
+    Route::get('/surveys/create', [SurveysController::class, 'create'])->name('surveysAddURL');
+    Route::get('/surveys/edit/{id?}', [SurveysController::class, 'edit'])->name('surveysEditURL');
+
+    // Ajax Store / Update survey
+    Route::post('/surveys/store/{id?}', [SurveysController::class, 'createOrUpdate'])->name('surveysCreateOrUpdateURL');
+
+        /****************************************************
+         * START Surveys Compose Routes
+        ****************************************************/
+        // Listing forms
+        Route::get('/surveys/compose/listing', [SurveysComposeController::class, 'index'])->name('surveysComposeIndexURL');
+
+        // Form url to create
+        Route::get('/surveys/compose/create/{type?}', [SurveysComposeController::class, 'create'])->name('surveysComposeAddURL')->where('type', 'custom|default');
+
+        // Edit the custom form
+        Route::get('/surveys/compose/edit/{id?}', [SurveysComposeController::class, 'edit'])->name('surveysComposeEditURL');
+
+        // Show the custom form
+        Route::get('/surveys/compose/show/{id?}', [SurveysComposeController::class, 'show'])->name('surveysComposeShowURL');
+
+        // Ajax Create or Update the custom form
+        //Route::post('/surveys/compose/store', [SurveysComposeController::class, 'create'])->name('surveysComposeStoreURL');
+        Route::post('/surveys/compose/post/{id?}', [SurveysComposeController::class, 'createOrUpdate'])->name('surveysComposeCreateOrUpdateURL');
+
+        // Ajax toggle status
+        Route::post('/surveys/compose/toggle-status/{id?}/{status?}', [SurveysComposeController::class, 'toggleStatus'])->name('surveysComposeToggleStatusURL');
+        /****************************************************
+         * START Surveys Compose Routes
+        ****************************************************/
+
+    /****************************************************
+     * END Surveys Routes
+    ****************************************************/
+
+    /****************************************************
+     * START Admin Settings
+    ***************************************************/
     Route::middleware(['admin'])->group(function () {
         Route::get('/settings', [SettingsAccountController::class, 'index'])->name('settingsIndexURL');
 
         // Subscription and form related with the primary user
         Route::get('/settings/account', [SettingsAccountController::class, 'show'])->name('settingsAccountShowURL');
-        Route::post('/settings/account/store', [SettingsAccountController::class, 'store'])->name('settingsAccountStoreURL');
+        Route::post('/settings/account/store', [SettingsAccountController::class, 'create'])->name('settingsAccountStoreURL');
 
         // API Key, Files Manager, Sinc Database (sales, companies, departments)
         Route::get('/settings/api-keys', [SettingsApiKeysController::class, 'index'])->name('settingsApiKeysURL');
-
-        //Route::get('/settings/googledrive', [GoogleDriveController::class, 'files'])->name('GoogleDriveFilesURL');
-        Route::get('/settings/dropbox', [DropboxController::class, 'files'])->name('DropboxFilesURL');
-        Route::get('/settings/dropbox/browse/{path}', [DropboxController::class, 'browseFolder'])->name('DropboxBrowseFolderURL');
 
         Route::get('/settings/database', [SettingsDatabaseController::class, 'index'])->name('settingsDatabaseIndexURL');
             Route::put('/settings/departments/store', [SettingsDatabaseController::class, 'updateDepartments'])->name('settingsDepartmentsUpdateURL');
@@ -122,31 +144,42 @@ Route::middleware(['auth'])->group(function () {
 
         // User Settings
         Route::get('/settings/users', [SettingsUserController::class, 'index'])->name('settingsUsersIndexURL');
-        Route::post('/settings/users/store', [SettingsUserController::class, 'store']);
+        Route::post('/settings/users/store', [SettingsUserController::class, 'create']);
         Route::post('/settings/users/update/{id}', [SettingsUserController::class, 'update']);
         Route::get('/settings/users/modal-form/{id?}', [SettingsUserController::class, 'getUserModalContent']);
 
         // TODO Security Settings
         //Route::get('/settings/security', [SettingsSecurityController::class, 'index'])->name('settingsSecurityIndexURL');
 
-        // Clarifai Edge AI API
+        // Storage APIs
+        //Route::get('/settings/googledrive', [GoogleDriveController::class, 'files'])->name('GoogleDriveFilesURL');
+        Route::get('/settings/dropbox', [DropboxController::class, 'index'])->name('DropboxIndexURL');
+        Route::get('/settings/dropbox/browse/{path}', [DropboxController::class, 'browseFolder'])->name('DropboxBrowseFolderURL');
 
-        //Route::get('/audits/clarifai/submit', [ClarifaiImageController::class, 'index'])->name('ClarifaiIndexURL');
-        //Route::post('submit', [ClarifaiImageController::class, 'submit'])->name('ClarifaiSubmitURL');
-        //Route::post('analyze', [ClarifaiImageController::class, 'analyze'])->name('ClarifaiAnalyse');
-        Route::post('/audits/clarifai/submit', [ClarifaiImageController::class, 'submit'])->name('ClarifaiSubmitURL');
-        Route::post('/audits/scenex/submit', [ScenexImageController::class, 'submit'])->name('ScenexSubmitURL');
+        // AI APIs
+        Route::post('/settings/clarifai', [ClarifaiImageController::class, 'submit'])->name('ClarifaiSubmitURL');
+        Route::post('/settings/scenex', [ScenexImageController::class, 'submit'])->name('ScenexSubmitURL');
 
 
     });
+    /****************************************************
+     * END Admin Settings
+    ****************************************************/
 
-    // File Upload
+    /****************************************************
+     * START File Upload
+    ***************************************************/
     Route::post('/upload/avatar', [UploadController::class, 'uploadAvatar']);
     Route::post('/upload/cover', [UploadController::class, 'uploadCover']);
     Route::post('/upload/logo', [UploadController::class, 'uploadLogo']);
     Route::delete('/upload/logo', [UploadController::class, 'deleteLogo']);
-
+    /****************************************************
+     * END File Upload
+    ***************************************************/
 });
+/****************************************************
+ * END Auth routes
+****************************************************/
 
 // Authentication with Dynamic Database
 Route::middleware([SetDynamicDatabase::class])->group(function () {
@@ -154,10 +187,8 @@ Route::middleware([SetDynamicDatabase::class])->group(function () {
 });
 
 // Login and Logout
-Route::post('/check-databases', [LoginController::class, 'checkDatabases']);
+Route::post('/login/check-databases', [LoginController::class, 'checkDatabases']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
 
 // Catch-All Route - should be the last route
 Route::get('{any}', [HomeController::class, 'index'])->where('any', '.*')->name('index');
-

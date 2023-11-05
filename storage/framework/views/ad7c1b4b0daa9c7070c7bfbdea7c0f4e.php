@@ -4,7 +4,7 @@
 <?php $__env->startSection('content'); ?>
     <?php $__env->startComponent('components.breadcrumb'); ?>
         <?php $__env->slot('url'); ?>
-        <?php echo e(url('settings')); ?>
+            <?php echo e(url('settings')); ?>
 
         <?php $__env->endSlot(); ?>
         <?php $__env->slot('li_1'); ?>
@@ -15,9 +15,7 @@
         <?php $__env->endSlot(); ?>
     <?php echo $__env->renderComponent(); ?>
 
-    <?php echo $__env->make('error.alert-errors', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-
-    <?php echo $__env->make('error.alert-success', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php echo $__env->make('components.alerts', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
     <div class="card">
         <div class="card-body">
@@ -180,9 +178,9 @@
                                         <td><?php echo e($formattedDate ?? ''); ?></td>
                                         <td class="text-end">
                                             <div class="btn-group">
-                                                <a href="<?php echo e($file['link'] ?? '#'); ?>" download class="btn btn-sm btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-original-title="Download"><i class="ri-download-2-line"></i></a>
+                                                <a href="<?php echo e($file['link'] ?? '#'); ?>" download class="btn btn-sm btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Download"><i class="ri-download-2-line"></i></a>
 
-                                                <button class="btn btn-sm btn-outline-dark btn-delete-file" data-path="<?php echo e($file['path_display']); ?>" data-id="<?php echo e($file['id']); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-original-title="Deletar">
+                                                <button class="btn btn-sm btn-outline-dark btn-delete-file" data-path="<?php echo e($file['path_display']); ?>" data-id="<?php echo e($file['id']); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Deletar">
                                                     <i class="ri-delete-bin-5-line text-danger"></i>
                                                 </button>
                                             </div>
@@ -202,15 +200,15 @@
                             <div class="col-sm-auto">
                                 <ul class="pagination pagination-separated pagination-sm justify-content-center justify-content-sm-start mb-0">
                                     <li class="page-item <?php echo e($page == 1 ? 'disabled' : ''); ?>">
-                                        <a href="<?php echo e(route('DropboxFilesURL', ['page' => $page - 1])); ?>" class="page-link">←</a>
+                                        <a href="<?php echo e(route('DropboxIndexURL', ['page' => $page - 1])); ?>" class="page-link">←</a>
                                     </li>
                                     <?php for($i = 1; $i <= ceil($totalFiles / $perPage); $i++): ?>
                                         <li class="page-item <?php echo e($page == $i ? 'active' : ''); ?>">
-                                            <a href="<?php echo e(route('DropboxFilesURL', ['page' => $i])); ?>" class="page-link"><?php echo e($i); ?></a>
+                                            <a href="<?php echo e(route('DropboxIndexURL', ['page' => $i])); ?>" class="page-link"><?php echo e($i); ?></a>
                                         </li>
                                     <?php endfor; ?>
                                     <li class="page-item <?php echo e($page == ceil($totalFiles / $perPage) ? 'disabled' : ''); ?>">
-                                        <a href="<?php echo e(route('DropboxFilesURL', ['page' => $page + 1])); ?>" class="page-link">→</a>
+                                        <a href="<?php echo e(route('DropboxIndexURL', ['page' => $page + 1])); ?>" class="page-link">→</a>
                                     </li>
                                 </ul>
                             </div>

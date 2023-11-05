@@ -233,6 +233,8 @@ return [
     "goal-results" => "Meta de Resultados",
     "audit" => "Auditoria",
     "audits" => "Auditorias",
+    "survey" => "Vistoria",
+    "surveys" => "Vistorias",
     "session" => "Sessão",
     "users" => "Usuários",
     "security" => "Segurança",

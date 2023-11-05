@@ -60,7 +60,7 @@
                     </tr>
                 @endforeach
 
-                @if (count($getDepartmentsActive) > 1)
+                @if (count($getActiveDepartments) > 1)
                     <tr tr-department="sum" class="">
                         <th scope="row" class="text-uppercase fs-16 align-middle text-end p-3 @if (!empty($filterDepartments) && count($filterDepartments) == 1) d-none @endif">
                             GERAL

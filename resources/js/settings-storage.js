@@ -106,7 +106,6 @@ window.addEventListener('load', function() {
             });
         });
     }
-    deleteFile();
 
     // Remove a file row from the file list
     function deleteFileRow(fileId) {
@@ -158,4 +157,8 @@ window.addEventListener('load', function() {
     }
 
 
+    // Call the function when the DOM is fully loaded
+    deleteFile();
+
 });
+

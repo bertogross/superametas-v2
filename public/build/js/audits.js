@@ -19,9 +19,9 @@ window.addEventListener('load', function() {
     /**
      * Load the content for the Goal Sales Edit Modal
      */
-    async function loadAuditsEditModal(auditId = null) {
+    async function loadsurveysEditForm(surveyId = null) {
         try {
-            let url = `/audits/form/${auditId}`;
+            let url = surveysEditURL + `/${surveyId}`;
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -37,7 +37,7 @@ window.addEventListener('load', function() {
             const content = await response.text();
             document.getElementById('modalContainer').insertAdjacentHTML('beforeend', content);
 
-            const modalElement = document.getElementById('auditsEditModal');
+            const modalElement = document.getElementById('surveysEditForm');
             const modal = new bootstrap.Modal(modalElement, {
                 backdrop: 'static',
                 keyboard: false,
@@ -50,16 +50,16 @@ window.addEventListener('load', function() {
 
             maxLengthTextarea();
 
-            if(auditId){
-                document.querySelector("#auditsEditModal .modal-title").innerHTML = `<u>Editar</u> Vistoria ID: <span class="text-theme">${auditId}</span>`;
+            if(surveyId){
+                document.querySelector("#surveysEditForm .modal-title").innerHTML = `<u>Editar</u> Vistoria ID: <span class="text-theme">${surveyId}</span>`;
 
-                document.querySelector("#auditsEditModal #btn-audits-update").innerHTML = 'Atualizar';
+                document.querySelector("#surveysEditForm #btn-surveys-store-or-update").innerHTML = 'Atualizar';
             }else{
-                document.querySelector("#auditsEditModal .modal-title").innerHTML = `<u>Adicionar</u> Vistoria</span>`;
-                document.querySelector("#auditsEditModal #btn-audits-update").innerHTML = 'Salvar';
+                document.querySelector("#surveysEditForm .modal-title").innerHTML = `<u>Adicionar</u> Vistoria</span>`;
+                document.querySelector("#surveysEditForm #btn-surveys-store-or-update").innerHTML = 'Salvar';
             }
 
-            attachAuditsUpdateListeners(auditId);
+            attachSurveyscreateOrUpdateListeners(surveyId);
 
         } catch (error) {
             console.error('Error fetching modal content:', error);
@@ -68,13 +68,13 @@ window.addEventListener('load', function() {
     }
 
     // Event listeners for 'Update' button
-    function attachAuditsUpdateListeners(auditId) {
+    function attachSurveyscreateOrUpdateListeners(surveyId) {
 
-        // store/update auditsForm
-        document.getElementById('btn-audits-update').addEventListener('click', async function(event) {
+        // store/update surveysForm
+        document.getElementById('btn-surveys-store-or-update').addEventListener('click', async function(event) {
             event.preventDefault();
 
-            const form = document.getElementById('auditsForm');
+            const form = document.getElementById('surveysForm');
 
             if (!form.checkValidity()) {
                 event.stopPropagation();
@@ -88,7 +88,7 @@ window.addEventListener('load', function() {
             let formData = new FormData(form);
 
             try {
-                let url = auditId ? `/audits/store/${auditId}` : `/audits/store/`;
+                let url = surveyId ? surveysCreateOrUpdateURL + `/${surveyId}` : surveysCreateOrUpdateURL;
 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -107,15 +107,13 @@ window.addEventListener('load', function() {
 
                 if (data.success) {
                     // Close current modal
-                    document.getElementById('btn-audits-update').closest('.modal').querySelector('.btn-close').click();
+                    document.getElementById('btn-surveys-store-or-update').closest('.modal').querySelector('.btn-close').click();
 
-                    let loading = '<span class="spinner-grow spinner-grow-sm text-theme ms-3" role="status"><span class="visually-hidden">Loading...</span></span>';
-
-                    toastAlert(data.message + loading, 'success', 10000);
+                    toastAlert(data.message, 'success', 10000);
 
                     setTimeout(function () {
                         location.reload(true);
-                    }, 5000);
+                    }, 500);
                 } else {
                     toastAlert(data.message, 'danger', 60000);
                 }
@@ -126,22 +124,24 @@ window.addEventListener('load', function() {
         });
     }
 
+    /*
     // Event listeners for each 'Edit Goal Sales' button
-    function attachModalEventListeners(){
-        var editButtons = document.querySelectorAll('.btn-audit-edit');
+    function attachFormEventListeners(){
+        var editButtons = document.querySelectorAll('.btn-survey-edit');
         if(editButtons){
             editButtons.forEach(function(button) {
                 button.addEventListener('click', function(event) {
                     event.preventDefault();
 
-                    const auditId = this.getAttribute("data-audit-id");
+                    const surveyId = this.getAttribute("data-survey-id");
 
-                    loadAuditsEditModal(auditId);
+                    loadsurveysEditForm(surveyId);
                 });
 
             });
         }
     }
-    attachModalEventListeners();
+    attachFormEventListeners();
+    */
 
 });

@@ -91,9 +91,9 @@
                                     </a>
                                 </div>
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="{{ route('auditsIndexURL') }}" title="Auditoria">
-                                        <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Auditoria">
-                                        <span>Auditoria</span>
+                                    <a class="dropdown-icon-item" href="{{ route('surveysIndexURL') }}" title="Vistorias">
+                                        <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Vistorias">
+                                        <span>Vistorias</span>
                                     </a>
                                 </div>
                             </div>

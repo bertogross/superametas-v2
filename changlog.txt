@@ -8,25 +8,25 @@ https://laravel-news.com/openai-for-laravel
 
 
 
-Version 2.0.23 - [2023-11-01 - 2023-11-03]
-- [Updated] HTML: blade page (/audits/compose) to Composition of the Inspection Form
-- [Added] AuditsComposeController and model/AuditCompose
-- [Added] audits-compose.js
+Version 2.0.23 - [2023-11-01 - 2023-11-05]
+- [Updated] HTML: blade page (/surveys/compose) to Composition of the Inspection Form
+- [Added] SurveysComposeController and model/surveyCompose
+- [Added] surveys-compose.js
 
 
 
 Version 2.0.22 - [2023-10-31]
-- [Added] HTML: blade page (/audits/compose) to Composition of the Inspection Form
+- [Added] HTML: blade page (/surveys/compose) to Composition of the Inspection Form
 
 
 
 Version 2.0.21 - [2023-10-30]
-- [Started] HTML: blade page (/audits/compose) to Composition of the Inspection Form
+- [Started] HTML: blade page (/surveys/compose) to Composition of the Inspection Form
 
 
 
 Version 2.0.20 - [2023-10-30]
-- [Added] Scenex API [ http://localhost:8000/audits/scenex/submit ]
+- [Added] Scenex API [ http://localhost:8000/surveys/scenex/submit ]
     - https://bestlaravel.com/p/laravel-open-api
     - https://github.com/jeandormehl/openapi-gen
 
@@ -37,7 +37,7 @@ Version 2.0.20 - [2023-10-30]
 
 
 Version 2.0.19 - [2023-10-29]
-- [Tested] Clarifai API [ http://localhost:8000/audits/clarifai/submit ]
+- [Tested] Clarifai API [ http://localhost:8000/surveys/clarifai/submit ]
     - https://clarifai.com
         - https://www.clarifai.com/use-cases/predictive-maintenance
         - https://www.clarifai.com/solutions/ai-in-manufacturing
@@ -77,14 +77,14 @@ Version 2.0.18 - [2023-10-27]
 Version 2.0.18 - [2023-10-26]
 - [Updated] Handler.php ( add function render() to redirect user for error page )
 - [Added] views\error\general.blade.php
-- [Added] AuditsController
-- [Added] Audit Model
-- [Added] AuditMeta Model
+- [Added] SurveysController
+- [Added] Survey Model
+- [Added] SurveyMeta Model
 - [Updated] helpers.php
-- [Added] views\audits
+- [Added] views\surveys
 - [Added] views\layouts\custom-pagination.blade.php
 - [Updated] helpers.js
-- [Added] audits.js
+- [Added] surveys.js
 
 
 

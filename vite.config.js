@@ -29,8 +29,8 @@ export default vite.defineConfig({
                     }
                 },
                 entryFileNames: 'js/' + `[name]` + `.js`,
-            },
-        },
+            }
+        }
     },
     plugins: [
         laravel(
@@ -39,7 +39,7 @@ export default vite.defineConfig({
                     'resources/scss/bootstrap.scss',
                     'resources/scss/icons.scss',
                     'resources/scss/app.scss',
-                    'resources/scss/custom.scss',
+                    'resources/scss/custom.scss'
                 ],
                 refresh: true
             }
@@ -65,7 +65,7 @@ export default vite.defineConfig({
                 {
                     src: 'resources/libs',
                     dest: ''
-                },
+                }
             ]
         }),
         {
@@ -95,9 +95,8 @@ export default vite.defineConfig({
                 } catch (error) {
                     console.error('Error copying and renaming packages:', error);
                 }
-            },
-        },
-
-    ],
+            }
+        }
+    ]
 });
 

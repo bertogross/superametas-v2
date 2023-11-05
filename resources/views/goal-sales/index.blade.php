@@ -3,27 +3,26 @@
 
     $totalPercentAccrued = $ndxChartId = 0;
 
-    $getCompaniesAuthorized = getCompaniesAuthorized();
-    //appPrintR($getCompaniesAuthorized);
+    $getAuthorizedCompanies = getAuthorizedCompanies();
     $getActiveCompanies = getActiveCompanies();
-    //appPrintR($getActiveCompanies);
-    $getDepartmentsActive = getDepartmentsActive();
-    //appPrintR($getDepartmentsActive);
+    $getActiveDepartments = getActiveDepartments();
 
-    //$getMeantime = request('meantime', date('Y-m'));
-    //$getCustomMeantime = request('getCustomMeantime');
+    $getMeantime = request('meantime', date('Y-m'));
+    $getCustomMeantime = request('custom_meantime', '');
 
-    $getMeantime = !empty($_REQUEST['meantime']) ? $_REQUEST['meantime'] : date('Y-m');
-    $getCustomMeantime = !empty($_REQUEST['custom_meantime']) ? $_REQUEST['custom_meantime'] : '';
-    $getMeantime = $getMeantime == 'custom' && empty($getCustomMeantime) ? date('Y-m') : $getMeantime;
+    // Ensure 'meantime' is a valid value
+    $validMeantimes = ['today', 'custom', date('Y-m'), now()->subMonth()->format('Y-m')];
+    if (!in_array($getMeantime, $validMeantimes)) {
+        $getMeantime = date('Y-m');
+    }
 
-    $explode = !empty($getCustomMeantime) ? explode(' até ', $getCustomMeantime) : '';
-    $explodeMeantime = !empty($explode) && is_array($explode) && count($explode) > 1 ? $explode : $getCustomMeantime;
+    $getMeantime = $getMeantime === 'custom' && empty($getCustomMeantime) ? date('Y-m') : $getMeantime;
 
-    //$filterCompanies = request('companies', array());
-    $filterCompanies = isset($_REQUEST['companies']) ? $_REQUEST['companies'] : array();
-    //$filterDepartments = request('departments', array());
-    $filterDepartments = isset($_REQUEST['departments']) ? $_REQUEST['departments'] : array();
+    $explode = !empty($getCustomMeantime) ? explode(' até ', $getCustomMeantime) : [];
+    $explodeMeantime = count($explode) === 2 ? $explode : $getCustomMeantime;
+
+    $filterCompanies = request('companies', []);
+    $filterDepartments = request('departments', []);
 
     $metric = metricGoalSales($getMeantime);
     $metricNumber = convertToNumeric($metric);
@@ -47,7 +46,7 @@
 @endsection
 
 @section('content')
-    @component('components.goal-sales-nav')
+    @component('goal-sales.components.nav')
         @slot('url')
             {{ route('goalSalesIndexURL') }}
         @endslot
@@ -84,20 +83,20 @@
                 data-max-date="{{ $lastDate }}" value="@if($getMeantime == 'custom'){{ $getCustomMeantime}}@endif" placeholder="Selecione o Período">
             </div>
 
-            @if (!empty($getCompaniesAuthorized) && is_array($getCompaniesAuthorized) && count($getCompaniesAuthorized) > 1)
+            @if (!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && count($getAuthorizedCompanies) > 1)
                 <div class="col-sm-12 col-md col-lg" title="Exibir somente Lojas selecionadas">
                     <select class="form-control" data-choices data-choices-removeItem name="companies[]" id="filter-companies" multiple data-placeholder="Loja">
-                        @foreach ($getCompaniesAuthorized as $company)
+                        @foreach ($getAuthorizedCompanies as $company)
                             <option {{ in_array($company, $filterCompanies) ? 'selected' : '' }} value="{{ $company }}">{{ getCompanyAlias(intval($company)) }}</option>
                         @endforeach
                     </select>
                 </div>
             @endif
 
-            @if (!empty($getDepartmentsActive) && is_object($getDepartmentsActive) && count($getDepartmentsActive) > 1)
+            @if (!empty($getActiveDepartments) && is_object($getActiveDepartments) && count($getActiveDepartments) > 1)
                 <div class="col-sm-12 col-md col-lg" title="Exibir somente Departamentos selecionados">
                     <select class="form-control" data-choices data-choices-removeItem name="departments[]" multiple data-placeholder="Departamento">
-                        @foreach ($getDepartmentsActive as $department)
+                        @foreach ($getActiveDepartments as $department)
                             <option {{ in_array($department->department_id, $filterDepartments) ? 'selected' : '' }} value="{{ $department->department_id }}">{{ $department->department_alias }}</option>
                         @endforeach
                     </select>
@@ -119,13 +118,13 @@
     @if (getUserMeta($userId, 'analytic-mode') == 'on')
         @include('goal-sales/analytic')
     @elseif (getUserMeta($userId, 'slide-mode') == 'on')
-        @if (count($filterCompanies) == 1 || count($getCompaniesAuthorized) == 1)
+        @if (count($filterCompanies) == 1 || count($getAuthorizedCompanies) == 1)
             @include('goal-sales/single')
         @else
             @include('goal-sales/slide')
         @endif
     @else
-        @if (count($filterCompanies) == 1 || count($getCompaniesAuthorized) == 1)
+        @if (count($filterCompanies) == 1 || count($getAuthorizedCompanies) == 1)
             @include('goal-sales/single')
         @else
             @include('goal-sales/table')
@@ -146,5 +145,13 @@
 
     <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
 
+    <script>
+        var goalSalesCreateOrUpdateURL = "{{ route('goalSalesCreateOrUpdateURL') }}";
+        var goalSalesEditURL = "{{ route('goalSalesEditURL') }}";
+        var goalSalesSettingsEditURL = "{{ route('goalSalesSettingsEditURL') }}";
+        var goalSalesAnalyticModeURL = "{{ route('goalSalesAnalyticModeURL') }}";
+        var goalSalesslideModeURL = "{{ route('goalSalesslideModeURL') }}";
+        var goalSalesDefaultModeURL = "{{ route('goalSalesDefaultModeURL') }}";
+    </script>
     <script src="{{ URL::asset('build/js/goal-sales.js') }}" type="module"></script>
 @endsection

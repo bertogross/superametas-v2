@@ -13,7 +13,7 @@ File: Main Js File
 	/**
 	 *  global variables
 	 */
-	var navbarMenuHTML = document.querySelector(".navbar-menu").innerHTML;
+	var navbarMenuHTML = document.querySelector(".navbar-menu") ? document.querySelector(".navbar-menu").innerHTML : '';
 	var horizontalMenuSplit = 7; // after this number all horizontal menus will be moved in More menu options
 	var default_lang = "en"; // set Default Language
 	var language = localStorage.getItem("language");
@@ -212,8 +212,8 @@ File: Main Js File
                         dateData.maxDate = isFlatpickerVal["data-maxDate"].value.toString();
                         dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
                     }
-                    if (isFlatpickerVal["data-deafult-date"]) {
-                        dateData.defaultDate = isFlatpickerVal["data-deafult-date"].value.toString();
+                    if (isFlatpickerVal["data-default-date"]) {
+                        dateData.defaultDate = isFlatpickerVal["data-default-date"].value.toString();
                         dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
                     }
                     if (isFlatpickerVal["data-multiple-date"]) {
@@ -226,7 +226,7 @@ File: Main Js File
                     }
                     if (isFlatpickerVal["data-inline-date"]) {
                         (dateData.inline = true),
-                            (dateData.defaultDate = isFlatpickerVal["data-deafult-date"].value.toString());
+                            (dateData.defaultDate = isFlatpickerVal["data-default-date"].value.toString());
                         dateData.dateFormat = isFlatpickerVal["data-date-format"].value.toString();
                     }
                     if (isFlatpickerVal["data-disable-date"]) {
@@ -373,7 +373,7 @@ File: Main Js File
 		var isValues = sessionStorage.getItem("defaultAttribute");
 		var defaultValues = JSON.parse(isValues);
 
-		if (defaultValues && (isTwoColumn == "twocolumn" || defaultValues["data-layout"] == "twocolumn")) {
+		if (navbarMenuHTML && defaultValues && (isTwoColumn == "twocolumn" || defaultValues["data-layout"] == "twocolumn")) {
 			if (document.querySelector(".navbar-menu")) {
 				document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
 			}
@@ -623,7 +623,7 @@ File: Main Js File
             if(document.getElementById("two-column-menu")){
                 document.getElementById("two-column-menu").innerHTML = "";
             }
-			if (document.querySelector(".navbar-menu")) {
+			if (navbarMenuHTML && document.querySelector(".navbar-menu")) {
 				document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
 			}
             if(document.getElementById("scrollbar") && document.getElementById("navbar-nav")){
@@ -1088,18 +1088,20 @@ File: Main Js File
 			});
 
 			var removeItem = document.getElementById('removeNotificationModal');
-			removeItem.addEventListener('show.bs.modal', function (event) {
-				document.getElementById("delete-notification").addEventListener("click", function () {
-					Array.from(document.querySelectorAll(".notification-item")).forEach(function (element) {
-						if (element.classList.contains("active")) {
-							element.remove();
-						}
-					});
-					emptyNotification();
+            if(removeItem){
+                removeItem.addEventListener('show.bs.modal', function (event) {
+                    document.getElementById("delete-notification").addEventListener("click", function () {
+                        Array.from(document.querySelectorAll(".notification-item")).forEach(function (element) {
+                            if (element.classList.contains("active")) {
+                                element.remove();
+                            }
+                        });
+                        emptyNotification();
 
-					document.getElementById("NotificationModalbtn-close").click();
-				})
-			})
+                        document.getElementById("NotificationModalbtn-close").click();
+                    })
+                })
+            }
 		}
 	}
 
@@ -1158,7 +1160,7 @@ File: Main Js File
             document.getElementById("two-column-menu").innerHTML = "";
 
         }
-		if (document.querySelector(".navbar-menu")) {
+		if (navbarMenuHTML && document.querySelector(".navbar-menu")) {
 			document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
 		}
         if(document.getElementById("scrollbar") && document.getElementById("navbar-nav")){
@@ -1203,7 +1205,7 @@ File: Main Js File
                 document.getElementById("two-column-menu").innerHTML = "";
 
             }
-			if (document.querySelector(".navbar-menu")) {
+			if (navbarMenuHTML && document.querySelector(".navbar-menu")) {
 				document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
 			}
 			if (document.getElementById("theme-settings-offcanvas")) {
@@ -1255,7 +1257,7 @@ File: Main Js File
             if(document.getElementById("two-column-menu")){
                 document.getElementById("two-column-menu").innerHTML = "";
             }
-			if (document.querySelector(".navbar-menu")) {
+			if (navbarMenuHTML && document.querySelector(".navbar-menu")) {
 				document.querySelector(".navbar-menu").innerHTML = navbarMenuHTML;
 			}
 			if (document.getElementById("theme-settings-offcanvas")) {
@@ -1278,15 +1280,17 @@ File: Main Js File
 
 	// add listener Sidebar Hover icon on change layout from setting
 	function addEventListenerOnSmHoverMenu() {
-		document.getElementById("vertical-hover").addEventListener("click", function () {
-			if (document.documentElement.getAttribute("data-sidebar-size") === "sm-hover") {
-				document.documentElement.setAttribute("data-sidebar-size", "sm-hover-active");
-			} else if (document.documentElement.getAttribute("data-sidebar-size") === "sm-hover-active") {
-				document.documentElement.setAttribute("data-sidebar-size", "sm-hover");
-			} else {
-				document.documentElement.setAttribute("data-sidebar-size", "sm-hover");
-			}
-		});
+        if(document.getElementById("vertical-hover")){
+            document.getElementById("vertical-hover").addEventListener("click", function () {
+                if (document.documentElement.getAttribute("data-sidebar-size") === "sm-hover") {
+                    document.documentElement.setAttribute("data-sidebar-size", "sm-hover-active");
+                } else if (document.documentElement.getAttribute("data-sidebar-size") === "sm-hover-active") {
+                    document.documentElement.setAttribute("data-sidebar-size", "sm-hover");
+                } else {
+                    document.documentElement.setAttribute("data-sidebar-size", "sm-hover");
+                }
+            });
+        }
 	}
 	// set full layout
 	function layoutSwitch(isLayoutAttributes) {

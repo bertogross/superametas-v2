@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('parent_id')->nullable()->constrained('audits')->onDelete('set null');
+            $table->foreignId('parent_id')->nullable()->constrained('surveys')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->string('url')->nullable();
             $table->string('type')->nullable();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
-            $table->enum('destiny', ['new', 'post', 'audits'])->default('new');
+            $table->enum('destiny', ['new', 'post', 'surveys'])->default('new');
             $table->unsignedBigInteger('size')->nullable();
             $table->unsignedTinyInteger('order')->default(0);
             $table->timestamps();

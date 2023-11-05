@@ -37,7 +37,6 @@ window.addEventListener('load', function() {
         }
         meantimeSelect.addEventListener('change', toggleCustomMeantimeInput);
     }
-    toggleCustomMeantimeInput();
 
     /**
      * Initialize flatpickr with specific options for elements with the class 'flatpickr-range-month'.
@@ -71,7 +70,7 @@ window.addEventListener('load', function() {
      */
     async function loadGoalSalesSettingsModal() {
         try {
-            const response = await fetch('/goal-sales/settings', {
+            const response = await fetch(goalSalesSettingsEditURL, {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -113,7 +112,7 @@ window.addEventListener('load', function() {
      */
     async function loadGoalSalesEditModal(meantime, companyId, companyName, purpose) {
         try {
-            let url = `/goal-sales/form/${meantime}/${companyId}/${purpose}`;
+            let url = goalSalesEditURL + `/${meantime}/${companyId}/${purpose}`;
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -199,7 +198,7 @@ window.addEventListener('load', function() {
 
             let formData = new FormData(form);
 
-            let url = `/goal-sales/post/${meantime}/${companyId}`;
+            let url = goalSalesCreateOrUpdateURL + `/${meantime}/${companyId}`;
 
             try {
                 const response = await fetch(url, {
@@ -254,7 +253,7 @@ window.addEventListener('load', function() {
             // Send AJAX request to toggle analytics mode in the database
             var xhr = new XMLHttpRequest();
 
-            xhr.open('POST', '/goal-sales/analytic-mode', true);
+            xhr.open('POST', goalSalesAnalyticModeURL, true);
             xhr.setRequestHeader('Cache-Control', 'no-cache'); // Set the Cache-Control header to no-cache
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -282,7 +281,7 @@ window.addEventListener('load', function() {
             // Send AJAX request to toggle analytics mode in the database
             var xhr = new XMLHttpRequest();
 
-            xhr.open('POST', '/goal-sales/slide-mode', true);
+            xhr.open('POST', goalSalesslideModeURL, true);
             xhr.setRequestHeader('Cache-Control', 'no-cache'); // Set the Cache-Control header to no-cache
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -314,7 +313,7 @@ window.addEventListener('load', function() {
             var xhr = new XMLHttpRequest();
 
 
-            xhr.open('POST', '/goal-sales/default-mode', true);
+            xhr.open('POST', goalSalesDefaultModeURL, true);
             xhr.setRequestHeader('Cache-Control', 'no-cache'); // Set the Cache-Control header to no-cache
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -382,12 +381,6 @@ window.addEventListener('load', function() {
             }
         }, 300);
     }
-
-    /**
-     * Initialize flatpickr
-     */
-    toggleZoomInOut();
-
 
 
     // Check if there are any elements with the class 'goal-chart' inside the element with class 'listing-chart'
@@ -709,8 +702,6 @@ window.addEventListener('load', function() {
     }
 
 
-    showButtonWhenInputChange();
-
 
     document.addEventListener('click', function (event) {
         // Check if the clicked element has the ID 'btn-ipca-self-fill'
@@ -876,9 +867,13 @@ window.addEventListener('load', function() {
     });
 
 
-    //Initialize bsPopoverTooltip
+
+    // Call the functions when the DOM is fully loaded
     bsPopoverTooltip();
-
-
+    toggleCustomMeantimeInput();
+    toggleZoomInOut();
+    showButtonWhenInputChange();
 
 });
+
+

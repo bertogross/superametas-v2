@@ -22,8 +22,8 @@
                         </div>
                         <div>
                             <h4>Error!</h4>
-                            <p class="text-muted w-75 mx-auto">We're not exactly sure what happened, but our servers say something is wrong.</p>
-                            <a href="{{ url('/') }}" class="btn btn-success"><i class="mdi mdi-home me-1"></i>Back to start</a>
+                            <p class="text-muted w-75 mx-auto">Não sabemos exatamente o que aconteceu, mas nossos servidores dizem que algo está errado.</p>
+                            <a href="{{ url('/') }}" class="btn btn-success"><i class="mdi mdi-home me-1"></i>Voltar ao início</a>
                         </div>
                     </div><!-- end col-->
                 </div>
