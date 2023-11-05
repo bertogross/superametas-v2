@@ -202,7 +202,8 @@ class SurveysController extends Controller
             'audited_by' => 'nullable',
             'current_user_editor' => 'nullable',
             'description' => 'nullable|string|max:1000',
-            'survey_compose_id' => 'nullable',
+            'survey_compose_custom_id' => 'nullable',
+            'survey_compose_default_id' => 'nullable',
             //'custom_fields' => 'nullable|array',
             //'custom_fields.*.type' => 'required_with:custom_fields|string|max:20',
             //'custom_fields.*.name' => 'required_with:custom_fields|string|max:30',
@@ -225,8 +226,11 @@ class SurveysController extends Controller
             $survey->update($validatedData);
 
             // Update custom fields
-            $composeId = $validatedData['survey_compose_id'];
-            SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_id', $composeId);
+            $composeCustomId = $validatedData['survey_compose_custom_id'];
+            SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_custom_id', $composeCustomId);
+
+            $composeDefaultId = $validatedData['survey_compose_default_id'];
+            SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_default_id', $composeDefaultId);
 
             //return redirect()->route('surveysShowURL', $survey)->with('success', 'Survey updated successfully');
             return response()->json(['success' => true, 'message' => 'Survey updated successfully!']);
@@ -234,11 +238,15 @@ class SurveysController extends Controller
             // Store operation
             $survey = $this->store($request);
 
-
             // Update custom fields
-            $composeId = $validatedData['survey_compose_id'];
-            SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_id', $composeId);
+            $composeCustomId = $validatedData['survey_compose_custom_id'];
+            SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_custom_id', $composeCustomId);
+
+            $composeDefaultId = $validatedData['survey_compose_default_id'];
+            SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_default_id', $composeDefaultId);
+
             return $survey;
+
             return response()->json(['success' => true, 'message' => 'Survey saved successfully!']);
         }
     }

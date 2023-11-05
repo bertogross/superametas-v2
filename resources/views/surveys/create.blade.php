@@ -14,7 +14,7 @@
         @endslot
         @slot('title')
             @if($survey)
-                Edição de Audotoria<small><i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i> #<span class="text-theme">{{$survey->id}}</span> {{-- limitChars($survey->title ?? '', 20) --}}</small>
+                Edição de Vistoria<small><i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i> #<span class="text-theme">{{$survey->id}}</span> {{-- limitChars($survey->title ?? '', 20) --}}</small>
             @else
                 Cadastrar Vistoria
             @endif
