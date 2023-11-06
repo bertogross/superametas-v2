@@ -54,26 +54,23 @@ class SurveyMeta extends Model
      */
     public static function updateSurveyMeta($surveyId, $metaKey, $metaValue)
     {
-        if($metaValue){
+        if($metaValue !== null){
             // Update or create the 'survey_metas' record for the given survey and key.
-            $meta = DB::connection('smAppTemplate')
+            return DB::connection('smAppTemplate')
                 ->table('survey_metas')
                 ->updateOrInsert(
                     ['survey_id' => $surveyId, 'meta_key' => $metaKey],
                     ['meta_value' => $metaValue]
                 );
-                return $meta ? true : null;
         }else{
             /// Delete the 'survey_metas' record for the given survey and key.
-            $deleted = DB::connection('smAppTemplate')
+            return DB::connection('smAppTemplate')
                 ->table('survey_metas')
                 ->where('survey_id', $surveyId)
                 ->where('meta_key', $metaKey)
                 ->delete();
 
-            return $deleted ? true : false;
         }
     }
-
 
 }

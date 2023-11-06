@@ -35,7 +35,12 @@ class SurveysComposeController extends Controller
 
         $getActiveDepartments = getActiveDepartments();
 
-        return view('surveys.compose.create', compact('type', 'data', 'topicsData', 'getActiveDepartments') );
+        return view('surveys.compose.create', compact(
+            'type',
+            'data',
+            'topicsData',
+            'getActiveDepartments'
+            ) );
     }
 
     public function edit($id)
@@ -52,7 +57,12 @@ class SurveysComposeController extends Controller
 
         session()->forget('success');
 
-        return view('surveys.compose.edit', compact('type', 'data', 'topicsData', 'getActiveDepartments'));
+        return view('surveys.compose.edit', compact(
+            'type',
+            'data',
+            'topicsData',
+            'getActiveDepartments'
+        ));
     }
 
     public function show(Request $request, $id = null)
@@ -69,7 +79,11 @@ class SurveysComposeController extends Controller
 
         $topicsData = SurveyCompose::reorderingData($decode);
 
-        return view('surveys.compose.show', compact('data', 'topicsData', 'preview') );
+        return view('surveys.compose.show', compact(
+            'data',
+            'topicsData',
+            'preview'
+            ) );
     }
 
 

@@ -16,7 +16,7 @@
     <div class="profile-foreground position-relative mx-n4 mt-n4">
         <div class="profile-wid-bg">
             <img
-            @if(empty(trim($user->cover)))
+            @if( empty(trim($user->cover)) || || !file_exists(URL::asset('storage/' . $user->cover)) )
                 src="{{URL::asset('build/images/small/img-9.jpg')}}"
             @else
                 src="{{ URL::asset('storage/' . $user->cover) }}"
@@ -30,7 +30,7 @@
             <div class="col-auto">
                 <div class="avatar-lg">
                     <img
-                    @if(empty(trim($user->avatar)))
+                    @if( empty(trim($user->avatar)) )
                         src="{{URL::asset('build/images/users/user-dummy-img.jpg')}}"
                     @else
                         src="{{ URL::asset('storage/' . $user->avatar) }}"

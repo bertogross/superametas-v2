@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Survey extends Model
 {
     use HasFactory;
 
     protected $connection = 'smAppTemplate';
+    //$model->setConnection('smAppTemplate');
 
     public $timestamps = true;
 
@@ -28,12 +30,15 @@ class Survey extends Model
         'audited_at'
     ];
 
-    public function meta()
+    public function metas()
     {
         return $this->hasMany(SurveyMeta::class);
     }
 
-    public static function countByStatus($status = false) {
+    public static function countByStatus($status = false)
+    {
+        $user = Auth::user();
+
         $query = DB::connection('smAppTemplate')
             ->table('surveys')
             ->select('status', DB::raw('count(*) as total'))
@@ -42,6 +47,8 @@ class Survey extends Model
         if($status){
             $query->where('status', $status);
         }
+
+        $query = $query->where('created_by', $user->id);
 
         $results = $query->get();
 

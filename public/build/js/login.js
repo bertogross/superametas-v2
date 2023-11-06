@@ -2,7 +2,6 @@ import {toastAlert} from './helpers.js';
 
 window.addEventListener('load', function() {
     document.getElementById('btn-login').addEventListener('click', function(event) {
-
         let database = document.getElementById('database').value;
         let email = document.getElementById('username').value;
         let password = document.getElementById('password-input').value;
@@ -20,7 +19,7 @@ window.addEventListener('load', function() {
         if(!database){
             event.preventDefault();
 
-            fetch('/login/check-databases', {
+            fetch(checkDatabasesURL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -34,6 +33,7 @@ window.addEventListener('load', function() {
             })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 if (data.databases.length > 1) {
                     // Show Swal to let user choose database
                     Swal.fire({
@@ -76,14 +76,23 @@ window.addEventListener('load', function() {
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            const databaseName = data.databases[result.value];
+                            let databaseName = data.databases[result.value];
                             document.getElementById('database').value = databaseName;
-                            document.getElementById('loginForm').submit();
+
+                            setTimeout(function() {
+                                document.getElementById('loginForm').submit();
+                            }, 500);
                         }
                     });
                 } else {
-                    document.getElementById('loginForm').submit();
+                    let databaseName = data.databases[0];
+                    document.getElementById('database').value = databaseName;
+
+                    setTimeout(function() {
+                        document.getElementById('loginForm').submit();
+                    }, 500);
                 }
+                return;
             });
         }
     });

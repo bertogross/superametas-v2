@@ -29,9 +29,9 @@ if (is_object($getActiveCompanies)) {
                             @if(isset($user))
                                 <!-- Save data in 'users' table collumn 'cover' -->
                                 <div class="px-1 pt-1">
-                                    <div class="modal-team-cover position-relative mb-0 mt-n4 mx-n4 rounded-top overflow-hidden">
+                                    <div class="modal-team-cover position-relative mb-0 mt-n4 mx-n4 rounded-top overflow-hidden" style="min-height: 140px;">
                                         <img
-                                        @if(empty(trim($user->cover)))
+                                        @if( empty(trim($user->cover)) )
                                             src="{{URL::asset('build/images/small/img-9.jpg')}}"
                                         @else
                                             src="{{ URL::asset('storage/' . $user->cover) }}"
@@ -77,7 +77,7 @@ if (is_object($getActiveCompanies)) {
                                         <div class="avatar-lg">
                                             <div class="avatar-title bg-light rounded-circle">
                                                 <img
-                                                @if(empty(trim($user->avatar)))
+                                                @if( empty(trim($user->avatar)) )
                                                     src="{{URL::asset('build/images/users/user-dummy-img.jpg')}}"
                                                 @else
                                                     src="{{ URL::asset('storage/' . $user->avatar) }}"

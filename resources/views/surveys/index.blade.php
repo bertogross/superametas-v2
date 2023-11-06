@@ -127,7 +127,7 @@
         <div class="card-body">
             @if ($surveys->isEmpty())
                 @component('components.nothing')
-                    @slot('url', route('surveysAddURL'))
+                    @slot('url', route('surveysCreateURL'))
                 @endcomponent
             @else
                 <div class="table-responsive table-card mb-4">
@@ -168,7 +168,7 @@
                                             @endphp
                                             <a href="javascript: void(0);" class="avatar-group-item me-1" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" aria-label="{{ $name }}" title="{{ $name }}">
                                                 <img
-                                                @if(empty(trim($avatar)))
+                                                @if( empty(trim($avatar)) )
                                                     src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
                                                 @else
                                                     src="{{ URL::asset('storage/' .$avatar ) }}"

@@ -40,7 +40,7 @@
                 <div class="col-lg-10">
                     <div class="tab-content text-muted mt-3 mt-lg-0">
                         <div class="tab-pane fade {{ session('active_tab') == 'account' || session('active_tab') == '' ? 'active show' : '' }}" id="v-pills-account" role="tabpanel" aria-labelledby="v-pills-account-tab">
-                            <form action="{{ route('settingsAccountStoreURL') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
+                            <form action="{{ route('settingsAccountCreateOrUpdateURL') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label" for="name">Nome da Empresa:</label>

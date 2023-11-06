@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\SurveyCompose;
 use App\Models\Survey;
 use App\Models\SurveyMeta;
-use App\Models\SurveyCompose;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +18,8 @@ class SurveysController extends Controller
 
     public function index(Request $request)
     {
+        $user = Auth::user();
+
         $status = $request->input('status');
         $delegated_to = $request->input('delegated_to');
         $audited_by = $request->input('audited_by');
@@ -31,7 +33,10 @@ class SurveysController extends Controller
             $query->where('status', $status);
         }
 
+        $query = $query->where('created_by', $user->id);
+
         // Search by delegated_to and or audited_by
+        /*
         if ($delegated_to) {
             $query->whereIn('delegated_to', $delegated_to);
         } elseif ($audited_by) {
@@ -39,7 +44,17 @@ class SurveysController extends Controller
         } elseif ($audited_by && $delegated_to) {
             $query->whereIn('audited_by', $audited_by)->orWhereIn('delegated_to', $delegated_to);
         }
-
+        */
+        if ($delegated_to && $audited_by) {
+            $query->where(function ($query) use ($delegated_to, $audited_by) {
+                $query->whereIn('delegated_to', $delegated_to)
+                      ->orWhereIn('audited_by', $audited_by);
+            });
+        } elseif ($delegated_to) {
+            $query->whereIn('delegated_to', $delegated_to);
+        } elseif ($audited_by) {
+            $query->whereIn('audited_by', $audited_by);
+        }
 
         if ($created_at) {
             $dates = explode(' até ', $created_at);
@@ -82,6 +97,7 @@ class SurveysController extends Controller
 
     public function show($id = null)
     {
+        /*
         $survey = Survey::findOrFail($id);
 
         if (!$survey) {
@@ -89,6 +105,10 @@ class SurveysController extends Controller
         }
 
         return view('surveys.show', compact('survey') );
+        */
+        $survey = Survey::findOrFail($id);
+        
+        return view('surveys.show', compact('survey'));
     }
 
     // Add
@@ -250,8 +270,4 @@ class SurveysController extends Controller
             return response()->json(['success' => true, 'message' => 'Survey saved successfully!']);
         }
     }
-
-
-
-
 }

@@ -64,7 +64,7 @@ class LoginController extends Controller
         DB::reconnect('smAppTemplate');
 
         // Debugging: Log the current database connection
-        //\Log::info('Current Database Connection: ' . config('database.connections.smAppTemplate.database'));
+        // \Log::info('Current Database Connection: ' . config('database.connections.smAppTemplate.database'));
         //dd(session()->all());
 
 

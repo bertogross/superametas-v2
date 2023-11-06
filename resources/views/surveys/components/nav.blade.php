@@ -13,17 +13,17 @@
             <span class="align-middle">Listar Vistorias</span>
         </a>
 
-        <a class="dropdown-item {{ request()->is('surveys/compose/listing') ? 'd-none' : '' }}" href="{{ route('surveysAddURL') }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Tarefa de Vistoria">
+        <a class="dropdown-item {{ request()->is('surveys/compose/listing') ? 'd-none' : '' }}" href="{{ route('surveysCreateURL') }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Tarefa de Vistoria">
             <i class="ri-add-line text-muted fs-16 align-middle me-1"></i>
             <span class="align-middle">Adicionar Vistoria</span>
         </a>
 
-        <a class="dropdown-item {{ request()->is('surveys/listing') ? 'd-none' : '' }}" href="{{ route('surveysComposeAddURL', ['type'=>'default']) }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Tarefa de Vistoria">
+        <a class="dropdown-item {{ request()->is('surveys/listing') ? 'd-none' : '' }}" href="{{ route('surveysComposeCreateURL', ['type'=>'default']) }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Tarefa de Vistoria">
             <i class="ri-add-line text-muted fs-16 align-middle me-1"></i>
             <span class="align-middle">Adicionar Formulário Departamentos</span>
         </a>
 
-        <a class="dropdown-item {{ request()->is('surveys/listing') ? 'd-none' : '' }}" href="{{ route('surveysComposeAddURL', ['type'=>'custom']) }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Tarefa de Vistoria">
+        <a class="dropdown-item {{ request()->is('surveys/listing') ? 'd-none' : '' }}" href="{{ route('surveysComposeCreateURL', ['type'=>'custom']) }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Tarefa de Vistoria">
             <i class="ri-add-line text-muted fs-16 align-middle me-1"></i>
             <span class="align-middle">Adicionar Formulário Customizado</span>
         </a>

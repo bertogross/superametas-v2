@@ -13,8 +13,6 @@ class SurveyCompose extends Model
     // Specifies the database connection for this model.
     protected $connection = 'smAppTemplate';
 
-    protected $table = 'survey_composes';
-
     protected $fillable = [
         'user_id',
         'title',
@@ -28,9 +26,6 @@ class SurveyCompose extends Model
 
     /**
      * Get all survey composes by type.
-     *
-     * @param string $type
-     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getAllByType($type = 'custom', $status = null)
     {
@@ -46,12 +41,9 @@ class SurveyCompose extends Model
         return $query->get();
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
-    public static function reorderingData($data) {
+    public static function reorderingData($data)
+    {
         $transformedData = [];
 
         if($data){

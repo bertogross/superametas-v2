@@ -22,22 +22,17 @@ class SetDynamicDatabase
             return redirect()->back()->withErrors(['email' => 'Informe um endereço de e-mail válido']);
         }
 
-        // Retrieve user by email from smOnboard
-        $user = DB::connection('smOnboard')->table('app_users')->where('user_email', $email)->first();
+        // Check if the user exists in the another databases
+        $getOtherDatabases = getOtherDatabases($email);
 
-        if (!$user) {
-            // Handle invalid user
-            return redirect()->back()->withErrors(['email' => 'Endereço de e-mail não cadastrado em nossa base de dados']);
+        if(!$getOtherDatabases){
+            return redirect()->back()->withErrors(['email' => 'Authentication failed']);
         }
 
-        // Determine which database to connect to based on user ID
-        $dynamicDatabaseName = isset($user->ID) ? 'smApp' . $user->ID : '';
+        // Get from the first account
+        $dynamicDatabaseName = $request->database ? $request->database : $getOtherDatabases[0];
 
-        if( empty($dynamicDatabaseName ) ){
-            return redirect()->back()->withErrors(['database' => 'Database not found']);
-        }
-
-        // Set the dynamic database connection configurations
+        // Set the dynamic database connection
         Config::set('database.connections.smAppTemplate.database', $dynamicDatabaseName);
 
         $dynamicDatabaseNameEncrypted = !empty($dynamicDatabaseName) ? Crypt::encryptString($dynamicDatabaseName) : '';

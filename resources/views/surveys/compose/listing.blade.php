@@ -64,7 +64,7 @@
                 <div class="tab-pane active" id="departments" role="tabpanel">
                     @if ($default->isEmpty())
                         @component('components.nothing')
-                            @slot('url', route('surveysComposeAddURL', ['type'=>'default']))
+                            @slot('url', route('surveysComposeCreateURL', ['type'=>'default']))
                         @endcomponent
                     @else
                         <div class="table-responsive">
@@ -112,7 +112,7 @@
                 <div class="tab-pane" id="custom" role="tabpanel">
                     @if ($custom->isEmpty())
                         @component('components.nothing')
-                            @slot('url', route('surveysComposeAddURL', ['type'=>'custom']))
+                            @slot('url', route('surveysComposeCreateURL', ['type'=>'custom']))
                         @endcomponent
                     @else
                         <div class="table-responsive">

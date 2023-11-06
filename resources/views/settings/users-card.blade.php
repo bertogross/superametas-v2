@@ -1,12 +1,14 @@
 <div class="col" data-search-user-id="{{ $id }}" data-search-user-name="@if(isset($name)) {{ $name }} @endif" data-search-user-role="@if(isset($role)){{ $role }}@endif">
     <div class="card team-box">
-        <div class="team-cover"> <img
-            @if(empty(trim($cover)))
+        <div class="team-cover" style="min-height: 140px">
+            <img
+            @if( empty(trim($cover)) )
                 src="{{ URL::asset('build/images/small/img-9.jpg') }}"
             @else
                 src="{{ URL::asset('storage/' . $cover) }}"
             @endif
-            alt="@if(isset($name)) {{ $name }} @endif" class="img-fluid" id="cover-img-@if(isset($id)){{ $id }}@endif"> </div>
+            alt="@if(isset($name)){{ $name }}@endif" class="img-fluid" height="140" id="cover-img-@if(isset($id)){{ $id }}@endif">
+        </div>
         <div class="card-body p-4">
             <div class="row align-items-center team-row">
                 <div class="col team-settings">
@@ -29,7 +31,7 @@
                 <div class="col-lg-4 col">
                     <div class="team-profile-img">
                         <div class="avatar-lg img-thumbnail rounded-circle flex-shrink-0"><img
-                            @if(empty(trim($avatar)))
+                            @if( empty(trim($avatar)) )
                                 src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
                             @else
                             src="{{ URL::asset('storage/' . $avatar) }}"

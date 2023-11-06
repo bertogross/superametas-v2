@@ -33,7 +33,7 @@
                                 <div class="p-2">
                                     <form id="loginForm" action="{{ route('login') }}" method="POST">
                                         @csrf
-                                        <input type="hidden" name="database" id="database">
+                                        <input type="hidden" name="database" id="database" autocomplete="off">
 
                                         <div class="mb-3">
                                             <label for="username" class="form-label">E-mail <span class="text-danger">*</span></label>
@@ -51,7 +51,7 @@
                                             </div>
                                             <label class="form-label" for="password-input">Senha <span class="text-danger">*</span></label>
                                             <div class="position-relative auth-pass-inputgroup mb-3">
-                                                <input type="password" class="form-control pe-5 password-input @error('password') is-invalid @enderror" name="password" placeholder="Senha aqui" id="password-input" required>
+                                                <input type="password" class="form-control pe-5 password-input @error('password') is-invalid @enderror" name="password" placeholder="Senha aqui" id="password-input" required maxlength="20">
                                                 <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle text-body"></i></button>
                                                 @error('password')
                                                     <span class="invalid-feedback" role="alert">
@@ -106,6 +106,10 @@
 @endsection
 @section('script')
 <script src="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.js') }}"></script>
+
+<script>
+    var checkDatabasesURL = "{{ route('checkDatabasesURL') }}";
+</script>
 
 <script src="{{ URL::asset('build/js/login.js') }}" type="module"></script>
 
