@@ -18,7 +18,7 @@ class SurveyCompose extends Model
         'title',
         'jsondata',
         //'status',
-    ];
+    ];                                                                                                         
 
     protected $casts = [
         'jsondata' => 'array',

@@ -84,7 +84,7 @@ class SurveysController extends Controller
         $audited_by = request('audited_by');
         $audited_by = is_array($audited_by) ? $audited_by : array();
 
-        return view('surveys.index', compact(
+        return view('surveys.listing', compact(
             'surveys',
             'users',
             'usersByRole',
@@ -107,13 +107,15 @@ class SurveysController extends Controller
         return view('surveys.show', compact('survey') );
         */
         $survey = Survey::findOrFail($id);
-        
+
         return view('surveys.show', compact('survey'));
     }
 
     // Add
     public function create()
     {
+        // Cache::flush();
+
         session()->forget('success');
 
         $survey = $surveyComposeCustomId = $surveyComposeDefaultId = null;
@@ -156,6 +158,8 @@ class SurveysController extends Controller
      */
     public function edit(Request $request)
     {
+        // Cache::flush();
+
         session()->forget('success');
 
         $survey = [];
@@ -211,9 +215,10 @@ class SurveysController extends Controller
         return $view;
     }
 
-
-    public function createOrUpdate(Request $request, $id = null)
+    public function storeOrUpdate(Request $request, $id = null)
     {
+        // Cache::flush();
+
         $validatedData = $request->validate([
             'status' => 'required|in:pending,in_progress,completed,audited',
             'assigned_to' => 'nullable',

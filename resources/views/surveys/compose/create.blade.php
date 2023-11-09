@@ -23,8 +23,16 @@
 
         @include('components.alerts')
 
-        <div class="row mb-3">
-            <div class="col-md-12 col-lg-6 col-xxl-7">
+        <div class="row mb-4">
+            <div class="col-md-12 col-lg-4 col-xxl-2">
+                <div class="card-body">
+                    @component('surveys.components.nav-pills')
+                        @slot('url', route('surveysComposeCreateURL', ['type'=>''.$type.'']))
+                    @endcomponent
+                </div>
+            </div>
+
+            <div class="col-md-12 col-lg-4 col-xxl-6">
                 <div class="card h-100">
                     <form id="surveysComposeForm" method="POST" autocomplete="off" class="needs-validation" novalidate autocomplete="false">
                         @csrf
@@ -33,17 +41,54 @@
                         <input type="hidden" name="type" value="{{ $type ?? 'custom'}}">
 
                         <div class="card-header">
-                            <div class="float-end">
-                                <button type="button" class="btn btn-sm btn-theme" id="btn-surveys-compose-store-or-update" tabindex="-1">
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="card-title mb-0"><i class="ri-drag-drop-line fs-16 align-middle text-theme me-2"></i>
+                                        Formulário
+                                        {{ $type == 'custom' ? 'Customizado' : 'Departamentos' }}
+                                    </h4>
+                                </div>
+                                <div class="col-auto dropstart">
+                                    <button type="button" class="btn btn-sm btn-theme" id="btn-surveys-compose-store-or-update" tabindex="-1">
+                                        @if ($data)
+                                            Atualizar
+                                        @else
+                                            Salvar
+                                        @endif
+                                    </button>
                                     @if ($data)
-                                        Atualizar
-                                    @else
-                                        Salvar
-                                    @endif
-                                </button>
-                            </div>
+                                        <button type="button" class="btn btn-sm btn-ghost-theme fs-4 pe-0" data-bs-toggle="dropdown" aria-expanded="false"  data-bs-auto-close="outside" title="Opções"><i class="ri-more-2-line"></i></button>
 
-                            <h4 class="card-title mb-0"><i class="ri-drag-drop-line fs-16 align-middle text-theme me-2"></i>Formulário</h4>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                @if ($data->status == 'active')
+                                                    <a class="dropdown-item" href="javascript:void(0);" id="btn-surveys-compose-toggle-status" id="btn-surveys-compose-toggle-status" data-status-to="disabled" data-compose-id="{{ $data->id }}" tabindex="-1" title="Clique para Desativar">
+                                                        <i class="ri-toggle-fill fs-16 align-middle me-1 text-theme"></i>
+                                                        <span class="align-middle">Desativar</span>
+                                                    </a>
+                                                @else
+                                                    <a class="dropdown-item" href="javascript:void(0);" id="btn-surveys-compose-toggle-status" data-status-to="active" data-compose-id="{{ $data->id }}" tabindex="-1" title="Clique para Ativar">
+                                                        <i class="ri-toggle-line fs-16 align-middle me-1 text-danger"></i>
+                                                        <span class="align-middle">Ativar</span>
+                                                    </a>
+                                                @endif
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0);" id="btn-surveys-compose-clone" data-compose-id="{{ $data->id }}" tabindex="-1" title="Gerar uma Cópia Exata">
+                                                    <i class="ri-file-copy-line fs-16 align-middle me-1 text-info"></i>
+                                                    <span class="align-middle">Clonar</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('surveysComposeShowURL', ['id' => is_array($data) ? $data['id'] : $data->id]) }}" title="Visualizar em nova guia" target="_blank" tabindex="-1">
+                                                    <i class="ri-eye-line fs-16 align-middle me-1 text-muted"></i>
+                                                    <span class="align-middle">Visualizar</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
 
                         <div id="nested-compose-area" class="card-body pb-0" style="min-height: 250px;">
@@ -52,17 +97,6 @@
                                     Esta é a área de composição
                                 </div>
                                 <div class="col-auto">
-                                    @if ($data)
-                                        <span class="btn-group">
-                                            @if ($data->status == 'active')
-                                                <button type="button" class="btn btn-sm btn-outline-danger" id="btn-surveys-compose-toggle-status" data-status-to="disabled" data-compose-id="{{ $data->id }}" tabindex="-1">Desativar</button>
-                                            @else
-                                                <button type="button" class="btn btn-sm btn-outline-success" id="btn-surveys-compose-toggle-status" data-status-to="active" data-compose-id="{{ $data->id }}" tabindex="-1">Ativar</a>
-                                            @endif
-
-                                            <button type="button" class="btn btn-sm btn-outline-info" id="btn-surveys-compose-clone" tabindex="-1">Clonar</button>
-                                        </span>
-                                    @endif
                                 </div>
                             </div>
 
@@ -101,19 +135,19 @@
                                         $originalIndex = intval($originalPosition);
                                         $newPosition = $stepData['new_position'] ?? $stepIndex;
                                     @endphp
-                                    <div id="{{ $originalIndex }}" class="accordion-item block-item mt-0 mb-3 border-dark p-0">
+                                    <div id="{{ $originalIndex }}" class="accordion-item block-item mt-3 mb-0 border-dark border-1 rounded rounded-2 p-0">
                                         <div class="input-group">
                                             @if( $type == 'custom' )
-                                                <input type="text" class="form-control" name="[{{ $originalIndex }}]['stepData']['step_name']" value="{{ $stepName }}" autocomplete="off" maxlength="100" required>
+                                                <input type="text" class="form-control text-theme" name="[{{ $originalIndex }}]['stepData']['step_name']" value="{{ $stepName }}" autocomplete="off" maxlength="100" required>
                                             @else
-                                                <input type="text" class="form-control disabled" autocomplete="off" maxlength="100" value="{{ $stepName }}"
+                                                <input type="text" class="form-control disabled text-theme" autocomplete="off" maxlength="100" value="{{ $stepName }}"
                                                 data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Para Departamentos, este campo não é editável"
                                                 readonly disabled>
                                                 <input type="hidden" name="[{{ $originalIndex }}]['stepData']['step_name']" value="{{ $stepName }}">
                                             @endif
-                                            <span class="btn btn-outline-light cursor-n-resize handle-receiver" title="Reordenar"><i class="ri-arrow-up-down-line text-body"></i></span>
+                                            <span class="tn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-receiver" title="Reordenar"><i class="ri-arrow-up-down-line text-body"></i></span>
 
-                                            <span class="btn btn-outline-light btn-accordion-toggle"><i class="ri-arrow-up-s-line"></i></span>
+                                            <span class="tn btn-ghost-dark btn-icon rounded-pill btn-accordion-toggle"><i class="ri-arrow-up-s-line"></i></span>
                                         </div>
 
                                         <input type="hidden" name="[{{ $originalIndex }}]['stepData']['original_position']" value="{{ $originalPosition }}" tabindex="-1">
@@ -131,8 +165,8 @@
                             @endif</div>
 
                             @if( $type == 'custom' )
-                                <div class="clearfix">
-                                    <button type="button" class="btn btn-sm btn-outline-theme float-end cursor-crosshair" id="btn-add-block" tabindex="-1" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Bloco"><i class="ri-folder-add-line"></i></button>
+                                <div class="clearfix mt-2">
+                                    <button type="button" class="btn btn-ghost-dark btn-icon rounded-pill float-end cursor-crosshair" id="btn-add-block" tabindex="-1" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Bloco"><i class="ri-folder-add-line text-theme fs-4"></i></button>
                                 </div>
                             @endif
                         </div>
@@ -140,14 +174,9 @@
                 </div>
             </div>
 
-            <div class="col-md-12 col-lg-6 col-xxl-5">
+            <div class="col-md-12 col-lg-4 col-xxl-4">
                 <div class="card h-100">
                     <div class="card-header">
-                        <div class="float-end">
-                            @if ($data)
-                                <a href="{{ route('surveysComposeShowURL', ['id' => is_array($data) ? $data['id'] : $data->id]) }}" class="btn btn-sm btn-outline-theme position-absolute me-3 end-0" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar em nova guia" target="_blank" tabindex="-1"><i class="ri-eye-line"></i></a>
-                            @endif
-                        </div>
                         <h4 class="card-title mb-0"><i class="ri-eye-2-fill fs-16 align-middle text-theme me-2"></i>Pré-visualização</h4>
                     </div>
 
@@ -165,15 +194,21 @@
     //appPrintR($topicsData);
 @endphp
 @section('script')
-    <script src="{{ URL::asset('build/libs/sortablejs/Sortable.min.js') }}"></script>
-
-    <script src="{{ URL::asset('build/js/surveys-sortable.js') }}" type="module"></script>
-
     <script>
         var surveysComposeShowURL = "{{ route('surveysComposeShowURL') }}";
-        var surveysComposeCreateOrUpdateURL = "{{ route('surveysComposeCreateOrUpdateURL') }}";
+        var surveysComposeStoreOrUpdateURL = "{{ route('surveysComposeStoreOrUpdateURL') }}";
         var surveysComposeToggleStatusURL = "{{ route('surveysComposeToggleStatusURL') }}";
+
+        var surveysTermsSearchURL = "{{ route('surveysTermsSearchURL') }}";
+        var surveysTermsStoreOrUpdateURL = "{{ route('surveysTermsStoreOrUpdateURL') }}";
+        var choicesSelectorClass = ".surveys-term-choice";
     </script>
 
+    <script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
+
+    <script src="{{ URL::asset('build/libs/sortablejs/Sortable.min.js') }}"></script>
+
     <script src="{{ URL::asset('build/js/surveys-compose.js') }}" type="module"></script>
+
+    <script src="{{ URL::asset('build/js/surveys-sortable.js') }}" type="module"></script>
 @endsection

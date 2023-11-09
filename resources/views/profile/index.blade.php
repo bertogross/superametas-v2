@@ -16,7 +16,7 @@
     <div class="profile-foreground position-relative mx-n4 mt-n4">
         <div class="profile-wid-bg">
             <img
-            @if( empty(trim($user->cover)) || || !file_exists(URL::asset('storage/' . $user->cover)) )
+            @if( empty(trim($user->cover)) || !file_exists(URL::asset('storage/' . $user->cover)) )
                 src="{{URL::asset('build/images/small/img-9.jpg')}}"
             @else
                 src="{{ URL::asset('storage/' . $user->cover) }}"

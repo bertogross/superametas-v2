@@ -8,20 +8,23 @@ https://laravel-news.com/openai-for-laravel
 
 
 
-Version 2.0.23 - [2023-11-01 - 2023-11-06]
+Version 2.0.23 - [2023-11-01 - 2023-11-08]
 - [Updated] HTML: blade page (/surveys/compose) to Composition of the Inspection Form
 - [Added] SurveysComposeController and model/surveyCompose
+- [Added] SurveysTermController and model/surveyTerm
 - [Added] surveys-compose.js
+- [Added] surveys-terms.js
+- [Started] HTML: blade pages (/surveys/terms)
 
 
 
 Version 2.0.22 - [2023-10-31]
-- [Added] HTML: blade page (/surveys/compose) to Composition of the Inspection Form
+- [Added] HTML: blade pages (/surveys/compose)
 
 
 
 Version 2.0.21 - [2023-10-30]
-- [Started] HTML: blade page (/surveys/compose) to Composition of the Inspection Form
+- [Started] HTML: blade page (/surveys/compose)
 
 
 

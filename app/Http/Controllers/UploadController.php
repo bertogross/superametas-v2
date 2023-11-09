@@ -96,34 +96,48 @@ class UploadController extends Controller
     public function uploadLogo(Request $request)
     {
         try {
-            // Validate the uploaded file
-            $request->validate([
-                'logo' => 'required|file|mimes:jpeg,jpg|max:5120', // Only allow JPEG images up to 5MB
-            ]);
+            $messages = [
+                'file.required' => 'A file is required.',
+                'file.file' => 'The uploaded item must be a file.',
+                'file.mimes' => 'Only JPEG images are allowed.',
+                'file.max' => 'The image may not be greater than 5 megabytes.',
+            ];
 
-            // Check if there's an old logo and delete it
-            $oldLogo = DB::connection($this->connection)->table('settings')->where('key', 'logo')->value('value');
-            if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
-                Storage::disk('public')->delete($oldLogo);
+            // Validate the uploaded file
+            $validatedData = $request->validate([
+                'file' => 'required|file|mimes:jpeg,jpg,png|max:5120', // Only allow JPEG images up to 5MB
+            ], $messages);
+
+            if ($request->hasFile('file')) {
+                // Store the uploaded file
+                $file = $request->file('file');
+
+                // Check if there's an old logo and delete it
+                $oldLogo = DB::connection($this->connection)->table('settings')->where('key', 'logo')->value('value');
+                if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
+                    Storage::disk('public')->delete($oldLogo);
+                }
+
+                // Get the database name from the connection configuration
+                $config = config("database.connections.{$this->connection}");
+                $dbName = $config['database'];
+
+                $folder = 'logo';
+
+                $path = "{$dbName}/" . $folder . '/' . date('Y') . '/' . date('m');
+
+                $filePath = $file->store($path, 'public');
+
+                // Save the file path in the settings table
+                $settings = DB::connection($this->connection)->table('settings')->updateOrInsert(
+                    ['key' => 'logo'],
+                    ['value' => $filePath]
+                );
+
+                return response()->json(['success' => true, 'message' => 'Logo uploaded successfully!', 'path' => $filePath], 200);
             }
 
-            // Get the database name from the connection configuration
-            $config = config("database.connections.{$this->connection}");
-            $dbName = $config['database'];
-
-            $path = "{$dbName}/" . '/logo' . '/' . date('Y') . '/' . date('m');
-
-            // Store the uploaded file
-            $file = $request->file('logo');
-            $filePath = $file->store($path, 'public');
-
-            // Save the file path in the settings table
-            $settings = DB::connection($this->connection)->table('settings')->updateOrInsert(
-                ['key' => 'logo'],
-                ['value' => $filePath]
-            );
-
-            return response()->json(['success' => true, 'message' => 'Logo uploaded successfully!', 'path' => $filePath], 200);
+            return response()->json(['success' => false, 'message' => 'File not provided'], 422);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }

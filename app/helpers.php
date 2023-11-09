@@ -2,6 +2,8 @@
 
 use App\Models\User;
 use App\Models\UserMeta;
+use App\Models\SurveyTerm;
+
 use Illuminate\Support\Facades\DB;
 
 // Get all users with status = 1, ordered by name
@@ -49,6 +51,7 @@ if( !function_exists('getUserData') ){
                 'status' => $user->status,
                 'avatar' => $user->avatar,
                 'cover' => $user->cover,
+                'role' => $user->role,
                 'created_at' => $user->created_at->format('Y-m-d H:i:s'),
             );
         }
@@ -56,6 +59,7 @@ if( !function_exists('getUserData') ){
         return null;
     }
 }
+
 
 if (!function_exists('canManageGoalSales')) {
     function canManageGoalSales() {
@@ -325,38 +329,50 @@ if (!function_exists('getActiveCompanies')) {
 
 if (!function_exists('getSettings')) {
     function getSettings($key) {
-        if($key){
-            $settings = DB::connection('smAppTemplate')->table('settings')->pluck('value', 'key')->toArray();
-            return isset($settings[$key]) ? $settings[$key] : '';
+        // Static variable to hold the settings array
+        static $settingsCache = null;
+
+        // Check if settings have already been loaded
+        if ($settingsCache === null) {
+            // Load settings and cache them
+            $settingsCache = DB::connection('smAppTemplate')->table('settings')->pluck('value', 'key')->toArray();
         }
 
-        return null;
+        // Return the setting if it exists, or an empty string as a default
+        return isset($settingsCache[$key]) ? $settingsCache[$key] : '';
     }
 }
 
 if (!function_exists('getCompanyLogo')) {
     function getCompanyLogo(){
-        return URL::asset('storage/' . getSettings('logo'));
+        // Use the 'getSettings' function which uses a cached version of settings
+        return getSettings('logo') ? URL::asset('storage/' . getSettings('logo')) : null;
     }
 }
 
 if (!function_exists('getCompanyName')) {
     function getCompanyName(){
+        // Use the 'getSettings' function which uses a cached version of settings
         return getSettings('name');
     }
 }
 
 if (!function_exists('getGoogleToken')) {
     function getGoogleToken(){
+        // Use the 'getSettings' function which uses a cached version of settings
         return getSettings('google_token');
     }
 }
 
 if (!function_exists('getDropboxToken')) {
     function getDropboxToken(){
+        // Use the 'getSettings' function which uses a cached version of settings
         return getSettings('dropbox_token');
     }
 }
+
+
+
 
 if (!function_exists('formatSize')) {
     function formatSize($size) {
@@ -481,6 +497,13 @@ if (!function_exists('getGoalsId')) {
     }
 }
 
+if (!function_exists('getTermNameById')) {
+    function getTermNameById($termId) {
+        $term = SurveyTerm::find($termId);
+
+        return $term ? $term->name : null;
+    }
+}
 
 if( !function_exists('goalsEmojiChart') ){
 	function goalsEmojiChart($nChartId, $goal, $sale, $departmentId, $departmentName, $companyName, $percent, $percentAccrued, $style = ''){

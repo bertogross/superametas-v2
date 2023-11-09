@@ -13,6 +13,7 @@ use App\Http\Controllers\{
     GoalSalesController,
     SurveysController,
     SurveysComposeController,
+    SurveyTermController,
     SettingsApiKeysController,
     DropboxController,
     ClarifaiImageController,
@@ -40,9 +41,13 @@ Route::middleware(['auth'])->group(function () {
     // Goal Sales Routes
     Route::prefix('goal-sales')->group(function () {
         Route::get('/', [GoalSalesController::class, 'index'])->name('goalSalesIndexURL');
-        Route::get('/settings', [GoalSalesController::class, 'settings'])->name('goalSalesSettingsURL');
+        Route::get('/settings', [GoalSalesController::class, 'settings'])->name('goalSalesSettingsEditURL');
         Route::get('/form/{meantime?}/{companyId?}/{purpose?}', [GoalSalesController::class, 'edit'])->name('goalSalesEditURL');
-        Route::post('/store/{meantime?}/{companyId?}', [GoalSalesController::class, 'createOrUpdate'])->name('goalSalesCreateOrUpdateURL');
+        Route::post('/store/{meantime?}/{companyId?}', [GoalSalesController::class, 'storeOrUpdate'])->name('goalSalesStoreOrUpdateURL');
+
+        Route::post('/analytic-mode', [GoalSalesController::class, 'analyticMode'])->name('goalSalesAnalyticModeURL');
+        Route::post('/slide-mode', [GoalSalesController::class, 'slideMode'])->name('goalSalesSlideModeURL');
+        Route::post('/default-mode', [GoalSalesController::class, 'defaultMode'])->name('goalSalesDefaultModeURL');
     });
 
     // Surveys Routes
@@ -51,26 +56,35 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id?}', [SurveysController::class, 'show'])->name('surveysShowURL')->where('id', '[0-9]+');
         Route::get('/create', [SurveysController::class, 'create'])->name('surveysCreateURL');
         Route::get('/edit/{id?}', [SurveysController::class, 'edit'])->name('surveysEditURL')->where('id', '[0-9]+');
-        Route::post('/store/{id?}', [SurveysController::class, 'createOrUpdate'])->name('surveysCreateOrUpdateURL');
+        Route::post('/store/{id?}', [SurveysController::class, 'storeOrUpdate'])->name('surveysStoreOrUpdateURL');
 
-        Route::get('/compose/listing', [SurveysComposeController::class, 'index'])->name('surveysComposeIndexURL');
-        Route::get('/compose/create/{type?}', [SurveysComposeController::class, 'create'])->name('surveysComposeCreateURL')->where('type', 'custom|default');
-        Route::get('/compose/edit/{id?}', [SurveysComposeController::class, 'edit'])->name('surveysComposeEditURL');
-        Route::get('/compose/show/{id?}', [SurveysComposeController::class, 'show'])->name('surveysComposeShowURL');
-        Route::post('/compose/store/{id?}', [SurveysComposeController::class, 'createOrUpdate'])->name('surveysComposeCreateOrUpdateURL');
-        Route::post('/compose/toggle-status/{id?}/{status?}', [SurveysComposeController::class, 'toggleStatus'])->name('surveysComposeToggleStatusURL');
+            // Form Compose Routes
+            Route::get('/compose/listing', [SurveysComposeController::class, 'index'])->name('surveysComposeIndexURL');
+            Route::get('/compose/create/{type?}', [SurveysComposeController::class, 'create'])->name('surveysComposeCreateURL')->where('type', 'custom|default');
+            Route::get('/compose/edit/{id?}', [SurveysComposeController::class, 'edit'])->name('surveysComposeEditURL');
+            Route::get('/compose/show/{id?}', [SurveysComposeController::class, 'show'])->name('surveysComposeShowURL');
+            Route::post('/compose/store/{id?}', [SurveysComposeController::class, 'storeOrUpdate'])->name('surveysComposeStoreOrUpdateURL');
+            Route::post('/compose/toggle-status/{id?}/{status?}', [SurveysComposeController::class, 'toggleStatus'])->name('surveysComposeToggleStatusURL');
+
+        // Term Routes
+        Route::get('/terms/listing', [SurveyTermController::class, 'index'])->name('surveysTermsIndexURL');
+        Route::get('/terms/create', [SurveyTermController::class, 'create'])->name('surveysTermsCreateURL');
+        Route::get('/terms/edit/{id?}', [SurveyTermController::class, 'edit'])->name('surveysTermsEditURL');
+        Route::post('/terms/store', [SurveyTermController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
+        Route::get('/terms/search', [SurveyTermController::class, 'search'])->name('surveysTermsSearchURL');
     });
+
 
     // Admin Settings
     Route::middleware(['admin'])->group(function () {
         Route::prefix('settings')->group(function () {
             Route::get('/', [SettingsAccountController::class, 'index'])->name('settingsIndexURL');
-            Route::get('/account', [SettingsAccountController::class, 'show'])->name('settingsAccountURL');
-                Route::post('/account/store', [SettingsAccountController::class, 'createOrUpdate'])->name('settingsAccountCreateOrUpdateURL');
+            Route::get('/account', [SettingsAccountController::class, 'show'])->name('settingsAccountShowURL');
+                Route::post('/account/store', [SettingsAccountController::class, 'storeOrUpdate'])->name('settingsAccountStoreOrUpdateURL');
 
-            Route::get('/api-keys', [SettingsApiKeysController::class, 'apiKeys'])->name('settingsApiKeysURL');
+            Route::get('/api-keys', [SettingsApiKeysController::class, 'index'])->name('settingsApiKeysURL');
 
-            Route::get('/database', [SettingsDatabaseController::class, 'database'])->name('settingsDatabaseURL');
+            Route::get('/database', [SettingsDatabaseController::class, 'index'])->name('settingsDatabaseIndexURL');
                 Route::put('/departments/store', [SettingsDatabaseController::class, 'updateDepartments'])->name('settingsDepartmentsUpdateURL');
                 Route::put('/companies/store', [SettingsDatabaseController::class, 'updateCompanies'])->name('settingsCompaniesUpdateURL');
 
@@ -89,21 +103,25 @@ Route::middleware(['auth'])->group(function () {
 
     // File Upload Routes
     Route::prefix('upload')->group(function () {
-        Route::post('/avatar', [UploadController::class, 'avatar'])->name('uploadAvatarURL');
-        Route::post('/cover', [UploadController::class, 'cover'])->name('uploadCoverURL');
-        Route::post('/logo', [UploadController::class, 'logo'])->name('uploadLogoURL');
+        Route::post('/avatar', [UploadController::class, 'uploadAvatar'])->name('uploadAvatarURL');
+        Route::post('/cover', [UploadController::class, 'uploadCover'])->name('uploadCoverURL');
+        Route::post('/logo', [UploadController::class, 'uploadLogo'])->name('uploadLogoURL');
         Route::delete('/logo', [UploadController::class, 'deleteLogo'])->name('deleteLogoURL');
     });
 });
 
 // Dynamic Database Middleware for Login
 Route::middleware([SetDynamicDatabase::class])->group(function () {
-    Route::post('/login', [LoginController::class, 'login'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
 });
 
 // Logout Route
 Route::post('/login/check-databases', [LoginController::class, 'checkDatabases'])->name('checkDatabasesURL');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::fallback(function () {
+    return response()->view('error.auth-404-basic', [], 404);
+});
 
 // Catch-All Route
 Route::get('{any}', [HomeController::class, 'index'])->where('any', '.*')->name('index');

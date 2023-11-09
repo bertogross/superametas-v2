@@ -19,9 +19,11 @@
 
     <div id="content" class="rounded rounded-2 mb-4">
         <div class="bg-warning-subtle position-relative">
-            <span class="float-start m-3"><?php echo statusBadge($data->status); ?></span>
+            <?php if(!$edition): ?>
+                <span class="float-start m-3"><?php echo statusBadge($data->status); ?></span>
+            <?php endif; ?>
 
-            <?php if(!$preview): ?>
+            <?php if(!$preview && !$edition): ?>
                 <a href="<?php echo e(route('surveysComposeEditURL', ['id' => $data->id])); ?>" class="btn btn-sm btn-light btn-icon waves-effect ms-2 float-end m-3" title="Editar registro: <?php echo e(limitChars($data->title ?? '', 20)); ?>"><i class="ri-edit-line"></i></a>
             <?php endif; ?>
 
@@ -48,7 +50,7 @@
         </div>
 
         <div>
-            <?php echo $__env->make('surveys.includes.steps-card', ['topicsData' => $topicsData], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+            <?php echo $__env->make('surveys.includes.steps-card', ['data' => $data, 'topicsData' => $topicsData, 'edition' => $edition, 'users' => $users], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
         </div>
         <?php
         //appPrintR($data->jsondata);

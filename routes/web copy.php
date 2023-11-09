@@ -65,10 +65,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/goal-sales/settings', [GoalSalesController::class, 'settings'])->name('goalSalesSettingsEditURL');
     Route::get('/goal-sales/form/{meantime?}/{companyId?}/{purpose?}', [GoalSalesController::class, 'edit'])->name('goalSalesEditURL');// view form
 
-    Route::post('/goal-sales/post/{meantime?}/{companyId?}', [GoalSalesController::class, 'createOrUpdate'])->name('goalSalesCreateOrUpdateURL'); // update or store
+    Route::post('/goal-sales/post/{meantime?}/{companyId?}', [GoalSalesController::class, 'storeOrUpdate'])->name('goalSalesStoreOrUpdateURL'); // update or store
 
     Route::post('/goal-sales/analytic-mode', [GoalSalesController::class, 'analyticMode'])->name('goalSalesAnalyticModeURL');
-    Route::post('/goal-sales/slide-mode', [GoalSalesController::class, 'slideMode'])->name('goalSalesslideModeURL');
+    Route::post('/goal-sales/slide-mode', [GoalSalesController::class, 'slideMode'])->name('goalSalesSlideModeURL');
     Route::post('/goal-sales/default-mode', [GoalSalesController::class, 'defaultMode'])->name('goalSalesDefaultModeURL');
     /****************************************************
      * END Goal Sales Routes
@@ -94,7 +94,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/surveys/edit/{id?}', [SurveysController::class, 'edit'])->name('surveysEditURL');
 
     // Ajax Store / Update survey
-    Route::post('/surveys/store/{id?}', [SurveysController::class, 'createOrUpdate'])->name('surveysCreateOrUpdateURL');
+    Route::post('/surveys/store/{id?}', [SurveysController::class, 'storeOrUpdate'])->name('surveysStoreOrUpdateURL');
 
         /****************************************************
          * START Surveys Compose Routes
@@ -113,7 +113,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Ajax Create or Update the custom form
         //Route::post('/surveys/compose/store', [SurveysComposeController::class, 'create'])->name('surveysComposeStoreURL');
-        Route::post('/surveys/compose/post/{id?}', [SurveysComposeController::class, 'createOrUpdate'])->name('surveysComposeCreateOrUpdateURL');
+        Route::post('/surveys/compose/post/{id?}', [SurveysComposeController::class, 'storeOrUpdate'])->name('surveysComposeStoreOrUpdateURL');
 
         // Ajax toggle status
         Route::post('/surveys/compose/toggle-status/{id?}/{status?}', [SurveysComposeController::class, 'toggleStatus'])->name('surveysComposeToggleStatusURL');
@@ -133,7 +133,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Subscription and form related with the primary user
         Route::get('/settings/account', [SettingsAccountController::class, 'show'])->name('settingsAccountShowURL');
-        Route::post('/settings/account/store', [SettingsAccountController::class, 'storeAccount'])->name('settingsAccountCreateOrUpdateURL');
+        Route::post('/settings/account/store', [SettingsAccountController::class, 'storeAccount'])->name('settingsAccountStoreOrUpdateURL');
 
         // API Key, Files Manager, Sinc Database (sales, companies, departments)
         Route::get('/settings/api-keys', [SettingsApiKeysController::class, 'index'])->name('settingsApiKeysURL');

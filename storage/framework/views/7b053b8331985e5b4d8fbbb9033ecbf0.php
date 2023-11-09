@@ -1,23 +1,38 @@
 <!-- ========== App Menu ========== -->
+<?php
+    $getCompanyLogo = getCompanyLogo();
+?>
 <div class="app-menu navbar-menu">
     <!-- LOGO -->
     <div class="navbar-brand-box">
         <!-- Dark Logo-->
-        <a href="<?php echo e(url('/')); ?>" class="logo logo-dark">
+        <a href="<?php echo e(url('/')); ?>" class="logo logo-dark" title="Ir para inicial do <?php echo e(env('APP_NAME')); ?>">
             <span class="logo-sm">
                 <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="22">
             </span>
             <span class="logo-lg">
-                <img src="<?php echo e(URL::asset('build/images/logo-dark.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="39">
+                <img
+                <?php if($getCompanyLogo): ?>
+                    src="<?php echo e($getCompanyLogo); ?>"
+                <?php else: ?>
+                    src="<?php echo e(URL::asset('build/images/logo-dark.png')); ?>"
+                <?php endif; ?>
+                alt="<?php echo e(env('APP_NAME')); ?>" height="39">
             </span>
         </a>
         <!-- Light Logo-->
-        <a href="<?php echo e(url('/')); ?>" class="logo logo-light">
+        <a href="<?php echo e(url('/')); ?>" class="logo logo-light" title="Ir para inicial do <?php echo e(env('APP_NAME')); ?>">
             <span class="logo-sm">
                 <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="22">
             </span>
             <span class="logo-lg">
-                <img src="<?php echo e(URL::asset('build/images/logo-light.png')); ?>" alt="<?php echo e(env('APP_NAME')); ?>" height="39">
+                <img
+                <?php if($getCompanyLogo): ?>
+                    src="<?php echo e($getCompanyLogo); ?>"
+                <?php else: ?>
+                    src="<?php echo e(URL::asset('build/images/logo-light.png')); ?>"
+                <?php endif; ?>
+                alt="<?php echo e(env('APP_NAME')); ?>" height="39">
             </span>
         </a>
         <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">

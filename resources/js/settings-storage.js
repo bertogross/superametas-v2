@@ -1,6 +1,6 @@
 import {toastAlert, formatSize} from './helpers.js';
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
     // Set the file type filter based on the URL parameter
     const url = new URL(window.location.href);
     const fileType = url.searchParams.get('fileType');

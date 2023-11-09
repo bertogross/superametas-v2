@@ -40,7 +40,7 @@
                 <div class="col-lg-10">
                     <div class="tab-content text-muted mt-3 mt-lg-0">
                         <div class="tab-pane fade {{ session('active_tab') == 'account' || session('active_tab') == '' ? 'active show' : '' }}" id="v-pills-account" role="tabpanel" aria-labelledby="v-pills-account-tab">
-                            <form action="{{ route('settingsAccountCreateOrUpdateURL') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
+                            <form action="{{ route('settingsAccountStoreOrUpdateURL') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label" for="name">Nome da Empresa:</label>
@@ -55,20 +55,33 @@
                                 <div class="card mb-3">
                                     <div class="card-header">
                                         <h4 class="card-title mb-0">Envie o logotipo de sua empresa</h4>
+                                        <small class="form-text">Formato suportado: <strong class="text-theme">JPG/PNG</strong> | Recomendado PNG transparente na dimensão: 360 x 80 pixels</small>
                                     </div>
                                     <div class="card-body">
-                                        <p class="form-text">
-                                            Formato suportado: <strong class="text-theme">JPG</strong> | Dimensão recomendada: 200 x 200 pixels
-                                        </p>
-                                        <div class="avatar-xl mx-auto">
-                                            <input
-                                            type="file"
-                                            class="filepond filepond-input-logo"
-                                            name="logo"
-                                            @if(isset($settings['logo']) && $settings['logo'])
-                                                data-default-file="{{ asset('storage/' . $settings['logo']) }}"
-                                            @endif
-                                            accept="image/jpeg"/>
+                                        <div class="text-center">
+                                            <div class="position-relative d-inline-block">
+                                                <div class="position-absolute bottom-0 end-0">
+                                                    <label for="logo-image-input" class="mb-0" data-bs-toggle="tooltip" data-bs-placement="right" title="Clique aqui e envie o logotipo de sua empresa">
+                                                        <div class="avatar-xs">
+                                                            <div class="avatar-title bg-light border rounded-circle text-muted cursor-pointer">
+                                                                <i class="ri-image-fill text-white"></i>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                    <input class="form-control d-none" name="logo" id="logo-image-input" type="file" accept="image/png, image/jpeg">
+                                                </div>
+                                                <div class="avatar-lg">
+                                                    <div class="avatar-title bg-transparent">
+                                                        <img
+                                                        @if(isset($settings['logo']) && $settings['logo'])
+                                                            src="{{ asset('storage/' . $settings['logo']) }}"
+                                                        @else
+                                                            src="{{URL::asset('build/images/logo.png')}}"
+                                                        @endif
+                                                        id="logo-img" alt="logo" data-user-id="1" style="max-height: 100px;" />
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -97,6 +110,8 @@
     <script src="{{ URL::asset('build/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js') }}"></script>
     <script src="{{ URL::asset('build/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
 
+    <script>
+        var uploadLogoURL = "{{ route('uploadLogoURL') }}";
+    </script>
     <script src="{{ URL::asset('build/js/settings-account.js') }}" type="module"></script>
-
 @endsection

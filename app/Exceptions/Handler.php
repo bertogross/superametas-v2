@@ -50,9 +50,9 @@ class Handler extends ExceptionHandler
         if ($e instanceof HttpException) {
             $statusCode = $e->getStatusCode();
             switch ($statusCode) {
-                case 501:
-                    return response()->view('error.auth-500', [], 501);
-                // Add other status codes as needed
+                case 500:
+                    return response()->view('error.auth-500', [], 500);
+                    break;
                 default:
                     return response()->view('error.general', ['exception' => $e], $statusCode);
             }

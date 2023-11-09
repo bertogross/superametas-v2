@@ -1,6 +1,11 @@
-import {toastAlert} from './helpers.js';
+import {
+    toastAlert,
+    attachImage
+} from './helpers.js';
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
+
+    /*
     // Register the plugins
     FilePond.registerPlugin(
         FilePondPluginFileEncode,
@@ -28,25 +33,56 @@ window.addEventListener('load', function() {
                 allowImagePreview: true,
                 allowRevert: true,
                 server: {
-                    url: '/upload/logo',
+                    url: uploadLogoURL,
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    onload: (response) => {
+                        try {
+                            const res = JSON.parse(response);
+                            toastAlert(res.message, res.success ? 'success' : 'error');
+                        } catch (e) {
+                            toastAlert('Failed to parse server response', 'error');
+                        }
+                    },
+                    onerror: (response) => {
+                        try {
+                            const res = JSON.parse(response);
+                            toastAlert(res.message, 'error');
+                        } catch (e) {
+                            toastAlert('Failed to parse error response', 'error');
+                        }
                     }
                 }
             });
 
             // Set the initial file if it exists
-            if (inputElement.dataset.defaultFile) {
                 pond.addFile(inputElement.dataset.defaultFile);
-            }
+
+                // Set up FilePond event listeners
+                pond.on('processfile', (error, file) => {
+                    if (error) {
+                        toastAlert('Error during upload: ' + error, 'error');
+                    } else {
+                        toastAlert('File uploaded: ' + file.filename, 'success');
+                    }
+                });
+
+                pond.on('error', (error) => {
+                    toastAlert('FilePond error: ' + error.description, 'error');
+                });
+
+
         } else {
-            console.error('Input element not found!');
+            // Handle the case when the input element is not found
             toastAlert('Input element not found!', 'error');
         }
     }
+    */
 
+    attachImage("#logo-image-input", "#logo-img", uploadLogoURL);
 
     // Mask for input phone
     function formatPhoneNumber() {
@@ -78,7 +114,7 @@ window.addEventListener('load', function() {
 
     // Call the functions when the DOM is fully loaded
     formatPhoneNumber();
-    attachFilePondToLogo();
+    //attachFilePondToLogo();
 });
 
 

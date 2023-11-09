@@ -190,8 +190,7 @@
                                             <div class="mb-3">
                                                 <label for="JoiningdatInput" class="form-label">Joining
                                                     Date</label>
-                                                <input type="text" class="form-control" data-provider="flatpickr"
-                                                    id="JoiningdatInput" data-date-format="d M, Y"
+                                                <input type="text" class="form-control flatpickr"                                                     id="JoiningdatInput" data-date-format="d M, Y"
                                                     data-default-date="24 Nov, 2021" placeholder="Select date" />
                                             </div>
                                         </div>

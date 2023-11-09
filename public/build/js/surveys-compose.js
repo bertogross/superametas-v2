@@ -1,16 +1,20 @@
 import {
     toastAlert,
     bsPopoverTooltip,
-    enableRevalidationOnInput,
+    revalidationOnInput,
     makeFormPreviewRequest
 } from './helpers.js';
 
-window.addEventListener('load', function() {
+import {
+    choicesListeners
+} from './surveys-terms.js';
+
+document.addEventListener('DOMContentLoaded', function() {
 
     // Ajax to store or update data
-    var btncreateOrUpdate = document.getElementById('btn-surveys-compose-store-or-update');
-    if (btncreateOrUpdate) {
-        btncreateOrUpdate.addEventListener('click', function (event) {
+    var btnStoreOrUpdate = document.getElementById('btn-surveys-compose-store-or-update');
+    if (btnStoreOrUpdate) {
+        btnStoreOrUpdate.addEventListener('click', function (event) {
             event.preventDefault();
 
             // Validate form
@@ -30,6 +34,14 @@ window.addEventListener('load', function() {
                 return;
             }
 
+            var searchInput = document.querySelectorAll('.choices__input--cloned');
+            if (searchInput) {
+                searchInput.forEach(function (choicesSearchTermsInput) {
+                    choicesSearchTermsInput.disabled = true;
+                });
+            }
+
+
             // Validate ID
             var id = form.querySelector('input[name="id"]').value;
 
@@ -43,7 +55,7 @@ window.addEventListener('load', function() {
                 var value = pair[1];
 
                 var stepMatch = key.match(/item\[(\d+)\]/);
-                var topicMatch = key.match(/\['topic_name'\]\[(\d+)\]/);
+                var topicMatch = key.match(/\['topic_id'\]\[(\d+)\]/);
 
                 var stepIndex = stepMatch ? stepMatch[1] : null;
                 var topicIndex = topicMatch ? topicMatch[1] : null;
@@ -85,7 +97,7 @@ window.addEventListener('load', function() {
               }
               object[key].push(value);
             });
-            //console.log(JSON.stringify(object, null, 2));
+            console.log(JSON.stringify(object, null, 2));
             //return;
 
             // Transform data
@@ -96,27 +108,27 @@ window.addEventListener('load', function() {
                 if (!data[stepNameKey]) break;
 
                 const stepData = {
-                step_name: data[stepNameKey],
-                original_position: parseInt(data[`[${i}]['stepData']['original_position']`], 10),
-                new_position: parseInt(data[`[${i}]['stepData']['new_position']`], 10)
+                    step_name: data[stepNameKey],
+                    original_position: parseInt(data[`[${i}]['stepData']['original_position']`], 10),
+                    new_position: parseInt(data[`[${i}]['stepData']['new_position']`], 10)
                 };
 
                 const topicData = [];
                 for (let j = 0; ; j++) {
-                const topicNameKey = `[${i}]['topicData'][${j}]['topic_name']`;
-                if (!data[topicNameKey]) break;
+                    const topicIdKey = `[${i}]['topicData'][${j}]['topic_id']`;
+                    if (!data[topicIdKey]) break;
 
-                const topic = {
-                    topic_name: data[topicNameKey],
-                    original_position: parseInt(data[`[${i}]['topicData'][${j}]['original_position']`], 10),
-                    new_position: parseInt(data[`[${i}]['topicData'][${j}]['new_position']`], 10)
-                };
-                topicData.push(topic);
+                    const topic = {
+                        topic_id: data[topicIdKey],
+                        original_position: parseInt(data[`[${i}]['topicData'][${j}]['original_position']`], 10),
+                        new_position: parseInt(data[`[${i}]['topicData'][${j}]['new_position']`], 10)
+                    };
+                    topicData.push(topic);
                 }
 
                 transformedData.push({ stepData, topicData });
             }
-            console.log(JSON.stringify(transformedData, null, 2));
+            //console.log(JSON.stringify(transformedData, null, 2));
             //return;
 
             formData.append('item_steps', JSON.stringify(transformedData, null, 2));
@@ -124,8 +136,7 @@ window.addEventListener('load', function() {
             // Send Ajax request
             var xhr = new XMLHttpRequest();
 
-
-            var url = id ? surveysComposeCreateOrUpdateURL + '/' + id : surveysComposeCreateOrUpdateURL;
+            var url = id ? surveysComposeStoreOrUpdateURL + '/' + id : surveysComposeStoreOrUpdateURL;
             xhr.open('POST', url, true);
             xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); // Prevents caching
             xhr.setRequestHeader('Pragma', 'no-cache'); // For legacy HTTP 1.0 servers
@@ -149,9 +160,9 @@ window.addEventListener('load', function() {
                             var message = id ? 'Data updated successfully' : 'Data saved successfully';
                             toastAlert(message, 'success', 10000);
 
-                            btncreateOrUpdate.textContent = 'Atualizar'; // Change button text
-                            btncreateOrUpdate.classList.remove('btn-theme'); // Remove old class
-                            btncreateOrUpdate.classList.add('btn-outline-theme'); // Add new class
+                            btnStoreOrUpdate.textContent = 'Atualizar'; // Change button text
+                            btnStoreOrUpdate.classList.remove('btn-theme'); // Remove old class
+                            btnStoreOrUpdate.classList.add('btn-outline-theme'); // Add new class
 
                             //localStorage.setItem('statusAlert', 'Status atualizado para ' + translatedStatus);
 
@@ -164,7 +175,7 @@ window.addEventListener('load', function() {
                         }
                     } else {
                         // Handle error
-                        var errorMessage = id ? 'Error updating data' : 'Error saving data';
+                        var errorMessage = id ? 'Erro ao tentar Atualizar este formulário' : 'Não foi possível Salvar os dados deste formulário';
                         toastAlert(errorMessage, 'danger', 10000);
                     }
                 }
@@ -205,14 +216,23 @@ window.addEventListener('load', function() {
 
                             if (statusTo === 'disabled') {
                                 btnToggleStatus.setAttribute('data-status-to', 'active');
-                                btnToggleStatus.classList.remove('btn-outline-danger');
-                                btnToggleStatus.classList.add('btn-outline-success');
-                                btnToggleStatus.textContent = 'Ativar'; // Change the text inside the button
+
+                                btnToggleStatus.querySelector('i').classList.remove('ri-toggle-fill');
+                                btnToggleStatus.querySelector('i').classList.remove('text-theme');
+
+                                btnToggleStatus.querySelector('i').classList.add('ri-toggle-line');
+                                btnToggleStatus.querySelector('i').classList.add('text-danger');
+                                btnToggleStatus.querySelector('span').textContent = 'Ativar';
                             } else {
                                 btnToggleStatus.setAttribute('data-status-to', 'disabled');
-                                btnToggleStatus.classList.remove('btn-outline-success');
-                                btnToggleStatus.classList.add('btn-outline-danger');
-                                btnToggleStatus.textContent = 'Desativar'; // Change the text inside the button
+
+                                btnToggleStatus.querySelector('i').classList.add('ri-toggle-fill');
+                                btnToggleStatus.querySelector('i').classList.add('text-theme');
+
+                                btnToggleStatus.querySelector('i').classList.remove('ri-toggle-line');
+                                btnToggleStatus.querySelector('i').classList.remove('text-danger');
+
+                                btnToggleStatus.querySelector('span').textContent = 'Desativar';
                             }
 
                             makeFormPreviewRequest(composeId, surveysComposeShowURL);
@@ -220,13 +240,13 @@ window.addEventListener('load', function() {
                             //location.reload();
                         } else {
                             // Handle error
-                            toastAlert('Erro ao tentar atualizar o status: ' + response.message, 'error', 5000);
+                            toastAlert('Erro ao tentar atualizar o status: ' + response.message, 'danger', 5000);
                         }
                     } else {
                         // Handle error
                         console.log('Error updating status: ' + response.message);
 
-                        toastAlert('Erro ao tentar atualizar o status: ' + response.message, 'error', 5000);
+                        toastAlert('Erro ao tentar atualizar o status: ' + response.message, 'danger', 5000);
                     }
                 }
             };
@@ -241,5 +261,6 @@ window.addEventListener('load', function() {
 
 
     // Call the function when the DOM is fully loaded
-    enableRevalidationOnInput();
+    revalidationOnInput();
+    choicesListeners(surveysTermsSearchURL, surveysTermsStoreOrUpdateURL, choicesSelectorClass);
 });

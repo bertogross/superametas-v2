@@ -1,6 +1,10 @@
-import {toastAlert} from './helpers.js';
+import {
+    toastAlert,
+    attachImage,
+    bsPopoverTooltip
+} from './helpers.js';
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
     // Load the content for the user modal
     function loadUserSettingsModal(userId = null, userName = '') {
@@ -35,11 +39,14 @@ window.addEventListener('load', function() {
                     }
 
                     attachModalEventListeners();
-                    attachImageEventListeners("#member-image-input", "#avatar-img", "/upload/avatar");
-                    attachImageEventListeners("#cover-image-input", "#cover-img", "/upload/cover");
+
+                    attachImage("#member-image-input", "#avatar-img", uploadAvatarURL);
+                    attachImage("#cover-image-input", "#cover-img", uploadCoverURL);
+
+                    bsPopoverTooltip();
 
                 }else{
-                    toastAlert('Não foi possível carregar o conteúdo', 'error', 10000);
+                    toastAlert('Não foi possível carregar o conteúdo', 'danger', 10000);
                 }
 
             } else {
@@ -149,120 +156,7 @@ window.addEventListener('load', function() {
         }
     }
 
-    // Attach event listeners for Avatar and Cover image upload
-    function attachImageEventListeners(inputSelector, imageSelector, uploadUrl) {
-        const inputFile = document.querySelector(inputSelector);
 
-        if (inputFile) {
-            inputFile.addEventListener("change", function() {
-                const preview = document.querySelector(imageSelector);
-                const userID = preview.getAttribute("data-user-id");
-                const previewCard = document.querySelector(`${imageSelector}-${userID}`);
-                const file = inputFile.files[0];
-                const reader = new FileReader();
-
-                reader.addEventListener("load", function() {
-                    preview.src = reader.result;
-                    //console.log("Image source:", preview.src);
-
-                    const img = new Image();
-                    img.src = reader.result;
-                    //console.log("Image source:", img.src);
-
-                    img.onload = function() {
-                        //console.log("Image loaded with dimensions:", img.width, "x", img.height);
-
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-
-                        if (imageSelector == '#avatar-img') {
-                            canvas.width = 200;
-                            canvas.height = 200;
-                            //console.log("Canvas dimensions:", canvas.width, "x", canvas.height);
-
-                            const aspectRatio = img.width / img.height;
-                            let sourceX, sourceY, sourceWidth, sourceHeight;
-
-                            if (aspectRatio > 1) {
-                                sourceWidth = img.height;
-                                sourceHeight = img.height;
-                                sourceX = (img.width - sourceWidth) / 2;
-                                sourceY = 0;
-                            } else if (aspectRatio < 1) {
-                                sourceWidth = img.width;
-                                sourceHeight = img.width;
-                                sourceX = 0;
-                                sourceY = (img.height - sourceHeight) / 2;
-                            } else {
-                                sourceWidth = img.width;
-                                sourceHeight = img.height;
-                                sourceX = 0;
-                                sourceY = 0;
-                            }
-                            //console.log("Source dimensions and positions:", sourceX, sourceY, sourceWidth, sourceHeight);
-
-                            ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
-                        } else if (imageSelector == '#cover-img') {
-                            let targetWidth = img.width;
-                            let targetHeight = img.height;
-
-                            if (targetWidth > 1920 || targetHeight > 1920) {
-                                const aspectRatio = targetWidth / targetHeight;
-                                if (targetWidth > targetHeight) {
-                                    targetWidth = 1920;
-                                    targetHeight = targetWidth / aspectRatio;
-                                } else {
-                                    targetHeight = 1920;
-                                    targetWidth = targetHeight * aspectRatio;
-                                }
-                            }
-
-                            canvas.width = targetWidth;
-                            canvas.height = targetHeight;
-                            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-                        }
-
-                        canvas.toBlob(function(blob) {
-                            const formData = new FormData();
-                            formData.append('file', blob, file.name);
-                            formData.append('user_id', userID);
-
-                            //console.log("Blob size:", blob.size);
-
-                            fetch(uploadUrl, {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                                }
-                            })
-                            .then(response => response.json())
-                            .then(response => {
-                                if (response.success) {
-                                    toastAlert(response.message, 'success');
-                                    if (response.path) {
-                                        preview.src = '/storage/' + response.path;
-                                        previewCard.src = '/storage/' + response.path;
-                                    }
-                                } else {
-                                    toastAlert(response.message, 'danger');
-                                }
-                            })
-                            .catch(error => {
-                                toastAlert('Upload failed: ' + error, 'danger');
-                                console.error('Error:', error);
-                            });
-                        }, 'image/jpeg', 0.7);
-                    };
-                }, false);
-
-                if (file) {
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-    }
 
     // Filter functionality for switching between list and grid views
     var list = document.querySelectorAll(".team-list");

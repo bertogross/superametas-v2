@@ -7,16 +7,19 @@
         <meta http-equiv="cache-control" content="no-cache">
         <meta http-equiv="pragma" content="no-cache">
         <meta http-equiv="expires" content="-1">
-        <meta name="robots" content="noindex,nofollow,noarchive,nocache,nopreview,nosnippet,notranslate,noimageindex,nomediaindex,novideoindex,noodp,noydir">
-        <meta content="Solution to help your team reach and exceed their sales goals" name="description" />
-        <meta content="Supera Metas" name="author" />
-        <meta name="robots" content="noindex, nofollow" />
+        <meta name="robots" content="noindex,nofollow,nopreview,nosnippet,notranslate,noimageindex,nomediaindex,novideoindex,noodp,noydir">
+        <meta property="og:image" content="{{ URL::asset('build/images/logo-sm.png') }}">
+        <meta content="Solução para ajudar sua equipe a atingir e Superar suas Metas de Vendas" name="description" />
+        <meta name="author" content="{{env('APP_NAME')}}" />
         <!-- App favicon -->
+        <link rel="icon" type="image/png" href="{{ URL::asset('build/images/logo-sm.png') }}">
         <link rel="shortcut icon" href="{{ URL::asset('build/images/favicons/favicon.ico')}}">
         @include('layouts.head-css')
     </head>
     <body>
-
+        <script>
+            let FF_FOUC_FIX;
+        </script>
         <!-- Begin page -->
         <div id="layout-wrapper">
 

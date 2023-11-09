@@ -85,6 +85,9 @@
 
 @endsection
 @section('script')
-
+    <script>
+        var uploadAvatarURL = "{{ route('uploadAvatarURL') }}";
+        var uploadCoverURL = "{{ route('uploadCoverURL') }}";
+    </script>
     <script src="{{ URL::asset('build/js/settings-users.js') }}" type="module"></script>
 @endsection

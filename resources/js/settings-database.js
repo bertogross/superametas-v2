@@ -5,7 +5,7 @@ import {
 } from './helpers.js';
 
 // Event listeners setup
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
     // A flag to track whether the execution is currently in progress or not.
     let isExecutionInProgress = false;
 
@@ -50,7 +50,7 @@ window.addEventListener('load', function() {
     async function sendRequest(url) {
         const response = await fetch(url);
         if (!response.ok) {
-            toastAlert(Error(response.statusText), 'error', 10000);
+            toastAlert(Error(response.statusText), 'danger', 10000);
             throw new Error(response.statusText);
         }
         return response.json();
@@ -110,7 +110,7 @@ window.addEventListener('load', function() {
 
             document.removeEventListener('contextmenu', preventRightClick);
 
-            toastAlert(`Error: ${error.message}`, 'error', 10000);
+            toastAlert(`Error: ${error.message}`, 'danger', 10000);
 
             document.querySelector('.synchronization-percent-text').innerHTML = '<span class="text-danger">Erro: ' + error.message + '</span>';
         }

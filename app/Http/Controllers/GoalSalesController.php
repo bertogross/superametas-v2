@@ -90,7 +90,9 @@ class GoalSalesController extends Controller
      * @param int|null
      * @return \Illuminate\View\View
      */
-    public function edit(Request $request) {
+    public function edit(Request $request)
+    {
+        // Cache::flush();
 
         $getActiveDepartments = getActiveDepartments();
 
@@ -156,8 +158,10 @@ class GoalSalesController extends Controller
     /**
      * GStore or Update Goals
      */
-    public function createOrUpdate(Request $request)
+    public function storeOrUpdate(Request $request)
     {
+        // Cache::flush();
+
         $data = $request->all();
 
         $companyId = $data['company'];

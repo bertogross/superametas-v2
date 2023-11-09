@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\SurveyCompose;
+use App\Models\SurveyTerm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,8 @@ class SurveysComposeController extends Controller
 
     public function edit($id)
     {
+        // Cache::flush();
+
         $data = SurveyCompose::findOrFail($id);
 
         $type = $data->type;
@@ -73,7 +76,11 @@ class SurveysComposeController extends Controller
             abort(404);
         }
 
+        $users = getUsers();
+
         $preview = $request->query('preview', false);
+
+        $edition = $request->query('edition', false);
 
         $decode = is_string($data->jsondata) ? json_decode($data->jsondata, true) : $data->jsondata;
 
@@ -82,13 +89,17 @@ class SurveysComposeController extends Controller
         return view('surveys.compose.show', compact(
             'data',
             'topicsData',
-            'preview'
-            ) );
+            'preview',
+            'edition',
+            'users'
+        ) );
     }
 
 
-    public function createOrUpdate(Request $request, $id = null)
+    public function storeOrUpdate(Request $request, $id = null)
     {
+        // Cache::flush();
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'item_steps' => 'required|string',
@@ -160,6 +171,10 @@ class SurveysComposeController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Survey compose status updated successfully']);
 
+    }
+
+    public function getTermNameById($termId) {
+        return SurveyTerm::getTermNameById($termId);
     }
 
 }

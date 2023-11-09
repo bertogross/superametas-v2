@@ -770,7 +770,7 @@
 @section('script')
     <script>
         var surveysEditURL = "{{ route('surveysEditURL') }}";
-        var surveysCreateOrUpdateURL = "{{ route('surveysCreateOrUpdateURL') }}";
+        var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
     </script>
     <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
 @endsection

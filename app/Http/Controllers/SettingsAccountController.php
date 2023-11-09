@@ -24,7 +24,7 @@ class SettingsAccountController extends Controller
         return view('settings.account', compact('settings'));
     }
 
-    public function createOrUpdate(Request $request)
+    public function storeOrUpdate(Request $request)
     {
         //\Log::info($request->all());
 

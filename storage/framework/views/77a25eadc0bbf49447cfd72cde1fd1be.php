@@ -139,7 +139,6 @@
 <?php $__env->startSection('script'); ?>
     <script src="<?php echo e(URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js')); ?>"></script>
 
-
     <script src="<?php echo e(URL::asset('build/libs/sweetalert2/sweetalert2.min.js')); ?>"></script>
 
     <script src="<?php echo e(URL::asset('build/libs/flatpickr/flatpickr.min.js')); ?>"></script>
@@ -149,11 +148,11 @@
     <script src="<?php echo e(URL::asset('build/libs/apexcharts/apexcharts.min.js')); ?>"></script>
 
     <script>
-        var goalSalesCreateOrUpdateURL = "<?php echo e(route('goalSalesCreateOrUpdateURL')); ?>";
+        var goalSalesStoreOrUpdateURL = "<?php echo e(route('goalSalesStoreOrUpdateURL')); ?>";
         var goalSalesEditURL = "<?php echo e(route('goalSalesEditURL')); ?>";
         var goalSalesSettingsEditURL = "<?php echo e(route('goalSalesSettingsEditURL')); ?>";
         var goalSalesAnalyticModeURL = "<?php echo e(route('goalSalesAnalyticModeURL')); ?>";
-        var goalSalesslideModeURL = "<?php echo e(route('goalSalesslideModeURL')); ?>";
+        var goalSalesSlideModeURL = "<?php echo e(route('goalSalesSlideModeURL')); ?>";
         var goalSalesDefaultModeURL = "<?php echo e(route('goalSalesDefaultModeURL')); ?>";
     </script>
     <script src="<?php echo e(URL::asset('build/js/goal-sales.js')); ?>" type="module"></script>

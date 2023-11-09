@@ -34,7 +34,7 @@
                             @if( empty(trim($avatar)) )
                                 src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
                             @else
-                            src="{{ URL::asset('storage/' . $avatar) }}"
+                                src="{{ URL::asset('storage/' . $avatar) }}"
                             @endif
                             alt="@if(isset($name)){{ $name }}@endif"
                             class="member-img img-fluid d-block rounded-circle" id="avatar-img-@if(isset($id)){{ $id }}@endif">

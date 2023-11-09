@@ -6,12 +6,13 @@ import {
     goTo,
     bsPopoverTooltip,
     formatNumber,
-    maxLengthTextarea
+    maxLengthTextarea,
+    makeFormPreviewRequest
 } from './helpers.js';
 
 
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
     initFlatpickrRange();
     initFlatpickr();
 
@@ -19,7 +20,7 @@ window.addEventListener('load', function() {
     /**
      * Load the content for the Goal Sales Edit Modal
      */
-    async function loadsurveysEditForm(surveyId = null) {
+    /*async function loadsurveysEditForm(surveyId = null) {
         try {
             let url = surveysEditURL + `/${surveyId}`;
 
@@ -59,19 +60,18 @@ window.addEventListener('load', function() {
                 document.querySelector("#surveysEditForm #btn-surveys-store-or-update").innerHTML = 'Salvar';
             }
 
-            attachSurveyscreateOrUpdateListeners(surveyId);
 
         } catch (error) {
             console.error('Error fetching modal content:', error);
-            toastAlert('Não foi possível carregar o conteúdo', 'error', 10000);
+            toastAlert('Não foi possível carregar o conteúdo', 'danger', 10000);
         }
-    }
+    }*/
 
-    // Event listeners for 'Update' button
-    function attachSurveyscreateOrUpdateListeners(surveyId) {
 
-        // store/update surveysForm
-        document.getElementById('btn-surveys-store-or-update').addEventListener('click', async function(event) {
+    // store/update surveysForm
+    var btnStoreOrUpdate = document.getElementById('btn-surveys-store-or-update');
+    if(btnStoreOrUpdate){
+        btnStoreOrUpdate.addEventListener('click', async function(event) {
             event.preventDefault();
 
             const form = document.getElementById('surveysForm');
@@ -88,7 +88,7 @@ window.addEventListener('load', function() {
             let formData = new FormData(form);
 
             try {
-                let url = surveyId ? surveysCreateOrUpdateURL + `/${surveyId}` : surveysCreateOrUpdateURL;
+                let url = surveyId ? surveysStoreOrUpdateURL + `/${surveyId}` : surveysStoreOrUpdateURL;
 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -123,6 +123,30 @@ window.addEventListener('load', function() {
             }
         });
     }
+
+
+
+    var selectForms = document.querySelectorAll('.select-survey-form');
+    selectForms.forEach(function(selectForm) {
+        // Set the selected value on load
+        var selectedValue = selectForm.dataset.selectedValue;
+        if (selectedValue) {
+            selectForm.value = selectedValue;
+        }
+
+        // Attach a change event listener to each select form
+        selectForm.addEventListener('change', function(event) {
+            event.preventDefault();
+
+            var selectId = this.getAttribute('data-id');
+            var idValue = this.value;
+
+            // that takes the selected value and updates some preview content
+            makeFormPreviewRequest(idValue, surveysComposeShowURL, 'load-preview-' + selectId, 'edition=true');
+        });
+    });
+
+
 
     /*
     // Event listeners for each 'Edit Goal Sales' button

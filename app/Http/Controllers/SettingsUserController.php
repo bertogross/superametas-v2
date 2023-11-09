@@ -172,7 +172,7 @@ class SettingsUserController extends Controller
             return response()->json(['success' => false, 'message' => "Selecione o Nível"], 200);
         }
 
-        if ($user->id == 1) {
+        if ($user->id == 1 || $user->role == 1) {
             $user->role = 1;
             $user->status = 1;
         }else{

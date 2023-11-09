@@ -19,9 +19,11 @@
 
     <div id="content" class="rounded rounded-2 mb-4">
         <div class="bg-warning-subtle position-relative">
-            <span class="float-start m-3">{!! statusBadge($data->status) !!}</span>
+            @if (!$edition)
+                <span class="float-start m-3">{!! statusBadge($data->status) !!}</span>
+            @endif
 
-            @if(!$preview)
+            @if(!$preview && !$edition)
                 <a href="{{ route('surveysComposeEditURL', ['id' => $data->id]) }}" class="btn btn-sm btn-light btn-icon waves-effect ms-2 float-end m-3" title="Editar registro: {{ limitChars($data->title ?? '', 20) }}"><i class="ri-edit-line"></i></a>
             @endif
 
@@ -47,7 +49,7 @@
         </div>
 
         <div>
-            @include('surveys.includes.steps-card', ['topicsData' => $topicsData])
+            @include('surveys.includes.steps-card', ['data' => $data, 'topicsData' => $topicsData, 'edition' => $edition, 'users' => $users])
         </div>
         @php
         //appPrintR($data->jsondata);

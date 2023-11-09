@@ -15,29 +15,12 @@ $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );
 
-/*$getHostname = gethostname();
-if (str_contains($getHostname, 'localhost') || str_contains($getHostname, '127.0.0.1')) {
-    $app->loadEnvironmentFrom('.envdev');
-} else {
-    $app->loadEnvironmentFrom('.env');
-}*/
 // Set the environment file based on the server's hostname
 if (isset($_SERVER['SERVER_NAME'])) {
-    switch ($_SERVER['SERVER_NAME']) {
-        case 'localhost':
-        case 'localhost:8000':
-        case '127.0.0.1':
-                $app->loadEnvironmentFrom('.env.dev');
-            break;
-        case 'superametas.com':
-        case 'app.superametas.com':
-        case 'development.superametas.com':
-                $app->loadEnvironmentFrom('.env');
-            break;
-        // Add more cases as needed
-        default:
-            // Load the default .env file
-            break;
+    if (str_contains($_SERVER['SERVER_NAME'], 'superametas.com')) {
+        $app->loadEnvironmentFrom('.env');
+    } else {
+        $app->loadEnvironmentFrom('.env.dev');
     }
 }
 

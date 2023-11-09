@@ -25,4 +25,20 @@ class ProfileController extends Controller
         return view('profile/settings');
     }
 
+    public function show($id = null)
+    {
+        if (!$id && auth()->check()) {
+            $user = auth()->user();
+        } else {
+            $user = User::findOrFail($id);
+
+            // Check if the authenticated user is the same as the user being viewed
+            /*if(auth()->user()->id !== $user->id) {
+                abort(403, 'Unauthorized action.');
+            }*/
+        }
+
+        return view('profile.index', compact('user'));
+    }
+
 }

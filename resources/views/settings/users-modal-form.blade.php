@@ -24,7 +24,7 @@ if (is_object($getActiveCompanies)) {
                     @csrf
                     <div class="row">
                         <div class="col-lg-12">
-                            <input type="hidden" name="user_id" value="{{ $user ? $user->id : '' }}" class="form-control" value="">
+                            <input type="hidden" name="user_id" value="{{ $user ? $user->id : '' }}" class="form-control">
 
                             @if(isset($user))
                                 <!-- Save data in 'users' table collumn 'cover' -->
@@ -36,7 +36,7 @@ if (is_object($getActiveCompanies)) {
                                         @else
                                             src="{{ URL::asset('storage/' . $user->cover) }}"
                                         @endif
-                                        alt="cover" id="cover-img" class="img-fluid"  data-user-id="{{ $user ? $user->id : '' }}">
+                                        alt="cover" id="cover-img" class="img-fluid" data-user-id="{{ $user ? $user->id : '' }}">
 
                                         <div class="d-flex position-absolute start-0 end-0 top-0 p-3">
                                             <div class="flex-grow-1">
@@ -52,7 +52,7 @@ if (is_object($getActiveCompanies)) {
                                                                 </div>
                                                             </div>
                                                         </label>
-                                                        <input class="form-control d-none" name="cover" value="" id="cover-image-input" type="file" accept="image/png, image/gif, image/jpeg">
+                                                        <input class="form-control d-none" name="cover" id="cover-image-input" type="file" accept="image/png, image/gif, image/jpeg">
                                                     </div>
                                                     <button type="button" class="btn-close btn-close-white" id="createMemberBtn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
@@ -72,7 +72,7 @@ if (is_object($getActiveCompanies)) {
                                                     </div>
                                                 </div>
                                             </label>
-                                            <input class="form-control d-none" name="avatar" value="" id="member-image-input" type="file" accept="image/jpeg">
+                                            <input class="form-control d-none" name="avatar" id="member-image-input" type="file" accept="image/jpeg">
                                         </div>
                                         <div class="avatar-lg">
                                             <div class="avatar-title bg-light rounded-circle">
@@ -120,12 +120,12 @@ if (is_object($getActiveCompanies)) {
                                 </div>
                             @endif
 
-                            @if( !isset($user) || $user->id != 1)
+                            @if( !isset($user) || $user->role !=1 )
                                 <!-- Save data in 'users' table collumn 'role'-->
                                 <div class="form-group mb-3">
                                     <label class="form-label">Nível <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Níveis e Permissões" data-bs-content="<ul class='list-unstyled mb-0'><li>Saiba mais na tabela Níveis e Permissões</li></ul>"></i></label>
                                     <select class="form-control form-select" name="role">
-                                        <option class="text-body" value="" disabled selected>- Selecione -</option>
+                                        <option class="text-body" disabled selected>- Selecione -</option>
                                         @foreach(User::CAPABILITIES as $roleId => $capabilities)
                                             @if($roleId != 1)
                                                 <option class="text-muted" @if(isset($user) && $roleId == $user->role) selected @endif value="{{ $roleId }}">{{ (new User)->getRoleName($roleId) }}</option>
@@ -138,7 +138,7 @@ if (is_object($getActiveCompanies)) {
                             @if(isset($user) && $user->id != 1)
                                 <!-- Save data in 'users' table collumn 'status' -->
                                 <div class="form-group mb-4 ">
-                                    <label class="form-label">Status <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Inoperante, o usuário não poderá mais efetuar login em seu Supera Metas"></i></label>
+                                    <label class="form-label">Status <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Inoperante, o usuário não poderá mais efetuar login em seu {{env('APP_NAME')}}"></i></label>
                                     <div class="row">
                                       <div class="col">
                                             <div class="form-check form-switch form-switch-theme">

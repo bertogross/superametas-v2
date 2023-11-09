@@ -1,2 +1,0 @@
-<?php echo $__env->make('audits.compose.add', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-<?php /**PATH D:\www\superametas\application\development.superametas.com\public_html\resources\views/audits/compose/edit.blade.php ENDPATH**/ ?>

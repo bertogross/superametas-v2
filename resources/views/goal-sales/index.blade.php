@@ -136,7 +136,6 @@
 @section('script')
     <script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
 
-
     <script src="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 
     <script src="{{ URL::asset('build/libs/flatpickr/flatpickr.min.js') }}"></script>
@@ -146,11 +145,11 @@
     <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
 
     <script>
-        var goalSalesCreateOrUpdateURL = "{{ route('goalSalesCreateOrUpdateURL') }}";
+        var goalSalesStoreOrUpdateURL = "{{ route('goalSalesStoreOrUpdateURL') }}";
         var goalSalesEditURL = "{{ route('goalSalesEditURL') }}";
         var goalSalesSettingsEditURL = "{{ route('goalSalesSettingsEditURL') }}";
         var goalSalesAnalyticModeURL = "{{ route('goalSalesAnalyticModeURL') }}";
-        var goalSalesslideModeURL = "{{ route('goalSalesslideModeURL') }}";
+        var goalSalesSlideModeURL = "{{ route('goalSalesSlideModeURL') }}";
         var goalSalesDefaultModeURL = "{{ route('goalSalesDefaultModeURL') }}";
     </script>
     <script src="{{ URL::asset('build/js/goal-sales.js') }}" type="module"></script>

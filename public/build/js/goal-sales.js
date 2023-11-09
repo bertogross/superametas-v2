@@ -15,7 +15,7 @@ import {
     getChartColorsArray
 } from './helpers.js';
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
     /**
      * Toggle the display of the custom meantime input field based on the selected option in the meantime select dropdown.
@@ -94,7 +94,7 @@ window.addEventListener('load', function() {
             attachModalEventListeners();
         } catch (error) {
             console.error('Error fetching modal content:', error);
-            toastAlert('Não foi possível carregar o conteúdo', 'error', 10000);
+            toastAlert('Não foi possível carregar o conteúdo', 'danger', 10000);
         }
     }
 
@@ -155,7 +155,7 @@ window.addEventListener('load', function() {
 
         } catch (error) {
             console.error('Error fetching modal content:', error);
-            toastAlert('Não foi possível carregar o conteúdo', 'error', 10000);
+            toastAlert('Não foi possível carregar o conteúdo', 'danger', 10000);
         }
     }
 
@@ -198,7 +198,7 @@ window.addEventListener('load', function() {
 
             let formData = new FormData(form);
 
-            let url = goalSalesCreateOrUpdateURL + `/${meantime}/${companyId}`;
+            let url = goalSalesStoreOrUpdateURL + `/${meantime}/${companyId}`;
 
             try {
                 const response = await fetch(url, {
@@ -281,7 +281,7 @@ window.addEventListener('load', function() {
             // Send AJAX request to toggle analytics mode in the database
             var xhr = new XMLHttpRequest();
 
-            xhr.open('POST', goalSalesslideModeURL, true);
+            xhr.open('POST', goalSalesSlideModeURL, true);
             xhr.setRequestHeader('Cache-Control', 'no-cache'); // Set the Cache-Control header to no-cache
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -737,7 +737,7 @@ window.addEventListener('load', function() {
                 inputValue: inputValue,
                 inputValidator: (value) => {
                     if (!value || value <= 0) {
-                        toastAlert('Necessário informar o percentual', 'error', 10000);
+                        toastAlert('Necessário informar o percentual', 'danger', 10000);
 
                         return 'Necessário informar o percentual'
                     }
@@ -785,7 +785,7 @@ window.addEventListener('load', function() {
                     var sumPrice = 0;
 
                     if (!newPercentage || newPercentage <= 0) {
-                        toastAlert('Necessário informar o percentual', 'error', 10000);
+                        toastAlert('Necessário informar o percentual', 'danger', 10000);
 
                         return;
                     }
@@ -866,6 +866,15 @@ window.addEventListener('load', function() {
         }
     });
 
+    // Prevent data-choices sort comapnies by name
+    var isChoiceEl = document.getElementById("filter-companies");
+    if(isChoiceEl){
+        var choiceInstance = new Choices(isChoiceEl, {
+            shouldSort: false,
+            removeItems: true,
+            removeItemButton: true
+        });
+    }
 
 
     // Call the functions when the DOM is fully loaded
