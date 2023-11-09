@@ -20,7 +20,7 @@
     <div id="content" class="rounded rounded-2 mb-4">
         <div class="bg-warning-subtle position-relative">
             @if (!$edition)
-                <span class="float-start m-3">{!! statusBadge($data->status) !!}</span>
+                <span class="float-start m-3 position-absolute">{!! statusBadge($data->status) !!}</span>
             @endif
 
             @if(!$preview && !$edition)
@@ -60,4 +60,14 @@
 @endsection
 @section('script')
 
+<script>
+    var surveysComposeShowURL = "{{ route('surveysComposeShowURL') }}";
+    var surveysComposeStoreOrUpdateURL = "{{ route('surveysComposeStoreOrUpdateURL') }}";
+    var surveysComposeToggleStatusURL = "{{ route('surveysComposeToggleStatusURL') }}";
+
+    var surveysTermsSearchURL = "{{ route('surveysTermsSearchURL') }}";
+    var surveysTermsStoreOrUpdateURL = "{{ route('surveysTermsStoreOrUpdateURL') }}";
+    var choicesSelectorClass = ".surveys-term-choice";
+</script>
+<script src="{{ URL::asset('build/js/surveys-compose.js') }}" type="module"></script>
 @endsection

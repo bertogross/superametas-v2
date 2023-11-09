@@ -313,16 +313,16 @@ pre:empty{
   }
 }
 
-.choices__item.choices__item--choice.has-no-choices{
-  display: none !important;
-}
-
 .form-switch-theme .form-check-input:checked{
   border-color: var(--vz-theme);
 }
 .form-switch-theme .form-check-input:checked::before,
 .form-switch-custom.form-switch-theme .form-check-input:checked::before{
   color: var(--vz-theme);
+}
+
+.choices__item.choices__item--choice.has-no-choices{
+  display: none !important;
 }
 
 .choices__list--multiple .choices__item{
@@ -338,6 +338,13 @@ pre:empty{
   margin-bottom: 0px !important;
   width: 100% !important;
 }
+.was-validated .choices__inner.is-invalid {
+    border-color: var(--vz-form-invalid-border-color);
+}
+.was-validated .choices__inner.is-valid {
+    border-color: var(--vz-form-valid-border-color);
+}
+
 
 .btn-theme {
   color: var(--vz-gray-dark);

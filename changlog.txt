@@ -7,6 +7,10 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 https://laravel-news.com/openai-for-laravel
 
 
+Version 2.0.23 - [2023-11-08 - 2023-11-10]
+- [Added] HTML: blade pages (/surveys/terms)
+
+
 
 Version 2.0.23 - [2023-11-01 - 2023-11-08]
 - [Updated] HTML: blade page (/surveys/compose) to Composition of the Inspection Form

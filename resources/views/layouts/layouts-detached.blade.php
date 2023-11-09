@@ -18,9 +18,7 @@
         @include('layouts.head-css')
     </head>
     <body>
-        <script>
-            let FF_FOUC_FIX;
-        </script>
+        <script>0</script>
         <!-- Begin page -->
         <div id="layout-wrapper">
 

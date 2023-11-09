@@ -3,6 +3,7 @@
         @php
             $stepData = $step['stepData'] ?? null;
             $stepName = $stepData['step_name'] ?? 0;
+            $stepId = $stepData['step_id'] ?? 0;
             $originalPosition = $stepData['original_position'] ?? 0;
             $newPosition = $stepData['new_position'] ?? 0;
         @endphp
@@ -91,25 +92,35 @@
                                     <span class="badge bg-light-subtle text-body badge-border text-theme">{{ $index }}</span>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h5 class="mb-0">{{ $topicId }}</h5>
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="mb-0">
+                                                {{ getTermNameById($topicId) }}
+                                            </h5>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fs-5 ri-time-line text-warning-emphasis" title="Pendente"></i>
+                                            <i class="fs-5 ri-check-double-fill text-success-emphasis d-none" title="Concluído"></i>
+                                        </div>
+                                    </div>
                                     <div class="row mt-3">
                                         <div class="col-auto">
                                             <div class="form-check form-switch form-switch-lg form-switch-theme mb-3">
-                                                <input tabindex="-1" class="form-check-input" type="radio" name="compliance" role="switch" id="SwitchCheck{{ $topicIndex }}">
-                                                <label class="form-check-label" for="SwitchCheck{{ $topicIndex }}">Conforme</label>
+                                                <input tabindex="-1" class="form-check-input" type="radio" name="compliance[{{$topicId}}]" role="switch" id="SwitchCheck{{ $originalPosition.$topicId }}">
+                                                <label class="form-check-label" for="SwitchCheck{{ $originalPosition.$topicId }}">Conforme</label>
                                             </div>
                                             <div class="form-check form-switch form-switch-lg form-switch-danger">
-                                                <input tabindex="-1" class="form-check-input" type="radio" name="compliance" role="switch" id="SwitchCheck2{{ $topicIndex }}">
-                                                <label class="form-check-label" for="SwitchCheck2{{ $topicIndex }}">Não Conforme</label>
+                                                <input tabindex="-1" class="form-check-input" type="radio" name="compliance[{{$topicId}}]" role="switch" id="SwitchCheck2{{ $originalPosition.$topicId }}">
+                                                <label class="form-check-label" for="SwitchCheck2{{ $originalPosition.$topicId }}">Não Conforme</label>
                                             </div>
                                         </div>
                                         <div class="col">
                                             <div class="input-group">
-                                                <button tabindex="-1" type="button" class="btn btn-outline-dark waves-effect waves-light ps-1 pe-1 dropdown" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Bater foto"><i  class="ri-image-add-fill fs-5 m-2"></i></button>
+                                                <button tabindex="-1" type="button" class="btn btn-outline-dark waves-effect waves-light ps-1 pe-1 dropdown" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Bater foto"><i class="ri-image-add-fill fs-5 m-2"></i></button>
 
-                                                <textarea tabindex="-1" class="form-control" maxlength="1000" rows="3" placeholder="Observações..."></textarea>
+                                                <textarea tabindex="-1" class="form-control" maxlength="1000" rows="3" name="observations[{{$topicId}}]" placeholder="Observações..."></textarea>
 
-                                                <button tabindex="-1" type="button" class="btn btn-outline-dark waves-effect waves-light"><i  class="ri-save-3-line fs-3 m-2 text-theme" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Salvar"></i></button>
+                                                <button tabindex="-1" type="button" class="btn btn-outline-dark waves-effect waves-light"><i class="ri-save-3-line fs-3 m-2 text-theme" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-step="{{$stepId}}" data-topic="{{$topicId}}" title="Salvar"></i></button>
                                             </div>
                                         </div>
                                     </div>

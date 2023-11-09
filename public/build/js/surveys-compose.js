@@ -2,7 +2,8 @@ import {
     toastAlert,
     bsPopoverTooltip,
     revalidationOnInput,
-    makeFormPreviewRequest
+    makeFormPreviewRequest,
+    allowUncheckRadioButtons
 } from './helpers.js';
 
 import {
@@ -24,14 +25,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            const choiceContainers = form.querySelectorAll('.choices__inner');
+
             if (!form.checkValidity()) {
                 event.stopPropagation();
 
                 form.classList.add('was-validated');
 
+                choiceContainers.forEach(container => {
+                    let select = container.parentElement.querySelector('select');
+                    if (select && !select.checkValidity()) {
+                        container.classList.add('is-invalid');
+                    }
+                    if (select && select.checkValidity()) {
+                        container.classList.add('is-valid');
+                    }
+                });
+
                 toastAlert('Preencha os campos obrigatórios', 'danger', 5000);
 
                 return;
+            }else{
+                form.classList.remove('was-validated');
+
+                choiceContainers.forEach(container => {
+                    container.classList.remove('is-invalid');
+                    container.classList.remove('is-valid');
+                });
             }
 
             var searchInput = document.querySelectorAll('.choices__input--cloned');
@@ -210,12 +230,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (xhr.status === 200) {
                         var response = JSON.parse(xhr.responseText);
                         if (response.success) {
-                            var translatedStatus = statusTo === 'active' ? 'ativo' : 'desabilitado';
 
-                            toastAlert('Status atualizado para: '+translatedStatus+'', 'success', 5000);
+                            toastAlert(response.message, 'success', 5000);
 
                             if (statusTo === 'disabled') {
                                 btnToggleStatus.setAttribute('data-status-to', 'active');
+                                btnToggleStatus.setAttribute('title', 'Clique para Ativar');
 
                                 btnToggleStatus.querySelector('i').classList.remove('ri-toggle-fill');
                                 btnToggleStatus.querySelector('i').classList.remove('text-theme');
@@ -225,6 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 btnToggleStatus.querySelector('span').textContent = 'Ativar';
                             } else {
                                 btnToggleStatus.setAttribute('data-status-to', 'disabled');
+                                btnToggleStatus.setAttribute('title', 'Clique para Desativar');
 
                                 btnToggleStatus.querySelector('i').classList.add('ri-toggle-fill');
                                 btnToggleStatus.querySelector('i').classList.add('text-theme');
@@ -236,6 +257,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
 
                             makeFormPreviewRequest(composeId, surveysComposeShowURL);
+
+                            document.getElementById('survey-status-badge').innerHTML = response.badge
 
                             //location.reload();
                         } else {
@@ -262,5 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Call the function when the DOM is fully loaded
     revalidationOnInput();
+    allowUncheckRadioButtons();
     choicesListeners(surveysTermsSearchURL, surveysTermsStoreOrUpdateURL, choicesSelectorClass);
+
 });

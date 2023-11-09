@@ -396,7 +396,7 @@ if (!function_exists('statusBadge')) {
             case 'disabled':
                 return '<span class="badge bg-danger-subtle text-danger text-uppercase" title="Registro de Status Desativado">Desativado</span>';
             default:
-                return '<span class="badge bg-info-primary text-primary text-uppercase" title="Registro de Status NÃO INFORMADO">Unknown</span>';
+                return '';
         }
     }
 }

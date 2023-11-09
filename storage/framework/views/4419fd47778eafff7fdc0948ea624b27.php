@@ -20,7 +20,7 @@
     <div id="content" class="rounded rounded-2 mb-4">
         <div class="bg-warning-subtle position-relative">
             <?php if(!$edition): ?>
-                <span class="float-start m-3"><?php echo statusBadge($data->status); ?></span>
+                <span class="float-start m-3 position-absolute"><?php echo statusBadge($data->status); ?></span>
             <?php endif; ?>
 
             <?php if(!$preview && !$edition): ?>
@@ -61,6 +61,16 @@
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
 
+<script>
+    var surveysComposeShowURL = "<?php echo e(route('surveysComposeShowURL')); ?>";
+    var surveysComposeStoreOrUpdateURL = "<?php echo e(route('surveysComposeStoreOrUpdateURL')); ?>";
+    var surveysComposeToggleStatusURL = "<?php echo e(route('surveysComposeToggleStatusURL')); ?>";
+
+    var surveysTermsSearchURL = "<?php echo e(route('surveysTermsSearchURL')); ?>";
+    var surveysTermsStoreOrUpdateURL = "<?php echo e(route('surveysTermsStoreOrUpdateURL')); ?>";
+    var choicesSelectorClass = ".surveys-term-choice";
+</script>
+<script src="<?php echo e(URL::asset('build/js/surveys-compose.js')); ?>" type="module"></script>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/compose/show.blade.php ENDPATH**/ ?>

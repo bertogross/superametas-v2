@@ -96,7 +96,10 @@
                                 <div class="col text-muted">
                                     Esta é a área de composição
                                 </div>
-                                <div class="col-auto">
+                                <div class="col-auto text-end" id="survey-status-badge">
+                                    @if ($data)
+                                        {!! statusBadge($data->status) !!}
+                                    @endif
                                 </div>
                             </div>
 
@@ -177,7 +180,7 @@
             <div class="col-md-12 col-lg-4 col-xxl-4">
                 <div class="card h-100">
                     <div class="card-header">
-                        <h4 class="card-title mb-0"><i class="ri-eye-2-fill fs-16 align-middle text-theme me-2"></i>Pré-visualização</h4>
+                        <h4 class="card-title mb-0"><i class="ri-todo-line fs-16 align-middle text-theme me-2"></i>Pré-visualização</h4>
                     </div>
 
                     <div id="load-preview" class="card-body">

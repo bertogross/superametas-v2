@@ -166,11 +166,10 @@ class SurveysComposeController extends Controller
         $surveyCompose->save();
 
         // Store status message in session
-        $translatedStatus = $status === 'active' ? 'ativo' : 'desabilitado';
+        $translatedStatus = $status === 'active' ? '<span class="text-success">Ativo</span>' : '<span class="text-danger">Desativado</span>';
         session(['success' => 'Status atualizado para: ' . $translatedStatus]);
 
-        return response()->json(['success' => true, 'message' => 'Survey compose status updated successfully']);
-
+        return response()->json(['success' => true, 'message' => 'Status atualizado para: ' . $translatedStatus, 'badge' => statusBadge($status)]);
     }
 
     public function getTermNameById($termId) {

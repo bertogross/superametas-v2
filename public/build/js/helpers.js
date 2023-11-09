@@ -492,7 +492,9 @@ export function revalidationOnInput(formSelector = '.needs-validation') {
 
     const inputs = form.querySelectorAll('input, select, textarea');
     inputs.forEach(function(input) {
-      input.addEventListener('input', removeValidationClass);
+        input.addEventListener('input', removeValidationClass);
+        input.addEventListener('select', removeValidationClass);
+        input.addEventListener('textarea', removeValidationClass);
     });
 }
 
@@ -539,6 +541,32 @@ export function toggleTableRows() {
     }
 }
 
+// Function to allow unchecking of radio buttons
+export function allowUncheckRadioButtons(radioSelector = '.form-check-input') {
+    document.addEventListener('click', function(e) {
+        // Check if the clicked element is a radio button and if it's part of the selection we want to control
+        if (e.target.matches(radioSelector)) {
+            var radio = e.target;
+            // If the radio button was already checked, uncheck it
+            if (radio.dataset.checked) {
+                radio.checked = false;
+                radio.dataset.checked = ''; // Clear the custom data attribute
+            } else {
+                // Mark all radios with the same name as unchecked
+                var allRadios = document.querySelectorAll('input[type="radio"][name="' + radio.name + '"]');
+                allRadios.forEach(function(otherRadio) {
+                    otherRadio.dataset.checked = '';
+                });
+                // Set the clicked one as checked
+                radio.dataset.checked = 'true';
+            }
+        }
+    }, true); // Use capturing to ensure we get the event first
+}
+
+
+
+
 
 // Make the preview URL request
 export function makeFormPreviewRequest(idValue, url, target = 'load-preview', param = 'preview=true') {
@@ -570,7 +598,7 @@ export function makeFormPreviewRequest(idValue, url, target = 'load-preview', pa
                     }
                 } else {
                     // Handle error
-                    toastAlert('não foi possível carregar a pré-visualiação', 'danger', 10000);
+                    toastAlert('Não foi possível carregar a pré-visualização', 'danger', 10000);
                 }
             }
         };
