@@ -13,6 +13,7 @@ use App\Http\Controllers\{
     GoalSalesController,
     SurveysController,
     //SurveysComposeController,
+    SurveyExecutionController,
     SurveyTermController,
     SettingsApiKeysController,
     DropboxController,
@@ -75,7 +76,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/terms/store', [SurveyTermController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
         Route::get('/terms/search', [SurveyTermController::class, 'search'])->name('surveysTermsSearchURL');
     });
-
+    /*
+    //php artisan route:list
+    GET|HEAD        survey-executions .......................... survey-executions.index › SurveyExecutionController@index
+    POST            survey-executions .......................... survey-executions.store › SurveyExecutionController@store
+    GET|HEAD        survey-executions/create ................... survey-executions.create › SurveyExecutionController@create
+    GET|HEAD        survey-executions/{survey_execution} ....... survey-executions.show › SurveyExecutionController@show
+    PUT|PATCH       survey-executions/{survey_execution} ....... survey-executions.update › SurveyExecutionController@update
+    DELETE          survey-executions/{survey_execution} ....... survey-executions.destroy › SurveyExecutionController@destroy
+    GET|HEAD        survey-executions/{survey_execution}/edit .. survey-executions.edit › SurveyExecutionController@edit
+    */
+    Route::resource('survey-executions', SurveyExecutionController::class);
 
     // Admin Settings
     Route::middleware(['admin'])->group(function () {

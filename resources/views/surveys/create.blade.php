@@ -58,7 +58,7 @@
             <h4 class="card-title mb-0"><i class="ri-drag-drop-line fs-16 align-middle text-theme me-2"></i>Atribuições</h4>
          </div>
         <div class="card-body">
-            <form id="surveysForm" method="POST" autocomplete="off" class="needs-validation" novalidate autocomplete="false">
+            <form id="surveysForm" method="POST" class="needs-validation" novalidate autocomplete="false">
                 @csrf
                 <div class="row">
                     <div class="col-sm-12 col-md-12 col-lg-5 col-xxl-4">
@@ -70,7 +70,9 @@
                             <div class="mb-4">
                                 <label for="title" class="form-label">Título:</label>
                                 <input type="text" id="title" name="title" class="form-control" value="{{ $dateRange }}" maxlength="100" required>
-                                <div class="form-text">Título é necessário para que, quando na listagem, você facilmente identifique este formulário</div>
+                                <div class="form-text">
+                                    Exemplo: Checklist Abertura de Loja
+                                </div>
                             </div>
 
                             <div class="mb-4">
@@ -97,7 +99,7 @@
 
                             <div class="mb-4">
                                 <label for="date-start-field" class="form-label">Data Inicial:</label>
-                                <input type="text" id="date-start-field"" name="date_start" class="form-control flatpickr-default" value="{{ $dateRange }}" maxlength="10" required>
+                                <input type="text" id="date-start-field"" name="start_date" class="form-control flatpickr-default" value="{{ $dateRange }}" maxlength="10" required>
                             </div>
 
                             <!--end col-->

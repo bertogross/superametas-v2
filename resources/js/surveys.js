@@ -15,56 +15,6 @@ import {
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    /**
-     * Load the content for the Goal Sales Edit Modal
-     */
-    /*async function loadsurveysEditForm(surveyId = null) {
-        try {
-            let url = surveysEditURL + `/${surveyId}`;
-
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const content = await response.text();
-            document.getElementById('modalContainer').insertAdjacentHTML('beforeend', content);
-
-            const modalElement = document.getElementById('surveysEditForm');
-            const modal = new bootstrap.Modal(modalElement, {
-                backdrop: 'static',
-                keyboard: false,
-            });
-            modal.show();
-
-            multipleModal();
-
-            initFlatpickr();
-
-            maxLengthTextarea();
-
-            if(surveyId){
-                document.querySelector("#surveysEditForm .modal-title").innerHTML = `<u>Editar</u> Vistoria ID: <span class="text-theme">${surveyId}</span>`;
-
-                document.querySelector("#surveysEditForm #btn-surveys-store-or-update").innerHTML = 'Atualizar';
-            }else{
-                document.querySelector("#surveysEditForm .modal-title").innerHTML = `<u>Adicionar</u> Vistoria</span>`;
-                document.querySelector("#surveysEditForm #btn-surveys-store-or-update").innerHTML = 'Salvar';
-            }
-
-
-        } catch (error) {
-            console.error('Error fetching modal content:', error);
-            toastAlert('Não foi possível carregar o conteúdo', 'danger', 10000);
-        }
-    }*/
-
 
     // store/update surveysForm
     var btnStoreOrUpdate = document.getElementById('btn-surveys-store-or-update');
@@ -122,86 +72,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const formData = new FormData(form);
 
-            /*
-            var groupedData = {};
-            for (var pair of formData.entries()) {
-                var key = pair[0];
-                var value = pair[1];
-
-                var stepMatch = key.match(/item\[(\d+)\]/);
-                var topicMatch = key.match(/\['topic_id'\]\[(\d+)\]/);
-
-                var stepIndex = stepMatch ? stepMatch[1] : null;
-                var topicIndex = topicMatch ? topicMatch[1] : null;
-
-                if (stepIndex !== null) {
-                    if (!groupedData[stepIndex]) {
-                        groupedData[stepIndex] = {
-                            stepData: {},
-                            topicData: {}
-                        };
-                    }
-
-                    if (topicIndex !== null) {
-                        if (!groupedData[stepIndex].topicData[topicIndex]) {
-                            groupedData[stepIndex].topicData[topicIndex] = {};
-                        }
-                        groupedData[stepIndex].topicData[topicIndex][key] = value;
-                    } else {
-                        groupedData[stepIndex].stepData[key] = value;
-                    }
-                } else {
-                    groupedData[key] = value;
-                }
-            }
-
-            if (Object.keys(groupedData).length === 0) {
-                toastAlert('Necessário adicionar Blocos', 'danger', 10000);
-                return;
-            }
-            */
-            var object = {};
+            // Transform data
+            var data = {};
             formData.forEach((value, key) => {
-              if (!object[key]) {
-                object[key] = value;
-                return;
-              }
-              if (!Array.isArray(object[key])) {
-                object[key] = [object[key]];
-              }
-              object[key].push(value);
+                // Handle array formation for keys with multiple values
+                if (data.hasOwnProperty(key)) {
+                    if (!Array.isArray(data[key])) {
+                        data[key] = [data[key]];
+                    }
+                    data[key].push(value);
+                } else {
+                    data[key] = value;
+                }
             });
-            console.log(JSON.stringify(object, null, 2));
+            //console.log(data);
             //return;
 
-            // Transform data
-            var data = object;
             const transformedData = [];
-            for (let i = 0; ; i++) {
-                const stepNameKey = `['stepData']['step_name']`;
-                if (!data[stepNameKey]) break;
-
+            for (let i = 0; data.hasOwnProperty(`steps[${i}]['stepData']['step_name']`); i++) {
                 const stepData = {
-                    step_name: data[stepNameKey],
-                    original_position: parseInt(data[`['stepData']['original_position']`], 10),
-                    new_position: parseInt(data[`['stepData']['new_position']`], 10)
+                    step_name: data[`steps[${i}]['stepData']['step_name']`],
+                    type: data[`steps[${i}]['stepData']['type']`],
+                    original_position: parseInt(data[`steps[${i}]['stepData']['original_position']`], 10),
+                    new_position: parseInt(data[`steps[${i}]['stepData']['new_position']`], 10)
                 };
 
-                const topicData = [];
-                for (let j = 0; ; j++) {
-                    const topicIdKey = `['topicsData'][${j}]['topic_id']`;
-                    if (!data[topicIdKey]) break;
-
+                const topics = [];
+                // Assuming topic_id is an array, iterate based on its length for each step.
+                const topicLength = data[`steps[${i}]['topics']['topic_id']`].length;
+                for (let j = 0; j < topicLength; j++) {
+                    const topicId = data[`steps[${i}]['topics']['topic_id']`][j];
+                    const originalPosition = data[`steps[${i}]['topics']['original_position']`][j];
+                    const newPosition = data[`steps[${i}]['topics']['new_position']`][j];
                     const topic = {
-                        topic_id: data[topicIdKey],
-                        original_position: parseInt(data[`['topicsData'][${j}]['original_position']`], 10),
-                        new_position: parseInt(data[`['topicsData'][${j}]['new_position']`], 10)
+                        topic_id: topicId,
+                        original_position: parseInt(originalPosition, 10),
+                        new_position: parseInt(newPosition, 10)
                     };
-                    topicData.push(topic);
+                    topics.push(topic);
                 }
 
-                transformedData.push({ stepData, topicData });
+                transformedData.push({ stepData, topics });
             }
+            //console.log(transformedData);
             //console.log(JSON.stringify(transformedData, null, 2));
             //return;
 
@@ -248,50 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
-
-    /*
-    var selectForms = document.querySelectorAll('.select-survey-form');
-    selectForms.forEach(function(selectForm) {
-        // Set the selected value on load
-        var selectedValue = selectForm.dataset.selectedValue;
-        if (selectedValue) {
-            selectForm.value = selectedValue;
-        }
-
-        // Attach a change event listener to each select form
-        selectForm.addEventListener('change', function(event) {
-            event.preventDefault();
-
-            var selectId = this.getAttribute('data-id');
-            var idValue = this.value;
-
-            // that takes the selected value and updates some preview content
-            makeFormPreviewRequest(idValue, surveysShowURL, 'load-preview-' + selectId, 'edition=true');
-        });
-    });
-    */
-
-
-    /*
-    // Event listeners for each 'Edit Goal Sales' button
-    function attachFormEventListeners(){
-        var editButtons = document.querySelectorAll('.btn-survey-edit');
-        if(editButtons){
-            editButtons.forEach(function(button) {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault();
-
-                    const surveyId = this.getAttribute("data-survey-id");
-
-                    loadsurveysEditForm(surveyId);
-                });
-
-            });
-        }
-    }
-    attachFormEventListeners();
-    */
 
     // Make the preview request
     var idInput = document.querySelector('input[name="id"]');

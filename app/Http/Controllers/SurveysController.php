@@ -155,7 +155,7 @@ class SurveysController extends Controller
                     'original_position' => $index,
                     'new_position' => $index,
                 ],
-                'topicsData' => $preListing
+                'topics' => $preListing
             ];
         }
 
@@ -246,15 +246,16 @@ class SurveysController extends Controller
 
         $validatedData = $request->validate([
             'title' => 'required|string|max:191',
-            //'status' => 'required|in:new,stoped,trash,pending,in_progress,completed,audited',
             'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
-            //'assigned_to' => 'nullable',
-            'delegated_to' => 'required|string',
-            'audited_by' => 'required|string',
-            //'current_user_editor' => 'nullable',
             'start_date' => 'nullable|date_format:d/m/Y',
             'description' => 'nullable|string|max:1000',
-            'jsondata' => 'required|string',
+
+            'delegated_to' => 'required',
+            'audited_by' => 'required',
+            'jsondata' => 'required',
+            //'current_user_editor' => 'nullable',
+            //'assigned_to' => 'nullable',
+            //'status' => 'required|in:new,stoped,trash,pending,in_progress,completed,audited',
             //'survey_compose_custom_id' => 'nullable',
             //'survey_compose_default_id' => 'nullable',
             //'custom_fields' => 'nullable|array',
@@ -263,45 +264,56 @@ class SurveysController extends Controller
             //'custom_fields.*.label' => 'required_with:custom_fields|string|max:50',
         ]);
 
-        $userId = auth()->id();
-        $validatedData['user_id'] = $userId;
+        // Convert array inputs to JSON strings for storage
+        $validatedData = array_map(function ($value) {
+            return is_array($value) ? json_encode($value) : $value;
+        }, $validatedData);
 
+        $jsondata = $validatedData['jsondata'];
+
+        /*
         $jsonString = $request->input('jsondata');
         $jsondata = $jsonString ? json_decode($jsonString, true) : null;
         if (json_last_error() !== JSON_ERROR_NONE) {
             return response()->json(['success' => false, 'message' => 'Invalid JSON format']);
         }
-
         $validatedData['jsondata'] = $jsondata ?? null;
 
-        $validatedData['start_date'] = $validatedData['start_date'] ?? null ? Carbon::createFromFormat('d/m/Y', $validatedData['start_date'])->format('Y-m-d') : null;
-        $validatedData['completed_at'] = $validatedData['completed_at'] ?? null ? Carbon::createFromFormat('d/m/Y', $validatedData['completed_at'])->format('Y-m-d') : null;
-        $validatedData['audited_at'] = $validatedData['audited_at'] ?? null ? Carbon::createFromFormat('d/m/Y', $validatedData['audited_at'])->format('Y-m-d') : null;
+
+        $jsonString = $request->input('delegated_to');
+        $jsondata = $jsonString ? json_decode($jsonString, true) : null;
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return response()->json(['success' => false, 'message' => 'Invalid JSON format']);
+        }
+        $validatedData['delegated_to'] = $jsondata ?? null;
+
+
+        $jsonString = $request->input('audited_by');
+        $jsondata = $jsonString ? json_decode($jsonString, true) : null;
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return response()->json(['success' => false, 'message' => 'Invalid JSON format']);
+        }
+        $validatedData['audited_by'] = $jsondata ?? null;
+        */
+
+        $userId = auth()->id();
+        $validatedData['user_id'] = $userId;
+
+        $validatedData['start_date'] = $validatedData['start_date'] ? Carbon::createFromFormat('d/m/Y', $validatedData['start_date'])->format('Y-m-d') : null;
+        //$validatedData['completed_at'] = $validatedData['completed_at'] ?? null ? Carbon::createFromFormat('d/m/Y', $validatedData['completed_at'])->format('Y-m-d') : null;
+        //$validatedData['audited_at'] = $validatedData['audited_at'] ?? null ? Carbon::createFromFormat('d/m/Y', $validatedData['audited_at'])->format('Y-m-d') : null;
 
         if ($id) {
-            $validatedData['status'] = 'new';
-
             // Update operation
             $survey = Survey::findOrFail($id);
 
             // Check if the current user is the creator
             if ($userId != $survey->user_id) {
-                return redirect()->back()->with('error', 'You are not authorized to edit this survey task.');
+                return response()->json(['success' => false, 'message' => 'You are not authorized to edit this survey.']);
             }
 
-            //$survey->update($validatedData);
-            $survey = $this->update($validatedData);
+            $survey->update($validatedData);
 
-            /*
-            // Update custom fields
-            $composeCustomId = $validatedData['survey_compose_custom_id'];
-            SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_custom_id', $composeCustomId);
-
-            $composeDefaultId = $validatedData['survey_compose_default_id'];
-            SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_default_id', $composeDefaultId);
-            */
-
-            //return redirect()->route('surveysShowURL', $survey)->with('success', 'Survey updated successfully');
             return response()->json([
                 'success' => true,
                 'message' => 'Survey updated successfully!',
@@ -310,18 +322,9 @@ class SurveysController extends Controller
             ]);
         } else {
             // Store operation
-            $survey = $this->store($validatedData);
-
-            /*
-            // Update custom fields
-            $composeCustomId = $validatedData['survey_compose_custom_id'];
-            SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_custom_id', $composeCustomId);
-
-            $composeDefaultId = $validatedData['survey_compose_default_id'];
-            SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_default_id', $composeDefaultId);
-            */
-
-            return $survey;
+            $survey = new Survey;
+            $survey->fill($validatedData);
+            $survey->save();
 
             return response()->json([
                 'success' => true,

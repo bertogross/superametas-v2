@@ -2,10 +2,10 @@
     @foreach ($topicsData as $step)
         @php
             $stepData = $step['stepData'] ?? null;
-            $stepName = $stepData['step_name'] ?? 0;
-            $stepId = $stepData['step_id'] ?? 0;
-            $originalPosition = $stepData['original_position'] ?? 0;
-            $newPosition = $stepData['new_position'] ?? 0;
+            $stepName = $stepData[{{$originalIndex}}]['step_name'] ?? 0;
+            $stepId = $stepData[{{$originalIndex}}]['step_id'] ?? 0;
+            $originalPosition = $stepData[{{$originalIndex}}]['original_position'] ?? 0;
+            $newPosition = $stepData[{{$originalIndex}}]['new_position'] ?? 0;
         @endphp
 
         @if($stepData)

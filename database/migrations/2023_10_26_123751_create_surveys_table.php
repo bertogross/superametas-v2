@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('parent_id')->default(0);
             $table->unsignedBigInteger('user_id')->nullable()->comment('The user who created the survey task');
+            $table->string('title', 191)->nullable();
             /*
             $table->unsignedBigInteger('assigned_to')->nullable()->comment('The company to which the survey task is assigned');
             $table->unsignedBigInteger('delegated_to')->nullable()->comment('The user to whom the survey task is delegated');

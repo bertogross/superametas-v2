@@ -17,12 +17,14 @@ class Survey extends Model
     public $timestamps = true;
 
     protected $fillable = [
+        'parent_id',
+        'user_id',
         'title',
-        'assigned_to',
         'delegated_to',
         'audited_by',
-        //'status',
-        //'priority',
+        'status',
+        'recurreing',
+        'priority',
         'description',
         'jsondata',
         'start_date',
