@@ -7,8 +7,12 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 https://laravel-news.com/openai-for-laravel
 
 
-Version 2.0.23 - [2023-11-08 - 2023-11-10]
+Version 2.0.23 - [2023-11-08 - 2023-11-11]
 - [Added] HTML: blade pages (/surveys/terms)
+- [Removed] SurveysComposeController and model/surveyCompose
+- [Removed] surveys-compose.js
+- [Removed] HTML: blade pages (/surveys/composes)
+- [Updated] HTML: all blade pages (/surveys)
 
 
 

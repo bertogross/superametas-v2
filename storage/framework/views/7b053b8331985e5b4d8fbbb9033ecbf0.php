@@ -40,11 +40,12 @@
         </button>
     </div>
 
-     <!-- Conditional Navigation Include -->
-     <?php if(Request::is('settings*')): ?>
-        <?php echo $__env->make('layouts.nav-settings', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <!-- Conditional Navigation Include -->
+    <?php if( Request::is('settings*') ): ?>
+        <?php $__env->startComponent('settings.components.nav'); ?>
+        <?php echo $__env->renderComponent(); ?>
     <?php endif; ?>
-
+    
 </div>
 <!-- Left Sidebar End -->
 <!-- Vertical Overlay-->

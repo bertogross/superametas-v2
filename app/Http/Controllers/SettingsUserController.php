@@ -49,7 +49,7 @@ class SettingsUserController extends Controller
             $user = User::findOrFail($id);
 
             // Check if the authenticated user is the same as the user being viewed
-            /*if(auth()->user()->id !== $user->id) {
+            /*if(auth()->id() !== $user->id) {
                 abort(403, 'Unauthorized action.');
             }*/
         }
@@ -367,7 +367,7 @@ class SettingsUserController extends Controller
             $user = User::find($id);
         }
 
-        return view('settings/users-modal-form', compact('user'));
+        return view('settings/users-form', compact('user'));
 
     }
 }

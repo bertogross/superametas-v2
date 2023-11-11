@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\User;
-use App\Models\SurveyCompose;
+//use App\Models\SurveyCompose;
 use App\Models\Survey;
 use App\Models\SurveyMeta;
+use App\Models\SurveyTerm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
 class SurveysController extends Controller
 {
@@ -18,8 +18,6 @@ class SurveysController extends Controller
 
     public function index(Request $request)
     {
-        $user = Auth::user();
-
         $status = $request->input('status');
         $delegated_to = $request->input('delegated_to');
         $audited_by = $request->input('audited_by');
@@ -33,7 +31,8 @@ class SurveysController extends Controller
             $query->where('status', $status);
         }
 
-        $query = $query->where('created_by', $user->id);
+        //$user = auth()->id();
+        //$query = $query->where('user_id', $user->id);
 
         // Search by delegated_to and or audited_by
         /*
@@ -76,7 +75,7 @@ class SurveysController extends Controller
 
         $users = getUsers();
 
-        $usersByRole = getUsersByRole(User::ROLE_AUDIT);
+        //$usersByRole = getUsersByRole(User::ROLE_CONTROLLERSHIP);
 
         $delegated_to = request('delegated_to');
         $delegated_to = is_array($delegated_to) ? $delegated_to : array();
@@ -84,14 +83,20 @@ class SurveysController extends Controller
         $audited_by = request('audited_by');
         $audited_by = is_array($audited_by) ? $audited_by : array();
 
+        $dateRange = Survey::getSurveysDateRange();
+        $firstDate = $dateRange['first_date'];
+        $lastDate = $dateRange['last_date'];
+
         return view('surveys.listing', compact(
             'surveys',
             'users',
-            'usersByRole',
+            //'usersByRole',
             'surveyStatusCount',
             'getSurveyStatusTranslations',
             'delegated_to',
-            'audited_by'
+            'audited_by',
+            'firstDate',
+            'lastDate'
         ));
     }
 
@@ -118,11 +123,13 @@ class SurveysController extends Controller
 
         session()->forget('success');
 
-        $survey = $surveyComposeCustomId = $surveyComposeDefaultId = null;
+        $survey = null;
+
+        //$surveyComposeCustomId = $surveyComposeDefaultId = null;
 
         $users = getUsers();
 
-        $usersByRole = getUsersByRole(User::ROLE_AUDIT);
+        //$usersByRole = getUsersByRole(User::ROLE_CONTROLLERSHIP);
 
         $getAuthorizedCompanies = getAuthorizedCompanies();
 
@@ -130,32 +137,46 @@ class SurveysController extends Controller
 
         $getSurveyStatusTranslations = Survey::getSurveyStatusTranslations();
 
-        $custom = SurveyCompose::getAllByType('custom');
-        $getSurveyComposeCustom = $custom ?? null;
+        //$custom = Survey::getAllByType('custom');
+        //$getSurveyComposeCustom = $custom ?? null;
 
-        $default = SurveyCompose::getAllByType('default');
-        $getSurveyComposeDefault = $default ?? null;
+        //$default = Survey::getAllByType('default');
+        //$getSurveyComposeDefault = $default ?? null;
+
+        $survey = $Custom = null;
+
+        $preListing = SurveyTerm::preListing();
+        $Default = [];
+        foreach($getActiveDepartments as $index => $department){
+            $Default[$index] = [
+                'stepData' => [
+                    'step_name' => $department->department_alias,
+                    'step_id' => $department->id,
+                    'original_position' => $index,
+                    'new_position' => $index,
+                ],
+                'topicsData' => $preListing
+            ];
+        }
 
         return view('surveys.create', compact(
-            'survey',
-            'users',
-            'usersByRole',
-            'getAuthorizedCompanies',
-            'getSurveyStatusTranslations',
-            'getSurveyComposeCustom',
-            'getSurveyComposeDefault',
-            'getActiveDepartments',
-            'surveyComposeCustomId',
-            'surveyComposeDefaultId'
-        ) );
+                'survey',
+                'users',
+                //'data',
+                'Default',
+                'Custom',
+                //'usersByRole',
+                'getAuthorizedCompanies',
+                'getSurveyStatusTranslations',
+                'getActiveDepartments',
+                //'getSurveyComposeCustom',
+                //'getSurveyComposeDefault',
+                //'surveyComposeCustomId',
+                //'surveyComposeDefaultId'
+            )
+        );
     }
 
-    /**
-     * Get the content for the modal because contains form
-     *
-     * @param int|null
-     * @return \Illuminate\View\View
-     */
     public function edit(Request $request)
     {
         // Cache::flush();
@@ -178,37 +199,41 @@ class SurveysController extends Controller
             $survey = $survey[0] ?? '';
         }
 
+        $decode = is_string($survey->jsondata) ? json_decode($survey->jsondata, true) : $survey->jsondata;
+
+        $data = Survey::reorderingData($decode);
+
+        $custom = Survey::getByType($data, 'custom');
+        $Custom = $custom ?? null;
+
+        //$surveyComposeCustomId = SurveyMeta::getSurveyMeta($surveyId, 'survey_compose_custom_id');
+
+        $default = Survey::getByType($data, 'default');
+        $Default = $default ?? null;
+
+        //$surveyComposeDefaultId = SurveyMeta::getSurveyMeta($surveyId, 'survey_compose_default_id');
+
         $users = getUsers();
 
-        $usersByRole = getUsersByRole(User::ROLE_AUDIT);
+        //$usersByRole = getUsersByRole(User::ROLE_CONTROLLERSHIP);
 
         $getAuthorizedCompanies = getAuthorizedCompanies();
 
-        $getSurveyStatusTranslations = Survey::getSurveyStatusTranslations();
-
-        $custom = SurveyCompose::getAllByType('custom');
-        $getSurveyComposeCustom = $custom ?? null;
-
-        $surveyComposeCustomId = SurveyMeta::getSurveyMeta($surveyId, 'survey_compose_custom_id');
-
-        $default = SurveyCompose::getAllByType('default');
-        $getSurveyComposeDefault = $default ?? null;
-
-        $surveyComposeDefaultId = SurveyMeta::getSurveyMeta($surveyId, 'survey_compose_default_id');
-
         $getActiveDepartments = getActiveDepartments();
 
+        $getSurveyStatusTranslations = Survey::getSurveyStatusTranslations();
+
         $view = view('surveys.edit', compact(
-            'survey',
             'users',
-            'usersByRole',
+            'survey',
+            'Custom',
+            'Default',
+            //'usersByRole',
             'getAuthorizedCompanies',
-            'getSurveyStatusTranslations',
-            'getSurveyComposeCustom',
-            'getSurveyComposeDefault',
             'getActiveDepartments',
-            'surveyComposeCustomId',
-            'surveyComposeDefaultId'
+            'getSurveyStatusTranslations',
+            //'surveyComposeCustomId',
+            //'surveyComposeDefaultId'
             )
         );
 
@@ -220,59 +245,90 @@ class SurveysController extends Controller
         // Cache::flush();
 
         $validatedData = $request->validate([
-            'status' => 'required|in:pending,in_progress,completed,audited',
-            'assigned_to' => 'nullable',
-            'due_date' => 'nullable|date_format:d/m/Y',
-            'delegated_to' => 'nullable',
-            'audited_by' => 'nullable',
-            'current_user_editor' => 'nullable',
+            'title' => 'required|string|max:191',
+            //'status' => 'required|in:new,stoped,trash,pending,in_progress,completed,audited',
+            'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
+            //'assigned_to' => 'nullable',
+            'delegated_to' => 'required|string',
+            'audited_by' => 'required|string',
+            //'current_user_editor' => 'nullable',
+            'start_date' => 'nullable|date_format:d/m/Y',
             'description' => 'nullable|string|max:1000',
-            'survey_compose_custom_id' => 'nullable',
-            'survey_compose_default_id' => 'nullable',
+            'jsondata' => 'required|string',
+            //'survey_compose_custom_id' => 'nullable',
+            //'survey_compose_default_id' => 'nullable',
             //'custom_fields' => 'nullable|array',
             //'custom_fields.*.type' => 'required_with:custom_fields|string|max:20',
             //'custom_fields.*.name' => 'required_with:custom_fields|string|max:30',
             //'custom_fields.*.label' => 'required_with:custom_fields|string|max:50',
         ]);
 
+        $userId = auth()->id();
+        $validatedData['user_id'] = $userId;
+
+        $jsonString = $request->input('jsondata');
+        $jsondata = $jsonString ? json_decode($jsonString, true) : null;
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return response()->json(['success' => false, 'message' => 'Invalid JSON format']);
+        }
+
+        $validatedData['jsondata'] = $jsondata ?? null;
+
+        $validatedData['start_date'] = $validatedData['start_date'] ?? null ? Carbon::createFromFormat('d/m/Y', $validatedData['start_date'])->format('Y-m-d') : null;
+        $validatedData['completed_at'] = $validatedData['completed_at'] ?? null ? Carbon::createFromFormat('d/m/Y', $validatedData['completed_at'])->format('Y-m-d') : null;
+        $validatedData['audited_at'] = $validatedData['audited_at'] ?? null ? Carbon::createFromFormat('d/m/Y', $validatedData['audited_at'])->format('Y-m-d') : null;
+
         if ($id) {
+            $validatedData['status'] = 'new';
+
             // Update operation
             $survey = Survey::findOrFail($id);
 
             // Check if the current user is the creator
-            if (auth()->id() != $survey->created_by) {
+            if ($userId != $survey->user_id) {
                 return redirect()->back()->with('error', 'You are not authorized to edit this survey task.');
             }
 
-            $validatedData['due_date'] = $validatedData['due_date'] ?? null ? Carbon::createFromFormat('d/m/Y', $validatedData['due_date'])->format('Y-m-d') : null;
-            $validatedData['completed_at'] = $validatedData['completed_at'] ?? null ? Carbon::createFromFormat('d/m/Y', $validatedData['completed_at'])->format('Y-m-d') : null;
-            $validatedData['audited_at'] = $validatedData['audited_at'] ?? null ? Carbon::createFromFormat('d/m/Y', $validatedData['audited_at'])->format('Y-m-d') : null;
+            //$survey->update($validatedData);
+            $survey = $this->update($validatedData);
 
-            $survey->update($validatedData);
-
+            /*
             // Update custom fields
             $composeCustomId = $validatedData['survey_compose_custom_id'];
             SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_custom_id', $composeCustomId);
 
             $composeDefaultId = $validatedData['survey_compose_default_id'];
             SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_default_id', $composeDefaultId);
+            */
 
             //return redirect()->route('surveysShowURL', $survey)->with('success', 'Survey updated successfully');
-            return response()->json(['success' => true, 'message' => 'Survey updated successfully!']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Survey updated successfully!',
+                'id' => $survey->id,
+                'json' => $jsondata
+            ]);
         } else {
             // Store operation
-            $survey = $this->store($request);
+            $survey = $this->store($validatedData);
 
+            /*
             // Update custom fields
             $composeCustomId = $validatedData['survey_compose_custom_id'];
             SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_custom_id', $composeCustomId);
 
             $composeDefaultId = $validatedData['survey_compose_default_id'];
             SurveyMeta::updateSurveyMeta($survey->id, 'survey_compose_default_id', $composeDefaultId);
+            */
 
             return $survey;
 
-            return response()->json(['success' => true, 'message' => 'Survey saved successfully!']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Survey saved successfully!',
+                'id' => $survey->id,
+                'json' => $jsondata
+            ]);
         }
     }
 }

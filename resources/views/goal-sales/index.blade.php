@@ -27,9 +27,6 @@
     $metric = metricGoalSales($getMeantime);
     $metricNumber = convertToNumeric($metric);
 
-    $dateRange = getSaleDateRange();
-    $firstDate = $dateRange['first_date'];
-    $lastDate = $dateRange['last_date'];
     $currentMonth = now()->format('Y-m');
     $previousMonth = now()->subMonth()->format('Y-m');
 @endphp
@@ -87,7 +84,7 @@
                 <div class="col-sm-12 col-md col-lg" title="Exibir somente Lojas selecionadas">
                     <select class="form-control" data-choices data-choices-removeItem name="companies[]" id="filter-companies" multiple data-placeholder="Loja">
                         @foreach ($getAuthorizedCompanies as $company)
-                            <option {{ in_array($company, $filterCompanies) ? 'selected' : '' }} value="{{ $company }}">{{ getCompanyAlias(intval($company)) }}</option>
+                            <option {{ in_array($company, $filterCompanies) ? 'selected' : '' }} value="{{ $company }}">{{ getCompanyAlias($company) }}</option>
                         @endforeach
                     </select>
                 </div>

@@ -14,9 +14,12 @@
                     <div class="d-flex">
                         <div class="flex-grow-1">
                             <h5 class="job-title text-theme">{{ $stepName }}</h5>
+                            {{--
                             <p class="delegated-name text-muted mb-0" title="Pessoa a qual foi delegada esta vistoria">Responsável: <span class="delegated_to-name"></span></p>
+                            --}}
                         </div>
                         <div>
+                            {{--
                             <div class="avatar-sm dropstart {{ $edition ? 'w-auto' : '' }}">
                                 <div
                                 @if ($edition)
@@ -41,9 +44,6 @@
                                                             name="delegated_to[][{{$data->id}}][{{$originalPosition}}]"
                                                             value="{{ $user->id }}"
                                                             id="user-{{$user->id}}{{$originalPosition}}{{$newPosition}}"
-                                                            {{--
-                                                            @checked(old('delegated_to', $delegated_to) == $user->id)
-                                                            --}}
                                                             required>
                                                             <label class="form-check-label d-flex align-items-center"
                                                                 for="user-{{$user->id}}{{$originalPosition}}{{$newPosition}}">
@@ -67,6 +67,7 @@
 
                                 </div>
                             </div>
+                            --}}
                         </div>
                     </div>
                     <!--<p class="text-muted job-description"></p>-->

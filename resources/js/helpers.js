@@ -389,18 +389,6 @@ export function bsPopoverTooltip(){
     });
 }
 
-export function initFlatpickrRange() {
-    const elements = document.querySelectorAll('.flatpickr-range');
-    elements.forEach(element => {
-        flatpickr(element, {
-            dateFormat: "d/m/Y",
-            locale: "pt",
-            clear: true,
-            mode: "range"
-        });
-    });
-}
-
 export function initFlatpickr() {
     const elements = document.querySelectorAll('.flatpickr-default');
     elements.forEach(element => {
@@ -413,6 +401,58 @@ export function initFlatpickr() {
             //maxDate: new Date().fp_incr(90)
         });
     });
+}
+
+export function initFlatpickrRange() {
+    const elements = document.querySelectorAll('.flatpickr-range');
+    elements.forEach(element => {
+        var getMinDate = element.getAttribute("data-min-date");
+        getMinDate = !getMinDate ? 'today' : getMinDate;
+
+        var getMaxDate = element.getAttribute("data-max-date");
+        getMaxDate = !getMaxDate ? 'today' : getMaxDate;
+
+        flatpickr(element, {
+            dateFormat: "d/m/Y",
+            locale: "pt",
+            clear: true,
+            mode: "range",
+            minDate: getMinDate,
+            maxDate: getMaxDate
+        });
+    });
+}
+
+export function initFlatpickrRangeMonths(){
+    const elements = document.querySelectorAll('.flatpickr-range-month');
+    if (elements) {
+        elements.forEach(function (element) {
+            var getMinDate = element.getAttribute("data-min-date");
+            getMinDate = !getMinDate ? 'today' : getMinDate;
+
+            var getMaxDate = element.getAttribute("data-max-date");
+            getMaxDate = !getMaxDate ? 'today' : getMaxDate;
+
+            flatpickr(element, {
+                locale: 'pt',
+                mode: "range",
+                allowInput: false,
+                static: true,
+                altInput: true,
+                minDate: getMinDate,
+                maxDate: getMaxDate,
+                plugins: [
+                    new monthSelectPlugin({
+                        shorthand: true,
+                        dateFormat: "Y-m",
+                        altFormat: "F/Y",
+                        theme: "dark"
+                    })
+                ]
+            });
+        });
+    }
+
 }
 
 function destroyModal() {
@@ -483,6 +523,7 @@ export function revalidationOnInput(formSelector = '.needs-validation') {
     const form = document.querySelector(formSelector);
     if (!form) {
       console.warn('Form not found:', formSelector);
+
       return;
     }
 

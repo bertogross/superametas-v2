@@ -40,11 +40,17 @@
         </button>
     </div>
 
-     <!-- Conditional Navigation Include -->
-     @if (Request::is('settings*'))
-        @include('layouts.nav-settings')
+    <!-- Conditional Navigation Include -->
+    @if ( Request::is('settings*') )
+        @component('settings.components.nav')
+        @endcomponent
     @endif
-
+    {{--
+    @if ( Request::is('surveys*') )
+        @component('surveys.components.nav')
+        @endcomponent
+    @endif
+    --}}
 </div>
 <!-- Left Sidebar End -->
 <!-- Vertical Overlay-->

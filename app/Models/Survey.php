@@ -17,15 +17,15 @@ class Survey extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'created_by',
-        'current_user_editor',
-        'delegated_to',
-        'description',
+        'title',
         'assigned_to',
+        'delegated_to',
         'audited_by',
-        'status',
+        //'status',
         //'priority',
-        'due_date',
+        'description',
+        'jsondata',
+        'start_date',
         'completed_at',
         'audited_at'
     ];
@@ -37,8 +37,6 @@ class Survey extends Model
 
     public static function countByStatus($status = false)
     {
-        $user = Auth::user();
-
         $query = DB::connection('smAppTemplate')
             ->table('surveys')
             ->select('status', DB::raw('count(*) as total'))
@@ -48,7 +46,8 @@ class Survey extends Model
             $query->where('status', $status);
         }
 
-        $query = $query->where('created_by', $user->id);
+        //$user = auth()->id();
+       //$query = $query->where('user_id', $user->id);
 
         $results = $query->get();
 
@@ -63,9 +62,21 @@ class Survey extends Model
 
     public static function getSurveyStatusTranslations() {
         return [
+            'new' => [
+                'label' => 'Novo',
+                'description' => 'Tarefa ou processo registrado mas não inicializado.',
+                'icon' => 'ri-flag-2-line',
+                'color' => 'primary'
+            ],
+            'stoped' => [
+                'label' => 'Parado',
+                'description' => 'Tarefa ou processo Parado.',
+                'icon' => 'ri-stop-circle-line',
+                'color' => 'danger'
+            ],
             'pending' => [
                 'label' => 'Pendente',
-                'description' => 'Tarefa ou processo que ainda não foi iniciado.',
+                'description' => 'Tarefa ou processo que foi inicializado mas ainda não possui dados de progresso.',
                 'icon' => 'ri-time-line',
                 'color' => 'warning'
             ],
@@ -77,18 +88,83 @@ class Survey extends Model
             ],
             'audited' => [
                 'label' => 'Em Auditoria',
-                'description' => 'Tarefa ou processo que está sendo revisado ou auditado.',
+                'description' => 'Tarefa ou processo que está sendo revisado/auditado.',
                 'icon' => 'ri-todo-line',
-                'color' => 'success'
+                'color' => 'secondary'
             ],
             'completed' => [
                 'label' => 'Finalizada',
-                'description' => 'Tarefa ou processo que foi concluído com sucesso.',
+                'description' => 'Tarefa ou processo que foi concluído.',
                 'icon' => 'ri-check-double-fill',
-                'color' => 'secondary'
+                'color' => 'success'
             ]
         ];
     }
 
+    /**
+     * Get all survey composes by type.
+     */
+    public static function getByType($data, $type = 'custom')
+    {
+        //$user = auth()->id();
+
+        /*
+        $query = self::where('type', $type);
+       // $query = $query->where('user_id', $user->id);
+
+        if ($status) {
+            $query = $query->where('status', $status);
+        }
+        */
+
+        //return $query->get();
+    }
+
+    public static function reorderingData($data)
+    {
+        $transformedData = [];
+
+        if($data){
+            // First, sort the steps according to their new_position
+            foreach ($data as $step) {
+                $newPosition = $step['stepData']['new_position'] ?? 0;
+                $transformedData[$newPosition] = $step;
+            }
+            ksort($transformedData); // Sort by key to maintain the order of steps
+
+            // Now, sort the topicData for each step
+            foreach ($transformedData as $stepPosition => &$step) {
+                $sortedTopicData = [];
+
+                if( isset($step['topicData']) ){
+                    foreach ($step['topicData'] as $topic) {
+                        $newTopicPosition = $topic['new_position'] ?? 0;
+                        $sortedTopicData[$newTopicPosition] = $topic;
+                    }
+                    ksort($sortedTopicData); // Sort by key to maintain the order of topics
+
+                    $step['topicData'] = array_values($sortedTopicData); // Re-index the array
+                }
+            }
+            unset($step); // Break the reference to the last element
+        }
+        return $transformedData;
+    }
+
+    public static function getSurveysDateRange()
+    {
+        $firstDate = DB::connection('smAppTemplate')->table('surveys')
+            ->select(DB::raw('DATE_FORMAT(MIN(created_at), "%Y-%m-%d") as first_date'))
+            ->first();
+
+        $lastDate = DB::connection('smAppTemplate')->table('surveys')
+            ->select(DB::raw('DATE_FORMAT(MAX(created_at), "%Y-%m-%d") as last_date'))
+            ->first();
+
+        return [
+            'first_date' => $firstDate->first_date ?? date('Y-m-d'),
+            'last_date' => $lastDate->last_date ?? date('Y-m-d'),
+        ];
+    }
 
 }

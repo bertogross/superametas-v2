@@ -29,13 +29,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     modal.show();
 
                     if (userId) {
-                        document.getElementById("modalUserTitle").innerHTML = userName ? '<span class="text-theme">'+ userName + '</span>' : 'Editar Usuário';
-                        document.getElementById("btn-save-user").innerHTML = 'Atualizar';
+                        document.getElementById("modalUserTitle").innerHTML = userName ? 'Editar <span class="text-theme">'+ userName + '</span>' : 'Editar Usuário';
+                        document.getElementById("btn-save-user").innerHTML = 'Atualizar Usuário';
 
                         injectScript("/build/js/pages/password-addon.init.js");
                     } else {
-                        document.getElementById("modalUserTitle").innerHTML = 'Adicionar Usuário';
-                        document.getElementById("btn-save-user").innerHTML = 'Salvar';
+                        document.getElementById("modalUserTitle").innerHTML = 'Novo Usuário';
+                        document.getElementById("btn-save-user").innerHTML = 'Adicionar Usuário';
                     }
 
                     attachModalEventListeners();

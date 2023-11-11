@@ -12,7 +12,8 @@ import {
     bsPopoverTooltip,
     formatNumber,
     percentageResult,
-    getChartColorsArray
+    getChartColorsArray,
+    initFlatpickrRangeMonths
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -38,30 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         meantimeSelect.addEventListener('change', toggleCustomMeantimeInput);
     }
 
-    /**
-     * Initialize flatpickr with specific options for elements with the class 'flatpickr-range-month'.
-     */
-    const flatpickrRangeMonthElements = document.querySelectorAll('.flatpickr-range-month');
 
-    if (flatpickrRangeMonthElements) {
-        flatpickrRangeMonthElements.forEach(function (element) {
-            flatpickr(element, {
-                locale: 'pt',
-                mode: "range",
-                allowInput: false,
-                static: true,
-                altInput: true,
-                plugins: [
-                    new monthSelectPlugin({
-                        shorthand: true,
-                        dateFormat: "Y-m",
-                        altFormat: "F/Y",
-                        theme: "dark"
-                    })
-                ]
-            });
-        });
-    }
 
 
 
@@ -879,6 +857,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Call the functions when the DOM is fully loaded
     bsPopoverTooltip();
+    initFlatpickrRangeMonths();
     toggleCustomMeantimeInput();
     toggleZoomInOut();
     showButtonWhenInputChange();

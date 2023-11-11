@@ -29,8 +29,7 @@
             <div class="row">
                 <div class="col-lg-2">
                     <div class="nav nav-pills flex-column nav-pills-tab verti-nav-pills custom-verti-nav-pills nav-pills-theme" role="tablist" aria-orientation="vertical">
-                        <a class="nav-link text-uppercase {{ session('active_tab') == 'account' || session('active_tab') == '' ? 'active show' : '' }}" id="v-pills-account-tab" data-bs-toggle="pill" href="#v-pills-account" role="tab" aria-controls="v-pills-account"
-                            aria-selected="true">
+                        <a class="nav-link text-uppercase {{ session('active_tab') == 'account' || session('active_tab') == '' ? 'active show' : '' }}" href="#v-pills-account" id="v-pills-account-tab" data-bs-toggle="pill" role="tab" aria-controls="v-pills-account" aria-selected="true">
                             Minha Conta</a>
                         <a class="nav-link text-uppercase {{ session('active_tab') == 'stripe' ? 'active show' : '' }}" id="v-pills-stripe-tab" data-bs-toggle="pill" href="#v-pills-stripe" role="tab" aria-controls="v-pills-stripe"
                             aria-selected="false">

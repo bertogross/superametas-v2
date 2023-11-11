@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use App\Models\Post;
 use App\Models\UserMeta;
+use App\Models\GoalSales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +41,10 @@ class GoalSalesController extends Controller
         // Calculate the start and end dates based on the selected timeframe
         list($startDate, $endDate) = $this->calculateStartAndEndDate($getMeantime);
 
+        $dateRange = GoalSales::getSaleDateRange();
+        $firstDate = $dateRange['first_date'];
+        $lastDate = $dateRange['last_date'];
+
         // If the user has analytic mode enabled
         if (getUserMeta($userId, 'analytic-mode') == 'on') {
             // Get sales data
@@ -61,14 +65,16 @@ class GoalSalesController extends Controller
                 'resultsSales',
                 'resultsGoals',
                 'totalSalesByMonth',
-                'totalGoalsByMonth'
+                'totalGoalsByMonth',
+                'firstDate',
+                'lastDate'
             ));
         } else {
             // If analytic mode is not enabled, use the getGoalAndSalesData query
             $data = $this->getGoalAndSalesData($startDate, $endDate, $selectedCompanies, $selectedDepartments);
 
             // Return the view with the old data
-            return view('goal-sales.index', compact('data'));
+            return view('goal-sales.index', compact('data', 'firstDate', 'lastDate'));
         }
     }
 
@@ -80,7 +86,11 @@ class GoalSalesController extends Controller
      */
     public function settings() {
 
-        return view('goal-sales.settings-edit');
+        $dateRange = GoalSales::getSaleDateRange();
+        $firstDate = $dateRange['first_date'];
+        $lastDate = $dateRange['last_date'];
+
+        return view('goal-sales.settings-edit', compact('firstDate', 'lastDate'));
 
     }
 
@@ -140,11 +150,18 @@ class GoalSalesController extends Controller
             ->pluck('total_net_value', 'department_id')
             ->toArray();
 
+
+        $dateRange = GoalSales::getSaleDateRange();
+        $firstDate = $dateRange['first_date'];
+        $lastDate = $dateRange['last_date'];
+
         return view('goal-sales.edit', compact(
                 'goals',
                 'salesYearBefore',
                 'salesMonthBefore',
                 'meantime',
+                'firstDate',
+                'lastDate',
                 'previousMeantimeYearBefore',
                 'previousMeantimeMonthBefore',
                 'getActiveDepartments',

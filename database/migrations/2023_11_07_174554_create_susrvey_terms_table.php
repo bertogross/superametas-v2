@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 191)->unique();
             $table->string('slug', 191)->unique();
-            $table->Integer('term_status')->default(1);
+            $table->Integer('status')->default(1);
         });
     }
 

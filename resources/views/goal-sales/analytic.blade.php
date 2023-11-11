@@ -44,17 +44,10 @@
 <div class="row" id="load-listing">
     <div class="col-xxl-3">
         <div class="card">
-            <div class="card-body p-4">
-                @if (getCompanyLogo())
-                    <div class="flex-shrink-0 avatar-md mx-auto">
-                        <div class="avatar-title bg-light rounded">
-                            <img src="{{ getCompanyLogo() }}" alt="{{ getCompanyName() }}" height="50" />
-                        </div>
-                    </div>
-                @endif
+            <div class="card-body p-3">
 
-                <div class="mt-4 text-center">
-                    <h5 class="mb-1">Departamentos</h5>
+                <div class="text-center">
+                    <h5 class="mb-1 text-uppercase">Departamentos</h5>
 
                     <div class="mt-3">
                         @foreach ($departments as $department)

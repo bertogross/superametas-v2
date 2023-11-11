@@ -12,7 +12,7 @@ use App\Http\Controllers\{
     SettingsAccountController,
     GoalSalesController,
     SurveysController,
-    SurveysComposeController,
+    //SurveysComposeController,
     SurveyTermController,
     SettingsApiKeysController,
     DropboxController,
@@ -59,12 +59,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store/{id?}', [SurveysController::class, 'storeOrUpdate'])->name('surveysStoreOrUpdateURL');
 
             // Form Compose Routes
+            /*
             Route::get('/compose/listing', [SurveysComposeController::class, 'index'])->name('surveysComposeIndexURL');
             Route::get('/compose/create/{type?}', [SurveysComposeController::class, 'create'])->name('surveysComposeCreateURL')->where('type', 'custom|default');
             Route::get('/compose/edit/{id?}', [SurveysComposeController::class, 'edit'])->name('surveysComposeEditURL');
             Route::get('/compose/show/{id?}', [SurveysComposeController::class, 'show'])->name('surveysComposeShowURL');
             Route::post('/compose/store/{id?}', [SurveysComposeController::class, 'storeOrUpdate'])->name('surveysComposeStoreOrUpdateURL');
             Route::post('/compose/toggle-status/{id?}/{status?}', [SurveysComposeController::class, 'toggleStatus'])->name('surveysComposeToggleStatusURL');
+            */
 
         // Term Routes
         Route::get('/terms/listing', [SurveyTermController::class, 'index'])->name('surveysTermsIndexURL');

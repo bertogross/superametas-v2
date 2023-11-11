@@ -19,24 +19,25 @@ class User extends Authenticatable
     // Constants representing user roles
     const ROLE_ADMIN = 1;
     const ROLE_EDITOR = 2;
-    const ROLE_AUDIT = 3;
+    const ROLE_CONTROLLERSHIP = 3;
     const ROLE_USER = 4;
     const ROLE_PARTNER = 5;
 
     // Capabilities for each role
     const CAPABILITIES = [
-        self::ROLE_ADMIN => ['manage_users', 'edit_content', 'audit_content', 'view_content'],
-        self::ROLE_EDITOR => ['edit_content', 'view_content'],
-        self::ROLE_AUDIT => ['audit_content', 'view_content'],
-        self::ROLE_USER => ['view_content'],
-        self::ROLE_PARTNER => ['view_content'],
+        self::ROLE_ADMIN => ['manage', 'edit', 'controllership', 'view'],
+        self::ROLE_EDITOR => ['edit', 'view'],
+        self::ROLE_CONTROLLERSHIP => ['controllership', 'view'],
+        self::ROLE_USER => ['partial_view'],
+        self::ROLE_PARTNER => ['view'],
     ];
 
     const CAPABILITY_TRANSLATIONS = [
-        'manage_users' => 'Configurações Gerais',
-        'edit_content' => 'Editar Registros',
-        'audit_content' => 'Auditar',
-        'view_content' => 'Visualizar',
+        'manage' => 'Configurações Gerais',
+        'edit' => 'Editar Metas',
+        'controllership' => 'Editar Vistorias',
+        'view' => 'Visualização Íntegral',
+        'partial_view' => 'Visualização Limitada',
     ];
 
     /**
@@ -56,7 +57,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'status',
+        //'status',
         //'avatar',
         //'cover',
     ];
@@ -83,7 +84,7 @@ class User extends Authenticatable
         $roles = [
             self::ROLE_ADMIN => 'Administração',
             self::ROLE_EDITOR => 'Gerência',
-            self::ROLE_AUDIT => 'Auditoria',
+            self::ROLE_CONTROLLERSHIP => 'Controladoria',
             self::ROLE_USER => 'Operacional',
             self::ROLE_PARTNER => 'Sócio Investidor',
         ];
@@ -127,51 +128,60 @@ class User extends Authenticatable
     public static function generatePermissionsTable()
     {
         $roles = array_keys(self::CAPABILITIES);
-        $capabilitiesList = ['manage_users', 'edit_content', 'audit_content', 'view_content']; // Add more capabilities as needed
+        $capabilitiesList = ['manage', 'edit', 'controllership', 'view', 'partial_view'];
+
+        $caption = '<div class="row">';
+            $caption .= '<div class="col text-end fw-normal fs-12"><i class="ri-checkbox-circle-fill text-success me-1 align-bottom" title="Ok"></i> Acesso permitido</div>';
+            //$caption .= '<div class="col fw-normal fs-12"><i class="ri-error-warning-line text-warning me-1 align-bottom" title="Limitações Administrativas"></i> Limitado pela Atribuição</div>';
+            $caption .= '<div class="col text-start fw-normal fs-12"><i class="ri-close-circle-line text-danger me-1 align-bottom" title="Não permitido"></i> Não permitido</div>';
+            //$caption .= '<div class="col fw-normal fs-12"><i class="ri-forbid-2-line text-info me-1 align-bottom" title="Somente visualização"></i> Somente visualização</div>';
+        $caption .= '</div>';
 
         $html = '<div class="card mt-2">';
-        $html .= '<div class="card-header fw-bold text-uppercase">Níveis e Permissões</div>';
-        $html .= '<div class="card-body">';
-        $html .= '<div class="table-responsive">';
-        $html .= '<table class="table table-bordered table-striped mb-0">';
-        $html .= '<thead class="table-light">';
-        $html .= '<tr>';
-        $html .= '<th class="invisible"></th>';
+            $html .= '<div class="card-header fw-bold text-uppercase">Níveis e Permissões</div>';
+            $html .= '<div class="card-body">';
+                $html .= '<div class="table-responsive">';
+                    $html .= '<table class="table table-bordered table-striped mb-0">';
+                        $html .= '<thead class="table-light">';
+                            $html .= '<tr>';
+                                $html .= '<th class="fw-normal">'.$caption.'</th>';
 
-        foreach ($roles as $roleId) {
-            $html .= '<th class="text-center">' . (new self)->getRoleName($roleId) . '</th>';
-        }
+                                foreach ($roles as $roleId) {
+                                    $html .= '<th class="text-center">' . (new self)->getRoleName($roleId) . '</th>';
+                                }
 
-        $html .= '</tr>';
-        $html .= '</thead>';
-        $html .= '<tbody>';
+                            $html .= '</tr>';
+                        $html .= '</thead>';
+                        $html .= '<tbody>';
 
-        foreach ($capabilitiesList as $capability) {
-            $html .= '<tr>';
-            //$html .= '<td class="text-end">' . ucfirst(str_replace('_', ' ', $capability)) . ':</td>';
-            $html .= '<td class="text-end">' . self::getHumanReadableCapability($capability) . ':</td>';
+                        foreach ($capabilitiesList as $capability) {
+                            $html .= '<tr>';
+                            //$html .= '<td class="text-end">' . ucfirst(str_replace('_', ' ', $capability)) . ':</td>';
+                            $html .= '<td class="text-end">' . self::getHumanReadableCapability($capability) . ':</td>';
 
-            foreach ($roles as $roleId) {
-                if (in_array($capability, self::CAPABILITIES[$roleId])) {
-                    $html .= '<td class="text-center"><i class="ri-checkbox-circle-fill text-success" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Permitido" data-bs-original-title="Permitido"></i></td>';
-                } else {
-                    $html .= '<td class="text-center"><i class="ri-close-circle-line text-danger" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Não permitido" data-bs-original-title="Não permitido"></i></td>';
-                }
-            }
+                            foreach ($roles as $roleId) {
+                                $html .= '<td class="text-center">';
+                                if (in_array($capability, self::CAPABILITIES[$roleId])) {
+                                    $html .= '<i class="ri-checkbox-circle-fill text-success" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Permitido" data-bs-original-title="Permitido"></i>';
+                                }
+                                /*
+                                else if ($roleId == 4) {
+                                    $html .= '<i class="ri-error-warning-line text-warning" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Limitado conforme a Atribuição" data-bs-original-title="Limitado conforme a Atribuição"></i>';
+                                }
+                                */
+                                else {
+                                    $html .= '<i class="ri-close-circle-line text-danger" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Não permitido" data-bs-original-title="Não permitido"></i>';
+                                }
+                                $html .= '</td>';
+                            }
 
-            $html .= '</tr>';
-        }
+                            $html .= '</tr>';
+                        }
 
-        $html .= '</tbody>';
-        $html .= '</table>';
-        $html .= '</div>';
-        $html .= '<div class="row mt-3 small3">';
-        $html .= '<div class="col-sm-6 col-md-3"><i class="ri-checkbox-circle-fill text-success float-start me-1" title="Ok"></i> Acesso permitido</div>';
-        $html .= '<div class="col-sm-6 col-md-3"><i class="ri-error-warning-line text-warning float-start me-1" title="Limitações Administrativas"></i> Limitado conforme o Nível</div>';
-        $html .= '<div class="col-sm-6 col-md-3"><i class="ri-close-circle-line text-danger float-start me-1" title="Não permitido"></i> Não permitido</div>';
-        $html .= '<div class="col-sm-6 col-md-3"><i class="ri-forbid-2-line text-info float-start me-1" title="Somente visualização"></i> Somente visualização</div>';
-        $html .= '</div>';
-        $html .= '</div>';
+                        $html .= '</tbody>';
+                    $html .= '</table>';
+                $html .= '</div>';
+            $html .= '</div>';
         $html .= '</div>';
 
         return $html;

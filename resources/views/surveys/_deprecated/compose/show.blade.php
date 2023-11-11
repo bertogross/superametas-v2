@@ -49,7 +49,15 @@
         </div>
 
         <div>
-            @include('surveys.includes.steps-card', ['data' => $data, 'topicsData' => $topicsData, 'edition' => $edition, 'users' => $users])
+            {{--
+                @include('surveys.components.steps-card', ['data' => $data, 'topicsData' => $topicsData, 'edition' => $edition, 'users' => $users])
+            --}}
+            @component('surveys.components.steps-card')
+                @slot('data', $data)
+                @slot('topicsData', $topicsData)
+                @slot('edition', $edition)
+                @slot('users', $users)
+            @endcomponent
         </div>
         @php
         //appPrintR($data->jsondata);

@@ -1,6 +1,7 @@
 .vscode/
 vendor/
 _html/
+*/_deprecated/
 node_modules/
 npm-debug.log
 yarn-error.log

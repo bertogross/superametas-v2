@@ -41,7 +41,7 @@ if (!function_exists('getUsersByRole')) {
 
 if( !function_exists('getUserData') ){
     function getUserData($userId = null) {
-        $user = $userId ? User::find($userId) : Auth::user();
+        $user = $userId ? User::find($userId) : auth()->user();
 
         if ($user) {
             return array(
@@ -241,11 +241,11 @@ if (!function_exists('formatBrazilianReal')) {
 // Get authorized companies from the user_metas table
 if (!function_exists('getAuthorizedCompanies')) {
     function getAuthorizedCompanies($userId = null) {
-        $userId = $userId ?? Auth::user()->id;
+        $userId = $userId ?? auth()->id();
 
         $AuthorizedCompanies = getUserMeta($userId, 'companies');
 
-        $AuthorizedCompanies = $AuthorizedCompanies ? json_decode($AuthorizedCompanies, true) : array();
+        $AuthorizedCompanies = !empty($AuthorizedCompanies) ? json_decode($AuthorizedCompanies, true) : array();
 
         return empty($AuthorizedCompanies) ? getActiveCompanies() : $AuthorizedCompanies;
     }
@@ -430,23 +430,6 @@ if (!function_exists('convertToNumeric')) {
     }
 }
 
-if (!function_exists('getSaleDateRange')) {
-    function getSaleDateRange()
-    {
-        $firstDate = DB::connection('smAppTemplate')->table('wlsm_sales')
-            ->select(DB::raw('DATE_FORMAT(MIN(date_sale), "%Y-%m") as first_date'))
-            ->first();
-
-        $lastDate = DB::connection('smAppTemplate')->table('wlsm_sales')
-            ->select(DB::raw('DATE_FORMAT(MAX(date_sale), "%Y-%m") as last_date'))
-            ->first();
-
-        return [
-            'first_date' => $firstDate->first_date,
-            'last_date' => $lastDate->last_date,
-        ];
-    }
-}
 
 if (!function_exists('getLastUpdate')) {
     function getLastUpdate($tableName, $dateFormat = "Y-m-d") {

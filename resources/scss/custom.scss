@@ -763,7 +763,7 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
     animation-duration: 1s;
 }
 #nested-compose-area .nested-receiver-block:empty::after{
-    content: 'Tópicos adicionados serão exibidos aqui';
+    content: 'Necessário adicionar tópicos';
     display: block;
     text-align: center;
 }

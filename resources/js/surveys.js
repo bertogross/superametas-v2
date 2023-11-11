@@ -1,21 +1,19 @@
 import {
     toastAlert,
-    multipleModal,
     initFlatpickr,
     initFlatpickrRange,
-    goTo,
-    bsPopoverTooltip,
-    formatNumber,
     maxLengthTextarea,
-    makeFormPreviewRequest
+    makeFormPreviewRequest,
+    revalidationOnInput,
+    allowUncheckRadioButtons
 } from './helpers.js';
 
+import {
+    choicesListeners
+} from './surveys-terms.js';
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    initFlatpickrRange();
-    initFlatpickr();
-
 
     /**
      * Load the content for the Goal Sales Edit Modal
@@ -75,17 +73,139 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault();
 
             const form = document.getElementById('surveysForm');
+            if (!form) {
+                console.error('Form not found');
+                return;
+            }
+
+            const choiceContainers = form.querySelectorAll('.choices__inner');
 
             if (!form.checkValidity()) {
                 event.stopPropagation();
+
                 form.classList.add('was-validated');
+
+                if(choiceContainers){
+                    choiceContainers.forEach(container => {
+                        let select = container.parentElement.querySelector('select');
+                        if (select && !select.checkValidity()) {
+                            container.classList.add('is-invalid');
+                        }
+                        if (select && select.checkValidity()) {
+                            container.classList.add('is-valid');
+                        }
+                    });
+                }
 
                 toastAlert('Preencha os campos obrigatórios', 'danger', 5000);
 
                 return;
+            }else{
+                form.classList.remove('was-validated');
+
+                choiceContainers.forEach(container => {
+                    container.classList.remove('is-invalid');
+                    container.classList.remove('is-valid');
+                });
             }
 
-            let formData = new FormData(form);
+            // Prevent to submit choices input
+            var searchInput = document.querySelectorAll('.choices__input--cloned');
+            if (searchInput) {
+                searchInput.forEach(function (choicesSearchTermsInput) {
+                    choicesSearchTermsInput.disabled = true;
+                });
+            }
+
+            // Validate ID
+            const surveyId = form.querySelector('input[name="id"]').value;
+
+            const formData = new FormData(form);
+
+            /*
+            var groupedData = {};
+            for (var pair of formData.entries()) {
+                var key = pair[0];
+                var value = pair[1];
+
+                var stepMatch = key.match(/item\[(\d+)\]/);
+                var topicMatch = key.match(/\['topic_id'\]\[(\d+)\]/);
+
+                var stepIndex = stepMatch ? stepMatch[1] : null;
+                var topicIndex = topicMatch ? topicMatch[1] : null;
+
+                if (stepIndex !== null) {
+                    if (!groupedData[stepIndex]) {
+                        groupedData[stepIndex] = {
+                            stepData: {},
+                            topicData: {}
+                        };
+                    }
+
+                    if (topicIndex !== null) {
+                        if (!groupedData[stepIndex].topicData[topicIndex]) {
+                            groupedData[stepIndex].topicData[topicIndex] = {};
+                        }
+                        groupedData[stepIndex].topicData[topicIndex][key] = value;
+                    } else {
+                        groupedData[stepIndex].stepData[key] = value;
+                    }
+                } else {
+                    groupedData[key] = value;
+                }
+            }
+
+            if (Object.keys(groupedData).length === 0) {
+                toastAlert('Necessário adicionar Blocos', 'danger', 10000);
+                return;
+            }
+            */
+            var object = {};
+            formData.forEach((value, key) => {
+              if (!object[key]) {
+                object[key] = value;
+                return;
+              }
+              if (!Array.isArray(object[key])) {
+                object[key] = [object[key]];
+              }
+              object[key].push(value);
+            });
+            console.log(JSON.stringify(object, null, 2));
+            //return;
+
+            // Transform data
+            var data = object;
+            const transformedData = [];
+            for (let i = 0; ; i++) {
+                const stepNameKey = `['stepData']['step_name']`;
+                if (!data[stepNameKey]) break;
+
+                const stepData = {
+                    step_name: data[stepNameKey],
+                    original_position: parseInt(data[`['stepData']['original_position']`], 10),
+                    new_position: parseInt(data[`['stepData']['new_position']`], 10)
+                };
+
+                const topicData = [];
+                for (let j = 0; ; j++) {
+                    const topicIdKey = `['topicsData'][${j}]['topic_id']`;
+                    if (!data[topicIdKey]) break;
+
+                    const topic = {
+                        topic_id: data[topicIdKey],
+                        original_position: parseInt(data[`['topicsData'][${j}]['original_position']`], 10),
+                        new_position: parseInt(data[`['topicsData'][${j}]['new_position']`], 10)
+                    };
+                    topicData.push(topic);
+                }
+
+                transformedData.push({ stepData, topicData });
+            }
+            //console.log(JSON.stringify(transformedData, null, 2));
+            //return;
+
+            formData.append('jsondata', JSON.stringify(transformedData, null, 2));
 
             try {
                 let url = surveyId ? surveysStoreOrUpdateURL + `/${surveyId}` : surveysStoreOrUpdateURL;
@@ -106,14 +226,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
 
                 if (data.success) {
-                    // Close current modal
-                    document.getElementById('btn-surveys-store-or-update').closest('.modal').querySelector('.btn-close').click();
-
                     toastAlert(data.message, 'success', 10000);
 
-                    setTimeout(function () {
-                        location.reload(true);
-                    }, 500);
+                    btnStoreOrUpdate.textContent = 'Atualizar'; // Change button text
+                    btnStoreOrUpdate.classList.remove('btn-theme'); // Remove old class
+                    btnStoreOrUpdate.classList.add('btn-outline-theme'); // Add new class
+
+                    //localStorage.setItem('statusAlert', 'Status atualizado para ' + translatedStatus);
+
+                    document.querySelector('input[name="id"]').value = data.id;
+
+                    // Make the preview request
+                    makeFormPreviewRequest(data.id, surveysShowURL);
                 } else {
                     toastAlert(data.message, 'danger', 60000);
                 }
@@ -126,6 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+    /*
     var selectForms = document.querySelectorAll('.select-survey-form');
     selectForms.forEach(function(selectForm) {
         // Set the selected value on load
@@ -142,10 +267,10 @@ document.addEventListener('DOMContentLoaded', function() {
             var idValue = this.value;
 
             // that takes the selected value and updates some preview content
-            makeFormPreviewRequest(idValue, surveysComposeShowURL, 'load-preview-' + selectId, 'edition=true');
+            makeFormPreviewRequest(idValue, surveysShowURL, 'load-preview-' + selectId, 'edition=true');
         });
     });
-
+    */
 
 
     /*
@@ -167,5 +292,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     attachFormEventListeners();
     */
+
+    // Make the preview request
+    var idInput = document.querySelector('input[name="id"]');
+    var idValue = idInput ? idInput.value : null;
+    makeFormPreviewRequest(idValue, surveysShowURL);
+
+
+    // Call the function when the DOM is fully loaded
+    initFlatpickrRange();
+    initFlatpickr();
+    revalidationOnInput();
+    maxLengthTextarea();
+    allowUncheckRadioButtons();
+    choicesListeners(surveysTermsSearchURL, surveysStoreOrUpdateURL, choicesSelectorClass);
 
 });

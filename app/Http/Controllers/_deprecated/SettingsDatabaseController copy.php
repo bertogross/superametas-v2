@@ -175,15 +175,11 @@ class SettingsDatabaseController extends Controller
         // Check for cURL initialization errors
         if (curl_errno($curl) || !$curl) {
             \Log::error('cURL initialization error: ' . curl_error($curl));
-
             curl_close($curl);
-
             return false;
         }
 
-        // Fetch existing departments with their company_ids
-        $existingDepartmentsWithCompanies = DB::connection($this->connection)->table('wlsm_departments')
-        ->pluck('company_ids', 'department_id');
+
 
         // Loop to fetch data from the API
         do {
@@ -206,8 +202,7 @@ class SettingsDatabaseController extends Controller
             // Decode the response
             $responseData = json_decode($currentResponse, true);
 
-            // API response and errors
-            if ( isset($responseData['codigo']) && $responseData['codigo'] != 'PROCESSO_EXECUTANDO' ) {
+            if ( isset($responseData['codigo']) ) {
                 $hasMorePages = false;
 
                 curl_close($curl);
@@ -216,9 +211,11 @@ class SettingsDatabaseController extends Controller
                 $elapsed_time = ($end_time - $start_time);
                 $elapsed_time = $elapsed_time >= 60 ? numberFormat( ($elapsed_time / 60), 2)." minutes" : numberFormat($elapsed_time, 0)." seconds";
 
+                DB::disconnect($this->connection);
+
                 return response()->json([
                     'success' => false,
-                    'message' => 'Conexão ERP indisponível. Tente novamente mais tarde.',
+                    'message' => 'Dados indisponíveis. Tente novamente mais tarde.',
                     'elapsed_time' => $elapsed_time,
                     'slept' => $slept.' seconds',
                     'response' => json_encode($responseData)
@@ -228,19 +225,6 @@ class SettingsDatabaseController extends Controller
             }
 
             $responseDataArr = $responseData[0]['dados'] ?? '';
-
-            if( empty($responseDataArr) ){
-
-                curl_close($curl);
-
-                return response()->json([
-                    'success' => false,
-                    'motive' => 'noData',
-                    'message' => 'Período <span class="text-danger">'.date("m/Y", strtotime($meantime)).'</span> não possui dados'
-                ]);
-
-                exit;
-            }
 
             // Process the response if it contains the expected data
             if (!empty($responseDataArr) && is_array($responseDataArr) && !in_array($pageNumber, $pageRead)) {
@@ -286,6 +270,7 @@ class SettingsDatabaseController extends Controller
                     $departmentData[$departmentID] = [
                         'department_id' => $departmentID,
                         'department_description' => $departmentDescription,
+                        'company_ids ' => $departmentCompanyIds,
                     ];
 
                     $salesData[] = [
@@ -295,19 +280,6 @@ class SettingsDatabaseController extends Controller
                         'date_sale' => $dateSale,
                         'created_at' => $now
                     ];
-
-                    // Merge and unify company_ids for departments
-                    if (isset($existingDepartmentsWithCompanies[$departmentID])) {
-                        $existingCompanyIds = explode(',', $existingDepartmentsWithCompanies[$departmentID]);
-                        if (!in_array($companyID, $existingCompanyIds)) {
-                            $existingCompanyIds[] = $companyID;
-                        }
-                        $existingCompanyIds = !empty($existingCompanyIds) && is_array($existingCompanyIds) ? array_filter($existingCompanyIds) : $existingCompanyIds;
-                        $existingDepartmentsWithCompanies[$departmentID] = implode(',', $existingCompanyIds);
-                    } else {
-                        $existingDepartmentsWithCompanies[$departmentID] = (string)$companyID;
-                    }
-
                 }
                 // Check if there are more pages to fetch
                 if ($pageNumber >= $totalPages) {
@@ -329,11 +301,11 @@ class SettingsDatabaseController extends Controller
             }
 
             // If the function has been sleeping for more than 150 seconds in total, exit the loop
-            if ($slept >= 50) {
+            if ($slept >= 150) {
+                //break;
 
+                // Close the cURL session
                 curl_close($curl);
-
-                DB::disconnect($this->connection);
 
                 $end_time = microtime(true);
                 $elapsed_time = ($end_time - $start_time);
@@ -352,53 +324,44 @@ class SettingsDatabaseController extends Controller
 
         } while ($hasMorePages);
 
+        // Close the cURL session
         curl_close($curl);
 
-        if( $companyData && $departmentData && $existingDepartmentsWithCompanies){
+        // Fetch existing companies
+        $existingCompanies = DB::connection($this->connection)->table('wlsm_companies')
+            ->whereIn('company_id', array_keys($companyData))
+            ->pluck('company_name', 'company_id');
 
-            // Fetch existing companies
-            $existingCompanies = DB::connection($this->connection)->table('wlsm_companies')
-                ->whereIn('company_id', array_keys($companyData))
-                ->pluck('company_name', 'company_id');
-
-            // Update or insert companies
-            foreach ($companyData as $companyID => $data) {
-                if (isset($existingCompanies[$companyID])) {
-                    // Update existing company
-                    DB::connection($this->connection)->table('wlsm_companies')
-                        ->where('company_id', $companyID)
-                        ->update($data);
-                } else {
-                    // Insert new company
-                    DB::connection($this->connection)->table('wlsm_companies')
-                        ->insert($data);
-                }
+        // Update or insert companies
+        foreach ($companyData as $companyID => $data) {
+            if (isset($existingCompanies[$companyID])) {
+                // Update existing company
+                DB::connection($this->connection)->table('wlsm_companies')
+                    ->where('company_id', $companyID)
+                    ->update($data);
+            } else {
+                // Insert new company
+                DB::connection($this->connection)->table('wlsm_companies')
+                    ->insert($data);
             }
+        }
 
-            // Fetch existing departments
-            $existingDepartments = DB::connection($this->connection)->table('wlsm_departments')
-                ->whereIn('department_id', array_keys($departmentData))
-                ->pluck('department_description', 'department_id');
+        // Fetch existing departments
+        $existingDepartments = DB::connection($this->connection)->table('wlsm_departments')
+            ->whereIn('department_id', array_keys($departmentData))
+            ->pluck('department_description', 'department_id');
 
-            // Update or insert departments
-            foreach ($departmentData as $departmentID => $data) {
-                if (isset($existingDepartments[$departmentID])) {
-                    // Update existing department
-                    DB::connection($this->connection)->table('wlsm_departments')
-                        ->where('department_id', $departmentID)
-                        ->update($data);
-                } else {
-                    // Insert new department
-                    DB::connection($this->connection)->table('wlsm_departments')
-                        ->insert($data);
-                }
-            }
-
-            // Update the wlsm_departments table with the new company_ids
-            foreach ($existingDepartmentsWithCompanies as $departmentID => $companyIdsString) {
+        // Update or insert departments
+        foreach ($departmentData as $departmentID => $data) {
+            if (isset($existingDepartments[$departmentID])) {
+                // Update existing department
                 DB::connection($this->connection)->table('wlsm_departments')
                     ->where('department_id', $departmentID)
-                    ->update(['company_ids' => $companyIdsString]);
+                    ->update($data);
+            } else {
+                // Insert new department
+                DB::connection($this->connection)->table('wlsm_departments')
+                    ->insert($data);
             }
         }
 
@@ -410,7 +373,7 @@ class SettingsDatabaseController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Período <span class="text-success">'.date("m/Y", strtotime($meantime)).'</span> foi importado',
+            'message' => 'Dados processados com sucesso!',
             'elapsed_time' => $elapsed_time,
             'slept' => $slept.' seconds',
             //'response' => json_encode($responseDataToMe)

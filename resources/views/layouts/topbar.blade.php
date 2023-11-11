@@ -73,7 +73,7 @@
                 </div>
                 -->
 
-                <div class="dropdown topbar-head-dropdown ms-1 header-item">
+                <div class="dropdown topbar-head-dropdown ms-1 header-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Módulos">
                     <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class='bx bx-category-alt fs-22'></i>
                     </button>
@@ -96,19 +96,27 @@
                             <div class="row g-0">
                                 <div class="col">
                                     <a class="dropdown-icon-item" href="{{ route('goalSalesIndexURL') }}" title="Meta de Vendas">
+                                        <i class="ri-user-smile-line text-theme fs-1"></i>
+                                        {{--
                                         <img src="{{ URL::asset('build/images/svg/happy.png') }}" alt="Meta de Vendas">
-                                        <span>Vendas</span>
+                                        --}}
+                                        <span>Meta de Vendas</span>
                                     </a>
                                 </div>
+                                <!--
                                 <div class="col">
                                     <a class="dropdown-icon-item" href="{{-- route('goalResultsIndexURL') --}}#" title="Meta de Resultados">
                                         <img src="{{ URL::asset('build/images/bg-d.png') }}" alt="Meta de Resultados">
                                         <span>Resultados</span>
                                     </a>
                                 </div>
+                                -->
                                 <div class="col">
                                     <a class="dropdown-icon-item" href="{{ route('surveysIndexURL') }}" title="Vistorias">
+                                        <i class="ri-todo-line text-theme fs-1"></i>
+                                        {{--
                                         <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Vistorias">
+                                        --}}
                                         <span>Vistorias</span>
                                     </a>
                                 </div>
@@ -415,7 +423,7 @@
                         -->
 
                         @if(auth()->user()->hasRole(User::ROLE_ADMIN))
-                            <a class="dropdown-item" href="{{ route('settingsIndexURL') }}">
+                            <a class="dropdown-item" href="{{ route('settingsUsersIndexURL') }}">
                                 <i class="ri-settings-4-fill text-muted fs-16 align-middle me-1"></i>
                                 <span class="align-middle">Configurações Gerais</span>
                             </a>

@@ -34,14 +34,18 @@ class SurveysComposeController extends Controller
 
         $data = $topicsData = null;
 
+        $preListing = SurveyTerm::preListing();
+
         $getActiveDepartments = getActiveDepartments();
 
         return view('surveys.compose.create', compact(
-            'type',
-            'data',
-            'topicsData',
-            'getActiveDepartments'
-            ) );
+                'type',
+                'data',
+                'preListing',
+                'topicsData',
+                'getActiveDepartments'
+            )
+        );
     }
 
     public function edit($id)
@@ -101,7 +105,7 @@ class SurveysComposeController extends Controller
         // Cache::flush();
 
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:191',
             'item_steps' => 'required|string',
             'type' => 'required|in:custom,default',
         ]);
@@ -172,8 +176,5 @@ class SurveysComposeController extends Controller
         return response()->json(['success' => true, 'message' => 'Status atualizado para: ' . $translatedStatus, 'badge' => statusBadge($status)]);
     }
 
-    public function getTermNameById($termId) {
-        return SurveyTerm::getTermNameById($termId);
-    }
 
 }

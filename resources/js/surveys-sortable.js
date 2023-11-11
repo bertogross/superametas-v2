@@ -147,10 +147,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             newBlock.innerHTML = `
                 <div class="input-group">
-                    <input type="text" class="form-control text-theme" name="[${newBlockIndex}]['stepData']['step_name']" placeholder="Informe o Título/Setor/Departamento/Etapa" autocomplete="off" maxlength="100" required>
+                    <input type="text" class="form-control text-theme" name="['stepData']['step_name']" placeholder="Informe o Título/Setor/Etapa" autocomplete="off" maxlength="100" required>
 
-                    <input type="hidden" name="[${newBlockIndex}]['stepData']['original_position']" value="${newBlockIndex}" tabindex="-1">
-                    <input type="hidden" name="[${newBlockIndex}]['stepData']['new_position']" tabindex="-1">
+                    <input type="hidden" name="['stepData']['type']" value="custom" tabindex="-1">
+                    <input type="hidden" name="['stepData']['original_position']" value="${newBlockIndex}" tabindex="-1">
+                    <input type="hidden" name="['stepData']['new_position']" tabindex="-1">
 
                     <span class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-receiver" title="Reordenar"><i class="ri-arrow-up-down-line text-body"></i></span>
 
@@ -173,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
                 var selector = `.btn-add-topic[data-block-index="${newBlockIndex}"]`;
                 document.querySelector(selector).click();
-            }, 500);
+            }, 100);
         }
     }
 
@@ -196,14 +197,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         <span class="btn btn-ghost-danger btn-icon rounded-pill btn-remove-topic" data-target="${stepIndex}${newTopicIndex}" title="Remover Bloco"><i class="ri-delete-bin-3-line"></i></span>
                     </div>
                     <div class="col">
-                        <select class="form-control surveys-term-choice w-100" select-one data-choices-removeItem class="form-control surveys-term-choice w-100" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia?" data-placeholder="Tópico..." name="[${stepIndex}]['topicData'][${newTopicIndex}]['topic_id']" required></select>
+                        <select class="form-control surveys-term-choice w-100" select-one data-choices-removeItem class="form-control surveys-term-choice w-100" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia?" data-placeholder="Tópico..." name="['topicsData'][${newTopicIndex}]['topic_id']" required></select>
                     </div>
                     <div class="col-auto">
                         <span class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-receiver-block" title="Reordenar"><i class="ri-arrow-up-down-line"></i></span>
                     </div>
                 </div>
-                <input type="hidden" name="[${stepIndex}]['topicData'][${newTopicIndex}]['original_position']" value="${newTopicIndex}" tabindex="-1">
-                <input type="hidden" name="[${stepIndex}]['topicData'][${newTopicIndex}]['new_position']" tabindex="-1">
+                <input type="hidden" name="['topicsData'][${newTopicIndex}]['original_position']" value="${newTopicIndex}" tabindex="-1">
+                <input type="hidden" name="['topicsData'][${newTopicIndex}]['new_position']" tabindex="-1">
             `;
             blockContainer.appendChild(newTopic);
         }

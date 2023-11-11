@@ -1,7 +1,8 @@
 import {
     toastAlert,
     toggleTableRows,
-    monthsInPortuguese
+    monthsInPortuguese,
+    bsPopoverTooltip
 } from './helpers.js';
 
 // Event listeners setup
@@ -70,8 +71,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
 
             const response = await sendRequest(`/api/process-sysmo-api/${meantime}`);
-            if (!response || response.success === false) {
-                finalizeSynchronization('error', response.message, '0%')
+            //console.log(response);
+            if (!response || ( response.success === false && !response.motive) ) {
+                finalizeSynchronization('error', response.message, '0%');
 
                 return;
             }
@@ -89,7 +91,17 @@ document.addEventListener('DOMContentLoaded', function() {
             // Populate the <li> elements with concluded meantimes
             const ulElement = document.querySelector('.concluded-meantimes');
             const liElement = document.createElement('li');
-            liElement.innerHTML = `<i class="ri-check-double-fill text-theme align-bottom me-2"></i>${convertMeantimeToPortuguese(meantime)}`;
+            if(response.success === false && response.motive){
+                toastAlert(response.message, 'warning', 10000);
+
+                liElement.innerHTML = `<span data-bs-toggle="tooltip" data-bs-placement="top" title="${response.message}"><i class="ri-error-warning-fill text-warning align-bottom me-2"></i>${convertMeantimeToPortuguese(meantime)}</span>`;
+            }else{
+                toastAlert(response.message, 'success', 10000);
+
+                liElement.innerHTML = `<span data-bs-toggle="tooltip" data-bs-placement="top" title="Dados recebidos com sucesso"><i class="ri-checkbox-circle-fill text-success align-bottom me-2"></i>${convertMeantimeToPortuguese(meantime)}</span>`;
+            }
+
+            bsPopoverTooltip();
 
             // Insert the new li element at the beginning of the ul element
             ulElement.insertBefore(liElement, ulElement.firstChild);
@@ -97,7 +109,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Determine next steps based on progress
             const nextMeantime = incrementMonth(meantime);
             if (new Date(nextMeantime) <= new Date()) {
-                makeRequests(nextMeantime, initialMeantime, completedIterations + 1);
+                setTimeout(() => {
+                    makeRequests(nextMeantime, initialMeantime, completedIterations + 1);
+                }, 2000);
             } else {
                 finalizeSynchronization('success', 'Concluído', '100%');
             }
@@ -169,10 +183,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Display initial status messages with delays
         const estimatedElement = document.querySelector('.synchronization-time');
-        ['Conectando...', 'Recebendo dados...'].forEach((message, index) => {
+        ['Conectando...', 'Aguardando resposta...', 'Requisitando dados...'].forEach((message, index) => {
             setTimeout(() => {
                 estimatedElement.innerHTML = `<span class="blink">${message}</span>`;
-            }, index * 2000 + 2000);
+            }, (index * 3000) + 3000);
         });
 
         // Prepare year and month options for user selection
@@ -213,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const year = document.getElementById('year').value;
                 const month = document.getElementById('month').value;
                 const fromMeantime = `${year}-${month.padStart(2, '0')}`;
+
                 makeRequests(fromMeantime, fromMeantime, 0);
             }
         });

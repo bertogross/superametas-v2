@@ -24,15 +24,8 @@
         @include('components.alerts')
 
         <div class="row mb-4">
-            <div class="col-md-12 col-lg-4 col-xxl-2">
-                <div class="card-body">
-                    @component('surveys.components.nav-pills')
-                        @slot('url', route('surveysComposeCreateURL', ['type'=>''.$type.'']))
-                    @endcomponent
-                </div>
-            </div>
 
-            <div class="col-md-12 col-lg-4 col-xxl-6">
+            <div class="col-md-12 col-lg-7 col-xxl-7">
                 <div class="card h-100">
                     <form id="surveysComposeForm" method="POST" autocomplete="off" class="needs-validation" novalidate autocomplete="false">
                         @csrf
@@ -111,8 +104,9 @@
 
                             @if( !$topicsData && $type == 'default' )
                                 @php
-                                    $defaultTopics = file_get_contents(resource_path('views/surveys/demo/default-survey-topics.json'));
-                                    $defaultTopics = json_decode($defaultTopics, true);
+                                    appPrintR($preListing);
+                                    //$defaultTopics = file_get_contents(resource_path('views/surveys/demo/default-survey-topics.json'));
+                                    //$defaultTopics = json_decode($defaultTopics, true);
 
                                     $topicsData = [];
                                     foreach($getActiveDepartments as $index => $department){
@@ -123,7 +117,8 @@
                                                 'original_position' => $index,
                                                 'new_position' => $index,
                                             ],
-                                            'topicData' => $defaultTopics['topics']
+                                            //'topicData' => $defaultTopics['topics']
+                                            'topicData' => $preListing
                                         ];
                                     }
                                 @endphp
@@ -157,11 +152,18 @@
                                         <input type="hidden" name="[{{ $originalIndex }}]['stepData']['new_position']" value="{{ $newPosition }}" tabindex="-1">
 
                                         <div class="accordion-collapse collapse show">
-                                            @include('surveys.includes.topics-input', [
+                                            {{--
+                                            @include('surveys.components.topics-input', [
                                                 'type' => $type,
                                                 'topicsData' =>  $step['topicData'],
                                                 'originalIndex' => $originalIndex
                                             ])
+                                            --}}
+                                             @component('surveys.components.topics-input')
+                                                @slot('type', $type)
+                                                @slot('topicsData', $step['topicData'])
+                                                @slot('originalIndex', $originalIndex)
+                                            @endcomponent
                                         </div>
                                     </div>
                                 @endforeach
@@ -177,7 +179,7 @@
                 </div>
             </div>
 
-            <div class="col-md-12 col-lg-4 col-xxl-4">
+            <div class="col-md-12 col-lg-5 col-xxl-5">
                 <div class="card h-100">
                     <div class="card-header">
                         <h4 class="card-title mb-0"><i class="ri-todo-line fs-16 align-middle text-theme me-2"></i>Pré-visualização</h4>
@@ -197,6 +199,10 @@
     //appPrintR($topicsData);
 @endphp
 @section('script')
+    <script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
+
+    <script src="{{ URL::asset('build/libs/sortablejs/Sortable.min.js') }}"></script>
+
     <script>
         var surveysComposeShowURL = "{{ route('surveysComposeShowURL') }}";
         var surveysComposeStoreOrUpdateURL = "{{ route('surveysComposeStoreOrUpdateURL') }}";
@@ -206,10 +212,6 @@
         var surveysTermsStoreOrUpdateURL = "{{ route('surveysTermsStoreOrUpdateURL') }}";
         var choicesSelectorClass = ".surveys-term-choice";
     </script>
-
-    <script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
-
-    <script src="{{ URL::asset('build/libs/sortablejs/Sortable.min.js') }}"></script>
 
     <script src="{{ URL::asset('build/js/surveys-compose.js') }}" type="module"></script>
 

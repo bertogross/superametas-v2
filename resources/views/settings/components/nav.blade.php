@@ -4,6 +4,7 @@
         <div id="two-column-menu">
         </div>
         <ul class="navbar-nav" id="navbar-nav">
+            {{--
             <li class="menu-title"><span>@lang('translation.menu')</span></li>
             <li class="nav-item">
                 <a class="nav-link menu-link" href="#sidebarDashboards" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarDashboards">
@@ -20,6 +21,7 @@
                     </ul>
                 </div>
             </li>
+            --}}
 
             <li class="menu-title"><i class="ri-more-fill"></i> <span>@lang('translation.components')</span></li>
 
@@ -29,6 +31,25 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link menu-link {{ request()->is('settings/users') ? 'active' : '' }}" href="{{ route('settingsUsersIndexURL') }}">
+                    <i class="ri-admin-fill"></i> <span>@lang('translation.users')</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link menu-link {{ request()->is('settings/database') ? 'active' : '' }}" href="{{ route('settingsDatabaseIndexURL') }}">
+                    <i class="ri-database-2-line"></i> @lang('translation.your-erp')
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link menu-link {{ request()->is('settings/api-keys') ? 'active' : '' }}" href="{{ route('settingsApiKeysURL') }}">
+                    <i class="ri-cloud-windy-fill"></i> @lang('translation.api-conections')
+                </a>
+            </li>
+
+            {{--
             <li class="nav-item">
                 <a class="nav-link menu-link {{ request()->is('settings/api-keys') || request()->is('settings/database') ? 'active' : '' }}" href="#sidebarAPIs" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAPIs">
                     <i class="ri-cloud-windy-fill"></i> <span>@lang('translation.api-conections')</span>
@@ -44,27 +65,21 @@
                     </ul>
                 </div>
             </li>
+            --}}
 
             @if ( getDropboxToken() )
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->is('settings/dropbox') ? 'active' : '' }}" href="{{ route('DropboxIndexURL') }}">
-                        <i class="ri-dropbox-fill {{ request()->is('settings/dropbox') ? 'text-primary' : '' }}"></i> <span class="{{ request()->is('settings/dropbox') ? 'text-white' : '' }}">Dropbox</span>
+                        <i class="ri-dropbox-fill {{ request()->is('settings/dropbox') ? 'text-primary' : '' }}"></i> <span class="{{ request()->is('settings/dropbox') ? 'text-white' : '' }}">Armazenamento</span>
                     </a>
                 </li>
             @endif
-
-            <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->is('settings/users') ? 'active' : '' }}" href="{{ route('settingsUsersIndexURL') }}">
-                    <i class="ri-admin-fill"></i> <span>@lang('translation.users')</span>
-                </a>
-            </li>
 
             <li class="nav-item">
                 <a class="nav-link menu-link {{ request()->is('settings/security') ? 'active' : '' }}" href="{{-- route('settingsSecurityIndexURL') --}}#">
                     <i class="ri-shield-keyhole-line"></i> <span>@lang('translation.security')</span>
                 </a>
             </li>
-
         </ul>
     </div>
 </div>

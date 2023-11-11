@@ -100,7 +100,7 @@ if (is_object($getActiveCompanies)) {
                             </div>
 
                             <!-- Save data in 'users' table collumn 'email' -->
-                            <div class="form-group mb-3">
+                            <div class="form-group mb-4">
                                 <label for="teammembersEmail" class="form-label">Endereço de E-mail </label>
                                 <input type="email" class="form-control" id="teammembersEmail" name="email" placeholder="Informe o endereço de e-mail corporativo" value="{{ $user ? $user->email : '' }}" required>
                             </div>
@@ -122,8 +122,8 @@ if (is_object($getActiveCompanies)) {
 
                             @if( !isset($user) || $user->role !=1 )
                                 <!-- Save data in 'users' table collumn 'role'-->
-                                <div class="form-group mb-3">
-                                    <label class="form-label">Nível <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Níveis e Permissões" data-bs-content="<ul class='list-unstyled mb-0'><li>Saiba mais na tabela Níveis e Permissões</li></ul>"></i></label>
+                                <div class="form-group mb-4">
+                                    <label class="form-label">Nível <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Níveis e Permissões" data-bs-content="<ul class='list-unstyled mb-0'><li>Saiba mais visualizando ao final desta página a tabela contendo o grid de Níveis e Permissões</li></ul>"></i></label>
                                     <select class="form-control form-select" name="role">
                                         <option class="text-body" disabled selected>- Selecione -</option>
                                         @foreach(User::CAPABILITIES as $roleId => $capabilities)
@@ -135,26 +135,38 @@ if (is_object($getActiveCompanies)) {
                                 </div>
                             @endif
 
-                            @if(isset($user) && $user->id != 1)
-                                <!-- Save data in 'users' table collumn 'status' -->
-                                <div class="form-group mb-4 ">
-                                    <label class="form-label">Status <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Inoperante, o usuário não poderá mais efetuar login em seu {{env('APP_NAME')}}"></i></label>
-                                    <div class="row">
-                                      <div class="col">
-                                            <div class="form-check form-switch form-switch-theme">
-                                                <input type="radio" class="form-check-input" name="status" id="user_status_1" @if(1 == $user->status) checked @endif value="1">
-                                                <label class="form-check-label" for="user_status_1">Ativo</label>
-                                            </div>
-                                      </div>
-                                      <div class="col">
-                                            <div class="form-check form-switch form-switch-danger">
-                                                <input type="radio" class="form-check-input" name="status" id="user_status_0" @if(0 == $user->status) checked @endif value="0">
-                                                <label class="form-check-label" for="user_status_0">Inoperante</label>
-                                            </div>
+                            <!-- Save data in 'users' table collumn 'status' -->
+                            <div class="form-group mb-5">
+                                <div class="form-check form-switch form-switch-theme form-switch-lg">
+                                    <input type="checkbox" class="form-check-input" name="status" id="user_status_1"
+                                    @if ($user)
+                                        @if(1 == $user->status)
+                                            checked
+                                        @endif
+                                    @else
+                                        checked
+                                    @endif
+                                    value="1">
+                                    <label class="form-check-label" for="user_status_1" data-bs-html="true" data-bs-toggle="tooltip" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Ativo = Verde">Status <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Desativado este usuário não terá sucesso ao tentar efetuar login em seu {{env('APP_NAME')}}"></i></label>
+                                </div>
+                                {{--
+                                <label class="form-label">Status <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Desativado, o usuário não poderá mais efetuar login em seu {{env('APP_NAME')}}"></i></label>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-check form-switch form-switch-theme form-switch-md">
+                                            <input type="radio" class="form-check-input" name="status" id="user_status_1" @if(1 == $user->status) checked @endif value="1">
+                                            <label class="form-check-label" for="user_status_1">Ativo</label>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-check form-switch form-switch-danger form-switch-md">
+                                            <input type="radio" class="form-check-input" name="status" id="user_status_0" @if(0 == $user->status) checked @endif value="0">
+                                            <label class="form-check-label" for="user_status_0">Inativo</label>
                                         </div>
                                     </div>
                                 </div>
-                            @endif
+                                --}}
+                            </div>
 
                             <!-- Save data in 'user_metas' table collumn 'meta_key' and 'meta_value'-->
                             @if(isset($user) && $user->id == 1)
@@ -164,8 +176,8 @@ if (is_object($getActiveCompanies)) {
                                     <div class="alert alert-warning">Empresas ainda não foram cadastradas/ativadas</div>
                                 @endif
                             @else
-                                <div class="mb-4">
-                                    <label class="form-label">Empresas Autorizadas</label>
+                                <div class="mb-3">
+                                    <label class="form-label">Empresas Autorizadas <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Selecione as empresas em que este usuário poderá obter acesso aos dados"></i></label>
                                     @if(isset($getActiveCompanies) && count($getActiveCompanies) > 0)
                                         <div class="row">
                                             @foreach($getActiveCompanies as $company)
@@ -175,7 +187,11 @@ if (is_object($getActiveCompanies)) {
                                                         class="form-check-input"
                                                         type="checkbox"
                                                         role="switch"
-                                                        {{ !empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && in_array(intval($company->company_id), $getAuthorizedCompanies) ? 'checked' : '' }}
+                                                        @if ($user)
+                                                            {{ !empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && in_array(intval($company->company_id), $getAuthorizedCompanies) ? 'checked' : '' }}
+                                                        @else
+                                                            checked
+                                                        @endif
                                                         id="company-{{ $company->company_id }}"
                                                         name="companies[]"
                                                         value="{{ $company->company_id }}">
@@ -184,7 +200,6 @@ if (is_object($getActiveCompanies)) {
                                                 </div>
                                             @endforeach
                                         </div>
-                                        <div class="form-text">Selecione as empresas em que este usuário poderá obter acesso aos dados.</div>
                                     @else
                                         <div class="alert alert-warning">Empresas ainda não foram cadastradas/ativadas</div>
                                     @endif
