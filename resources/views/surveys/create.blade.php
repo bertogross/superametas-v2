@@ -58,7 +58,7 @@
             <h4 class="card-title mb-0"><i class="ri-drag-drop-line fs-16 align-middle text-theme me-2"></i>Atribuições</h4>
          </div>
         <div class="card-body">
-            <form id="surveysForm" method="POST" class="needs-validation" novalidate autocomplete="false">
+            <form id="surveysForm" method="POST" class="needs-validation" novalidate autocomplete="off">
                 @csrf
                 <div class="row">
                     <div class="col-sm-12 col-md-12 col-lg-5 col-xxl-4">
@@ -232,14 +232,14 @@
                             <div id="nested-compose-area" style="min-height: 250px;">
                                 <div class="accordion list-group nested-list nested-receiver">@if ($Default || $Custom)
                                     @if ($Default)
-                                        @component('surveys.components.composer-form')
+                                        @component('surveys.components.template-form')
                                             @slot('type', 'default')
                                             @slot('data', $Default)
                                         @endcomponent
                                     @endif
 
                                     @if ($Custom)
-                                        @component('surveys.components.composer-form')
+                                        @component('surveys.components.template-form')
                                             @slot('type', 'custom')
                                             @slot('data', $Custom)
                                         @endcomponent
@@ -274,10 +274,10 @@
         var surveysShowURL = "{{ route('surveysShowURL') }}";
         var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
 
-        var surveysTermsSearchURL = "{{ route('surveysTermsSearchURL') }}";
-        var surveysTermsStoreOrUpdateURL = "{{ route('surveysTermsStoreOrUpdateURL') }}";
+        //var surveysTermsSearchURL = "{{ route('surveysTermsSearchURL') }}";
+        //var surveysTermsStoreOrUpdateURL = "{{ route('surveysTermsStoreOrUpdateURL') }}";
 
-        var choicesSelectorClass = ".surveys-term-choice";
+        //var choicesSelectorClass = ".surveys-term-choice";
     </script>
     <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
 

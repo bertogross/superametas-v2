@@ -2,13 +2,13 @@
     "topics": [
         {
             "topic_id": 1,
-            "topic_name": "Limpeza do Departamento",
+            "question": "Limpeza do Departamento",
             "original_position": 0,
             "new_position": 0
         },
         {
             "topic_id": 2,
-            "topic_name": "Organização do Departamento",
+            "question": "Organização do Departamento",
             "original_position": 1,
             "new_position": 1
         }

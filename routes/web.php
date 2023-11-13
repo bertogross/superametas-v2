@@ -12,9 +12,10 @@ use App\Http\Controllers\{
     SettingsAccountController,
     GoalSalesController,
     SurveysController,
+    SurveysTemplatesController,
     //SurveysComposeController,
-    SurveyExecutionController,
-    SurveyTermController,
+    //SurveyExecutionController,
+    //SurveyTermController,
     SettingsApiKeysController,
     DropboxController,
     ClarifaiImageController,
@@ -53,11 +54,17 @@ Route::middleware(['auth'])->group(function () {
 
     // Surveys Routes
     Route::prefix('surveys')->group(function () {
-        Route::get('/listing', [SurveysController::class, 'index'])->name('surveysIndexURL');
-        Route::get('/{id?}', [SurveysController::class, 'show'])->name('surveysShowURL')->where('id', '[0-9]+');
+        Route::get('/index', [SurveysController::class, 'index'])->name('surveysIndexURL');
         Route::get('/create', [SurveysController::class, 'create'])->name('surveysCreateURL');
         Route::get('/edit/{id?}', [SurveysController::class, 'edit'])->name('surveysEditURL')->where('id', '[0-9]+');
+        Route::get('/{id?}', [SurveysController::class, 'show'])->name('surveysShowURL')->where('id', '[0-9]+');
         Route::post('/store/{id?}', [SurveysController::class, 'storeOrUpdate'])->name('surveysStoreOrUpdateURL');
+
+            //Route::get('/listing', [SurveysTemplatesController::class, 'index'])->name('surveyTemplateIndexURL');
+            Route::get('/template/create', [SurveysTemplatesController::class, 'create'])->name('surveysTemplateCreateURL');
+            Route::get('/template/edit/{id?}', [SurveysTemplatesController::class, 'edit'])->name('surveyTemplateEditURL')->where('id', '[0-9]+');
+            Route::get('/template/show/{id?}', [SurveysTemplatesController::class, 'show'])->name('surveyTemplateShowURL')->where('id', '[0-9]+');
+            Route::post('/template/store/{id?}', [SurveysTemplatesController::class, 'storeOrUpdate'])->name('surveysTemplateStoreOrUpdateURL');
 
             // Form Compose Routes
             /*
@@ -70,23 +77,15 @@ Route::middleware(['auth'])->group(function () {
             */
 
         // Term Routes
+        /*
         Route::get('/terms/listing', [SurveyTermController::class, 'index'])->name('surveysTermsIndexURL');
         Route::get('/terms/create', [SurveyTermController::class, 'create'])->name('surveysTermsCreateURL');
         Route::get('/terms/edit/{id?}', [SurveyTermController::class, 'edit'])->name('surveysTermsEditURL');
         Route::post('/terms/store', [SurveyTermController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
         Route::get('/terms/search', [SurveyTermController::class, 'search'])->name('surveysTermsSearchURL');
+        */
     });
-    /*
-    //php artisan route:list
-    GET|HEAD        survey-executions .......................... survey-executions.index › SurveyExecutionController@index
-    POST            survey-executions .......................... survey-executions.store › SurveyExecutionController@store
-    GET|HEAD        survey-executions/create ................... survey-executions.create › SurveyExecutionController@create
-    GET|HEAD        survey-executions/{survey_execution} ....... survey-executions.show › SurveyExecutionController@show
-    PUT|PATCH       survey-executions/{survey_execution} ....... survey-executions.update › SurveyExecutionController@update
-    DELETE          survey-executions/{survey_execution} ....... survey-executions.destroy › SurveyExecutionController@destroy
-    GET|HEAD        survey-executions/{survey_execution}/edit .. survey-executions.edit › SurveyExecutionController@edit
-    */
-    Route::resource('survey-executions', SurveyExecutionController::class);
+
 
     // Admin Settings
     Route::middleware(['admin'])->group(function () {

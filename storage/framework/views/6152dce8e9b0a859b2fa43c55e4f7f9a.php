@@ -1,0 +1,2 @@
+<?php echo $__env->make('surveys.template.create', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+<?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views\surveys\template\edit.blade.php ENDPATH**/ ?>

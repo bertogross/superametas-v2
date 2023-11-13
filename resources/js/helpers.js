@@ -498,20 +498,20 @@ function checkInternetConnection() {
 }
 
 export function maxLengthTextarea() {
-    const textareas = document.querySelectorAll('textarea[maxlength]'); // Select all textareas with a maxlength attribute
-    textareas.forEach(textarea => {
-        const maxLength = textarea.getAttribute('maxlength');
+    const textareas = document.querySelectorAll('.maxlength'); // Select all textareas with a maxlength attribute
+    textareas.forEach(formComponent => {
+        const maxLength = formComponent.getAttribute('maxlength');
         const counter = document.createElement('div');
         counter.className = 'counter badge bg-warning-subtle text-warning float-end';
-        textarea.parentNode.insertBefore(counter, textarea.nextSibling);
+        formComponent.parentNode.insertBefore(counter, formComponent.nextSibling);
 
-        textarea.addEventListener('input', function () {
-            const currentLength = textarea.value.length;
+        formComponent.addEventListener('input', function () {
+            const currentLength = formComponent.value.length;
             counter.textContent = `${currentLength} / ${maxLength}`;
         });
 
         // Trigger the input event to set the initial counter value
-        textarea.dispatchEvent(new Event('input'));
+        formComponent.dispatchEvent(new Event('input'));
     });
 }
 

@@ -12,30 +12,31 @@ class Survey extends Model
     use HasFactory;
 
     protected $connection = 'smAppTemplate';
-    //$model->setConnection('smAppTemplate');
 
     public $timestamps = true;
 
     protected $fillable = [
-        'parent_id',
+        'template_id',
         'user_id',
-        'title',
-        'delegated_to',
-        'audited_by',
         'status',
-        'recurreing',
         'priority',
-        'description',
-        'jsondata',
         'start_date',
         'completed_at',
         'audited_at'
     ];
 
+    // Define relationships here
+    public function steps()
+    {
+        return $this->hasMany(SurveyStep::class);
+    }
+
+    /*
     public function metas()
     {
         return $this->hasMany(SurveyMeta::class);
     }
+    */
 
     public static function countByStatus($status = false)
     {
@@ -103,55 +104,7 @@ class Survey extends Model
         ];
     }
 
-    /**
-     * Get all survey composes by type.
-     */
-    public static function getByType($data, $type = 'custom')
-    {
-        //$user = auth()->id();
 
-        /*
-        $query = self::where('type', $type);
-       // $query = $query->where('user_id', $user->id);
-
-        if ($status) {
-            $query = $query->where('status', $status);
-        }
-        */
-
-        //return $query->get();
-    }
-
-    public static function reorderingData($data)
-    {
-        $transformedData = [];
-
-        if($data){
-            // First, sort the steps according to their new_position
-            foreach ($data as $step) {
-                $newPosition = $step['stepData']['new_position'] ?? 0;
-                $transformedData[$newPosition] = $step;
-            }
-            ksort($transformedData); // Sort by key to maintain the order of steps
-
-            // Now, sort the topicData for each step
-            foreach ($transformedData as $stepPosition => &$step) {
-                $sortedTopicData = [];
-
-                if( isset($step['topicData']) ){
-                    foreach ($step['topicData'] as $topic) {
-                        $newTopicPosition = $topic['new_position'] ?? 0;
-                        $sortedTopicData[$newTopicPosition] = $topic;
-                    }
-                    ksort($sortedTopicData); // Sort by key to maintain the order of topics
-
-                    $step['topicData'] = array_values($sortedTopicData); // Re-index the array
-                }
-            }
-            unset($step); // Break the reference to the last element
-        }
-        return $transformedData;
-    }
 
     public static function getSurveysDateRange()
     {

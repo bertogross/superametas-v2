@@ -8,10 +8,11 @@ import {
     allowUncheckRadioButtons
 } from './helpers.js';
 
+/*
 import {
     choicesListeners
 } from './surveys-terms.js';
-
+*/
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -98,14 +99,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
 
                 const topics = [];
-                // Assuming topic_id is an array, iterate based on its length for each step.
-                const topicLength = data[`steps[${i}]['topics']['topic_id']`].length;
+                // Assuming question is an array, iterate based on its length for each step.
+                const topicLength = data[`steps[${i}]['topics']['question']`].length;
                 for (let j = 0; j < topicLength; j++) {
-                    const topicId = data[`steps[${i}]['topics']['topic_id']`][j];
+                    const theQuestion = data[`steps[${i}]['topics']['question']`][j];
                     const originalPosition = data[`steps[${i}]['topics']['original_position']`][j];
                     const newPosition = data[`steps[${i}]['topics']['new_position']`][j];
                     const topic = {
-                        topic_id: topicId,
+                        question: theQuestion,
                         original_position: parseInt(originalPosition, 10),
                         new_position: parseInt(newPosition, 10)
                     };
@@ -174,6 +175,6 @@ document.addEventListener('DOMContentLoaded', function() {
     revalidationOnInput();
     maxLengthTextarea();
     allowUncheckRadioButtons();
-    choicesListeners(surveysTermsSearchURL, surveysStoreOrUpdateURL, choicesSelectorClass);
+   // choicesListeners(surveysTermsSearchURL, surveysStoreOrUpdateURL, choicesSelectorClass);
 
 });

@@ -1,11 +1,17 @@
-@if ( $topicsData )
-    @foreach ($topicsData as $step)
+@if ( $data )
+    @php
+        $radioIndex = $badgeIndex = 0;// To prevent radio id duplication
+
+    @endphp
+    @foreach ($data as $stepIndex => $step)
         @php
             $stepData = $step['stepData'] ?? null;
-            $stepName = $stepData[{{$originalIndex}}]['step_name'] ?? 0;
-            $stepId = $stepData[{{$originalIndex}}]['step_id'] ?? 0;
-            $originalPosition = $stepData[{{$originalIndex}}]['original_position'] ?? 0;
-            $newPosition = $stepData[{{$originalIndex}}]['new_position'] ?? 0;
+            $stepName = $stepData['step_name'] ?? '';
+            $originalPosition = $stepData['original_position'] ?? $stepIndex;
+            $newPosition = $stepData['new_position'] ?? $stepIndex;
+
+            $topics = $step['topics'] ?? null;
+
         @endphp
 
         @if($stepData)
@@ -14,116 +20,58 @@
                     <div class="d-flex">
                         <div class="flex-grow-1">
                             <h5 class="job-title text-theme">{{ $stepName }}</h5>
-                            {{--
-                            <p class="delegated-name text-muted mb-0" title="Pessoa a qual foi delegada esta vistoria">Responsável: <span class="delegated_to-name"></span></p>
-                            --}}
                         </div>
                         <div>
-                            {{--
-                            <div class="avatar-sm dropstart {{ $edition ? 'w-auto' : '' }}">
-                                <div
-                                @if ($edition)
-                                    id="dropdownMenu-{{$originalPosition}}" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false"
-                                @endif
-                                class="avatar-title bg-light rounded {{ $edition ? 'dropdown-toggle p-3 pe-2' : '' }} ">
-                                    <img src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                    @if (!$edition)
-                                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa delegada ao (Nome do colaborador)"
-                                    @endif
-                                    class="avatar-xxs rounded-circle {{ $edition ? 'blink' : '' }}">
-
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenu-{{$originalPosition}}" data-simplebar style="height: 130px;">
-                                        <ul class="list-unstyled vstack gap-2 mb-0 p-2">
-                                            @foreach ($users as $user)
-                                                @if ($user->role == 4)
-                                                    <li>
-                                                        <div class="form-check form-check-success d-flex align-items-center">
-                                                            <input class="form-check-input me-3"
-                                                            type="radio"
-                                                            data-step="{{$originalPosition}}"
-                                                            name="delegated_to[][{{$data->id}}][{{$originalPosition}}]"
-                                                            value="{{ $user->id }}"
-                                                            id="user-{{$user->id}}{{$originalPosition}}{{$newPosition}}"
-                                                            required>
-                                                            <label class="form-check-label d-flex align-items-center"
-                                                                for="user-{{$user->id}}{{$originalPosition}}{{$newPosition}}">
-                                                                <span class="flex-shrink-0">
-                                                                    <img
-                                                                    @if(empty(trim($user->avatar)))
-                                                                        src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                                                    @else
-                                                                        src="{{ URL::asset('storage/' . $user->avatar) }}"
-                                                                    @endif
-                                                                        alt="{{ $user->name }}" class="avatar-xxs rounded-circle">
-                                                                </span>
-                                                                <span class="flex-grow-1 ms-2">{{ $user->name }}</span>
-                                                            </label>
-                                                        </div>
-                                                    </li>
-                                                @endif
-                                            @endforeach
-                                        </ul>
-                                    </div>
-
-                                </div>
-                            </div>
-                            --}}
                         </div>
                     </div>
-                    <!--<p class="text-muted job-description"></p>-->
                 </div>
-                @if (isset($step['topicData']) && is_array($step['topicData']))
+                @if ( $topics && is_array($topics))
                     @php
-                        $index = 0;
                         $bg = 'bg-opacity-75';
                     @endphp
-                    @foreach ($step['topicData'] as $topicIndex => $topic)
+                    @foreach ($topics as $topicIndex => $topic)
                         @php
-                            $index++;
-
                             $bg = $bg == 'bg-opacity-75' ? 'bg-opacity-50' : 'bg-opacity-75';
 
-                            $topicId = $topic['topic_id'] ?? '';
-                            $originalPosition = $topic['original_position'] ?? 0;
-                            $newPosition = $topic['new_position'] ?? 0;
+                            $radioIndex++;
+
+                            $question = $topic['question'] ?? '';
+                            $originalPosition = $topic['original_position'] ?? $topicIndex;
+                            $newPosition = $topic['new_position'] ?? $topicIndex;
+
+                            $stepTopicIndex = intval($stepIndex.$topicIndex);
                         @endphp
                         <div class="card-footer border-top-dashed bg-dark {{ $bg }}">
-                            <div class="d-flex">
-                                <div class="flex-shrink-0 text-uppercase pe-2">
-                                    <span class="badge bg-light-subtle text-body badge-border text-theme">{{ $index }}</span>
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="mb-0">
+                                        <span class="badge bg-light-subtle text-body badge-border text-theme align-bottom me-1">{{ $newPosition+1 }}</span>
+                                        {{ $question }}
+                                    </h5>
                                 </div>
-                                <div class="flex-grow-1">
-                                    <div class="row">
-                                        <div class="col">
-                                            <h5 class="mb-0">
-                                                {{ getTermNameById($topicId) }}
-                                            </h5>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fs-5 ri-time-line text-warning-emphasis" title="Pendente"></i>
-                                            <i class="fs-5 ri-check-double-fill text-success-emphasis d-none" title="Concluído"></i>
-                                        </div>
+                                <div class="col-auto">
+                                    <i class="fs-5 ri-time-line text-warning-emphasis" title="Pendente"></i>
+                                    <i class="fs-5 ri-check-double-fill text-success-emphasis d-none" title="Concluído"></i>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-auto">
+                                    <div class="form-check form-switch form-switch-sm form-switch-theme mb-4">
+                                        <input tabindex="-1" class="form-check-input" type="radio" name="compliance[{{$stepIndex}}][{{$topicIndex}}]" role="switch" id="YesSwitchCheck{{ $radioIndex }}" value="yes">
+                                        <label class="form-check-label" for="YesSwitchCheck{{ $radioIndex }}">Conforme</label>
                                     </div>
-                                    <div class="row mt-3">
-                                        <div class="col-auto">
-                                            <div class="form-check form-switch form-switch-lg form-switch-theme mb-3">
-                                                <input tabindex="-1" class="form-check-input" type="radio" name="compliance[{{$topicId}}]" role="switch" id="SwitchCheck{{ $originalPosition.$topicId }}">
-                                                <label class="form-check-label" for="SwitchCheck{{ $originalPosition.$topicId }}">Conforme</label>
-                                            </div>
-                                            <div class="form-check form-switch form-switch-lg form-switch-danger">
-                                                <input tabindex="-1" class="form-check-input" type="radio" name="compliance[{{$topicId}}]" role="switch" id="SwitchCheck2{{ $originalPosition.$topicId }}">
-                                                <label class="form-check-label" for="SwitchCheck2{{ $originalPosition.$topicId }}">Não Conforme</label>
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="input-group">
-                                                <button tabindex="-1" type="button" class="btn btn-outline-dark waves-effect waves-light ps-1 pe-1 dropdown" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Bater foto"><i class="ri-image-add-fill fs-5 m-2"></i></button>
+                                    <div class="form-check form-switch form-switch-sm form-switch-danger">
+                                        <input tabindex="-1" class="form-check-input" type="radio" name="compliance[{{$stepIndex}}][{{$topicIndex}}]" role="switch" id="NoSwitchCheck{{ $radioIndex }}" value="no">
+                                        <label class="form-check-label" for="NoSwitchCheck{{ $radioIndex }}">Não Conforme</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group">
+                                        <button tabindex="-1" type="button" class="btn btn-outline-dark waves-effect waves-light ps-1 pe-1 dropdown" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Bater foto"><i class="ri-image-add-fill fs-5 m-2"></i></button>
 
-                                                <textarea tabindex="-1" class="form-control" maxlength="1000" rows="3" name="observations[{{$topicId}}]" placeholder="Observações..."></textarea>
+                                        <textarea tabindex="-1" class="form-control maxlength" maxlength="1000" rows="3" name="observations[{{$stepIndex}}]" placeholder="Observações..."></textarea>
 
-                                                <button tabindex="-1" type="button" class="btn btn-outline-dark waves-effect waves-light"><i class="ri-save-3-line fs-3 m-2 text-theme" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-step="{{$stepId}}" data-topic="{{$topicId}}" title="Salvar"></i></button>
-                                            </div>
-                                        </div>
+                                        <button tabindex="-1" type="button" class="btn btn-outline-dark waves-effect waves-light ps-1 pe-1"><i class="ri-save-3-line fs-3 m-2 text-theme" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-step="{{$stepIndex}}" data-topic="{{$stepIndex}}" title="Salvar"></i></button>
                                     </div>
                                 </div>
                             </div>

@@ -1,11 +1,12 @@
 @foreach ($data as $stepIndex => $step)
     @php
-        $stepName = $step['stepData']['step_name'] ?? '';
-        $originalPosition = $step['stepData']['original_position'] ?? $stepIndex;
-        $stepIndex = intval($originalPosition);
-        $newPosition = $step['stepData']['new_position'] ?? $stepIndex;
+        $stepData = $step['stepData'] ?? null;
+        $stepName = $stepData['step_name'] ?? '';
+        $originalPosition = $stepData['original_position'] ?? $stepIndex;
+        $newPosition = $stepData['new_position'] ?? $stepIndex;
 
-        $topicsData = $step['topics'] ?? null;
+        $topics = $step['topics'] ?? null;
+        $topics = !empty($topics) && is_array($topics) ? array_filter($topics) : $topics;
     @endphp
     <div id="{{ $stepIndex }}" class="accordion-item block-item mt-3 mb-0 border-dark border-1 rounded rounded-2 p-0">
         <div class="input-group">
@@ -28,10 +29,10 @@
         <input type="hidden" name="steps[{{$stepIndex}}]['stepData']['new_position']" value="{{ $newPosition }}" tabindex="-1">
 
         <div class="accordion-collapse collapse show">
-            <div class="nested-receiver-block mt-0 p-1">@if (isset($topicsData) && is_array($topicsData))
-                @foreach ($topicsData as $topicIndex => $topic)
+            <div class="nested-receiver-block mt-0 p-1">@if ( isset($topics) && is_array($topics) && count($topics) > 0 )
+                @foreach ($topics as $topicIndex => $topic)
                     @php
-                        $topicId = $topic['topic_id'] ?? '';
+                        $question = $topic['question'] ?? '';
                         $originalPosition = $topic['original_position'] ?? 0;
                         $originalTopicIndex = $originalPosition ? intval($originalPosition) : 0;
                         $newPosition = $topic['new_position'] ?? 0;
@@ -42,9 +43,7 @@
                                 <span class="btn btn-ghost-danger btn-icon rounded-pill btn-remove-topic" data-target="{{ $stepIndex . $originalTopicIndex }}" title="Remover Tópico"><i class="ri-delete-bin-3-line"></i></span>
                             </div>
                             <div class="col">
-                                <select select-one data-choices-removeItem class="form-control surveys-term-choice w-100" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia?" data-placeholder="Tópico..." name="steps[{{$stepIndex}}]['topics']['topic_id']" required>
-                                    <option value="{{$topicId}}" selected>{{getTermNameById($topicId)}}</option>
-                                </select>
+                                <input type="text" class="form-control" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia? " placeholder="Tópico..." name="steps[{{$stepIndex}}]['topics']['question']" value="{{$question}}" maxlength="150" required>
                             </div>
                             <div class="col-auto">
                                 <span class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-receiver-block" title="Reordenar"><i class="ri-arrow-up-down-line"></i></span>

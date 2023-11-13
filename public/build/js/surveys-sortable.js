@@ -3,9 +3,11 @@ import {
     bsPopoverTooltip
 } from './helpers.js';
 
+/*
 import {
     choicesListeners
 } from './surveys-terms.js';
+*/
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -197,14 +199,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         <span class="btn btn-ghost-danger btn-icon rounded-pill btn-remove-topic" data-target="${stepIndex}${newTopicIndex}" title="Remover Bloco"><i class="ri-delete-bin-3-line"></i></span>
                     </div>
                     <div class="col">
-                        <select class="form-control surveys-term-choice w-100" select-one data-choices-removeItem class="form-control surveys-term-choice w-100" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia?" data-placeholder="Tópico..." name="steps[${stepIndex}][topics]['topic_id']" required></select>
+                        <input type="text" class="form-control" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia?" data-placeholder="Tópico..." name="steps[${stepIndex}]['topics']['question']" placeholder="Exemplo: Organização do Departamento" maxlength="150" required></input>
                     </div>
                     <div class="col-auto">
                         <span class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-receiver-block" title="Reordenar"><i class="ri-arrow-up-down-line"></i></span>
                     </div>
                 </div>
-                <input type="hidden" name="steps[${stepIndex}][topics]['original_position']" value="${newTopicIndex}" tabindex="-1">
-                <input type="hidden" name="steps[${stepIndex}][topics]['new_position']" tabindex="-1">
+                <input type="hidden" name="steps[${stepIndex}]['topics']['original_position']" value="${newTopicIndex}" tabindex="-1">
+                <input type="hidden" name="steps[${stepIndex}]['topics']['new_position']" tabindex="-1">
             `;
             blockContainer.appendChild(newTopic);
         }
@@ -223,11 +225,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         addNewTopic(stepIndex);
 
-                        bsPopoverTooltip();
+                        //bsPopoverTooltip();
                         attachNestedListeners();
                         updateBlockAndTopicPositions();
                         attachRemoveButtonListeners();
-                        choicesListeners(surveysTermsSearchURL, surveysTermsStoreOrUpdateURL, choicesSelectorClass);
+                        //choicesListeners(surveysTermsSearchURL, surveysTermsStoreOrUpdateURL, choicesSelectorClass);
                     });
                 }
             });
@@ -269,12 +271,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (topicElement) {
                     topicElement.remove();
 
+                    updateBlockAndTopicPositions();
+
                     event.stopPropagation();
 
                     return;
                 }
             }
-            return;
         }
 
         if (removeBlockButtons) {
@@ -295,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        updateBlockAndTopicPositions();
+        return;
     }
 
     // Attach event listeners to accordion toggle buttons

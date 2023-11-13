@@ -218,8 +218,8 @@
         var surveysShowURL = "{{ route('surveysShowURL') }}";
         var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
 
-        var surveysTermsSearchURL = "{{ route('surveysTermsSearchURL') }}";
-        var choicesSelectorClass = ".surveys-term-choice";
+        //var surveysTermsSearchURL = "{{ route('surveysTermsSearchURL') }}";
+        //var choicesSelectorClass = ".surveys-term-choice";
     </script>
     <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
 @endsection
