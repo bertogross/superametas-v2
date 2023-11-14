@@ -19,7 +19,7 @@ class SurveyTemplates extends Model
         'user_id',
         'title',
         'description',
-        'jsondata',
+        'template_data',
         'recurring',
         'completed_at'
     ];

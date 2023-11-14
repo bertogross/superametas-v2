@@ -70,7 +70,7 @@
                                     <div class="input-group">
                                         <button tabindex="-1" type="button" class="btn btn-outline-dark waves-effect waves-light ps-1 pe-1 dropdown" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Bater foto"><i class="ri-image-add-fill fs-5 m-2"></i></button>
 
-                                        <textarea tabindex="-1" class="form-control maxlength" maxlength="1000" rows="3" name="observations[<?php echo e($stepIndex); ?>]" placeholder="Observações..."></textarea>
+                                        <textarea tabindex="-1" class="form-control" maxlength="1000" rows="3" name="observations[<?php echo e($stepIndex); ?>]" placeholder="Observações..."></textarea>
 
                                         <button tabindex="-1" type="button" class="btn btn-outline-dark waves-effect waves-light ps-1 pe-1"><i class="ri-save-3-line fs-3 m-2 text-theme" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-step="<?php echo e($stepIndex); ?>" data-topic="<?php echo e($stepIndex); ?>" title="Salvar"></i></button>
                                     </div>

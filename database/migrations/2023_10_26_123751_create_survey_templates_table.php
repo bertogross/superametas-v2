@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->string('title', 191)->nullable();
             $table->longText('description')->nullable();
-            $table->json('jsondata')->nullable();
+            $table->json('template_data')->nullable();
             $table->enum('recurring', ['once', 'daily', 'weekly', 'biweekly', 'monthly', 'annual'])->default('once');
             $table->timestamps();
         });

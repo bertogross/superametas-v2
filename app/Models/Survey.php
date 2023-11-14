@@ -19,6 +19,7 @@ class Survey extends Model
         'template_id',
         'user_id',
         'status',
+        'distributed_data',
         'priority',
         'start_date',
         'completed_at',

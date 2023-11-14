@@ -1,5 +1,6 @@
 import {
     toastAlert,
+    sweetAlerts,
     initFlatpickr,
     initFlatpickrRange,
     maxLengthTextarea,
@@ -124,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
             //console.log(JSON.stringify(transformedData, null, 2));
             //return;
 
-            formData.append('jsondata', JSON.stringify(transformedData, null, 2));
+            formData.append('template_data', JSON.stringify(transformedData, null, 2));
 
             try {
                 let url = surveyTemplateId ? surveysTemplateStoreOrUpdateURL + `/${surveyTemplateId}` : surveysTemplateStoreOrUpdateURL;
@@ -147,14 +148,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     toastAlert(data.message, 'success', 10000);
 
-                    btnStoreOrUpdate.textContent = 'Atualizar'; // Change button text
-                    btnStoreOrUpdate.classList.remove('btn-theme'); // Remove old class
-                    btnStoreOrUpdate.classList.add('btn-outline-theme'); // Add new class
+                    //btnStoreOrUpdate.textContent = 'Atualizar'; // Change button text
+                    //btnStoreOrUpdate.classList.remove('btn-theme'); // Remove old class
+                    //btnStoreOrUpdate.classList.add('btn-outline-theme'); // Add new class
 
                     document.querySelector('input[name="id"]').value = data.id; // Add id
 
                     // Make the preview request
                     makeFormPreviewRequest(data.id, surveyTemplateShowURL);
+
+                    var sweetMessage = 'Modelo registrado com sucesso!';
+                    if(surveyTemplateId){
+                        sweetMessage = 'Modelo atualizado!';
+                    }
+                    sweetAlerts(sweetMessage, surveysIndexURL);
                 } else {
                     toastAlert(data.message, 'danger', 60000);
                 }

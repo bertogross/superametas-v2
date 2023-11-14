@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
             } else {
-                console.log("Error fetching modal content:", xhr.statusText);
+                console.log("Fetching modal content:", xhr.statusText);
             }
         };
         xhr.send();

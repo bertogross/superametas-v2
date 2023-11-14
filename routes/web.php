@@ -44,7 +44,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('goal-sales')->group(function () {
         Route::get('/', [GoalSalesController::class, 'index'])->name('goalSalesIndexURL');
         Route::get('/settings', [GoalSalesController::class, 'settings'])->name('goalSalesSettingsEditURL');
-        Route::get('/form/{meantime?}/{companyId?}/{purpose?}', [GoalSalesController::class, 'edit'])->name('goalSalesEditURL');
+        Route::get('/edit/{meantime?}/{companyId?}/{purpose?}', [GoalSalesController::class, 'edit'])->name('goalSalesEditURL');
         Route::post('/store/{meantime?}/{companyId?}', [GoalSalesController::class, 'storeOrUpdate'])->name('goalSalesStoreOrUpdateURL');
 
         Route::post('/analytic-mode', [GoalSalesController::class, 'analyticMode'])->name('goalSalesAnalyticModeURL');

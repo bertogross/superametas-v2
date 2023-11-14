@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             attachModalEventListeners();
         } catch (error) {
-            console.error('Error fetching modal content:', error);
+            console.error('Fetching modal content:', error);
             toastAlert('Não foi possível carregar o conteúdo', 'danger', 10000);
         }
     }
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
             attachGoalSalesUpdateListeners(meantime, companyId);
 
         } catch (error) {
-            console.error('Error fetching modal content:', error);
+            console.error('Fetching modal content:', error);
             toastAlert('Não foi possível carregar o conteúdo', 'danger', 10000);
         }
     }

@@ -80,9 +80,6 @@ class GoalSalesController extends Controller
 
     /**
      * Get the content for the modal settings.
-     *
-     * @param int|null
-     * @return \Illuminate\View\View
      */
     public function settings() {
 
@@ -96,9 +93,6 @@ class GoalSalesController extends Controller
 
     /**
      * Get the content for the modal edit.
-     *
-     * @param int|null
-     * @return \Illuminate\View\View
      */
     public function edit(Request $request)
     {
@@ -149,7 +143,6 @@ class GoalSalesController extends Controller
             ->get()
             ->pluck('total_net_value', 'department_id')
             ->toArray();
-
 
         $dateRange = GoalSales::getSaleDateRange();
         $firstDate = $dateRange['first_date'];

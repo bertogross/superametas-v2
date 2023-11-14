@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\SurveyTerm;
+use App\Models\SurveyTemplates;
 
 use Illuminate\Support\Facades\DB;
 
@@ -482,9 +483,17 @@ if (!function_exists('getGoalsId')) {
 
 if (!function_exists('getTermNameById')) {
     function getTermNameById($termId) {
-        $term = SurveyTerm::find($termId);
+        $term = $termId ? SurveyTerm::find($termId) : null;
 
         return $term ? $term->name : null;
+    }
+}
+
+if (!function_exists('getTemplateNameById')) {
+    function getTemplateNameById($templateId) {
+        $template = $templateId ? SurveyTemplates::find($templateId) : null;
+
+        return $template ? $template->title : null;
     }
 }
 
@@ -528,8 +537,9 @@ if (!function_exists('getCookie')) {
     }
 }
 
+//Max length (limit chars)
 if (!function_exists('limitChars')) {
-    function limitChars($text, $number) {
+    function limitChars($text, $number = 50) {
         return $text ? \Illuminate\Support\Str::limit($text, $number) : '';
     }
 }

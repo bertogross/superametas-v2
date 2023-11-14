@@ -50,6 +50,60 @@ export function toastAlert(message, type = 'success', duration = 0) {
     }
 }
 
+
+export function sweetAlerts(message, urlToRedirect = false){
+    Swal.fire({
+        title: message,
+        icon: 'success',
+        showDenyButton: false,
+        showCancelButton: true,
+        confirmButtonText: 'Finalizar',
+        confirmButtonClass: 'btn btn-outline-success w-xs me-2',
+        cancelButtonClass: 'btn btn-outline-info w-xs',
+        denyButtonClass: 'btn btn-danger w-xs me-2',
+        buttonsStyling: false,
+        denyButtonText: 'Não',
+        cancelButtonText: 'Continuar Editando',
+        showCloseButton: false,
+        allowOutsideClick: false
+    }).then(function (result) {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            var timerInterval;
+            Swal.fire({
+                title: 'Ok!',
+                html: 'Redirecionando...',
+                timer: 4000,
+                timerProgressBar: true,
+                showCloseButton: false,
+                didOpen: function () {
+                    Swal.showLoading()
+                    timerInterval = setInterval(function () {
+                        var content = Swal.getHtmlContainer()
+                        if (content) {
+                            var b = content.querySelector('b')
+                            if (b) {
+                                b.textContent = Swal.getTimerLeft()
+                            }
+                        }
+                    }, 100)
+                },
+                onClose: function () {
+                    clearInterval(timerInterval)
+                }
+            }).then(function (result) {
+                /* Read more about handling dismissals below */
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    //console.log('I was closed by the timer')
+                    if(urlToRedirect){
+                        window.location.href = urlToRedirect;
+                    }
+                }
+            });
+        }
+    })
+}
+
 // Multiple Modals
 // Maintain modal-open when close another modal
 export function multipleModal() {
@@ -83,6 +137,21 @@ export function multipleModal() {
         destroyModal();
     }, 500);
 }
+
+/*
+export function preventWizardNavigation(){
+    // Using plain JavaScript to disable click on nav items
+    document.querySelectorAll('.nav-item .nav-link').forEach(function(tab) {
+        tab.addEventListener('click', function(e) {
+            if (!this.classList.contains('active')) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+        });
+    });
+}
+*/
 
 export function formatNumberInput(selector = '.format-numbers', decimals = 0) {
     const numberInputs = document.querySelectorAll(selector);
@@ -376,29 +445,59 @@ export function percentageResult(price, percentage, decimal = 0){
     return result;
 }
 
-export function bsPopoverTooltip(){
-    var toggles = document.querySelectorAll('[data-bs-toggle]');
-    toggles.forEach(function(toggle) {
-        var toggleType = toggle.getAttribute('data-bs-toggle');
-        if (toggleType === 'tooltip') {
-            new bootstrap.Tooltip(toggle);
-        } else if (toggleType === 'popover') {
-            new bootstrap.Popover(toggle);
+export function bsPopoverTooltip() {
+    setTimeout(() => {
+        // Arrays to keep track of all tooltips and popovers
+        let allTooltips = [];
+        let allPopovers = [];
+
+        // Function to hide all tooltips
+        function hideAllTooltips() {
+            allTooltips.forEach(tooltip => tooltip.hide());
+            allTooltips = []; // Clear the array after hiding all tooltips
         }
 
-    });
+        // Function to hide all popovers
+        function hideAllPopovers() {
+            allPopovers.forEach(popover => popover.hide());
+            allPopovers = []; // Clear the array after hiding all popovers
+        }
+
+        // Hide existing tooltips and popovers
+        hideAllTooltips();
+        hideAllPopovers();
+
+        // Find all elements with data-bs-toggle
+        var toggles = document.querySelectorAll('[data-bs-toggle]');
+
+        toggles.forEach(function(toggle) {
+            var toggleType = toggle.getAttribute('data-bs-toggle');
+            if (toggleType === 'tooltip') {
+                // Initialize tooltip and store the instance
+                allTooltips.push(new bootstrap.Tooltip(toggle));
+            } else if (toggleType === 'popover') {
+                // Initialize popover and store the instance
+                allPopovers.push(new bootstrap.Popover(toggle));
+            }
+        });
+    }, 1000);
 }
+
+
 
 export function initFlatpickr() {
     const elements = document.querySelectorAll('.flatpickr-default');
     elements.forEach(element => {
+        const defaultValue = element.value ? element.value : null;
+
         flatpickr(element, {
             dateFormat: "d/m/Y",
             locale: "pt",
             allowInput: true,
             clear: true,
             minDate: "today",
-            //maxDate: new Date().fp_incr(90)
+            defaultDate: defaultValue,
+            maxDate: new Date().fp_incr(360)// Set the maximum date to 360 days from today
         });
     });
 }
@@ -520,22 +619,162 @@ export function maxLengthTextarea() {
  * @param {string} formSelector - The selector for the form.
  */
 export function revalidationOnInput(formSelector = '.needs-validation') {
-    const form = document.querySelector(formSelector);
-    if (!form) {
-      console.warn('Form not found:', formSelector);
+    if(formSelector.length){
+        const form = document.querySelector(formSelector);
 
-      return;
+        if (!form) {
+            console.warn('Form not found:', formSelector);
+
+            return;
+        }
+
+        function removeValidationClass() {
+            form.classList.remove('was-validated');
+        }
+
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(function(input) {
+            input.addEventListener('input', removeValidationClass);
+            input.addEventListener('select', removeValidationClass);
+            input.addEventListener('textarea', removeValidationClass);
+        });
     }
+}
 
-    function removeValidationClass() {
-      form.classList.remove('was-validated');
+export function wizardFormSteps(totalCompanies = 1){
+    var formSteps = document.querySelectorAll(".form-steps");
+    if (formSteps){
+        Array.from(formSteps).forEach(function (form) {
+            checkAllFormCheckInputs();
+
+            // next tab
+            if (form.querySelectorAll(".nexttab")){
+
+                Array.from(form.querySelectorAll(".nexttab")).forEach(function (nextButton) {
+                    var tabEl = form.querySelectorAll('button[data-bs-toggle="pill"]');
+
+                    Array.from(tabEl).forEach(function (item) {
+                        item.addEventListener('show.bs.tab', function (event) {
+                            event.target.classList.add('done');
+                        });
+                    });
+
+                    nextButton.addEventListener("click", function () {
+
+                        form.classList.add('was-validated');
+
+                        var nextTab = nextButton.getAttribute('data-nexttab');
+
+                        document.getElementById(nextTab).removeAttribute('disabled');
+
+                        var inputControl = form.querySelectorAll(".tab-pane.show .form-control");
+                        if(inputControl){
+                            inputControl.forEach(function(elem){
+
+                                //console.log('nextTab ID: ', nextTab);
+
+                                /*var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+                                if(elem.value.length > 0 && elem.value.match(validRegex)){*/
+                                if(elem.value.length > 0){
+                                    form.classList.remove('was-validated');
+
+                                    document.getElementById(nextTab).click();
+                                }
+                            });
+                        }
+
+                        var checkedControl = form.querySelectorAll(".tab-pane.show .form-check-input:checked");
+                        if(checkedControl){
+                            var checkedControllemght = checkedControl.length
+                            //console.log('checked count', checkedControllemght);
+
+                            checkedControl.forEach(function(elem){
+                                //console.log('totalCompanies:', totalCompanies);
+                                //console.log('nextTab ID: ', nextTab);
+
+                                if(checkedControllemght == (parseInt(totalCompanies) * 2)){
+                                    form.classList.remove('was-validated');
+
+                                    document.getElementById(nextTab).click();
+
+                                }
+                            });
+                        }
+
+                        document.getElementById(nextTab).setAttribute('disabled', 'disabled');
+                    });
+                });
+
+            }
+
+            //Pervies tab
+            if (form.querySelectorAll(".previestab")){
+                Array.from(form.querySelectorAll(".previestab")).forEach(function (prevButton) {
+
+                    prevButton.addEventListener("click", function () {
+                        var prevTab = prevButton.getAttribute('data-previous');
+
+                        document.getElementById(prevTab).removeAttribute('disabled');
+
+                        var totalDone = prevButton.closest("form").querySelectorAll(".custom-nav .done").length;
+                        for (var i = totalDone - 1; i < totalDone; i++) {
+                            (prevButton.closest("form").querySelectorAll(".custom-nav .done")[i]) ? prevButton.closest("form").querySelectorAll(".custom-nav .done")[i].classList.remove('done'): '';
+                        }
+                        document.getElementById(prevTab).click();
+
+                        document.getElementById(prevTab).setAttribute('disabled', 'disabled');
+
+                    });
+                });
+            }
+
+            // Step number click
+            var tabButtons = form.querySelectorAll('button[data-bs-toggle="pill"]');
+            if (tabButtons){
+                Array.from(tabButtons).forEach(function (button, i) {
+                    button.setAttribute("data-position", i);
+                    button.addEventListener("click", function () {
+                        form.classList.remove('was-validated');
+
+                        var getProgressBar = button.getAttribute("data-progressbar");
+                        if (getProgressBar) {
+                            var totalLength = document.getElementById("custom-progress-bar").querySelectorAll("li").length - 1;
+                            var current = i;
+                            var percent = (current / totalLength) * 100;
+                            document.getElementById("custom-progress-bar").querySelector('.progress-bar').style.width = percent + "%";
+                        }
+                        (form.querySelectorAll(".custom-nav .done").length > 0) ?
+                        Array.from(form.querySelectorAll(".custom-nav .done")).forEach(function (doneTab) {
+                            doneTab.classList.remove('done');
+                        }): '';
+                        for (var j = 0; j <= i; j++) {
+                            tabButtons[j].classList.contains('active') ? tabButtons[j].classList.remove('done') : tabButtons[j].classList.add('done');
+                        }
+                    });
+                });
+            }
+        });
     }
+}
 
-    const inputs = form.querySelectorAll('input, select, textarea');
-    inputs.forEach(function(input) {
-        input.addEventListener('input', removeValidationClass);
-        input.addEventListener('select', removeValidationClass);
-        input.addEventListener('textarea', removeValidationClass);
+function checkAllFormCheckInputs() {
+    // Select all elements with the .form-check-input class
+    var checkboxes = document.querySelectorAll('.form-check-input');
+
+    // Iterate over them and add a change event listener to each one
+    checkboxes.forEach(function(checkbox) {
+        // Add a change listener to the current checkbox
+        checkbox.addEventListener('change', function() {
+            // This function is called whenever a checkbox is checked or unchecked
+            // You can add your logic here for what happens when the state changes
+            if (this.checked) {
+                this.setAttribute('checked', '');
+                //console.log(this.id + ' is checked');
+            } else {
+                this.removeAttribute('checked');
+                //console.log(this.id + ' is unchecked');
+            }
+        });
     });
 }
 
@@ -606,6 +845,71 @@ export function allowUncheckRadioButtons(radioSelector = '.form-check-input') {
 }
 
 
+export function layouRightSide(){
+    var layoutRightSideBtn = document.querySelector('.layout-rightside-btn');
+    if (layoutRightSideBtn) {
+        Array.from(document.querySelectorAll(".layout-rightside-btn")).forEach(function (item) {
+            var userProfileSidebar = document.querySelector(".layout-rightside-col");
+            item.addEventListener("click", function () {
+                if (userProfileSidebar.classList.contains("d-block")) {
+                    userProfileSidebar.classList.remove("d-block");
+                    userProfileSidebar.classList.add("d-none");
+                } else {
+                    userProfileSidebar.classList.remove("d-none");
+                    userProfileSidebar.classList.add("d-block");
+                }
+            });
+        });
+        window.addEventListener("resize", function () {
+            var userProfileSidebar = document.querySelector(".layout-rightside-col");
+            if (userProfileSidebar) {
+                Array.from(document.querySelectorAll(".layout-rightside-btn")).forEach(function () {
+                    if (window.outerWidth < 1699 || window.outerWidth > 3440) {
+                        userProfileSidebar.classList.remove("d-block");
+                    } else if (window.outerWidth > 1699) {
+                        userProfileSidebar.classList.add("d-block");
+                    }
+                });
+            }
+
+            var htmlAttr = document.documentElement;
+            if (htmlAttr.getAttribute("data-layout") == "semibox") {
+                userProfileSidebar.classList.remove("d-block");
+                userProfileSidebar.classList.add("d-none");
+            }
+        });
+        var overlay = document.querySelector('.overlay');
+        if (overlay) {
+            document.querySelector(".overlay").addEventListener("click", function () {
+                if (document.querySelector(".layout-rightside-col").classList.contains('d-block') == true) {
+                    document.querySelector(".layout-rightside-col").classList.remove("d-block");
+                }
+            });
+        }
+    }
+
+    window.addEventListener("load", function () {
+        var userProfileSidebar = document.querySelector(".layout-rightside-col");
+        if (userProfileSidebar) {
+            Array.from(document.querySelectorAll(".layout-rightside-btn")).forEach(function () {
+                if (window.outerWidth < 1699 || window.outerWidth > 3440) {
+                    userProfileSidebar.classList.remove("d-block");
+                } else if (window.outerWidth > 1699) {
+                    userProfileSidebar.classList.add("d-block");
+                }
+            });
+        }
+
+        var htmlAttr = document.documentElement
+
+        if (htmlAttr.getAttribute("data-layout") == "semibox") {
+            if (window.outerWidth > 1699) {
+                userProfileSidebar.classList.remove("d-block");
+                userProfileSidebar.classList.add("d-none");
+            }
+        }
+    });
+}
 
 
 

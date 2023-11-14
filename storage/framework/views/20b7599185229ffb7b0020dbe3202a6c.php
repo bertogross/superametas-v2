@@ -2,6 +2,7 @@
     <?php echo app('translator')->get('translation.surveys'); ?>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('css'); ?>
+    <link href="<?php echo e(URL::asset('build/libs/sweetalert2/sweetalert2.min.css')); ?>" rel="stylesheet" type="text/css" />
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>
     <?php $__env->startComponent('components.breadcrumb'); ?>
@@ -29,22 +30,22 @@
         $description = $data->description ?? '';
         $recurring = $data->recurring ?? '';
 
-        appPrintR($data);
-        appPrintR($default);
-        appPrintR($custom);
+        //appPrintR($data);
+        //appPrintR($default);
+        //appPrintR($custom);
     ?>
 
     <div class="card">
         <div class="card-header">
             <div class="float-end">
                 <?php if($data): ?>
-                    <button type="button" class="btn btn-sm btn-outline-theme" id="btn-survey-template-store-or-update" tabindex="-1">Atualizar</button>
+                    <button type="button" class="btn btn-sm btn-label right btn-outline-theme" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Atualizar</button>
 
-                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-surveys-clone" tabindex="-1">Clonar</button>
+                    <button type="button" class="btn btn-sm btn-label right btn-outline-info" id="btn-surveys-clone" tabindex="-1"><i class="ri-file-copy-line label-icon align-middle fs-16 ms-2"></i>Clonar</button>
 
-                    <a href="<?php echo e(route('surveyTemplateShowURL', ['id' => $data->id])); ?>" class="btn btn-sm btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar em nova guia" target="_blank" tabindex="-1">Visualizar</a>
+                    <a href="<?php echo e(route('surveyTemplateShowURL', ['id' => $templateId])); ?>" class="btn btn-sm btn-label right btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar em nova guia" target="_blank" tabindex="-1"><i class="ri-eye-line label-icon align-middle fs-16 ms-2"></i>Visualizar</a>
                 <?php else: ?>
-                    <button type="button" class="btn btn-sm btn-theme" id="btn-survey-template-store-or-update" tabindex="-1">Salvar</button>
+                    <button type="button" class="btn btn-sm btn-label right btn-outline-theme" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Salvar</button>
                 <?php endif; ?>
             </div>
             <h4 class="card-title mb-0"><i class="ri-drag-drop-line fs-16 align-middle text-theme me-2"></i><?php echo e($data->title ?? 'Formulário'); ?></h4>
@@ -68,7 +69,7 @@
                             <div class="mb-4">
                                 <label for="date-range-field" class="form-label">Tipo de Recorrência:</label>
                                 <select class="form-select" name="recurring" required>
-                                    <option disabled selected>- Selecione -</option>
+                                    <option disabled <?php echo e(!$recurring ?? 'selected'); ?>>- Selecione -</option>
                                     <?php $__currentLoopData = $getSurveyRecurringTranslations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <option value="<?php echo e($index); ?>" <?php echo e($recurring == $index ? 'selected' : ''); ?>><?php echo e($value['label']); ?></option>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -123,6 +124,8 @@
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
+    <script src="<?php echo e(URL::asset('build/libs/sweetalert2/sweetalert2.min.js')); ?>"></script>
+
     <script src="<?php echo e(URL::asset('build/libs/sortablejs/Sortable.min.js')); ?>"></script>
 
     <script src="<?php echo e(URL::asset('build/libs/flatpickr/flatpickr.min.js')); ?>"></script>
@@ -131,6 +134,7 @@
     <script src="<?php echo e(URL::asset('build/libs/flatpickr/plugins/confirmDate/confirmDate.js')); ?>"></script>
 
     <script>
+        var surveysIndexURL = "<?php echo e(route('surveysIndexURL')); ?>";
         var surveyTemplateEditURL = "<?php echo e(route('surveyTemplateEditURL')); ?>";
         var surveyTemplateShowURL = "<?php echo e(route('surveyTemplateShowURL')); ?>";
         var surveysTemplateStoreOrUpdateURL = "<?php echo e(route('surveysTemplateStoreOrUpdateURL')); ?>";

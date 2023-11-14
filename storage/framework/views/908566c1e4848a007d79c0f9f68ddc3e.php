@@ -1,1 +1,0 @@
-<?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views\surveys\_deprecated\terms\listing.blade.php ENDPATH**/ ?>

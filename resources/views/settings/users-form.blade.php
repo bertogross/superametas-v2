@@ -213,8 +213,5 @@ if (is_object($getActiveCompanies)) {
                 </form>
             </div>
         </div>
-        <!--end modal-content-->
     </div>
-    <!--end modal-dialog-->
 </div>
-<!--end modal-->

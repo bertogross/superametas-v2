@@ -48,28 +48,23 @@
                 </svg>
             </div>
         </div>
-        <?php
-        //appPrintR($data);
-        //appPrintR($default);
-        //exit;
-        ?>
-        <div>
-            <?php if($default): ?>
-                <?php $__env->startComponent('surveys.components.steps-card'); ?>
-                    <?php $__env->slot('type', 'default'); ?>
-                    <?php $__env->slot('data', $default); ?>
-                    <?php $__env->slot('edition', $edition); ?>
-                <?php echo $__env->renderComponent(); ?>
-            <?php endif; ?>
 
-            <?php if($custom): ?>
-                <?php $__env->startComponent('surveys.components.steps-card'); ?>
-                    <?php $__env->slot('type', 'custom'); ?>
-                    <?php $__env->slot('data', $custom); ?>
-                    <?php $__env->slot('edition', $edition); ?>
-                <?php echo $__env->renderComponent(); ?>
-            <?php endif; ?>
-        </div>
+        <?php if($default): ?>
+            <?php $__env->startComponent('surveys.components.steps-card'); ?>
+                <?php $__env->slot('type', 'default'); ?>
+                <?php $__env->slot('data', $default); ?>
+                <?php $__env->slot('edition', $edition); ?>
+            <?php echo $__env->renderComponent(); ?>
+        <?php endif; ?>
+
+        <?php if($custom): ?>
+            <?php $__env->startComponent('surveys.components.steps-card'); ?>
+                <?php $__env->slot('type', 'custom'); ?>
+                <?php $__env->slot('data', $custom); ?>
+                <?php $__env->slot('edition', $edition); ?>
+            <?php echo $__env->renderComponent(); ?>
+        <?php endif; ?>
+
     </div>
 
 <?php $__env->stopSection(); ?>

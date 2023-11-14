@@ -1,4 +1,4 @@
-@php
+<?php
     $surveyId = $data && $data->id ? $data->id : '';
     $templateId = $data && $data->template_id ? $data->template_id : '';
     $startDate = $data ? $data->start_date : null;
@@ -6,24 +6,24 @@
 
     $distributedData = $data->distributed_data ?? null;
         $distributedData = $distributedData ? json_decode($distributedData, true) : '';
-@endphp
+?>
 <div class="modal fade" id="surveysModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content border-0">
             <div class="modal-header p-3 bg-soft-info">
                 <h5 class="modal-title">
-                    @if($surveyId)
-                        Edição de: <span class="text-theme">{{ limitChars(getTemplateNameById($templateId), 30) }}</span>
-                    @else
+                    <?php if($surveyId): ?>
+                        Edição de: <span class="text-theme"><?php echo e(limitChars(getTemplateNameById($templateId), 30)); ?></span>
+                    <?php else: ?>
                         Registrando Nova Vistoria
-                    @endif
+                    <?php endif; ?>
                 </h5>
                 <button type="button" class="btn-close btn-destroy" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="surveysForm" method="POST" class="needs-validation form-steps" novalidate autocomplete="off">
-                    @csrf
-                    <input type="hidden" name="id" value="{{ $surveyId }}">
+                    <?php echo csrf_field(); ?>
+                    <input type="hidden" name="id" value="<?php echo e($surveyId); ?>">
 
                     <div class="step-arrow-nav mb-4">
                         <ul class="nav nav-pills custom-nav nav-pills-theme nav-justified" role="tablist">
@@ -58,16 +58,16 @@
                             <div class="row">
                                 <div class="col mb-3">
                                     <label for="template-field" class="form-label">Selecione o Modelo:</label>
-                                    <select name="template_id" class="form-control form-select" required>
-                                        <option value="" {{ empty($templateId) ? 'selected' : ''  }} disabled>- Selecione -</option>
-                                        @foreach ($templates as $template)
-                                            <option value="{{$template->id}}" {{ isset($template->id) && $template->id == $templateId ? 'selected' : ''}}>{{ $template->title ? e($template->title) : '' }} {{ $template->recurring ? ' [ Recorrência: '.$getSurveyRecurringTranslations[$template->recurring]['label'].' ]' : '' }}</option>
-                                        @endforeach
+                                    <select name="template_id" class="form-control" required>
+                                        <option value="" <?php echo e(empty($templateId) ? 'selected' : ''); ?> disabled>- Selecione -</option>
+                                        <?php $__currentLoopData = $templates; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $template): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($template->id); ?>" <?php echo e(isset($template->id) && $template->id == $templateId ? 'selected' : ''); ?>><?php echo e($template->title ? e($template->title) : ''); ?> <?php echo e($template->recurring ? ' [ Recorrência: '.$getSurveyRecurringTranslations[$template->recurring]['label'].' ]' : ''); ?></option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                 </div>
                                 <div class="col-auto mb-3">
                                     <label for="date-start-field" class="form-label">Data de início:</label>
-                                    <input type="text" id="date-start-field" name="start_date" class="form-control flatpickr-default" value="{{ $startDate }}" maxlength="10" readonly required>
+                                    <input type="text" id="date-start-field" name="start_date" class="form-control flatpickr-default" value="<?php echo e($startDate); ?>" maxlength="10" readonly required>
                                 </div>
                             </div>
                             <div class="d-flex align-items-start gap-3 mt-4">
@@ -84,23 +84,23 @@
                                 <div class="row">
                                     <div class="col-sm-6 col-md-4 col-lg-4 col-xxl-3">
                                         <div class="nav nav-pills flex-column nav-pills-tab verti-nav-pills custom-verti-nav-pills nav-pills-theme" role="tablist" aria-orientation="vertical">
-                                            @foreach ($getAuthorizedCompanies as $key => $companyId)
-                                                <a class="nav-link text-uppercase {{ $key == 0 ? 'active' : '' }} text-uppercase" data-bs-target="#distributed-tab-company-{{ $companyId }}" id="distributed-tab-company-{{ $companyId }}-tab" data-bs-toggle="pill" role="tab" aria-controls="v-pills-account" aria-selected="true">{{ getCompanyAlias($companyId) }}</a>
-                                            @endforeach
+                                            <?php $__currentLoopData = $getAuthorizedCompanies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $companyId): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <a class="nav-link text-uppercase <?php echo e($key == 0 ? 'active' : ''); ?> text-uppercase" data-bs-target="#distributed-tab-company-<?php echo e($companyId); ?>" id="distributed-tab-company-<?php echo e($companyId); ?>-tab" data-bs-toggle="pill" role="tab" aria-controls="v-pills-account" aria-selected="true"><?php echo e(getCompanyAlias($companyId)); ?></a>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
                                     </div>
                                     <div class="col-sm-6 col-md-8 col-lg-8 col-xxl-9">
                                         <div class="tab-content p-0 bg-light h-100">
-                                            @foreach ($getAuthorizedCompanies as $key => $companyId)
-                                                <div class="tab-pane fade show {{ $key == 0 ? 'active' : '' }} p-3" id="distributed-tab-company-{{ $companyId }}" role="tabpanel" aria-labelledby="distributed-tab-company-{{ $companyId }}-tab">
+                                            <?php $__currentLoopData = $getAuthorizedCompanies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $companyId): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <div class="tab-pane fade show <?php echo e($key == 0 ? 'active' : ''); ?> p-3" id="distributed-tab-company-<?php echo e($companyId); ?>" role="tabpanel" aria-labelledby="distributed-tab-company-<?php echo e($companyId); ?>-tab">
                                                     <div class="row">
                                                         <div class="col mb-3">
                                                             <h6><span class="text-theme">Vistoria</span> Atribuída a:</h6>
 
                                                             <div class="bg-light p-3 rounded-2">
                                                                 <ul class="list-unstyled vstack gap-2 mb-0">
-                                                                    @foreach ($users as $user)
-                                                                        @php
+                                                                    <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <?php
                                                                             $userId = $user->id;
                                                                             $userName = $user->name;
                                                                             $userAvatar = $user->avatar;
@@ -116,29 +116,29 @@
                                                                                     }
                                                                                 }
                                                                             }
-                                                                        @endphp
-                                                                        @if ( is_array($userCompanies) && in_array($companyId, $userCompanies) )
+                                                                        ?>
+                                                                        <?php if( is_array($userCompanies) && in_array($companyId, $userCompanies) ): ?>
                                                                             <li>
                                                                                 <div class="form-check form-check-success d-flex align-items-center">
-                                                                                    <input class="form-check-input me-3" type="radio" name="delegated_to[{{$companyId}}]"
-                                                                                        value="{{ $userId }}" id="delegated_to-user-{{ $companyId.$userId }}" {{ $isDelegated ? 'checked' : '' }} required>
+                                                                                    <input class="form-check-input me-3" type="radio" name="delegated_to[<?php echo e($companyId); ?>]"
+                                                                                        value="<?php echo e($userId); ?>" id="delegated_to-user-<?php echo e($companyId.$userId); ?>" <?php echo e($isDelegated ? 'checked' : ''); ?> required>
                                                                                     <label class="form-check-label d-flex align-items-center"
-                                                                                        for="delegated_to-user-{{ $companyId.$userId }}">
+                                                                                        for="delegated_to-user-<?php echo e($companyId.$userId); ?>">
                                                                                         <span class="flex-shrink-0">
                                                                                             <img
-                                                                                            @if(empty(trim($userAvatar)))
-                                                                                                src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                                                                            @else
-                                                                                                src="{{ URL::asset('storage/' . $userAvatar) }}"
-                                                                                            @endif
-                                                                                                alt="{{ $userName }}" class="avatar-xxs rounded-circle">
+                                                                                            <?php if(empty(trim($userAvatar))): ?>
+                                                                                                src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
+                                                                                            <?php else: ?>
+                                                                                                src="<?php echo e(URL::asset('storage/' . $userAvatar)); ?>"
+                                                                                            <?php endif; ?>
+                                                                                                alt="<?php echo e($userName); ?>" class="avatar-xxs rounded-circle">
                                                                                         </span>
-                                                                                        <span class="flex-grow-1 ms-2">{{ $userName }}</span>
+                                                                                        <span class="flex-grow-1 ms-2"><?php echo e($userName); ?></span>
                                                                                     </label>
                                                                                 </div>
                                                                             </li>
-                                                                        @endif
-                                                                    @endforeach
+                                                                        <?php endif; ?>
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                 </ul>
                                                             </div>
                                                         </div>
@@ -147,8 +147,8 @@
 
                                                             <div class="bg-light p-3 rounded-2">
                                                                 <ul class="list-unstyled vstack gap-2 mb-0">
-                                                                    @foreach ($users as $user)
-                                                                        @php
+                                                                    <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <?php
                                                                             $userId = $user->id;
                                                                             $userName = $user->name;
                                                                             $userAvatar = $user->avatar;
@@ -165,35 +165,35 @@
                                                                                     }
                                                                                 }
                                                                             }
-                                                                        @endphp
-                                                                        @if ( is_array($userCompanies) && in_array($companyId, $userCompanies) )
+                                                                        ?>
+                                                                        <?php if( is_array($userCompanies) && in_array($companyId, $userCompanies) ): ?>
                                                                             <li>
                                                                                 <div class="form-check form-check-success d-flex align-items-center">
-                                                                                    <input class="form-check-input me-3" type="radio" name="audited_by[{{$companyId}}]"
-                                                                                        value="{{ $userId }}" id="audited_by-user-{{ $companyId.$userId }}" {{ $isAudited ? 'checked' : '' }} required>
+                                                                                    <input class="form-check-input me-3" type="radio" name="audited_by[<?php echo e($companyId); ?>]"
+                                                                                        value="<?php echo e($userId); ?>" id="audited_by-user-<?php echo e($companyId.$userId); ?>" <?php echo e($isAudited ? 'checked' : ''); ?> required>
                                                                                     <label class="form-check-label d-flex align-items-center"
-                                                                                        for="audited_by-user-{{ $companyId.$userId }}">
+                                                                                        for="audited_by-user-<?php echo e($companyId.$userId); ?>">
                                                                                         <span class="flex-shrink-0">
                                                                                             <img
-                                                                                            @if(empty(trim($userAvatar)))
-                                                                                                src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                                                                            @else
-                                                                                                src="{{ URL::asset('storage/' . $userAvatar) }}"
-                                                                                            @endif
-                                                                                                alt="{{ $userName }}" class="avatar-xxs rounded-circle">
+                                                                                            <?php if(empty(trim($userAvatar))): ?>
+                                                                                                src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
+                                                                                            <?php else: ?>
+                                                                                                src="<?php echo e(URL::asset('storage/' . $userAvatar)); ?>"
+                                                                                            <?php endif; ?>
+                                                                                                alt="<?php echo e($userName); ?>" class="avatar-xxs rounded-circle">
                                                                                         </span>
-                                                                                        <span class="flex-grow-1 ms-2">{{ $userName }}</span>
+                                                                                        <span class="flex-grow-1 ms-2"><?php echo e($userName); ?></span>
                                                                                     </label>
                                                                                 </div>
                                                                             </li>
-                                                                        @endif
-                                                                    @endforeach
+                                                                        <?php endif; ?>
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                 </ul>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
                                     </div>
                                 </div>
@@ -228,3 +228,4 @@
         </div>
     </div>
 </div>
+<?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/create.blade.php ENDPATH**/ ?>

@@ -16,8 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->bigInteger('template_id')->default(0);
             $table->enum('status', ['new', 'stoped', 'trash', 'pending', 'in_progress', 'completed', 'audited'])->default('new')->comment('The status of the survey task');
-            $table->enum('priority', ['high', 'medium', 'low'])->default('medium')->comment('The priority of the survey task');
+            $table->enum('priority', ['high', 'medium', 'low'])->default('high')->comment('The priority of the survey task');
             $table->date('start_date')->nullable()->comment('The start date of the survey task');
+            $table->json('distributed_data')->nullable();
             $table->timestamp('completed_at')->nullable()->comment('The timestamp when the survey task was completed');
             $table->timestamp('audited_at')->nullable()->comment('The timestamp when the survey task was audited');
             $table->timestamps();

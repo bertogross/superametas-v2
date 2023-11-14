@@ -47,28 +47,23 @@
                 </svg>
             </div>
         </div>
-        @php
-        //appPrintR($data);
-        //appPrintR($default);
-        //exit;
-        @endphp
-        <div>
-            @if ($default)
-                @component('surveys.components.steps-card')
-                    @slot('type', 'default')
-                    @slot('data', $default)
-                    @slot('edition', $edition)
-                @endcomponent
-            @endif
 
-            @if ($custom)
-                @component('surveys.components.steps-card')
-                    @slot('type', 'custom')
-                    @slot('data', $custom)
-                    @slot('edition', $edition)
-                @endcomponent
-            @endif
-        </div>
+        @if ($default)
+            @component('surveys.components.steps-card')
+                @slot('type', 'default')
+                @slot('data', $default)
+                @slot('edition', $edition)
+            @endcomponent
+        @endif
+
+        @if ($custom)
+            @component('surveys.components.steps-card')
+                @slot('type', 'custom')
+                @slot('data', $custom)
+                @slot('edition', $edition)
+            @endcomponent
+        @endif
+
     </div>
 
 @endsection

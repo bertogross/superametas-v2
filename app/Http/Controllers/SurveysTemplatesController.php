@@ -33,10 +33,10 @@ class SurveysTemplatesController extends Controller
 
         $getSurveyRecurringTranslations = SurveyTemplates::getSurveyRecurringTranslations();
 
-        $surveyTemplates = $query->orderBy('updated_at')->paginate(10);
+        $templates = $query->orderBy('updated_at')->paginate(10);
 
         return view('surveys.template.listing', compact(
-            'surveyTemplates',
+            'templates',
             'getSurveyRecurringTranslations'
         ));
     }
@@ -56,7 +56,7 @@ class SurveysTemplatesController extends Controller
             abort(404);
         }
 
-        $decodedData = isset($data->jsondata) && is_string($data->jsondata) ? json_decode($data->jsondata, true) : $data->jsondata;
+        $decodedData = isset($data->template_data) && is_string($data->template_data) ? json_decode($data->template_data, true) : $data->template_data;
 
         $reorderingData = SurveyTemplates::reorderingData($decodedData);
 
@@ -94,7 +94,7 @@ class SurveysTemplatesController extends Controller
 
         $getActiveDepartments = getActiveDepartments();
 
-        $surveyTemplate = $custom = null;
+        $data = $custom = $templates = null;
 
         $default = [];
         foreach($getActiveDepartments as $index => $department){
@@ -110,10 +110,14 @@ class SurveysTemplatesController extends Controller
         }
         $default = array_filter($default);
 
+        $getSurveyRecurringTranslations = SurveyTemplates::getSurveyRecurringTranslations();
+
         return view('surveys.template.create', compact(
-                'surveyTemplate',
+                'data',
+                'custom',
                 'default',
-                'custom'
+                'templates',
+                'getSurveyRecurringTranslations'
             )
         );
     }
@@ -136,7 +140,7 @@ class SurveysTemplatesController extends Controller
             abort(404);
         }
 
-        $decodedData = isset($data->jsondata) && is_string($data->jsondata) ? json_decode($data->jsondata, true) : $data->jsondata;
+        $decodedData = isset($data->template_data) && is_string($data->template_data) ? json_decode($data->template_data, true) : $data->template_data;
 
         $reorderingData = SurveyTemplates::reorderingData($decodedData);
 
@@ -167,7 +171,7 @@ class SurveysTemplatesController extends Controller
         $validatedData = $request->validate([
             'title' => 'required|string|max:191',
             'description' => 'nullable|string|max:1000',
-            'jsondata' => 'required',
+            'template_data' => 'required',
             'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
         ]);
 
@@ -176,39 +180,39 @@ class SurveysTemplatesController extends Controller
             return is_array($value) ? json_encode($value) : $value;
         }, $validatedData);
 
-        $jsondata = $validatedData['jsondata'];
+        $template_data = $validatedData['template_data'];
 
         $userId = auth()->id();
         $validatedData['user_id'] = $userId;
 
         if ($id) {
             // Update operation
-            $surveyTemplate = SurveyTemplates::findOrFail($id);
+            $templates = SurveyTemplates::findOrFail($id);
 
             // Check if the current user is the creator
-            if ($userId != $surveyTemplate->user_id) {
+            if ($userId != $templates->user_id) {
                 return response()->json(['success' => false, 'message' => 'You are not authorized to edit this survey.']);
             }
 
-            $surveyTemplate->update($validatedData);
+            $templates->update($validatedData);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Survey updated successfully!',
-                'id' => $surveyTemplate->id,
-                'json' => $jsondata
+                'message' => 'Modelo atualizado!',
+                'id' => $templates->id,
+                'json' => $template_data
             ]);
         } else {
             // Store operation
-            $surveyTemplate = new SurveyTemplates;
-            $surveyTemplate->fill($validatedData);
-            $surveyTemplate->save();
+            $templates = new SurveyTemplates;
+            $templates->fill($validatedData);
+            $templates->save();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Survey saved successfully!',
-                'id' => $surveyTemplate->id,
-                'json' => $jsondata
+                'message' => 'Modelo salvo!',
+                'id' => $templates->id,
+                'json' => $template_data
             ]);
         }
     }
