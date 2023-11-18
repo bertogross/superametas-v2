@@ -15,7 +15,7 @@
             $topics = $step['topics'] ?? null;
         ?>
 
-        <?php if( $stepData): ?>
+        <?php if( $stepData && $topics ): ?>
             <div class="card joblist-card">
                 <div class="card-body">
                     <div class="d-flex">
@@ -40,7 +40,7 @@
                             $originalPosition = $topic['original_position'] ?? $topicIndex;
                             $newPosition = $topic['new_position'] ?? $originalPosition;
                         ?>
-                        <div class="card-footer border-top-dashed bg-dark <?php echo e($bg); ?>">
+                        <div class="card-footer border-top-dashed <?php echo e($bg); ?>">
                             <div class="row">
                                 <div class="col">
                                     <h5 class="mb-0">

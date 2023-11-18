@@ -121,7 +121,23 @@
                     </div>
                 </div>
 
-                
+                <div class="ms-1 header-item d-none d-sm-flex">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" data-toggle="fullscreen">
+                        <i class="bx bx-fullscreen fs-22"></i>
+                    </button>
+                </div>
+
+                <div class="ms-1 header-item d-none d-sm-flex">
+                    <button type="button" id="btn-light-dark-mode" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"  data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Alternar Visual">
+                        <i class="bx bx-moon fs-22"></i>
+                    </button>
+                </div>
+
+                <?php $__env->startComponent('components.notifications'); ?>
+                    <?php $__env->slot('url'); ?>
+                        
+                    <?php $__env->endSlot(); ?>
+                <?php echo $__env->renderComponent(); ?>
 
                 <div class="dropdown ms-sm-3 header-item topbar-user">
                     <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

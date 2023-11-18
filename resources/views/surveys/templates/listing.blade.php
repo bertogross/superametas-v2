@@ -37,7 +37,7 @@
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <div class="flex-grow-1">
-                                        <p class="text-uppercase fw-medium text-white text-truncate mb-0">{{ limitChars($template->title, 30) }}</p>
+                                        <p class="text-uppercase fw-medium text-body text-truncate mb-0">{{ limitChars($template->title, 30) }}</p>
                                     </div>
                                     <div class="flex-shrink-0">
                                         <div class="dropdown dropstart">

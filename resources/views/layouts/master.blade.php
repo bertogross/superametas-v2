@@ -1,6 +1,8 @@
 <!doctype html >
-<html class="no-focus" moznomarginboxes mozdisallowselectionprint lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-layout="horizontal" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-layout-mode="dark" data-layout-style="default" data-layout-width="fluid" data-layout-position="fixed" data-preloader="disable" data-bs-theme="dark" data-sidebar-visibility="show">
-
+@php
+    $userTheme = getUserMeta(auth()->id(), 'theme');
+@endphp
+<html class="no-focus" moznomarginboxes mozdisallowselectionprint lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-layout="horizontal" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-bs-theme="{{ $userTheme ?? 'dark' }}" data-layout-width="fluid" data-layout-position="fixed" data-layout-style="default" data-sidebar-visibility="show"><head>
 <head>
     <meta charset="utf-8" />
     <title>@yield('title') | {{env('APP_NAME')}}</title>
@@ -46,7 +48,7 @@
         <!-- JAVASCRIPT -->
         @include('layouts.vendor-scripts')
 
-        <div id="custom-backdrop" class="d-none text-muted">
+        <div id="custom-backdrop" class="d-none text-white">
             <div style="display: flex; align-items: flex-end; justify-content: flex-start; height: 100vh; padding: 25px; padding-bottom: 70px;">
                 Para continuar trabalhando enquanto este processo está em andamento, <a href="{{ url('/') }}" target="_blank" class="text-theme me-1 ms-1">clique aqui</a> para abrir o {{ env('APP_NAME') }} em nova guia
             </div>

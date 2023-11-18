@@ -14,3 +14,8 @@ window.App = {!! json_encode([
 ]) !!};
 </script>
 <script src="{{ URL::asset('build/js/app.js') }}"></script>
+
+<script>
+    var profileChangeLayoutModeURL = "{{ route('profileChangeLayoutModeURL') }}";
+</script>
+<script src="{{ URL::asset('build/js/app-custom.js') }}" type="module"></script>

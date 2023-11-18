@@ -40,7 +40,7 @@
                             $originalPosition = $topic['original_position'] ?? $topicIndex;
                             $newPosition = $topic['new_position'] ?? $originalPosition;
                         @endphp
-                        <div class="card-footer border-top-dashed bg-dark {{ $bg }}">
+                        <div class="card-footer border-top-dashed {{ $bg }}">
                             <div class="row">
                                 <div class="col">
                                     <h5 class="mb-0">

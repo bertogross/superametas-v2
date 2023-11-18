@@ -63,7 +63,7 @@
 
                             <div>
                                 <label for="description" class="form-label">Descrição:</label>
-                                <textarea name="description" class="form-control maxlength" maxlength="1000" id="description" rows="7" maxlength="500" placeholder="Descreva, por exemplo, a funcionalidade ou destino deste modelo..."><?php echo e($description); ?></textarea>
+                                <textarea name="description" class="form-control maxlength" maxlength="1000" id="description" rows="3" maxlength="500" placeholder="Descreva, por exemplo, a funcionalidade ou destino deste modelo..."><?php echo e($description); ?></textarea>
                                 <div class="form-text">Opcional</div>
                             </div>
 

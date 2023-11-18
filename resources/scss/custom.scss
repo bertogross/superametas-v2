@@ -472,8 +472,12 @@ pre:empty{
 
 .flatpickr-months,
 .flatpickr-monthSelect-theme-dark{
-    background-color: var(--vz-input-bg-custom) !important;
-    background: var(--vz-input-bg-custom) !important;
+    background-color: var(--vz-gray-800) !important;
+    background: var(--vz-gray-800) !important;
+}
+
+[data-bs-theme="dark"] #btn-light-dark-mode .bx-moon::before {
+    content: "\ec34";
 }
 
 .flatpickr-day.selected,
@@ -491,6 +495,10 @@ pre:empty{
 
 .flatpickr-calendar.arrowBottom::after {
   border-top-color: var(--vz-theme) !important;
+}
+
+.flatpickr-calendar.arrowTop::before {
+    border-bottom-color: var(--vz-theme) !important;
 }
 
 .form-control.flatpickr-range-year.input,

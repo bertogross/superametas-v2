@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\UserMeta;
 
 
 class ProfileController extends Controller
@@ -39,6 +40,24 @@ class ProfileController extends Controller
         }
 
         return view('profile.index', compact('user'));
+    }
+
+    public function ChangeLayoutMode(Request $request){
+
+        $userId = auth()->id();
+
+        $theme = $request->json('theme');
+
+        UserMeta::updateOrCreate(
+            ['user_id' => $userId, 'meta_key' => 'theme'],
+            ['meta_value' => $theme]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Layout modificado!'
+        ]);
+
     }
 
 }

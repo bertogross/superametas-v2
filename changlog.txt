@@ -7,10 +7,31 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 https://laravel-news.com/openai-for-laravel
 
 
+Version 2.0.26 - [2023-11-18]
+- [Added] Stripe
+- [Updated] settings/account views
+
+
+
+Version 2.0.25 - [2023-11-18]
+- [Added] app-custom.js
+- [Added] Overwrite the native app initModeSetting function
+- [Updated] acustom.css
+- [Updated] routes/web.php
+
+
 
 Version 2.0.24 - [2023-11-11 - 2023-11-17]
 - [Added] HTML: blade pages (/surveys/terms)
 - [Added] SurveyTemplatesController and model/SurveyTemplates
+- [Added] model/SurveyResponse
+- [Added] model/SurveyAuditorAssigment
+- [Added] model/SurveyTopic
+- [Added] model/SurveyStep
+- [Updated] SurveyController and model/Survey
+- [Updated] SurveysTermsController and model/SurveyTerms
+- [Updated] all surveys js files
+- [Updated] routes/web.php
 
 
 
@@ -19,6 +40,7 @@ Version 2.0.23 - [2023-11-08 - 2023-11-11]
 - [Removed] surveys-compose.js
 - [Removed] HTML: blade pages (/surveys/composes)
 - [Updated] HTML: all blade pages (/surveys)
+- [Updated] routes/web.php
 
 
 
@@ -34,6 +56,7 @@ Version 2.0.23 - [2023-11-01 - 2023-11-08]
 
 Version 2.0.22 - [2023-10-31]
 - [Added] HTML: blade pages (/surveys/compose)
+- [Updated] routes/web.php
 
 
 
@@ -50,6 +73,8 @@ Version 2.0.20 - [2023-10-30]
     - https://scenex.jina.ai/
         - https://scenex.jina.ai/api
             - https://github.com/jina-ai/jinaai-js
+- [Updated] routes/web.php
+- [Updated] routes/api.php
 
 
 
@@ -66,7 +91,8 @@ Version 2.0.19 - [2023-10-29]
         - https://github.com/Clarifai/clarifai-php-grpc/
 
         - https://platform.openai.com/account/api-keys [login contact@upididu.com Google Account]
-
+- [Updated] routes/web.php
+- [Updated] routes/api.php
 
 
 Version 2.0.18 - [2023-10-28 - 2023-10-29]
@@ -83,7 +109,8 @@ Version 2.0.18 - [2023-10-28 - 2023-10-29]
             6. Enter a name for your app and click "Create App".
             7. Once your app is created, you will be taken to the app's settings page. Here you will find your "App key" and "App secret".
             8. Copy the "App key" and use it in your `.env` file as the value for `DROPBOX_APP_KEY`.
-
+- [Updated] routes/web.php
+- [Updated] routes/api.php
 
 
 Version 2.0.18 - [2023-10-27]

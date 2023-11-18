@@ -19,7 +19,7 @@
                     
 
                     <div class="col-sm-12 col-md col-lg">
-                        <input type="text" class="form-control bg-light border-light flatpickr-range" name="created_at" placeholder="Período" data-min-date="<?php echo e($firstDate); ?>" data-max-date="<?php echo e($lastDate); ?>" value="<?php echo e(request('created_at')); ?>">
+                        <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="Período" data-min-date="<?php echo e($firstDate); ?>" data-max-date="<?php echo e($lastDate); ?>" value="<?php echo e(request('created_at')); ?>">
                     </div>
 
                     <div class="col-sm-12 col-md col-lg">
@@ -42,7 +42,7 @@
         </div>
     <?php endif; ?>
 
-    <div class="card-body pt-1">
+    <div class="card-body">
         <?php if( !$data || $data->isEmpty() ): ?>
             <?php $__env->startComponent('components.nothing'); ?>
                 

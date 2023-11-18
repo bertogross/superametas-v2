@@ -14,4 +14,9 @@ window.App = <?php echo json_encode([
 ]); ?>;
 </script>
 <script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
+
+<script>
+    var profileChangeLayoutModeURL = "<?php echo e(route('profileChangeLayoutModeURL')); ?>";
+</script>
+<script src="<?php echo e(URL::asset('build/js/app-custom.js')); ?>" type="module"></script>
 <?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/layouts/vendor-scripts.blade.php ENDPATH**/ ?>

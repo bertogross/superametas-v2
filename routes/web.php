@@ -43,6 +43,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/update-password/{id}', [ProfileController::class, 'updatePassword'])->name('updatePasswordURL');
     });
     Route::get('/profile/{id?}', [ProfileController::class, 'show'])->name('profileShowURL');
+    Route::post('/profile/layout-mode', [ProfileController::class, 'ChangeLayoutMode'])->name('profileChangeLayoutModeURL');
 
     // Goal Sales Routes
     Route::prefix('goal-sales')->group(function () {

@@ -36,7 +36,7 @@
                     --}}
 
                     <div class="col-sm-12 col-md col-lg">
-                        <input type="text" class="form-control bg-light border-light flatpickr-range" name="created_at" placeholder="Período" data-min-date="{{ $firstDate }}" data-max-date="{{ $lastDate }}" value="{{ request('created_at') }}">
+                        <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="Período" data-min-date="{{ $firstDate }}" data-max-date="{{ $lastDate }}" value="{{ request('created_at') }}">
                     </div>
 
                     <div class="col-sm-12 col-md col-lg">
@@ -59,7 +59,7 @@
         </div>
     @endif
 
-    <div class="card-body pt-1">
+    <div class="card-body">
         @if ( !$data || $data->isEmpty() )
             @component('components.nothing')
                 {{--

@@ -51,7 +51,7 @@
 
                                 <h2 class="text-body mb-2 h4">Departamentos</h2>
                                 <p>Renomeie cada dos departamentos caso entenda que será necessário para fins de exibição em relatórios </p>
-                                <div class="table-responsive border border-1 border-dark rounded rounded-2">
+                                <div class="table-responsive border border-1 border-light rounded rounded-2">
                                     <table class="table table-striped mb-0">
                                         <thead class="table-light text-uppercase">
                                             <tr>
@@ -119,7 +119,7 @@
 
                                 <h2 class="text-body mb-2 h4">Empresas</h2>
                                 <p>Renomeie cada das empresas caso entenda que será necessário para fins de exibição em relatórios </p>
-                                <div class="table-responsive border border-1 border-dark rounded rounded-2">
+                                <div class="table-responsive border border-1 border-light rounded rounded-2">
                                     <table class="table table-striped mb-0">
                                         <thead class="table-light text-uppercase">
                                             <tr>

@@ -67,6 +67,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('contextmenu', preventRightClick);
 
         try {
+            // Sleep for X miliseconds
+            let ms = 2000;
+            await new Promise(resolve => setTimeout(resolve, ms));
+
             //document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">A importação poderá levar algum tempo. Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
             document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
 
@@ -109,9 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Determine next steps based on progress
             const nextMeantime = incrementMonth(meantime);
             if (new Date(nextMeantime) <= new Date()) {
-                setTimeout(() => {
-                    makeRequests(nextMeantime, initialMeantime, completedIterations + 1);
-                }, 2000);
+                makeRequests(nextMeantime, initialMeantime, completedIterations + 1);
             } else {
                 finalizeSynchronization('success', 'Concluído', '100%');
             }

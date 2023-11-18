@@ -1,6 +1,4 @@
 @php
-    use App\Models\SurveyTemplates;
-
     $surveyId = $data && $data->id ? $data->id : '';
     $templateId = $data && $data->template_id ? $data->template_id : '';
     $startDate = $data ? $data->start_date : null;
@@ -9,8 +7,10 @@
     $distributedData = $data->distributed_data ?? null;
         $distributedData = $distributedData ? json_decode($distributedData, true) : '';
 
-    $recurring = $data && $data->recurring ? $data->recurring : ''
+    $recurring = $data && $data->recurring ? $data->recurring : '';
 
+    //appPrintR($data);
+    //appPrintR($templates);
 @endphp
 <div class="modal fade" id="surveysModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -67,19 +67,26 @@
                         <div class="tab-pane fade show active" role="tabpanel"
                         id="steparrow-template-info"
                         aria-labelledby="steparrow-template-info-tab">
-                            <div class="mb-3">
-                                <label for="template-field" class="form-label">Selecione o Modelo:</label>
-                                <select name="template_id" id="template-field" class="form-control form-select" required>
-                                    <option value="" {{ empty($templateId) ? 'selected' : ''  }} disabled>- Selecione -</option>
-                                    @foreach ($templates as $template)
-                                        <option value="{{$template->id}}" {{ isset($template->id) && $template->id == $templateId ? 'selected' : ''}}>{{ $template->title ? e($template->title) : '' }} {{ $template->recurring ? ' [ Recorrência: '.$getSurveyRecurringTranslations[$template->recurring]['label'].' ]' : '' }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
 
-                            <div class="d-flex align-items-start gap-3 mt-4">
-                                <button type="button" class="btn btn-outline-theme btn-label right ms-auto nexttab" data-nexttab="steparrow-recurring-info-tab"><i class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>Próximo</button>
-                            </div>
+                            @if ( !$templates || $templates->isEmpty() )
+                                @component('components.nothing')
+                                    @slot('warning', 'Será necessário primeiramente <u>Compor</u> um Formulário <u>Modelo</u>')
+                                @endcomponent
+                            @else
+                                <div class="mb-3">
+                                    <label for="template-field" class="form-label">Selecione o Modelo:</label>
+                                    <select name="template_id" id="template-field" class="form-control form-select" required>
+                                        <option value="" {{ empty($templateId) ? 'selected' : ''  }} disabled>- Selecione -</option>
+                                        @foreach ($templates as $template)
+                                            <option value="{{$template->id}}" {{ isset($template->id) && $template->id == $templateId ? 'selected' : ''}}>{{ $template->title ? e($template->title) : '' }} {{ $template->recurring ? ' [ Recorrência: '.$getSurveyRecurringTranslations[$template->recurring]['label'].' ]' : '' }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="d-flex align-items-start gap-3 mt-4">
+                                    <button type="button" class="btn btn-outline-theme btn-label right ms-auto nexttab" data-nexttab="steparrow-recurring-info-tab"><i class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>Próximo</button>
+                                </div>
+                            @endif
                         </div>
 
                         <div class="tab-pane fade" role="tabpanel"
@@ -105,132 +112,142 @@
                         <div class="tab-pane fade" role="tabpanel"
                         id="steparrow-users-info"
                         aria-labelledby="steparrow-users-info-tab">
-                            <div>
-                                <label class="form-label mb-0">Atribuições para esta Vistoria:</label>
-                                <div class="form-text mt-0 mb-2">Selecione para cada das Lojas o colaborador(a) que irá proceder com a <strong>Vistoria</strong> e outro(a) na <strong>Auditoria</strong></div>
-                                <div class="row">
-                                    <div class="col-sm-6 col-md-4 col-lg-4 col-xxl-3">
-                                        <div class="nav nav-pills flex-column nav-pills-tab verti-nav-pills custom-verti-nav-pills nav-pills-theme" role="tablist" aria-orientation="vertical">
-                                            @foreach ($getAuthorizedCompanies as $key => $companyId)
-                                                <a class="nav-link text-uppercase {{ $key == 0 ? 'active' : '' }} text-uppercase" data-bs-target="#distributed-tab-company-{{ $companyId }}" id="distributed-tab-company-{{ $companyId }}-tab" data-bs-toggle="pill" role="tab" aria-controls="v-pills-account" aria-selected="true">{{ getCompanyAlias($companyId) }}</a>
-                                            @endforeach
+                            @if ( empty($getAuthorizedCompanies) || !is_array($getAuthorizedCompanies) )
+                                @component('components.nothing')
+                                    @slot('warning', 'Será necessário primeiramente solicitar a(o) Administrador(a) a autorização de acesso a Lojas')
+                                @endcomponent
+                            @elseif (empty($users))
+                                @component('components.nothing')
+                                    @slot('warning', 'Não há usuários cadastrados/ativos. Consulte o(a) Administrador(a)')
+                                @endcomponent
+                            @else
+                                <div>
+                                    <label class="form-label mb-0">Atribuições para esta Vistoria:</label>
+                                    <div class="form-text mt-0 mb-2">Selecione para cada das Lojas o colaborador(a) que irá proceder com a <strong>Vistoria</strong> e outro(a) na <strong>Auditoria</strong></div>
+                                    <div class="row">
+                                        <div class="col-sm-6 col-md-4 col-lg-4 col-xxl-3">
+                                            <div class="nav nav-pills flex-column nav-pills-tab verti-nav-pills custom-verti-nav-pills nav-pills-theme" role="tablist" aria-orientation="vertical">
+                                                @foreach ($getAuthorizedCompanies as $key => $companyId)
+                                                    <a class="nav-link text-uppercase {{ $key == 0 ? 'active' : '' }} text-uppercase" data-bs-target="#distributed-tab-company-{{ $companyId }}" id="distributed-tab-company-{{ $companyId }}-tab" data-bs-toggle="pill" role="tab" aria-controls="v-pills-account" aria-selected="true">{{ getCompanyAlias($companyId) }}</a>
+                                                @endforeach
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-6 col-md-8 col-lg-8 col-xxl-9">
-                                        <div class="tab-content p-0 bg-light h-100">
-                                            @foreach ($getAuthorizedCompanies as $key => $companyId)
-                                                <div class="tab-pane fade show {{ $key == 0 ? 'active' : '' }} p-3" id="distributed-tab-company-{{ $companyId }}" role="tabpanel" aria-labelledby="distributed-tab-company-{{ $companyId }}-tab">
-                                                    <div class="row">
-                                                        <div class="col mb-3">
-                                                            <h6><span class="text-theme">Vistoria</span> Atribuída a:</h6>
+                                        <div class="col-sm-6 col-md-8 col-lg-8 col-xxl-9">
+                                            <div class="tab-content p-0 bg-light h-100">
+                                                @foreach ($getAuthorizedCompanies as $key => $companyId)
+                                                    <div class="tab-pane fade show {{ $key == 0 ? 'active' : '' }} p-3" id="distributed-tab-company-{{ $companyId }}" role="tabpanel" aria-labelledby="distributed-tab-company-{{ $companyId }}-tab">
+                                                        <div class="row">
+                                                            <div class="col mb-3">
+                                                                <h6><span class="text-theme">Vistoria</span> Atribuída a:</h6>
 
-                                                            <div class="bg-light p-3 rounded-2">
-                                                                <ul class="list-unstyled vstack gap-2 mb-0">
-                                                                    @foreach ($users as $user)
-                                                                        @php
-                                                                            $userId = $user->id;
-                                                                            $userName = $user->name;
-                                                                            $userAvatar = $user->avatar;
-                                                                            $userCompanies = getAuthorizedCompanies($userId) ?? null;
-                                                                            $isDelegated = false;
+                                                                <div class="bg-light p-3 rounded-2">
+                                                                    <ul class="list-unstyled vstack gap-2 mb-0">
+                                                                        @foreach ($users as $user)
+                                                                            @php
+                                                                                $userId = $user->id;
+                                                                                $userName = $user->name;
+                                                                                $userAvatar = $user->avatar;
+                                                                                $userCompanies = getAuthorizedCompanies($userId) ?? null;
+                                                                                $isDelegated = false;
 
-                                                                            // Loop through the distributed data to find if this user has been delegated to this company
-                                                                            if( $data && isset($distributedData) && is_array($distributedData['delegated_to']) ){
-                                                                                foreach ($distributedData['delegated_to'] as $delegation) {
-                                                                                    if ($delegation['company_id'] == $companyId && $delegation['user_id'] == $userId) {
-                                                                                        $isDelegated = true;
-                                                                                        break;
+                                                                                // Loop through the distributed data to find if this user has been delegated to this company
+                                                                                if( $data && isset($distributedData) && is_array($distributedData['delegated_to']) ){
+                                                                                    foreach ($distributedData['delegated_to'] as $delegation) {
+                                                                                        if ($delegation['company_id'] == $companyId && $delegation['user_id'] == $userId) {
+                                                                                            $isDelegated = true;
+                                                                                            break;
+                                                                                        }
                                                                                     }
                                                                                 }
-                                                                            }
-                                                                        @endphp
-                                                                        @if ( is_array($userCompanies) && in_array($companyId, $userCompanies) )
-                                                                            <li>
-                                                                                <div class="form-check form-check-success d-flex align-items-center">
-                                                                                    <input class="form-check-input me-3" type="radio" name="delegated_to[{{$companyId}}]"
-                                                                                        value="{{ $userId }}" id="delegated_to-user-{{ $companyId.$userId }}" {{ $isDelegated ? 'checked' : '' }} required>
-                                                                                    <label class="form-check-label d-flex align-items-center"
-                                                                                        for="delegated_to-user-{{ $companyId.$userId }}">
-                                                                                        <span class="flex-shrink-0">
-                                                                                            <img
-                                                                                            @if(empty(trim($userAvatar)))
-                                                                                                src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                                                                            @else
-                                                                                                src="{{ URL::asset('storage/' . $userAvatar) }}"
-                                                                                            @endif
-                                                                                                alt="{{ $userName }}" class="avatar-xxs rounded-circle">
-                                                                                        </span>
-                                                                                        <span class="flex-grow-1 ms-2">{{ $userName }}</span>
-                                                                                    </label>
-                                                                                </div>
-                                                                            </li>
-                                                                        @endif
-                                                                    @endforeach
-                                                                </ul>
+                                                                            @endphp
+                                                                            @if ( is_array($userCompanies) && in_array($companyId, $userCompanies) )
+                                                                                <li>
+                                                                                    <div class="form-check form-check-success d-flex align-items-center">
+                                                                                        <input class="form-check-input me-3" type="radio" name="delegated_to[{{$companyId}}]"
+                                                                                            value="{{ $userId }}" id="delegated_to-user-{{ $companyId.$userId }}" {{ $isDelegated ? 'checked' : '' }} required>
+                                                                                        <label class="form-check-label d-flex align-items-center"
+                                                                                            for="delegated_to-user-{{ $companyId.$userId }}">
+                                                                                            <span class="flex-shrink-0">
+                                                                                                <img
+                                                                                                @if(empty(trim($userAvatar)))
+                                                                                                    src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
+                                                                                                @else
+                                                                                                    src="{{ URL::asset('storage/' . $userAvatar) }}"
+                                                                                                @endif
+                                                                                                    alt="{{ $userName }}" class="avatar-xxs rounded-circle">
+                                                                                            </span>
+                                                                                            <span class="flex-grow-1 ms-2">{{ $userName }}</span>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </li>
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </ul>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="col mb-3">
-                                                            <h6><span class="text-theme">Auditoria</span> Atribuída a:</h6>
+                                                            <div class="col mb-3">
+                                                                <h6><span class="text-theme">Auditoria</span> Atribuída a:</h6>
 
-                                                            <div class="bg-light p-3 rounded-2">
-                                                                <ul class="list-unstyled vstack gap-2 mb-0">
-                                                                    @foreach ($users as $user)
-                                                                        @php
-                                                                            $userId = $user->id;
-                                                                            $userName = $user->name;
-                                                                            $userAvatar = $user->avatar;
-                                                                            $userCompanies = getAuthorizedCompanies($userId) ?? null;
+                                                                <div class="bg-light p-3 rounded-2">
+                                                                    <ul class="list-unstyled vstack gap-2 mb-0">
+                                                                        @foreach ($users as $user)
+                                                                            @php
+                                                                                $userId = $user->id;
+                                                                                $userName = $user->name;
+                                                                                $userAvatar = $user->avatar;
+                                                                                $userCompanies = getAuthorizedCompanies($userId) ?? null;
 
-                                                                            $isAudited = false;
+                                                                                $isAudited = false;
 
-                                                                            // Loop through the distributed data to find if this user has been delegated to this company
-                                                                            if( $data && isset($distributedData) && is_array($distributedData['audited_by']) ){
-                                                                                foreach ($distributedData['audited_by'] as $auditation) {
-                                                                                    if ($auditation['company_id'] == $companyId && $auditation['user_id'] == $userId) {
-                                                                                        $isAudited = true;
-                                                                                        break;
+                                                                                // Loop through the distributed data to find if this user has been delegated to this company
+                                                                                if( $data && isset($distributedData) && is_array($distributedData['audited_by']) ){
+                                                                                    foreach ($distributedData['audited_by'] as $auditation) {
+                                                                                        if ($auditation['company_id'] == $companyId && $auditation['user_id'] == $userId) {
+                                                                                            $isAudited = true;
+                                                                                            break;
+                                                                                        }
                                                                                     }
                                                                                 }
-                                                                            }
-                                                                        @endphp
-                                                                        @if ( is_array($userCompanies) && in_array($companyId, $userCompanies) )
-                                                                            <li>
-                                                                                <div class="form-check form-check-success d-flex align-items-center">
-                                                                                    <input class="form-check-input me-3" type="radio" name="audited_by[{{$companyId}}]"
-                                                                                        value="{{ $userId }}" id="audited_by-user-{{ $companyId.$userId }}" {{ $isAudited ? 'checked' : '' }} required>
-                                                                                    <label class="form-check-label d-flex align-items-center"
-                                                                                        for="audited_by-user-{{ $companyId.$userId }}">
-                                                                                        <span class="flex-shrink-0">
-                                                                                            <img
-                                                                                            @if(empty(trim($userAvatar)))
-                                                                                                src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                                                                            @else
-                                                                                                src="{{ URL::asset('storage/' . $userAvatar) }}"
-                                                                                            @endif
-                                                                                                alt="{{ $userName }}" class="avatar-xxs rounded-circle">
-                                                                                        </span>
-                                                                                        <span class="flex-grow-1 ms-2">{{ $userName }}</span>
-                                                                                    </label>
-                                                                                </div>
-                                                                            </li>
-                                                                        @endif
-                                                                    @endforeach
-                                                                </ul>
+                                                                            @endphp
+                                                                            @if ( is_array($userCompanies) && in_array($companyId, $userCompanies) )
+                                                                                <li>
+                                                                                    <div class="form-check form-check-success d-flex align-items-center">
+                                                                                        <input class="form-check-input me-3" type="radio" name="audited_by[{{$companyId}}]"
+                                                                                            value="{{ $userId }}" id="audited_by-user-{{ $companyId.$userId }}" {{ $isAudited ? 'checked' : '' }} required>
+                                                                                        <label class="form-check-label d-flex align-items-center"
+                                                                                            for="audited_by-user-{{ $companyId.$userId }}">
+                                                                                            <span class="flex-shrink-0">
+                                                                                                <img
+                                                                                                @if(empty(trim($userAvatar)))
+                                                                                                    src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
+                                                                                                @else
+                                                                                                    src="{{ URL::asset('storage/' . $userAvatar) }}"
+                                                                                                @endif
+                                                                                                    alt="{{ $userName }}" class="avatar-xxs rounded-circle">
+                                                                                            </span>
+                                                                                            <span class="flex-grow-1 ms-2">{{ $userName }}</span>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </li>
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </ul>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            @endforeach
+                                                @endforeach
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="d-flex align-items-start gap-3 mt-4">
-                                <button type="button" class="btn btn-light btn-label previestab" data-previous="steparrow-recurring-info-tab"><i class="ri-arrow-left-line label-icon align-middle fs-16 me-2"></i> Voltar</button>
+                                <div class="d-flex align-items-start gap-3 mt-4">
+                                    <button type="button" class="btn btn-light btn-label previestab" data-previous="steparrow-recurring-info-tab"><i class="ri-arrow-left-line label-icon align-middle fs-16 me-2"></i> Voltar</button>
 
-                                <button type="button" class="btn btn-outline-theme btn-label right ms-auto nexttab" data-nexttab="steparrow-success-tab"><i class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>Próximo</button>
-                            </div>
+                                    <button type="button" class="btn btn-outline-theme btn-label right ms-auto nexttab" data-nexttab="steparrow-success-tab"><i class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>Próximo</button>
+                                </div>
+                            @endif
                         </div>
 
                         <div class="tab-pane fade" role="tabpanel"
