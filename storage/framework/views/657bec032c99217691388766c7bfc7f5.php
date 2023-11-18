@@ -12,7 +12,7 @@
 <?php $__env->startSection('content'); ?>
     
 
-    <div class="row">
+    <div class="row mb-3">
         <div class="col">
             <div class="row mb-3 pb-1">
                 <div class="col-12">
@@ -38,7 +38,7 @@
 
             <div class="row">
                 <div class="col-sm-12 col-md-12 col-lg-4 col-xxl-3">
-                    <?php echo $__env->make('surveys.template.listing', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                    <?php echo $__env->make('surveys.templates.listing', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                 </div>
 
                 <div class="col-sm-12 col-md-12 col-lg-8 col-xxl-9">
@@ -59,7 +59,7 @@
                         <div class="p-3">
                             TODO
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -76,7 +76,7 @@
     <script>
         var totalCompanies = <?php echo e(!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) ? count($getAuthorizedCompanies) : 1); ?>;
 
-        var surveysIndexURL = "<?php echo e(route('surveysCreateURL')); ?>";
+        var surveysIndexURL = "<?php echo e(route('surveysIndexURL')); ?>";
         var surveysCreateURL = "<?php echo e(route('surveysCreateURL')); ?>";
         var surveysEditURL = "<?php echo e(route('surveysEditURL')); ?>";
         var surveysShowURL = "<?php echo e(route('surveysShowURL')); ?>";

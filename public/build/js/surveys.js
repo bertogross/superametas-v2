@@ -1,5 +1,6 @@
 import {
     toastAlert,
+    sweetAlerts,
     initFlatpickr,
     initFlatpickrRange,
     maxLengthTextarea,
@@ -8,7 +9,8 @@ import {
     wizardFormSteps,
     multipleModal,
     bsPopoverTooltip,
-    layouRightSide
+    layouRightSide,
+    toggleTableRows
 } from './helpers.js';
 
 /*
@@ -51,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.open('GET', url, true);
         xhr.setRequestHeader('Cache-Control', 'no-cache'); // Set the Cache-Control header to no-cache
         xhr.onreadystatechange = function() {
-            if (xhr.status == 200) { // xhr.readyState == 4 && 
+            if (xhr.readyState == 4 && xhr.status == 200) {
                 if(xhr.responseText){
                     document.getElementById('modalContainer').innerHTML = xhr.responseText;
 
@@ -186,6 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+
     // Make the preview request
     var idInput = document.querySelector('input[name="id"]');
     var idValue = idInput ? idInput.value : null;
@@ -197,6 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initFlatpickr();
     maxLengthTextarea();
     layouRightSide();
+    toggleTableRows();
    // choicesListeners(surveysTermsSearchURL, surveysStoreOrUpdateURL, choicesSelectorClass);
 
 });

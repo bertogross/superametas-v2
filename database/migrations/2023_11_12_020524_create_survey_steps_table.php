@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('survey_steps', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('survey_id')->constrained('surveys')->onDelete('cascade');
-            $table->string('step_name', 191)->nullable();
+            $table->bigInteger('user_id')->nullable();
+            $table->bigInteger('survey_id')->nullable();
+            $table->bigInteger('term_id')->nullable();
             $table->integer('step_order')->default(0);
             $table->timestamps();
         });

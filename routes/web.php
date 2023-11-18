@@ -13,9 +13,10 @@ use App\Http\Controllers\{
     GoalSalesController,
     SurveysController,
     SurveysTemplatesController,
+    SurveyTermsController,
     //SurveysComposeController,
     //SurveyExecutionController,
-    //SurveyTermController,
+    //SurveyTermsController,
     SettingsApiKeysController,
     DropboxController,
     ClarifaiImageController,
@@ -29,10 +30,13 @@ Auth::routes();
 // Language Translation
 Route::get('index/{locale}', [HomeController::class, 'lang']);
 
-// Root
-Route::get('/', [HomeController::class, 'root'])->name('root');
-
+//
 Route::middleware(['auth'])->group(function () {
+
+    // Root
+    //Route::get('/', [HomeController::class, 'root'])->name('root');
+    Route::get('/', [GoalSalesController::class, 'index'])->name('root');
+
     // User Profile & Password Update
     Route::prefix('user')->group(function () {
         Route::post('/update-profile/{id}', [ProfileController::class, 'updateProfile'])->name('updateProfileURL');
@@ -76,14 +80,13 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/compose/toggle-status/{id?}/{status?}', [SurveysComposeController::class, 'toggleStatus'])->name('surveysComposeToggleStatusURL');
             */
 
-        // Term Routes
-        /*
-        Route::get('/terms/listing', [SurveyTermController::class, 'index'])->name('surveysTermsIndexURL');
-        Route::get('/terms/create', [SurveyTermController::class, 'create'])->name('surveysTermsCreateURL');
-        Route::get('/terms/edit/{id?}', [SurveyTermController::class, 'edit'])->name('surveysTermsEditURL');
-        Route::post('/terms/store', [SurveyTermController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
-        Route::get('/terms/search', [SurveyTermController::class, 'search'])->name('surveysTermsSearchURL');
-        */
+            // Terms Routes
+            Route::get('/terms/listing', [SurveyTermsController::class, 'index'])->name('surveysTermsIndexURL');
+            Route::get('/terms/create', [SurveyTermsController::class, 'create'])->name('surveysTermsCreateURL');
+            Route::get('/terms/form', [SurveyTermsController::class, 'form'])->name('surveysTermsFormURL');
+            Route::get('/terms/edit/{id?}', [SurveyTermsController::class, 'edit'])->name('surveysTermsEditURL');
+            Route::post('/terms/store/{id?}', [SurveyTermsController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
+            Route::get('/terms/search', [SurveyTermsController::class, 'search'])->name('surveysTermsSearchURL');
     });
 
 

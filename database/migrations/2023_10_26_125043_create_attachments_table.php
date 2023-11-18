@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->bigInteger('user_id')->nullable();
             $table->bigInteger('parent_id')->default(0);
             $table->string('url')->nullable();
             $table->string('type')->nullable();

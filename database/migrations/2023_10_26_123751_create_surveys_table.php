@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('surveys', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->bigInteger('user_id')->nullable();
             $table->bigInteger('template_id')->default(0);
             $table->enum('status', ['new', 'stoped', 'trash', 'pending', 'in_progress', 'completed', 'audited'])->default('new')->comment('The status of the survey task');
             $table->enum('priority', ['high', 'medium', 'low'])->default('high')->comment('The priority of the survey task');
-            $table->date('start_date')->nullable()->comment('The start date of the survey task');
-            $table->json('distributed_data')->nullable();
+            $table->enum('recurring', ['once', 'daily', 'weekly', 'biweekly', 'monthly', 'annual'])->default('once');
+            $table->json('distributed_data')->nullable()->comment('The json data to to use to populate the _assigments');
+            $table->json('template_data')->nullable()->comment('The json data from survey_templates table');
+            $table->date('started_at')->nullable()->comment('The start date of the survey task');
             $table->timestamp('completed_at')->nullable()->comment('The timestamp when the survey task was completed');
             $table->timestamp('audited_at')->nullable()->comment('The timestamp when the survey task was audited');
             $table->timestamps();

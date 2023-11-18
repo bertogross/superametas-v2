@@ -1,5 +1,5 @@
 @php
-    $userId = getUserData()['id'];
+    $userId = auth()->id();
 
     $explodeMeantime = $getCustomMeantime ? explode(' até ', $getCustomMeantime) : '';
 

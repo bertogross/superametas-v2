@@ -48,43 +48,20 @@
                 </svg>
             </div>
         </div>
+        <?php
+            //appPrintR($result);
+        ?>
 
-        <?php if($default): ?>
+        <?php if($result): ?>
             <?php $__env->startComponent('surveys.components.steps-card'); ?>
-                <?php $__env->slot('type', 'default'); ?>
-                <?php $__env->slot('data', $default); ?>
+                <?php $__env->slot('data', $result); ?>
                 <?php $__env->slot('edition', $edition); ?>
             <?php echo $__env->renderComponent(); ?>
         <?php endif; ?>
-
-        <?php if($custom): ?>
-            <?php $__env->startComponent('surveys.components.steps-card'); ?>
-                <?php $__env->slot('type', 'custom'); ?>
-                <?php $__env->slot('data', $custom); ?>
-                <?php $__env->slot('edition', $edition); ?>
-            <?php echo $__env->renderComponent(); ?>
-        <?php endif; ?>
-
     </div>
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
-
-<script src="<?php echo e(URL::asset('build/libs/sortablejs/Sortable.min.js')); ?>"></script>
-
-<script src="<?php echo e(URL::asset('build/libs/flatpickr/flatpickr.min.js')); ?>"></script>
-<script src="<?php echo e(URL::asset('build/libs/flatpickr/l10n/pt.js')); ?>"></script>
-<script src="<?php echo e(URL::asset('build/libs/flatpickr/plugins/monthSelect/index.js')); ?>"></script>
-<script src="<?php echo e(URL::asset('build/libs/flatpickr/plugins/confirmDate/confirmDate.js')); ?>"></script>
-
-<script>
-    var surveyTemplateEditURL = "<?php echo e(route('surveyTemplateEditURL')); ?>";
-    var surveyTemplateShowURL = "<?php echo e(route('surveyTemplateShowURL')); ?>";
-    var surveysTemplateStoreOrUpdateURL = "<?php echo e(route('surveysTemplateStoreOrUpdateURL')); ?>";
-</script>
-<script src="<?php echo e(URL::asset('build/js/surveys-template.js')); ?>" type="module"></script>
-
-<script src="<?php echo e(URL::asset('build/js/surveys-sortable.js')); ?>" type="module"></script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/template/show.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/templates/show.blade.php ENDPATH**/ ?>

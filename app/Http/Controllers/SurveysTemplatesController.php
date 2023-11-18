@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\SurveyTemplates;
+use App\Models\SurveyStep;
+use App\Models\SurveyTerms;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,43 +14,11 @@ class SurveysTemplatesController extends Controller
 {
     protected $connection = 'smAppTemplate';
 
-    /*
-    public function index(Request $request)
-    {
-        $created_at = $request->input('created_at');
-
-        $query = SurveyTemplates::query();
-
-        if ($created_at) {
-            $dates = explode(' até ', $created_at);
-            if (is_array($dates) && count($dates) === 2) {
-                $start_date = Carbon::createFromFormat('d/m/Y', $dates[0])->format('Y-m-d');
-                $end_date = Carbon::createFromFormat('d/m/Y', $dates[1])->format('Y-m-d') . ' 23:59:59';
-                $query->whereBetween('created_at', [$start_date, $end_date]);
-            } else {
-                $start_date = Carbon::createFromFormat('d/m/Y', $created_at)->format('Y-m-d');
-                $query->whereDate('created_at', '=', $start_date);
-            }
-        }
-
-        $getSurveyRecurringTranslations = SurveyTemplates::getSurveyRecurringTranslations();
-
-        $templates = $query->orderBy('updated_at')->paginate(10);
-
-        return view('surveys.template.listing', compact(
-            'templates',
-            'getSurveyRecurringTranslations'
-        ));
-    }
-    */
-
     public function show(Request $request, $id = null)
     {
         if (!$id) {
             abort(404);
         }
-
-        $data = [];
 
         $data = SurveyTemplates::findOrFail($id);
 
@@ -60,25 +30,17 @@ class SurveysTemplatesController extends Controller
 
         $reorderingData = SurveyTemplates::reorderingData($decodedData);
 
-        $custom = SurveyTemplates::getByType($reorderingData, 'custom');
-        $custom = $custom ?? null;
-
-        $default = SurveyTemplates::getByType($reorderingData, 'default');
-        $default = $default ?? null;
-
-        $getSurveyRecurringTranslations = SurveyTemplates::getSurveyRecurringTranslations();
+        $result = $reorderingData ?? null;
 
         $preview = $request->query('preview', false);
 
         $edition = $request->query('edition', false);
 
-        return view('surveys.template.show', compact(
+        return view('surveys.templates.show', compact(
             'data',
-            'custom',
-            'default',
+            'result',
             'preview',
             'edition',
-            'getSurveyRecurringTranslations'
         ) );
     }
 
@@ -90,34 +52,34 @@ class SurveysTemplatesController extends Controller
 
         session()->forget('success');
 
+        $terms = SurveyTerms::all();
+
         $getAuthorizedCompanies = getAuthorizedCompanies();
 
         $getActiveDepartments = getActiveDepartments();
 
-        $data = $custom = $templates = null;
+        $data = $defaultOriginal = [];
 
-        $default = [];
-        foreach($getActiveDepartments as $index => $department){
-            $default[$index] = [
+        $index = 0;
+        foreach($getActiveDepartments as $department){
+            $defaultOriginal[] = [
                 'stepData' => [
                     'step_name' => $department->department_alias,
-                    'step_id' => $department->id,
-                    'original_position' => $index,
-                    'new_position' => $index
+                    'term_id' => $department->department_id,
+                    'type' => 'default',
+                    'original_position' => $department->department_id,
+                    'new_position' => $index,
                 ],
                 //'topics' => $preListing
             ];
+            $index++;
         }
-        $default = array_filter($default);
+        $result = array_filter($defaultOriginal);
 
-        $getSurveyRecurringTranslations = SurveyTemplates::getSurveyRecurringTranslations();
-
-        return view('surveys.template.create', compact(
+        return view('surveys.templates.create', compact(
                 'data',
-                'custom',
-                'default',
-                'templates',
-                'getSurveyRecurringTranslations'
+                'result',
+                'terms',
             )
         );
     }
@@ -132,32 +94,68 @@ class SurveysTemplatesController extends Controller
 
         session()->forget('success');
 
-        $data = [];
+        $userId = auth()->id();
 
         $data = SurveyTemplates::findOrFail($id);
+        /*
+        $data = SurveyTemplates::query();
+        $data->where('id', $id);
+        $data->where('user_id', $userId);
+        $data->get();
+        */
 
         if (!$data) {
             abort(404);
         }
 
-        $decodedData = isset($data->template_data) && is_string($data->template_data) ? json_decode($data->template_data, true) : $data->template_data;
+        $getActiveDepartments = getActiveDepartments();
+
+        $terms = SurveyTerms::all();
+
+        // Check if the current user is the creator
+        /*
+        if ($userId == $data->user_id) {
+            return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro efetuado por outra pessoa']);
+        }
+        */
+
+        $decodedData = isset($data->template_data) ? json_decode($data->template_data, true) : $data->template_data;
 
         $reorderingData = SurveyTemplates::reorderingData($decodedData);
 
+        //$result = $reorderingData ?? null;
+
         $custom = SurveyTemplates::getByType($reorderingData, 'custom');
-        $custom = $custom ?? null;
+        $custom = $custom ?? [];
 
         $default = SurveyTemplates::getByType($reorderingData, 'default');
-        $default = $default ?? null;
+        $default = $default ?? [];
 
-        $getSurveyRecurringTranslations = SurveyTemplates::getSurveyRecurringTranslations();
+        $defaultOriginal = [];
+        $index = 0;
+        foreach($getActiveDepartments as  $department){
+            $defaultOriginal[] = [
+                'stepData' => [
+                    'step_name' => $department->department_alias,
+                    'term_id' => $department->department_id,
+                    'type' => 'default',
+                    'original_position' => $department->department_id,
+                    'new_position' =>$index,
+                ],
+                //'topics' => $preListing
+            ];
+            $index++;
+        }
+        $defaultOriginal = array_filter($defaultOriginal);
 
-        $view = view('surveys.template.edit', compact(
-            'data',
-            'custom',
-            'default',
-            'decodedData',
-            'getSurveyRecurringTranslations'
+        $default = SurveyTemplates::mergeTemplateDataArrays($defaultOriginal, $default);
+
+        $result = array_merge($default, $custom);
+
+        $view = view('surveys.templates.edit', compact(
+                'data',
+                'result',
+                'terms',
             )
         );
 
@@ -167,12 +165,12 @@ class SurveysTemplatesController extends Controller
     public function storeOrUpdate(Request $request, $id = null)
     {
         // Cache::flush();
+        $userId = auth()->id();
 
         $validatedData = $request->validate([
             'title' => 'required|string|max:191',
             'description' => 'nullable|string|max:1000',
             'template_data' => 'required',
-            'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
         ]);
 
         // Convert array inputs to JSON strings for storage
@@ -182,7 +180,6 @@ class SurveysTemplatesController extends Controller
 
         $template_data = $validatedData['template_data'];
 
-        $userId = auth()->id();
         $validatedData['user_id'] = $userId;
 
         if ($id) {
@@ -191,7 +188,7 @@ class SurveysTemplatesController extends Controller
 
             // Check if the current user is the creator
             if ($userId != $templates->user_id) {
-                return response()->json(['success' => false, 'message' => 'You are not authorized to edit this survey.']);
+                return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro efetuado por outra pessoa']);
             }
 
             $templates->update($validatedData);

@@ -2,7 +2,7 @@
 
 use App\Models\User;
 use App\Models\UserMeta;
-use App\Models\SurveyTerm;
+use App\Models\SurveyTerms;
 use App\Models\SurveyTemplates;
 
 use Illuminate\Support\Facades\DB;
@@ -483,7 +483,7 @@ if (!function_exists('getGoalsId')) {
 
 if (!function_exists('getTermNameById')) {
     function getTermNameById($termId) {
-        $term = $termId ? SurveyTerm::find($termId) : null;
+        $term = $termId ? SurveyTerms::find($termId) : null;
 
         return $term ? $term->name : null;
     }
@@ -496,6 +496,17 @@ if (!function_exists('getTemplateNameById')) {
         return $template ? $template->title : null;
     }
 }
+
+if (!function_exists('getTemplateRecurringById')) {
+    function getTemplateRecurringById($templateId) {
+        $template = $templateId ? SurveyTemplates::find($templateId) : null;
+
+        return $template ? $template->recurring : null;
+    }
+}
+
+
+
 
 if( !function_exists('goalsEmojiChart') ){
 	function goalsEmojiChart($nChartId, $goal, $sale, $departmentId, $departmentName, $companyName, $percent, $percentAccrued, $style = ''){

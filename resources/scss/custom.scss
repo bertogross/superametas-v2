@@ -36,7 +36,6 @@ a:focus {
   outline: none !important;
 }
 
-
 @media(min-width:810px) {
   .page-content{
     margin-top: 0px !important;
@@ -541,7 +540,9 @@ pre:empty{
 }
 
 
-
+.footer{
+    border-top: 1px var(--vz-body-bg) solid !important;
+}
 
 @media (max-width: 1024.1px) {
   [data-layout="horizontal"] .page-content {
@@ -720,9 +721,9 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
 #nested-elements-area button,
 #nested-elements-area label,
 #nested-elements-area .always-this-one-as-first-and-dont-sort,
-#nested-elements-area .nested-receiver-block,
+#nested-elements-area .nested-sortable-step,
 #nested-elements-area .btn-remove-element,
-#nested-compose-area .nested-receiver-block-fake,
+#nested-compose-area .nested-sortable-step-fake,
 #nested-compose-area .label-element,
 #nested-compose-area .hiddn-for-receiver,
 #nested-compose-area .sidebar-element
@@ -731,15 +732,15 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
 }
 
 
-#nested-compose-area .nested-receiver-block:empty,
+#nested-compose-area .nested-sortable-step:empty,
 #nested-compose-area .nested-receiver:empty{
-    border-color: var(--vz-theme) !important;
+    border-color: var(--vz-gray-700) !important;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 50px;
-    border-color: var(--vz-theme) !important;
-    border: 1px dashed var(--vz-theme) !important;
+    border-color: var(--vz-gray-700) !important;
+    border: 1px dashed var(--vz-gray-700) !important;
 }
 #nested-compose-area .nested-receiver:empty{
     margin-bottom: 15px !important;
@@ -751,7 +752,7 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
 }
 
 /*#nested-compose-area .accordion-header input:not([value=""]),*/
-#nested-compose-area .nested-receiver-block:empty{
+#nested-compose-area .nested-sortable-step:empty{
     text-decoration: blink;
     -webkit-animation-name: blinker;
     animation-name: blinker;
@@ -762,16 +763,18 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
     -webkit-animation-duration: 1s;
     animation-duration: 1s;
 }
-#nested-compose-area .nested-receiver-block:empty::after{
+#nested-compose-area .nested-sortable-step:empty::after{
     content: 'Necessário adicionar tópicos';
     display: block;
     text-align: center;
 }
-#nested-elements-area .nested-receiver-block-fake::after{
+/*
+#nested-elements-area .nested-sortable-step-fake::after{
     content: 'Bloco do Formuláro';
     display: block;
     text-align: center;
 }
+*/
 
 .nested-element,
 .nested-element-to-block{

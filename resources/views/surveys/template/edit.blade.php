@@ -1,1 +1,0 @@
-@include('surveys.template.create')

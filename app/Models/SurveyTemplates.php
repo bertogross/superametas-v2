@@ -20,8 +20,6 @@ class SurveyTemplates extends Model
         'title',
         'description',
         'template_data',
-        'recurring',
-        'completed_at'
     ];
 
     // Define relationships here
@@ -39,7 +37,7 @@ class SurveyTemplates extends Model
             // First, sort the steps according to their new_position
             foreach ($data as $step) {
                 $newPosition = $step['stepData']['new_position'] ?? 0;
-                $transformedData[$newPosition] = $step;
+                $transformedData[intval($newPosition)] = $step;
             }
             ksort($transformedData); // Sort by key to maintain the order of steps
 
@@ -50,7 +48,7 @@ class SurveyTemplates extends Model
                 if( isset($step['stepData']['topics']) ){
                     foreach ($step['stepData']['topics'] as $topic) {
                         $newTopicPosition = $topic['new_position'] ?? 0;
-                        $sortedTopicData[$newTopicPosition] = $topic;
+                        $sortedTopicData[intval($newTopicPosition)] = $topic;
                     }
                     ksort($sortedTopicData); // Sort by key to maintain the order of topics
 
@@ -79,35 +77,36 @@ class SurveyTemplates extends Model
         return $data && $filteredData ? array_values($filteredData) : null;
     }
 
-    public static function getSurveyRecurringTranslations() {
-        return [
-            'once' => [
-                'label' => 'Uma vez',
-                'description' => 'Tarefa ou processo que será executado uma vez.',
-            ],
-            'daily' => [
-                'label' => 'Diária',
-                'description' => 'Tarefa ou processo que será repetido diáriamente.',
-            ],
-            /*
-            'weekly' => [
-                'label' => 'Semanal',
-                'description' => 'Tarefa ou processo que será repetido semanalmente.',
-            ],
-            'biweekly' => [
-                'label' => 'Quinzenal',
-                'description' => 'Tarefa ou processo que será repetido quinzenalmente.',
-            ],
-            'monthly' => [
-                'label' => 'Mensal',
-                'description' => 'Tarefa ou processo que será repetido uma vez por mês.',
-            ],
-            'annual' => [
-                'label' => 'Anual',
-                'description' => 'Tarefa ou processo que será repetido uma vez ao ano.',
-            ]
-            */
-        ];
+    /*
+    public static function getSurveyTemplateDataFromId($templateId){
+        $data = SurveyTemplates::findOrFail($templateId);
+
+        return $data->template_data ? json_decode($data->template_data, true) : null;
+
     }
+    */
+
+    // usefull when new default sector/department is included
+    public static function mergeTemplateDataArrays($data1, $data2) {
+        $mergedData = [];
+
+        foreach ($data1 as $key => $value1) {
+            $termId1 = intval($value1['stepData']['term_id']);
+            $mergedData[$key] = $value1; // Copy the original data
+
+            foreach ($data2 as $value2) {
+                $termId2 = intval($value2['stepData']['term_id']);
+
+                if ($termId2 === $termId1) {
+                    // Merge stepData from data2 into the new array
+                    $mergedData[$key] = array_merge($value1, $value2);
+                    break;
+                }
+            }
+        }
+
+        return $mergedData;
+    }
+
 
 }

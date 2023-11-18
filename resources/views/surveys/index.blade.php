@@ -22,7 +22,7 @@
     @endcomponent
     --}}
 
-    <div class="row">
+    <div class="row mb-3">
         <div class="col">
             <div class="row mb-3 pb-1">
                 <div class="col-12">
@@ -79,7 +79,7 @@
 
             <div class="row">
                 <div class="col-sm-12 col-md-12 col-lg-4 col-xxl-3">
-                    @include('surveys.template.listing')
+                    @include('surveys.templates.listing')
                 </div>
 
                 <div class="col-sm-12 col-md-12 col-lg-8 col-xxl-9">
@@ -100,7 +100,7 @@
                         <div class="p-3">
                             TODO
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -117,7 +117,7 @@
     <script>
         var totalCompanies = {{ !empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) ? count($getAuthorizedCompanies) : 1 }};
 
-        var surveysIndexURL = "{{ route('surveysCreateURL') }}";
+        var surveysIndexURL = "{{ route('surveysIndexURL') }}";
         var surveysCreateURL = "{{ route('surveysCreateURL') }}";
         var surveysEditURL = "{{ route('surveysEditURL') }}";
         var surveysShowURL = "{{ route('surveysShowURL') }}";

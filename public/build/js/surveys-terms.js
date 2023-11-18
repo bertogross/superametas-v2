@@ -1,3 +1,9 @@
+import {
+    toastAlert,
+    bsPopoverTooltip
+} from './helpers.js';
+
+
 /**
  * https://github.com/Choices-js/Choices
  * @param {*} SearchURL
@@ -118,4 +124,81 @@ export function choicesListeners(SearchURL, StoreOrUpdateURL, choicesSelectorCla
             });
         }
     }
+}
+
+
+export function addTerms(){
+    var btnAddTerm = document.getElementById('btn-add-survey-term');
+    if(btnAddTerm){
+        btnAddTerm.addEventListener('click', function() {
+            var termInput = document.getElementById('termiInput');
+            var term = termInput.value.trim();
+            //console.log(JSON.stringify({ name: term }));
+
+            if (term) {
+                // Assuming you have a route like 'surveysTermsStoreOrUpdateURL' to handle the POST request
+                fetch(surveysTermsStoreOrUpdateURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                    },
+                    body: JSON.stringify({ name: term })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+
+                        toastAlert(data.message, 'success', 5000);
+                    } else {
+                        // Handle error
+                        console.error('Error adding term:', data.message);
+
+                        toastAlert(data.message, 'danger', 5000);
+                    }
+
+                    // Reload the terms form
+                    reloadTermsForm();
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    }
+}
+
+export function reloadTermsForm() {
+    // Assuming you have a route like '/api/terms-form' to fetch the updated terms form
+    fetch(surveysTermsFormURL)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('load-terms-form').innerHTML = html;
+
+            addTerms();
+
+            removeInputIfTheSameExistOnTheListing();
+
+            bsPopoverTooltip();
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+
+export function removeInputIfTheSameExistOnTheListing() {
+    // Get all input elements from surveyTemplateForm
+    var surveyTemplateInputs = document.querySelectorAll('#surveyTemplateForm input[type="hidden"][name*="term_id"]');
+
+    // Create an array of their values
+    var existingValues = Array.from(surveyTemplateInputs).map(input => input.value);
+    //console.log(existingValues);
+
+    // Get all checkboxes from surveysPopulateTermForm
+    var populateTermCheckboxes = document.querySelectorAll('#surveysPopulateTermForm input[type="checkbox"][name*="step_terms"]');
+
+    // Loop through each checkbox
+    populateTermCheckboxes.forEach(function(checkbox) {
+        // If the checkbox value is in the existingValues array, hide its parent div
+        if (existingValues.includes(checkbox.value)) {
+            checkbox.closest('.form-check-container').remove();
+        }
+    });
 }

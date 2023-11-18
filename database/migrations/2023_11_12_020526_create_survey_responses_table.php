@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('survey_responses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->bigInteger('user_id')->nullable();
             $table->foreignId('topic_id')->constrained('survey_topics')->onDelete('cascade');
             $table->foreignId('survey_id')->constrained('surveys')->onDelete('cascade');
             $table->enum('response', ['yes', 'no', 'na']);

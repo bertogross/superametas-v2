@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('survey_templates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->bigInteger('user_id')->nullable();
             $table->string('title', 191)->nullable();
             $table->longText('description')->nullable();
             $table->json('template_data')->nullable();
-            $table->enum('recurring', ['once', 'daily', 'weekly', 'biweekly', 'monthly', 'annual'])->default('once');
             $table->timestamps();
         });
     }

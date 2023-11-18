@@ -20,7 +20,7 @@ class GoalSalesController extends Controller
      */
     public function index(Request $request)
     {
-        $userId = getUserData()['id'];
+        $userId = auth()->id();
 
         $selectedCompanies = $request->input('companies');
         $selectedDepartments = $request->input('departments');

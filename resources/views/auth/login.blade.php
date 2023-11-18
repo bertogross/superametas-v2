@@ -3,7 +3,6 @@
     @lang('translation.signin')
 @endsection
 @section('css')
-    <link href="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
     <div class="auth-page-wrapper pt-5">
@@ -105,8 +104,6 @@
     </div>
 @endsection
 @section('script')
-<script src="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.js') }}"></script>
-
 <script>
     var checkDatabasesURL = "{{ route('checkDatabasesURL') }}";
 </script>

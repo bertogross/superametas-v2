@@ -111,7 +111,7 @@
                                 -->
                                 <div class="col">
                                     <a class="dropdown-icon-item" href="<?php echo e(route('surveysIndexURL')); ?>" title="Vistorias">
-                                        <i class="ri-todo-line text-theme fs-1"></i>
+                                        <i class="ri-survey-line text-theme fs-1"></i>
                                         
                                         <span>Vistorias</span>
                                     </a>

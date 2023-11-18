@@ -3,325 +3,299 @@ import {
     bsPopoverTooltip
 } from './helpers.js';
 
-/*
 import {
-    choicesListeners
+    removeInputIfTheSameExistOnTheListing,
+    reloadTermsForm
 } from './surveys-terms.js';
-*/
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Initialize nested sortable elements using Sortable.js
-    function attachNestedListeners() {
-        // Initialize nested receivers
-        var nestedReceiver = [].slice.call(document.querySelectorAll('.nested-receiver'));
-        if (nestedReceiver) {
-            Array.from(nestedReceiver).forEach(function(nestedSortReceiver) {
-                new Sortable(nestedSortReceiver, {
-                    handle: '.handle-receiver',
-                    swap: true,
-                    swapClass: 'bg-warning-subtle',
-                    animation: 150,
-                    fallbackOnBody: true,
-                    invertSwap: true,
-                    swapThreshold: 0.65,
-                    sort: true,
-                    group: 'shared',
-                    onUpdate: function () {
-                        updateBlockPositions(nestedSortReceiver);
-                    }
-                });
-            });
-        }
+    document.addEventListener('click', function(event) {
+        // The event.target contains the clicked element
+        const clickedElement = event.target;
+        //console.log('Clicked element:', clickedElement);
 
-        // Initialize nested elements
-        /*
-        var nestedElements = [].slice.call(document.querySelectorAll('.nested-element'));
-        if (nestedElements) {
-            Array.from(nestedElements).forEach(function(nestedSortElements) {
-                new Sortable(nestedSortElements, {
-                    handle: '.handle',
-                    swap: true,
-                    swapClass: 'bg-warning-subtle',
-                    group: {
-                        name: 'shared',
-                        pull: 'clone',
-                        put: false
-                    },
-                    sort: false,
-                    animation: 150,
-                    fallbackOnBody: true,
-                    invertSwap: true,
-                    swapThreshold: 0.65,
-                });
-            });
-        }
-        */
-        // Initialize nested receiver blocks
-        var nestedReceiverBlock = [].slice.call(document.querySelectorAll('.nested-receiver-block'));
-        if (nestedReceiverBlock) {
-            Array.from(nestedReceiverBlock).forEach(function(nestedSortReceiverBlock) {
-                new Sortable(nestedSortReceiverBlock, {
-                    handle: '.handle-receiver-block',
-                    swap: true,
-                    swapClass: 'bg-warning-subtle',
-                    animation: 150,
-                    fallbackOnBody: true,
-                    invertSwap: true,
-                    swapThreshold: 0.65,
-                    sort: true,
-                    onUpdate: function () {
-                        updateTopicPositions(nestedSortReceiverBlock);
-                    }
-                });
-            });
-        }
-    }
-
-    /**
-     * Update the positions of topics within a block
-     * @param {HTMLElement} nestedSortReceiverBlock - The block containing the topics
-     */
-    function updateTopicPositions(nestedSortReceiverBlock) {
-        var topics = nestedSortReceiverBlock.children;
-        Array.from(topics).forEach(function(topic, idx) {
-            var newPositionInput = topic.querySelector('[name$="[\'new_position\']"]');
-            if (newPositionInput) {
-                newPositionInput.value = idx;
-            }
-        });
-    }
-
-    /**
-     * Update the positions of blocks within a receiver
-     * @param {HTMLElement} nestedSortReceiver - The receiver containing the blocks
-     */
-    function updateBlockPositions(nestedSortReceiver) {
-        var blocks = nestedSortReceiver.children;
-        Array.from(blocks).forEach(function(block, idx) {
-            var newPositionInput = block.querySelector('[name$="[\'new_position\']"]');
-            if (newPositionInput) {
-                newPositionInput.value = idx;
-            }
-        });
-    }
-
-    //Populate the new_position input fields after the page loads
-    function updateBlockAndTopicPositions() {
-        // Update positions for blocks
-        var nestedSortReceivers = document.querySelectorAll('.nested-receiver');
-        Array.from(nestedSortReceivers).forEach(function(nestedSortReceiver) {
-            updateBlockPositions(nestedSortReceiver);
-        });
-
-        // Update positions for topics
-        var nestedReceiverBlocks = document.querySelectorAll('.nested-receiver-block');
-        Array.from(nestedReceiverBlocks).forEach(function(nestedReceiverBlock) {
-            updateTopicPositions(nestedReceiverBlock);
-        });
-    }
-
-    // Attach event listener to the new 'Add new step block'
-    function attachNewBlockButtonListeners() {
-        var btnAddBlock = document.getElementById('btn-add-block');
-        if(btnAddBlock){
-            btnAddBlock.addEventListener('click', function(event) {
+        if(clickedElement){
+            // Check if the clicked element is a remove block button
+            if (clickedElement.classList.contains('btn-remove-block')) {
                 event.preventDefault();
 
-                addNewBlock();
+                const targetId = clickedElement.getAttribute("data-target");
+                const isConfirmed = confirm('Certeza que deseja deletar este Bloco?');
+                if (isConfirmed) {
+                    const blockElement = document.querySelector('.block-item[id="' + targetId + '"]');
+                    if (blockElement) {
+                        blockElement.remove();
 
-                attachElementAccordionToggleButtonListeners();
-                attachNestedListeners();
-                updateBlockAndTopicPositions();
-                attachRemoveButtonListeners();
-            });
+                        attachNestedListeners()
+
+                        reloadTermsForm();
+
+                        event.stopPropagation();
+
+                        return;
+                    }
+                }
+            }
+
+            // Check if the clicked element is a remove topic button
+            if (clickedElement.classList.contains('btn-remove-topic')) {
+                event.preventDefault();
+
+                const targetId = clickedElement.getAttribute("data-target");
+                const isConfirmed = confirm('Certeza que deseja deletar este Tópico?');
+                if (isConfirmed) {
+                    const topicElement = document.querySelector('.step-topic[id="' + targetId + '"]');
+                    if (topicElement) {
+                        topicElement.remove();
+
+                        attachNestedListeners()
+
+                        event.stopPropagation();
+
+                        return;
+                    }
+                }
+            }
+
+            // Attach event listener to the new "Add Topic" button
+            if (clickedElement.classList.contains('btn-add-topic')) {
+                event.preventDefault();
+
+                const stepIndex = parseInt(clickedElement.getAttribute('data-block-index'));
+                const termId = parseInt(clickedElement.getAttribute('data-block-step-id'));
+
+                addNewTopic(termId, stepIndex);
+            }
+
+            // Check if the clicked element is the one you're interested in
+            if (clickedElement.id === 'btn-add-multiple-blocks') {
+                event.preventDefault();
+
+                const form = document.getElementById('surveysPopulateTermForm');
+                if (!form) {
+                    console.error('Form not found');
+                    return;
+                }
+
+                removeInputIfTheSameExistOnTheListing();
+
+                var checkboxes = document.querySelectorAll('input[name="step_terms[]"]:checked');
+                var checkedItems = Array.from(checkboxes).map(function(checkbox) {
+                    var label = document.querySelector('label[for="' + checkbox.id + '"]');
+                    let term_label = label ? label.textContent.trim() : '';
+                    let term_id = checkbox.value;
+
+                    setTimeout(function() {
+                        addNewBlock(term_label, term_id);
+                    }, 500);
+                });
+
+                if (checkedItems) {
+                    toastAlert('Termos adicionados', 'success', 5000);
+                    document.querySelector('[data-bs-dismiss="modal"]').click();
+                }
+            }
+
+            // Attach event listeners to accordion toggle buttons
+            // Check if the clicked element or its parent has the 'btn-accordion-toggle' class
+            if (clickedElement.classList.contains('btn-accordion-toggle') || clickedElement.closest('.btn-accordion-toggle')) {
+                event.preventDefault();
+
+                // Find the closest accordion-toggle button, in case the clicked element is a child
+                const accordionToggleButton = clickedElement.closest('.btn-accordion-toggle');
+                const accordionCollapse = accordionToggleButton.closest('.accordion-item').querySelector('.accordion-collapse');
+
+                // Toggle the accordion collapse
+                if (accordionCollapse.classList.contains('show')) {
+                    accordionCollapse.classList.remove('show');
+                    accordionToggleButton.classList.remove('ri-arrow-up-s-line');
+                    accordionToggleButton.classList.add('ri-arrow-down-s-line');
+                } else {
+                    accordionCollapse.classList.add('show');
+                    accordionToggleButton.classList.remove('ri-arrow-down-s-line');
+                    accordionToggleButton.classList.add('ri-arrow-up-s-line');
+                }
+            }
+
         }
-    }
+    });
 
     // Add a new step block to the form
-    function addNewBlock() {
-        const blocksContainer = document.querySelector('.nested-receiver');
+    function addNewBlock(value, termId) {
+        const blocksContainer = document.querySelector('.nested-sortable-block');
         if (blocksContainer) {
-            const newBlockIndex = blocksContainer.children.length;
+            const blockIndex = blocksContainer.children.length;
             const newBlock = document.createElement('div');
-            newBlock.id = newBlockIndex;
+            newBlock.id = termId;
             newBlock.className = 'accordion-item block-item mt-3 mb-0 border-dark border-1 rounded rounded-2 p-0';
 
             newBlock.innerHTML = `
                 <div class="input-group">
-                    <input type="text" class="form-control text-theme" name="steps[${newBlockIndex}][stepData]['step_name']" placeholder="Informe o Título/Setor/Etapa" autocomplete="off" maxlength="100" required>
+                    <input type="text" class="form-control text-theme" name="steps[${blockIndex}]['stepData']['step_name']" placeholder="Informe o Setor/Etapa" maxlength="100" value="${value}" readonly required tabindex="-1">
+                    <div class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-block ri-arrow-up-down-line text-body" title="Reordenar"></div>
 
-                    <input type="hidden" name="steps[${newBlockIndex}][stepData]['type']" tabindex="-1" value="custom">
-                    <input type="hidden" name="steps[${newBlockIndex}][stepData]['original_position']" tabindex="-1" value="${newBlockIndex}">
-                    <input type="hidden" name="steps[${newBlockIndex}][stepData]['new_position']" tabindex="-1">
-
-                    <span class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-receiver" title="Reordenar"><i class="ri-arrow-up-down-line text-body"></i></span>
-
-                    <span class="btn btn-ghost-dark btn-icon rounded-pill btn-accordion-toggle"><i class="ri-arrow-up-s-line"></i></span>
+                    <button type="button" class="btn btn-ghost-dark btn-icon rounded-pill btn-accordion-toggle ri-arrow-up-s-line" tabindex="-1"></button>
                 </div>
+
+                <input type="hidden" name="steps[${blockIndex}]['stepData']['term_id']" value="${termId}">
+                <input type="hidden" name="steps[${blockIndex}]['stepData']['type']" value="custom">
+                <input type="hidden" name="steps[${blockIndex}]['stepData']['original_position']" value="${blockIndex}">
+                <input type="hidden" name="steps[${blockIndex}]['stepData']['new_position']" value="${blockIndex}">
+
                 <div class="accordion-collapse collapse show">
-                    <div class="nested-receiver-block mt-0 p-1"></div>
+                    <div class="nested-sortable-topic mt-0 p-1"></div>
 
                     <div class="clearfix">
-                        <span class="btn btn-ghost-dark btn-icon btn-add-topic rounded-pill float-end cursor-copy text-theme" data-block-index="${newBlockIndex}" title="Adicionar Tópico"><i class="ri-menu-add-line"></i></span>
+                        <button type="button" class="btn btn-ghost-dark btn-icon btn-add-topic rounded-pill float-end cursor-copy text-theme ri-menu-add-line" data-block-index="${blockIndex}" data-block-step-id="${termId}" title="Adicionar Tópico"></button>
 
-                        <span class="btn btn-ghost-danger btn-icon rounded-pill btn-remove-block float-start" data-target="${newBlockIndex}" title="Remover Bloco"><i class="ri-delete-bin-7-fill"></i></span>
+                        <button type="button" class="btn btn-ghost-danger btn-icon rounded-pill btn-remove-block float-end ri-delete-bin-7-fill" data-target="${termId}" title="Remover Bloco" tabindex="-1"></button>
                     </div>
                 </div>
             `;
             blocksContainer.appendChild(newBlock);
 
-            attachNewTopicButtonListeners();
-
             setTimeout(function() {
-                var selector = `.btn-add-topic[data-block-index="${newBlockIndex}"]`;
+                var selector = `.btn-add-topic[data-block-index="${blockIndex}"]`;
                 document.querySelector(selector).click();
-            }, 100);
+
+                attachNestedListeners();
+
+                //attachRemoveButtonListeners();
+                //choicesListeners(surveysTermsSearchURL, surveysTermsStoreOrUpdateURL, choicesSelectorClass);
+            }, 500);
         }
     }
 
-    /**
-     * Add a new topic to a step block
-     * @param {number} stepIndex - The index of the step block
-     */
-    function addNewTopic(stepIndex) {
-        const blockContainer = document.querySelector(`.nested-receiver .block-item[id="${stepIndex}"] .nested-receiver-block`);
-
-        if (blockContainer) {
-            const newTopicIndex = blockContainer.children.length;
+    // Add a new topic to a step block
+    function addNewTopic(termId, stepIndex) {
+        const topicContainer = document.querySelector(`.block-item[id="${termId}"] .nested-sortable-topic`);
+        if (topicContainer) {
+            const topicIndex = topicContainer.children.length;
             const newTopic = document.createElement('div');
-            newTopic.className = 'step-item mt-1 mb-1';
-            newTopic.id = `${stepIndex}${newTopicIndex}`;
+            newTopic.className = 'step-topic mt-1 mb-1';
+            newTopic.id = `${termId}${topicIndex}`;
 
             newTopic.innerHTML = `
                 <div class="row">
                     <div class="col-auto">
-                        <span class="btn btn-ghost-danger btn-icon rounded-pill btn-remove-topic" data-target="${stepIndex}${newTopicIndex}" title="Remover Bloco"><i class="ri-delete-bin-3-line"></i></span>
+                        <button type="button" class="btn btn-ghost-danger btn-icon rounded-pill btn-remove-topic ri-delete-bin-3-line" data-target="${termId}${topicIndex}" title="Remover Bloco" tabindex="-1"></button>
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia?" data-placeholder="Tópico..." name="steps[${stepIndex}]['topics']['question']" placeholder="Exemplo: Organização do Departamento" maxlength="150" required></input>
+                        <input type="text" class="form-control focus-${termId}${topicIndex}" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia?" data-placeholder="Tópico..." name="steps[${stepIndex}]['topics']['question']" placeholder="Exemplo: Organização do Departamento" maxlength="150" required></input>
                     </div>
                     <div class="col-auto">
-                        <span class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-receiver-block" title="Reordenar"><i class="ri-arrow-up-down-line"></i></span>
+                        <div class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-topic ri-arrow-up-down-line" title="Reordenar Tópico"></div>
                     </div>
+                    <input type="hidden" name="steps[${stepIndex}]['topics']['original_position']" tabindex="-1" value="${topicIndex}">
+                    <input type="hidden" name="steps[${stepIndex}]['topics']['new_position']" tabindex="-1" value="${topicIndex}">
                 </div>
-                <input type="hidden" name="steps[${stepIndex}]['topics']['original_position']" value="${newTopicIndex}" tabindex="-1">
-                <input type="hidden" name="steps[${stepIndex}]['topics']['new_position']" tabindex="-1">
             `;
-            blockContainer.appendChild(newTopic);
+            topicContainer.appendChild(newTopic);
+
+            setTimeout(function() {
+                attachNestedListeners();
+
+                //var inputName = `steps[${stepIndex}]['topics']['question']`;
+                //document.querySelector('input[name="' + inputName + '"]').focus();
+                document.querySelector('input.focus-' + termId + topicIndex + '').focus();
+
+                //attachRemoveButtonListeners();
+                //choicesListeners(surveysTermsSearchURL, surveysTermsStoreOrUpdateURL, choicesSelectorClass);
+            }, 500);
         }
     }
 
-    // Attach event listener to the new "Add Topic" button
-    function attachNewTopicButtonListeners() {
-        var newTopicButton = document.querySelectorAll('.btn-add-topic');
-        if (newTopicButton) {
-            newTopicButton.forEach(function(button) {
-                if (button.hasAttribute('data-block-index')) {
-                    button.addEventListener('click', function(event) {
-                        event.preventDefault();
-
-                        const stepIndex = parseInt(this.getAttribute('data-block-index'));
-
-                        addNewTopic(stepIndex);
-
-                        //bsPopoverTooltip();
-                        attachNestedListeners();
-                        updateBlockAndTopicPositions();
-                        attachRemoveButtonListeners();
-                        //choicesListeners(surveysTermsSearchURL, surveysTermsStoreOrUpdateURL, choicesSelectorClass);
-                    });
-                }
+    // Initialize nested sortable elements using Sortable.js
+    function attachNestedListeners() {
+        // Helper function to initialize Sortable with common settings
+        function initializeSortable(selector, handleClass) {
+            document.querySelectorAll(selector).forEach(function(element) {
+                new Sortable(element, {
+                    handle: handleClass,
+                    swap: true,
+                    swapClass: 'bg-warning-subtle',
+                    animation: 150,
+                    fallbackOnBody: true,
+                    invertSwap: true,
+                    swapThreshold: 0.85,
+                    sort: true,
+                    group: selector === '.nested-sortable-topic' ? 'shared' : null,
+                    onUpdate: function () {
+                        updateNestedPositions(selector);
+                    }
+                });
             });
         }
+
+        // Initialize Sortable for nested receiver blocks
+        initializeSortable('.nested-sortable-block', '.handle-block');
+
+        // Initialize Sortable for nested receiver topics
+        initializeSortable('.nested-sortable-topic', '.handle-topic');
+    }
+    attachNestedListeners();
+
+
+    // Function to update positions of nested elements (blocks or topics)
+    function updateNestedPositions(selector) {
+        document.querySelectorAll(selector).forEach(function(nestedSortReceiver) {
+            Array.from(nestedSortReceiver.children).forEach(function(child, idx) {
+                const newPositionInput = child.querySelector('[name$="[\'new_position\']"]');
+                if (newPositionInput) {
+                    newPositionInput.value = idx;
+                }
+            });
+        });
     }
 
-    // Attach event listeners to remove step block and topic buttons
-    function attachRemoveButtonListeners() {
-        var removeBlockButtons = document.querySelectorAll('.btn-remove-block');
-        var removeTopicButtons = document.querySelectorAll('.btn-remove-topic');
+    // Update positions for both blocks and topics
+    updateNestedPositions('.nested-sortable-block');
+    updateNestedPositions('.nested-sortable-topic');
 
-        function removeBlock(event) {
-            event.preventDefault();
 
-            const target = event.currentTarget.getAttribute("data-target");
-
-            var isConfirmed = confirm('Certeza que deseja deletar este Bloco?');
-            if (isConfirmed) {
-                var blockElement = document.querySelector('.block-item[id="' + target + '"]');
-                if (blockElement) {
-                    blockElement.remove();
-
-                    event.stopPropagation();
-
-                    return;
+    // Function to observe DOM changes
+    function observeDOMChanges() {
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList') {
+                    removeInputIfTheSameExistOnTheListing();
                 }
-            }
-            return;
-        }
+                //attachNestedListeners();
 
-        function removeTopic(event) {
-            event.preventDefault();
-
-            const target = event.currentTarget.getAttribute("data-target");
-
-            var isConfirmed = confirm('Certeza que deseja deletar este Tópico?');
-            if (isConfirmed) {
-                var topicElement = document.querySelector('.nested-receiver-block .step-item[id="' + target + '"]');
-                if (topicElement) {
-                    topicElement.remove();
-
-                    updateBlockAndTopicPositions();
-
-                    event.stopPropagation();
-
-                    return;
-                }
-            }
-        }
-
-        if (removeBlockButtons) {
-            removeBlockButtons.forEach(function(button) {
-                if (!button.hasAttribute('data-listener-attached')) {
-                    button.setAttribute('data-listener-attached', 'true');
-                    button.addEventListener('click', removeBlock);
-                }
             });
-        }
+        });
 
-        if (removeTopicButtons) {
-            removeTopicButtons.forEach(function(button) {
-                if (!button.hasAttribute('data-listener-attached')) {
-                    button.setAttribute('data-listener-attached', 'true');
-                    button.addEventListener('click', removeTopic);
-                }
-            });
-        }
+        var config = { childList: true, subtree: true };
 
-        return;
+        // Start observing the target node for configured mutations
+        observer.observe(document.body, config);
     }
+
+
 
     // Attach event listeners to accordion toggle buttons
+    /*
     function attachElementAccordionToggleButtonListeners() {
         var accordionToggleButtons = document.querySelectorAll('.btn-accordion-toggle');
         if (accordionToggleButtons) {
             accordionToggleButtons.forEach(function(button) {
                 if (!button.hasAttribute('data-listener-attached')) {
                     button.setAttribute('data-listener-attached', 'true');
+
                     button.addEventListener('click', function(event) {
                         event.preventDefault();
 
                         const accordionCollapse = button.closest('.accordion-item').querySelector('.accordion-collapse');
-                        const icon = button.querySelector('i');
 
                         if (accordionCollapse.classList.contains('show')) {
                             accordionCollapse.classList.remove('show');
-                            icon.classList.remove('ri-arrow-up-s-line');
-                            icon.classList.add('ri-arrow-down-s-line');
+                            button.classList.remove('ri-arrow-up-s-line');
+                            button.classList.add('ri-arrow-down-s-line');
                         } else {
                             accordionCollapse.classList.add('show');
-                            icon.classList.remove('ri-arrow-down-s-line');
-                            icon.classList.add('ri-arrow-up-s-line');
+                            button.classList.remove('ri-arrow-down-s-line');
+                            button.classList.add('ri-arrow-up-s-line');
                         }
 
                         return;
@@ -330,23 +304,16 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-
-
-
-    // Attach nested listeners on drag and drop events
-    /*
-    ['drop', 'dragend'].forEach(eventType => {
-        document.addEventListener(eventType, function() {
-            attachNestedListeners();
-        });
-    });
     */
 
+
+
     // Call the function when the DOM is fully loaded
-    attachNestedListeners();
-    attachNewBlockButtonListeners();
-    attachNewTopicButtonListeners();
-    attachRemoveButtonListeners();
-    attachElementAccordionToggleButtonListeners();
-    updateBlockAndTopicPositions();
+    //attachNewBlockButtonListeners();
+    //attachNewTopicButtonListeners();
+    //attachRemoveButtonListeners();
+    //attachElementAccordionToggleButtonListeners();
+    observeDOMChanges();
+    //attachbtnAddMultipleBlocksListeners();
+
 });

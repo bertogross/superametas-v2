@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('survey_topics', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('step_id')->constrained('survey_steps')->onDelete('cascade');
+            $table->bigInteger('user_id')->nullable();
+            $table->bigInteger('step_id')->nullable();
             $table->string('question', 191)->nullable();
             $table->integer('topic_order')->default(0);
             $table->timestamps();

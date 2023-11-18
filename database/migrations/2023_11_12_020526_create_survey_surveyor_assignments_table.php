@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('survey_surveyor_assignments', function (Blueprint $table) {
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->bigInteger('user_id')->nullable();
             $table->foreignId('survey_id')->constrained('surveys')->onDelete('cascade');
             $table->integer('company_id')->default(0);
             $table->timestamps();

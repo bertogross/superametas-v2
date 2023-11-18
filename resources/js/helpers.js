@@ -51,10 +51,10 @@ export function toastAlert(message, type = 'success', duration = 0) {
 }
 
 
-export function sweetAlerts(message, urlToRedirect = false){
+export function sweetAlerts(message, urlToRedirect = false, icon = 'success'){
     Swal.fire({
         title: message,
-        icon: 'success',
+        icon: icon,
         showDenyButton: false,
         showCancelButton: true,
         confirmButtonText: 'Finalizar',
@@ -71,8 +71,8 @@ export function sweetAlerts(message, urlToRedirect = false){
         if (result.isConfirmed) {
             var timerInterval;
             Swal.fire({
-                title: 'Ok!',
-                html: 'Redirecionando...',
+                title: 'Redirecionando...',
+                html: '',
                 timer: 4000,
                 timerProgressBar: true,
                 showCloseButton: false,
@@ -445,6 +445,8 @@ export function percentageResult(price, percentage, decimal = 0){
     return result;
 }
 
+
+
 export function bsPopoverTooltip() {
     setTimeout(() => {
         // Arrays to keep track of all tooltips and popovers
@@ -564,6 +566,8 @@ function destroyModal() {
         });
     });
 }
+
+
 
 // Check the internet connection status and display a toast notification if offline
 function checkInternetConnection() {
@@ -816,6 +820,8 @@ export function toggleTableRows() {
                     iconExpand.classList.add('d-none');
                     iconCollapse.classList.remove('d-none');
                 }
+
+                this.blur();
             });
         });
     }

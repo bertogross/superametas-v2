@@ -1,5 +1,5 @@
 @php
-    $userId = getUserData()['id'];
+    $userId = auth()->id();
 
     $totalPercentAccrued = $ndxChartId = 0;
 
@@ -39,7 +39,6 @@
     <link href="{{ URL::asset('build/libs/gridjs/theme/mermaid.min.css') }}" rel="stylesheet">
     <link href="{{ URL::asset('build/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
     <link href="{{ URL::asset('build/libs/flatpickr/plugins/monthSelect/style.css') }}" rel="stylesheet">
-    <link href="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('content')
@@ -132,8 +131,6 @@
 
 @section('script')
     <script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
-
-    <script src="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 
     <script src="{{ URL::asset('build/libs/flatpickr/flatpickr.min.js') }}"></script>
     <script src="{{ URL::asset('build/libs/flatpickr/l10n/pt.js') }}"></script>

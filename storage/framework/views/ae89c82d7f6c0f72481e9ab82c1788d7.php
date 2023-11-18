@@ -2,7 +2,6 @@
     <?php echo app('translator')->get('translation.surveys'); ?>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('css'); ?>
-    <link href="<?php echo e(URL::asset('build/libs/sweetalert2/sweetalert2.min.css')); ?>" rel="stylesheet" type="text/css" />
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>
     <?php $__env->startComponent('components.breadcrumb'); ?>
@@ -17,7 +16,7 @@
             <?php if($data): ?>
                 Edição de Modelo <small><i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i> <span class="text-theme"><?php echo e($data->id); ?></span> </small>
             <?php else: ?>
-                Compor Modelo
+                Compor Modelo de Formulário
             <?php endif; ?>
         <?php $__env->endSlot(); ?>
     <?php echo $__env->renderComponent(); ?>
@@ -25,14 +24,10 @@
     <?php echo $__env->make('components.alerts', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
     <?php
+        //appPrintR($data);
         $templateId = $data->id ?? '';
         $title = $data->title ?? '';
         $description = $data->description ?? '';
-        $recurring = $data->recurring ?? '';
-
-        //appPrintR($data);
-        //appPrintR($default);
-        //appPrintR($custom);
     ?>
 
     <div class="card">
@@ -41,80 +36,53 @@
                 <?php if($data): ?>
                     <button type="button" class="btn btn-sm btn-label right btn-outline-theme" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Atualizar</button>
 
-                    <button type="button" class="btn btn-sm btn-label right btn-outline-info" id="btn-surveys-clone" tabindex="-1"><i class="ri-file-copy-line label-icon align-middle fs-16 ms-2"></i>Clonar</button>
+                    
 
                     <a href="<?php echo e(route('surveyTemplateShowURL', ['id' => $templateId])); ?>" class="btn btn-sm btn-label right btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar em nova guia" target="_blank" tabindex="-1"><i class="ri-eye-line label-icon align-middle fs-16 ms-2"></i>Visualizar</a>
                 <?php else: ?>
                     <button type="button" class="btn btn-sm btn-label right btn-outline-theme" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Salvar</button>
                 <?php endif; ?>
             </div>
-            <h4 class="card-title mb-0"><i class="ri-drag-drop-line fs-16 align-middle text-theme me-2"></i><?php echo e($data->title ?? 'Formulário'); ?></h4>
+            <h4 class="card-title mb-0"><i class="ri-survey-line fs-16 align-middle text-theme me-2"></i><?php echo e($data->title ?? 'Formulário'); ?></h4>
          </div>
         <div class="card-body">
             <form id="surveyTemplateForm" method="POST" class="needs-validation" novalidate autocomplete="off">
                 <?php echo csrf_field(); ?>
                 <div class="row">
-                    <div class="col-sm-12 col-md-12 col-lg-4 col-xxl-3">
-                        <div class="p-3 border border-1 border-light rounded">
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xxl-6">
+                        <div class="p-3">
+                            <p class="text-body mb-4">Composição do Modelo:</p>
+
                             <input type="hidden" name="id" value="<?php echo e($templateId); ?>">
 
                             <div class="mb-4">
                                 <label for="title" class="form-label">Título:</label>
                                 <input type="text" id="title" name="title" class="form-control" value="<?php echo e($title); ?>" maxlength="100" required>
-                                <div class="form-text">
-                                    Exemplo: Checklist Abertura de Loja
-                                </div>
+                                <div class="form-text">Exemplo: Checklist Abertura de Loja</div>
                             </div>
-
-                            <div class="mb-4">
-                                <label for="date-range-field" class="form-label">Tipo de Recorrência:</label>
-                                <select class="form-select" name="recurring" required>
-                                    <option disabled <?php echo e(!$recurring ?? 'selected'); ?>>- Selecione -</option>
-                                    <?php $__currentLoopData = $getSurveyRecurringTranslations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <option value="<?php echo e($index); ?>" <?php echo e($recurring == $index ? 'selected' : ''); ?>><?php echo e($value['label']); ?></option>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                </select>
-                            </div>
-
 
                             <div>
-                                <label for="description" class="form-label">Observações:</label>
-                                <textarea name="description" class="form-control maxlength" maxlength="1000" id="description" rows="7" maxlength="500"><?php echo e($description); ?></textarea>
+                                <label for="description" class="form-label">Descrição:</label>
+                                <textarea name="description" class="form-control maxlength" maxlength="1000" id="description" rows="7" maxlength="500" placeholder="Descreva, por exemplo, a funcionalidade ou destino deste modelo..."><?php echo e($description); ?></textarea>
                                 <div class="form-text">Opcional</div>
                             </div>
 
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-md-12 col-lg-4 col-xxl-5">
-                        <div class="p-3 border border-1 border-light rounded">
-
-                            <p class="text-ody mb-0">Composição do Modelo:</p>
+                            <hr class="w-50 start-50 position-relative translate-middle-x clearfix mt-4 mb-4">
 
                             <div id="nested-compose-area" style="min-height: 250px;">
-                                <div class="accordion list-group nested-list nested-receiver"><?php if($default || $custom): ?>
-                                    <?php if($default): ?>
-                                        <?php $__env->startComponent('surveys.components.template-form'); ?>
-                                            <?php $__env->slot('type', 'default'); ?>
-                                            <?php $__env->slot('data', $default); ?>
-                                        <?php echo $__env->renderComponent(); ?>
-                                    <?php endif; ?>
-
-                                    <?php if($custom): ?>
-                                        <?php $__env->startComponent('surveys.components.template-form'); ?>
-                                            <?php $__env->slot('type', 'custom'); ?>
-                                            <?php $__env->slot('data', $custom); ?>
-                                        <?php echo $__env->renderComponent(); ?>
-                                    <?php endif; ?>
+                                <div class="accordion list-group nested-list nested-sortable-block"><?php if($result): ?>
+                                    <?php echo $__env->make('surveys.templates.form', ['data' => $result] , \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                                 <?php endif; ?></div>
 
                                 <div class="clearfix mt-3">
-                                    <button type="button" class="btn btn-sm btn-outline-theme float-end cursor-crosshair" id="btn-add-block" tabindex="-1" title="Adicionar Bloco"><i class="ri-folder-add-line align-middle me-1"></i>Adicionar Bloco</button>
+                                    <button type="button" class="btn btn-sm btn-outline-theme btn-label right float-end" data-bs-toggle="modal" data-bs-target="#addStepModal" tabindex="-1" title="Adicionar Etapa/Setor/Departamento"><i class="ri-terminal-window-line label-icon align-middle fs-16 ms-2"></i>Adicionar</button>
                                 </div>
                             </div>
 
                         </div>
                     </div>
-                    <div class="col-sm-12 col-md-12 col-lg-4 col-xxl-4">
+                    <div class="col-sm-12 col-md-6 col-lg-6 col-xxl-6">
+                        <p class="text-body mb-1 p-3">Pré-visualização:</p>
                         <div id="load-preview" class="p-3 border border-1 border-light rounded"></div>
                     </div>
                 </div>
@@ -122,9 +90,24 @@
         </div>
     </div>
 
+    <div id="addStepModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-right">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalgridLabel">Termos</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="load-terms-form">
+                        <?php echo $__env->make('surveys.terms.form', ['terms' => $terms] , \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
-    <script src="<?php echo e(URL::asset('build/libs/sweetalert2/sweetalert2.min.js')); ?>"></script>
 
     <script src="<?php echo e(URL::asset('build/libs/sortablejs/Sortable.min.js')); ?>"></script>
 
@@ -138,10 +121,13 @@
         var surveyTemplateEditURL = "<?php echo e(route('surveyTemplateEditURL')); ?>";
         var surveyTemplateShowURL = "<?php echo e(route('surveyTemplateShowURL')); ?>";
         var surveysTemplateStoreOrUpdateURL = "<?php echo e(route('surveysTemplateStoreOrUpdateURL')); ?>";
+
+        var surveysTermsStoreOrUpdateURL = "<?php echo e(route('surveysTermsStoreOrUpdateURL')); ?>";
+        var surveysTermsFormURL = "<?php echo e(route('surveysTermsFormURL')); ?>";
     </script>
-    <script src="<?php echo e(URL::asset('build/js/surveys-template.js')); ?>" type="module"></script>
+    <script src="<?php echo e(URL::asset('build/js/surveys-templates.js')); ?>" type="module"></script>
 
     <script src="<?php echo e(URL::asset('build/js/surveys-sortable.js')); ?>" type="module"></script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/template/create.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/templates/create.blade.php ENDPATH**/ ?>

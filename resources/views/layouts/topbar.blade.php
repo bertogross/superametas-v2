@@ -113,7 +113,7 @@
                                 -->
                                 <div class="col">
                                     <a class="dropdown-icon-item" href="{{ route('surveysIndexURL') }}" title="Vistorias">
-                                        <i class="ri-todo-line text-theme fs-1"></i>
+                                        <i class="ri-survey-line text-theme fs-1"></i>
                                         {{--
                                         <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Vistorias">
                                         --}}

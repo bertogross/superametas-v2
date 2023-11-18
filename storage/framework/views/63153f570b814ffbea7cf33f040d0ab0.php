@@ -7,14 +7,15 @@
         <?php
             $stepData = $step['stepData'] ?? null;
             $stepName = $stepData['step_name'] ?? '';
+            $termId = $stepData['term_id'] ?? '';
+            $type = $stepData['type'] ?? 'custom';
             $originalPosition = $stepData['original_position'] ?? $stepIndex;
-            $newPosition = $stepData['new_position'] ?? $stepIndex;
+            $newPosition = $stepData['new_position'] ?? $originalPosition;
 
             $topics = $step['topics'] ?? null;
-
         ?>
 
-        <?php if($stepData): ?>
+        <?php if( $stepData): ?>
             <div class="card joblist-card">
                 <div class="card-body">
                     <div class="d-flex">
@@ -37,9 +38,7 @@
 
                             $question = $topic['question'] ?? '';
                             $originalPosition = $topic['original_position'] ?? $topicIndex;
-                            $newPosition = $topic['new_position'] ?? $topicIndex;
-
-                            $stepTopicIndex = intval($stepIndex.$topicIndex);
+                            $newPosition = $topic['new_position'] ?? $originalPosition;
                         ?>
                         <div class="card-footer border-top-dashed bg-dark <?php echo e($bg); ?>">
                             <div class="row">

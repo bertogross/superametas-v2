@@ -20,8 +20,10 @@ class Survey extends Model
         'user_id',
         'status',
         'distributed_data',
+        'template_data',
+        'recurring',
         'priority',
-        'start_date',
+        'started_at',
         'completed_at',
         'audited_at'
     ];
@@ -41,6 +43,9 @@ class Survey extends Model
 
     public static function countByStatus($status = false)
     {
+
+        $userId = auth()->id();
+
         $query = DB::connection('smAppTemplate')
             ->table('surveys')
             ->select('status', DB::raw('count(*) as total'))
@@ -50,8 +55,7 @@ class Survey extends Model
             $query->where('status', $status);
         }
 
-        //$user = auth()->id();
-       //$query = $query->where('user_id', $user->id);
+        $query = $query->where('user_id', $userId);
 
         $results = $query->get();
 
@@ -122,5 +126,41 @@ class Survey extends Model
             'last_date' => $lastDate->last_date ?? date('Y-m-d'),
         ];
     }
+
+
+    public static function getSurveyRecurringTranslations() {
+        return [
+            'once' => [
+                'label' => 'Uma vez',
+                'description' => 'Tarefa ou processo que será executado uma vez.',
+                'color' => 'primary'
+            ],
+            'daily' => [
+                'label' => 'Diária',
+                'description' => 'Tarefa ou processo que será repetido diáriamente.',
+                'color' => 'secondary'
+            ],
+            /*
+            'weekly' => [
+                'label' => 'Semanal',
+                'description' => 'Tarefa ou processo que será repetido semanalmente.',
+            ],
+            'biweekly' => [
+                'label' => 'Quinzenal',
+                'description' => 'Tarefa ou processo que será repetido quinzenalmente.',
+            ],
+            'monthly' => [
+                'label' => 'Mensal',
+                'description' => 'Tarefa ou processo que será repetido uma vez por mês.',
+            ],
+            'annual' => [
+                'label' => 'Anual',
+                'description' => 'Tarefa ou processo que será repetido uma vez ao ano.',
+            ]
+            */
+        ];
+    }
+
+
 
 }

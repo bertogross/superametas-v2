@@ -47,41 +47,18 @@
                 </svg>
             </div>
         </div>
+        @php
+            //appPrintR($result);
+        @endphp
 
-        @if ($default)
+        @if ($result)
             @component('surveys.components.steps-card')
-                @slot('type', 'default')
-                @slot('data', $default)
+                @slot('data', $result)
                 @slot('edition', $edition)
             @endcomponent
         @endif
-
-        @if ($custom)
-            @component('surveys.components.steps-card')
-                @slot('type', 'custom')
-                @slot('data', $custom)
-                @slot('edition', $edition)
-            @endcomponent
-        @endif
-
     </div>
 
 @endsection
 @section('script')
-
-<script src="{{ URL::asset('build/libs/sortablejs/Sortable.min.js') }}"></script>
-
-<script src="{{ URL::asset('build/libs/flatpickr/flatpickr.min.js') }}"></script>
-<script src="{{ URL::asset('build/libs/flatpickr/l10n/pt.js') }}"></script>
-<script src="{{ URL::asset('build/libs/flatpickr/plugins/monthSelect/index.js') }}"></script>
-<script src="{{ URL::asset('build/libs/flatpickr/plugins/confirmDate/confirmDate.js') }}"></script>
-
-<script>
-    var surveyTemplateEditURL = "{{ route('surveyTemplateEditURL') }}";
-    var surveyTemplateShowURL = "{{ route('surveyTemplateShowURL') }}";
-    var surveysTemplateStoreOrUpdateURL = "{{ route('surveysTemplateStoreOrUpdateURL') }}";
-</script>
-<script src="{{ URL::asset('build/js/surveys-template.js') }}" type="module"></script>
-
-<script src="{{ URL::asset('build/js/surveys-sortable.js') }}" type="module"></script>
 @endsection

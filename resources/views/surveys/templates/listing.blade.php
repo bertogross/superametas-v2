@@ -1,10 +1,10 @@
 <div id="surveyTemplateListing" class="card h-100">
     <div class="card-header">
         <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Modelos</h5>
+            <h5 class="card-title mb-0 flex-grow-1"><i class="ri-file-list-line fs-16 align-bottom text-theme me-2"></i>Modelos</h5>
             <div class="flex-shrink-0">
                 <div class="d-flex flex-wrap gap-2">
-                    <a class="btn btn-sm btn-label right btn-outline-theme float-end" href="<?php echo e(route('surveysTemplateCreateURL')); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Modelo">
+                    <a class="btn btn-sm btn-label right btn-outline-theme float-end" href="{{ route('surveysTemplateCreateURL') }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Modelo">
                         <i class="ri-add-line label-icon align-middle fs-16 ms-2"></i>Modelo
                     </a>
                 </div>
@@ -12,17 +12,19 @@
         </div>
     </div>
     <div class="card-body">
-        <?php if($templates->isEmpty()): ?>
-            <?php $__env->startComponent('components.nothing'); ?>
-                
-            <?php echo $__env->renderComponent(); ?>
-        <?php else: ?>
+        @if ($templates->isEmpty())
+            @component('components.nothing')
+                {{--
+                @slot('url', route('surveysTemplateCreateURL'))
+                --}}
+            @endcomponent
+        @else
             <div class="row">
-                <?php $__currentLoopData = $templates; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $template): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                @foreach ($templates as $template)
                     <div class="col-sm-12 col-xl-12 col-md-6">
                         <div class="card card-animate bg-info-subtle shadow-none bg-opacity-10">
                             <div class="position-absolute start-0" style="z-index: 0;">
-                                <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="110">
+                                <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="100%" height="90">
                                     <style>
                                         .s0 {
                                             opacity: .05;
@@ -35,7 +37,7 @@
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <div class="flex-grow-1">
-                                        <p class="text-uppercase fw-medium text-white text-truncate mb-0"><?php echo e(limitChars($template->title, 30)); ?></p>
+                                        <p class="text-uppercase fw-medium text-white text-truncate mb-0">{{ limitChars($template->title, 30) }}</p>
                                     </div>
                                     <div class="flex-shrink-0">
                                         <div class="dropdown dropstart">
@@ -44,37 +46,29 @@
                                             </a>
                                             <div class="dropdown-menu">
                                                 <li>
-                                                    <a href="<?php echo e(route('surveyTemplateEditURL', $template->id)); ?>" class="dropdown-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Editar">Editar</a>
+                                                    <a href="{{ route('surveyTemplateEditURL', $template->id) }}" class="dropdown-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Editar">Editar</a>
                                                 </li>
                                                 <li>
-                                                    <a href="<?php echo e(route('surveyTemplateShowURL', $template->id)); ?>" class="dropdown-item" target="_blank" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualizar Modelo em nova Janela">Visualizar</a>
+                                                    <a href="{{ route('surveyTemplateShowURL', $template->id) }}" class="dropdown-item" target="_blank" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualizar Modelo em nova Janela">Visualizar</a>
                                                 </li>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="d-flex align-items-center mt-4">
+                                <div class="d-flex align-items-center mt-2">
                                     <div class="flex-grow-1">
-                                        <h4 class="fs-22 fw-semibold ff-secondary mb-0">
-                                            <?php echo e(date("d/m/Y", strtotime($template->created_at))); ?>
-
-                                        </h4>
-                                    </div>
-                                    <div class="flex-shrink-0">
-                                        <span class="badge bg-secondary-subtle text-body text-uppercase" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="<?php echo e($getSurveyRecurringTranslations[$template->recurring]['description']); ?>">
-                                            <?php echo e($getSurveyRecurringTranslations[$template->recurring]['label']); ?>
-
-                                        </span>
+                                        <h3 class="fs-14 fw-semibold ff-secondary mb-0">
+                                            {{ date("d/m/Y", strtotime($template->created_at)) }}
+                                        </h3>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                @endforeach
             </div>
-        <?php endif; ?>
+        @endif
 
     </div>
     <!--end card-body-->
 </div>
-<?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/template/listing.blade.php ENDPATH**/ ?>
