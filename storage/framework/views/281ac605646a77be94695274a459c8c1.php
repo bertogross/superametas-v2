@@ -8,9 +8,21 @@ appPrintR($distributedData);
     <div class="col-sm-12 col-md-4">
         <div class="card">
             <?php if($survey->status == 'new'): ?>
-                <button type="button" class="btn btn-lg btn-soft-theme btn-icon w-100 h-100 p-4" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Iniciar Rotina <?php echo e($recurringLabel); ?>"><i class="ri-play-fill"></i></button>
+                <button type="button"
+                class="btn btn-lg btn-soft-theme btn-icon w-100 h-100 p-4"
+                id="btn-surveys-action"
+                data-survey-id="<?php echo e($survey->id); ?>"
+                data-action="start"
+                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                title="Iniciar Rotina "><i class="ri-play-fill"></i></button>
             <?php else: ?>
-                <button type="button" class="btn btn-lg btn-soft-danger btn-icon w-100 h-100 p-4" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Parar Rotina <?php echo e($recurringLabel); ?>"><i class="ri-stop-fill"></i></button>
+                <button type="button"
+                class="btn btn-lg btn-soft-danger btn-icon w-100 h-100 p-4"
+                id="btn-surveys-action"
+                data-survey-id="<?php echo e($survey->id); ?>"
+                data-action="stop" data-action="stop"
+                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                title="Interromper Rotina "><i class="ri-stop-fill"></i></button>
             <?php endif; ?>
         </div>
         <div class="card">
@@ -20,21 +32,24 @@ appPrintR($distributedData);
                     <table class="table table-borderless mb-0">
                         <tbody>
                             <tr>
-                                <th class="ps-0" scope="row">Data de Início :</th>
-                                <td class="text-muted">dd/mm/YYYY</td>
+                                <th class="ps-0" scope="row">Data de Registro :</th>
+                                <td class="text-muted"><?php echo e($survey->created_at  ? date("d/m/Y", strtotime($survey->created_at )) : '-'); ?></td>
                             </tr>
-                            
+                            <tr>
+                                <th class="ps-0" scope="row">Data de Início :</th>
+                                <td class="text-muted"><?php echo e($survey->started_at ? date("d/m/Y", strtotime($survey->started_at)) : '-'); ?></td>
+                            </tr>
                             <tr>
                                 <th class="ps-0" scope="row">Falhas :</th>
-                                <td class="text-muted">??</td>
+                                <td class="text-muted">-</td>
                             </tr>
                             <tr>
                                 <th class="ps-0" scope="row">Em Progresso :</th>
-                                <td class="text-muted">??</td>
+                                <td class="text-muted">-</td>
                             </tr>
                             <tr>
                                 <th class="ps-0" scope="row">Concluídas :</th>
-                                <td class="text-muted">??</td>
+                                <td class="text-muted">-</td>
                             </tr>
                         </tbody>
                     </table>

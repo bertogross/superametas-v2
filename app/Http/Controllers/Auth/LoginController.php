@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Config;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cookie;
+use App\Providers\RouteServiceProvider;
+use App\Http\Controllers\OnboardController;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 //use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
@@ -49,7 +50,7 @@ class LoginController extends Controller
         $credentials = $request->only('email', 'password');
 
         // Check if the user exists in the another databases
-        $getOtherDatabases = getOtherDatabases($credentials['email']);
+        $getOtherDatabases = OnboardController::getOtherDatabases($credentials['email']);
 
         if(!$getOtherDatabases){
             return redirect()->back()->withErrors(['email' => 'Authentication failed']);
@@ -113,7 +114,7 @@ class LoginController extends Controller
             return response()->json(['error' => 'Email is required']);
         }
 
-        $databases = getOtherDatabases($email);
+        $databases = OnboardController::getOtherDatabases($email);
 
         return response()->json(['databases' => $databases]);
     }

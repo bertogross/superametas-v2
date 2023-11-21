@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let isExecutionInProgress = false;
 
     // Prevent right-click context menu.
-    function preventRightClick(e) {
-        e.preventDefault();
+    function preventRightClick(event) {
+        event.preventDefault();
     }
 
     // Update the progress bar's color based on the given percentage.
@@ -171,17 +171,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Warn the user if they try to leave the page during execution
-    window.addEventListener('beforeunload', function(e) {
+    window.addEventListener('beforeunload', function(event) {
         if (isExecutionInProgress) {
             const message = 'A execução está em andamento. Tem certeza de que quer sair?';
-            e.returnValue = message;
+            event.returnValue = message;
             return message;
         }
     });
 
     // Event listener for the start synchronization button
-    document.getElementById('btn-start-synchronization').addEventListener('click', function(e) {
-        e.preventDefault();
+    document.getElementById('btn-start-synchronization').addEventListener('click', function(event) {
+        event.preventDefault();
 
         // Display initial status messages with delays
         const estimatedElement = document.querySelector('.synchronization-time');

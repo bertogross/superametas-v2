@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Survey;
 use App\Models\SurveyTemplates;
 use App\Models\SurveyStep;
 use App\Models\SurveyTerms;
@@ -21,10 +22,6 @@ class SurveysTemplatesController extends Controller
         }
 
         $data = SurveyTemplates::findOrFail($id);
-
-        if (!$data) {
-            abort(404);
-        }
 
         $decodedData = isset($data->template_data) && is_string($data->template_data) ? json_decode($data->template_data, true) : $data->template_data;
 
@@ -97,16 +94,11 @@ class SurveysTemplatesController extends Controller
         $userId = auth()->id();
 
         $data = SurveyTemplates::findOrFail($id);
-        /*
-        $data = SurveyTemplates::query();
-        $data->where('id', $id);
-        $data->where('user_id', $userId);
-        $data->get();
-        */
 
-        if (!$data) {
-            abort(404);
-        }
+        $surveys = Survey::where('template_id', $id)
+            ->where('user_id', $userId)
+            ->where('condition_of', '!=', 'deleted')
+            ->get();
 
         $getActiveDepartments = getActiveDepartments();
 
@@ -154,6 +146,7 @@ class SurveysTemplatesController extends Controller
 
         $view = view('surveys.templates.edit', compact(
                 'data',
+                'surveys',
                 'result',
                 'terms',
             )

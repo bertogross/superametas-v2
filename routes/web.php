@@ -18,6 +18,8 @@ use App\Http\Controllers\{
     //SurveyExecutionController,
     //SurveyTermsController,
     SettingsApiKeysController,
+    SettingsStripeController,
+    StripeWebhookController,
     DropboxController,
     ClarifaiImageController,
     ScenexImageController
@@ -64,6 +66,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/edit/{id?}', [SurveysController::class, 'edit'])->name('surveysEditURL')->where('id', '[0-9]+');
         Route::get('/{id?}', [SurveysController::class, 'show'])->name('surveysShowURL')->where('id', '[0-9]+');
         Route::post('/store/{id?}', [SurveysController::class, 'storeOrUpdate'])->name('surveysStoreOrUpdateURL');
+        Route::post('/action', [SurveysController::class, 'action'])->name('surveysActionURL');
 
             //Route::get('/listing', [SurveysTemplatesController::class, 'index'])->name('surveyTemplateIndexURL');
             Route::get('/template/create', [SurveysTemplatesController::class, 'create'])->name('surveysTemplateCreateURL');
@@ -88,6 +91,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/terms/edit/{id?}', [SurveyTermsController::class, 'edit'])->name('surveysTermsEditURL');
             Route::post('/terms/store/{id?}', [SurveyTermsController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
             Route::get('/terms/search', [SurveyTermsController::class, 'search'])->name('surveysTermsSearchURL');
+
+
     });
 
 
@@ -109,11 +114,18 @@ Route::middleware(['auth'])->group(function () {
                 Route::post('/users/update/{id}', [SettingsUserController::class, 'update']);
                 Route::get('/users/modal-form/{id?}', [SettingsUserController::class, 'getUserModalContent']);
 
+            Route::post('/stripe/subscription', [SettingsStripeController::class, 'createStripeSession'])->name('stripeSubscriptionURL');
+            Route::post('/stripe/subscription/details', [SettingsStripeController::class, 'updateSubscriptionItem'])->name('stripeSubscriptionDetailsURL');
+            Route::post('/stripe/cart/addon', [SettingsStripeController::class, 'addonCart'])->name('stripeCartAddonURL');
+            Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);
+
             Route::get('/dropbox', [DropboxController::class, 'index'])->name('DropboxIndexURL');
             Route::get('/dropbox/browse/{path}', [DropboxController::class, 'browseFolder'])->name('DropboxBrowseFolderURL');
 
             Route::post('/clarifai', [ClarifaiImageController::class, 'submit'])->name('ClarifaiSubmitURL');
             Route::post('/scenex', [ScenexImageController::class, 'submit'])->name('ScenexSubmitURL');
+
+
         });
     });
 
@@ -129,6 +141,7 @@ Route::middleware(['auth'])->group(function () {
 // Dynamic Database Middleware for Login
 Route::middleware([SetDynamicDatabase::class])->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
+    // Route::post('/onboard', [OnboardController::class, 'onboard']);
 });
 
 // Logout Route

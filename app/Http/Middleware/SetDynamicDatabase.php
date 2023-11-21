@@ -2,11 +2,13 @@
 
 namespace App\Http\Middleware;
 
+use in;
 use Closure;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cookie;
+use App\Http\Controllers\OnboardController;
 //use Illuminate\Support\Facades\Session;
 
 class SetDynamicDatabase
@@ -23,7 +25,7 @@ class SetDynamicDatabase
         }
 
         // Check if the user exists in the another databases
-        $getOtherDatabases = getOtherDatabases($email);
+        $getOtherDatabases = OnboardController::getOtherDatabases($email);
 
         if(!$getOtherDatabases){
             return redirect()->back()->withErrors(['email' => 'Authentication failed']);

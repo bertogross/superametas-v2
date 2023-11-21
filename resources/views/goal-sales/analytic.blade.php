@@ -66,7 +66,7 @@
                                 </div>
                                 <div class="col">
                                     <div class="p-1">
-                                        <h6 class="mb-0 text-muted text-start">{{ formatBrazilianReal($department->sales, 2) }}</h6>
+                                        <h6 class="mb-0 text-muted text-start">{{ brazilianRealFormat($department->sales, 2) }}</h6>
                                     </div>
                                 </div>
                             </div>
@@ -133,7 +133,7 @@
                         <div class="p-3 border border-dashed border-start-0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Vendas" data-bs-content="Você está visualizando o valor somado de {{ count($filterCompanies) > 0 ? '<span class="text-theme fw-bold me-1">'.count($filterCompanies).'</span> Loja'.$plural.'' : 'Todas as Lojas' }}">
                             <h5 class="mb-1">
                                 <span>
-                                    {{ is_array($totalSalesByMonth) && array_sum($totalSalesByMonth) > 0 ? formatBrazilianReal( array_sum($totalSalesByMonth), 0) : 0 }}
+                                    {{ is_array($totalSalesByMonth) && array_sum($totalSalesByMonth) > 0 ? brazilianRealFormat( array_sum($totalSalesByMonth), 0) : 0 }}
                                 </span>
                             </h5>
                             <p class="text-muted mb-0">Vendas</p>
@@ -143,7 +143,7 @@
                         <div class="p-3 border border-dashed border-start-0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Meta" data-bs-content="Você está visualizando o valor somado de {{ count($filterCompanies) > 0 ? '<span class="text-theme fw-bold me-1">'.count($filterCompanies).'</span> Loja'.$plural.'' : 'Todas as Lojas' }}">
                             <h5 class="mb-1">
                                 <span>
-                                    {{ is_array($totalGoalsByMonth) && array_sum($totalGoalsByMonth) > 0 ? formatBrazilianReal( array_sum($totalGoalsByMonth), 0) : 0 }}
+                                    {{ is_array($totalGoalsByMonth) && array_sum($totalGoalsByMonth) > 0 ? brazilianRealFormat( array_sum($totalGoalsByMonth), 0) : 0 }}
                                 </span>
                             </h5>
                             <p class="text-muted mb-0">Meta</p>

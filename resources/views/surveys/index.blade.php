@@ -120,6 +120,7 @@
         var surveysIndexURL = "{{ route('surveysIndexURL') }}";
         var surveysCreateURL = "{{ route('surveysCreateURL') }}";
         var surveysEditURL = "{{ route('surveysEditURL') }}";
+        var surveysActionURL = "{{ route('surveysActionURL') }}";
         var surveysShowURL = "{{ route('surveysShowURL') }}";
         var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
     </script>

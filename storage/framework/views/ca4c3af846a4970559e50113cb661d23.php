@@ -10,7 +10,7 @@
         $topics = $step['topics'] ?? null;
         $topics = $topics && is_array($topics) ? array_filter($topics) : $topics;
     ?>
-    <div id="<?php echo e($termId); ?>" class="accordion-item block-item mt-3 mb-0 border-dark border-1 rounded rounded-2 p-0">
+    <div id="<?php echo e($termId); ?>" class="accordion-item block-item mt-3 mb-0 border-light border-1 rounded rounded-2 p-0">
         <div class="input-group">
             <input type="text" class="form-control text-theme" name="steps[<?php echo e($stepIndex); ?>]['stepData']['step_name']" value="<?php echo e($stepName); ?>" placeholder="Setor/Etapa" maxlength="100" readonly required tabindex="-1">
 

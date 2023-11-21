@@ -17,7 +17,8 @@
             </div>
             <div class="col-sm-6">
                 <div class="text-sm-end d-none d-sm-block">
-                    <span class="badge bg-warning">Badge</span>
+                    <?php echo e(subscriptionLabel()); ?>
+
                 </div>
             </div>
         </div>

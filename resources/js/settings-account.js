@@ -89,12 +89,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const phoneInputs = document.querySelectorAll('.phone-mask');
 
         phoneInputs.forEach(input => {
-            input.addEventListener('input', function(e) {
-                if (e.inputType === "deleteContentBackward") {
+            input.addEventListener('input', function(event) {
+                if (event.inputType === "deleteContentBackward") {
                     return; // If backspace was pressed, just return
                 }
 
-                var target = e.target,
+                var target = event.target,
                     value = target.value;
 
                 value = onlyNumbers(value); // Remove non-numeric characters

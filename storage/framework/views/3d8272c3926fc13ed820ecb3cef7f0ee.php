@@ -24,7 +24,7 @@
 
         <?php echo $__env->make('layouts.vendor-scripts', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-        <div id="custom-backdrop" class="d-none text-muted">
+        <div id="custom-backdrop" class="d-none text-white">
             <div style="display: flex; align-items: flex-end; justify-content: flex-start; height: 100vh; padding: 25px; padding-bottom: 70px;">
                 Para continuar trabalhando enquanto este processo está em andamento, <a href="<?php echo e(url('/')); ?>" target="_blank" class="text-theme me-1 ms-1">clique aqui</a> para abrir o <?php echo e(env('APP_NAME')); ?> em nova guia
             </div>

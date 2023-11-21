@@ -28,7 +28,7 @@ class SurveyTermsController extends Controller
         return view('surveys.terms.show', compact('term'));
     }
 
-    public function storeOrUpdate(Request $request, $id = null)
+    public function storeOrUpdate(Request $request)
     {
         $validatedData = $request->validate([
             'name' => 'required',

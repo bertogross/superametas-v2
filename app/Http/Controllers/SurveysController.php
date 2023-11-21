@@ -62,6 +62,7 @@ class SurveysController extends Controller
             $query->where('status', $status);
         }
         $query = $query->where('user_id', $userId);
+        $query = $query->where('condition_of', 'publish');
 
         // Search by delegated_to and or audited_by
         /*
@@ -134,10 +135,6 @@ class SurveysController extends Controller
 
         $data = Survey::findOrFail($id);
 
-        if (!$data) {
-            abort(404);
-        }
-
         $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
 
         $preview = $request->query('preview', false);
@@ -206,16 +203,10 @@ class SurveysController extends Controller
         $data->where('user_id', $userId);
         */
 
-        if (!$data) {
-            abort(404);
-        }
-
         // Check if the current user is the creator
-        /*
-        if ($userId == $data->user_id) {
+        if ($userId != $data->user_id) {
             return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro efetuado por outra pessoa']);
         }
-        */
 
         $users = getUsers();
 
@@ -235,6 +226,39 @@ class SurveysController extends Controller
                 'getSurveyRecurringTranslations'
             )
         );
+    }
+
+    //start/stop survey
+    public function action(Request $request)
+    {
+        $userId = auth()->id();
+
+        $id = $request->input('id');
+
+        $data = Survey::findOrFail($id);
+
+        if ($userId != $data->user_id) {
+            return response()->json(['success' => false, 'message' => 'Você não possui autorização para Inicializar/Interromper a rotina registrada por outra pessoa']);
+        }
+
+        // Change the status based on current status
+        if ($data->status != 'new') {
+            $data->status = 'stopped';
+        } else {
+            $data->status = 'pending';
+        }
+
+        /*
+        if( empty($data->started_at) ){
+            $data->started_at = date('Y-m-d H:i:s');
+        }
+        */
+
+        // Save the changes
+        $data->save();
+
+        // Return a success response
+        return response()->json(['success' => true, 'message' => 'Status da rotina atualizado com sucesso']);
     }
 
     public function storeOrUpdate(Request $request, $id = null)

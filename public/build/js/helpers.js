@@ -1,7 +1,7 @@
 
 // Toast Notifications
 // Display a toast notification using Bootstrap's Toast API with a backdrop
-export function toastAlert(message, type = 'success', duration = 0) {
+export function toastAlert(message, type = 'success', duration = 6000) {
     // Remove existing toast containers
     document.querySelectorAll('.toast-container').forEach(element => element.remove());
 
@@ -142,10 +142,10 @@ export function multipleModal() {
 export function preventWizardNavigation(){
     // Using plain JavaScript to disable click on nav items
     document.querySelectorAll('.nav-item .nav-link').forEach(function(tab) {
-        tab.addEventListener('click', function(e) {
+        tab.addEventListener('click', function(event) {
             if (!this.classList.contains('active')) {
-                e.preventDefault();
-                e.stopPropagation();
+                event.preventDefault();
+                event.stopPropagation();
                 return;
             }
         });
@@ -180,12 +180,12 @@ export function formatNumberInput(selector = '.format-numbers', decimals = 0) {
 
     numberInputs.forEach(input => {
         // Format value when typing
-        input.addEventListener('input', function(e) {
-            if (e.inputType === "deleteContentBackward") {
+        input.addEventListener('input', function(event) {
+            if (event.inputType === "deleteContentBackward") {
                 return; // If backspace was pressed, just return
             }
 
-            var target = e.target;
+            var target = event.target;
             target.value = formatValue(target.value, decimals);
         });
 
@@ -338,16 +338,16 @@ export function toggleZoomInOut() {
         }
 
         // Click events
-        document.addEventListener('click', function (e) {
-            if (e.target.id === 'zoom_in') {
-                e.preventDefault();
-                zoomPage(10, e.target, zoomTarget);
-            } else if (e.target.id === 'zoom_out') {
-                e.preventDefault();
-                zoomPage(-10, e.target, zoomTarget);
-            } else if (e.target.id === 'zoom_reset') {
-                e.preventDefault();
-                zoomPage(0, e.target, zoomTarget);
+        document.addEventListener('click', function (event) {
+            if (event.target.id === 'zoom_in') {
+                event.preventDefault();
+                zoomPage(10, event.target, zoomTarget);
+            } else if (event.target.id === 'zoom_out') {
+                event.preventDefault();
+                zoomPage(-10, event.target, zoomTarget);
+            } else if (event.target.id === 'zoom_reset') {
+                event.preventDefault();
+                zoomPage(0, event.target, zoomTarget);
             }
         });
 
@@ -829,10 +829,10 @@ export function toggleTableRows() {
 
 // Function to allow unchecking of radio buttons
 export function allowUncheckRadioButtons(radioSelector = '.form-check-input') {
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function(event) {
         // Check if the clicked element is a radio button and if it's part of the selection we want to control
-        if (e.target.matches(radioSelector)) {
-            var radio = e.target;
+        if (event.target.matches(radioSelector)) {
+            var radio = event.target;
             // If the radio button was already checked, uncheck it
             if (radio.dataset.checked) {
                 radio.checked = false;
@@ -916,6 +916,7 @@ export function layouRightSide(){
         }
     });
 }
+
 
 
 
@@ -1079,19 +1080,19 @@ export function attachImage(inputSelector, imageSelector, uploadUrl) {
                             }
                         })
                         .then(response => response.json())
-                        .then(response => {
-                            if (response.success) {
-                                toastAlert(response.message, 'success');
-                                if (response.path) {
+                        .then(data => {
+                            if (data.success) {
+                                toastAlert(data.message, 'success');
+                                if (data.path) {
                                     if(preview){
-                                        preview.src = '/storage/' + response.path;
+                                        preview.src = '/storage/' + data.path;
                                     }
                                     if(previewCard){
-                                        previewCard.src = '/storage/' + response.path;
+                                        previewCard.src = '/storage/' + data.path;
                                     }
                                 }
                             } else {
-                                toastAlert(response.message, 'danger');
+                                toastAlert(data.message, 'danger');
                             }
                         })
                         .catch(error => {

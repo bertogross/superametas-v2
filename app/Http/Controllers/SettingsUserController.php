@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
-
+use App\Http\Controllers\OnboardController;
 /**
  * SettingsUserController
  *
@@ -96,7 +96,7 @@ class SettingsUserController extends Controller
         }
 
         // Check if email exists in another smApp database and copu
-        $password = $this->getPasswordFromOtherDatabases($request->email);
+        $password = OnboardController::getPasswordFromOtherDatabases($request->email);
 
         // Generate a random password if not found in other databases
         if (!$password) {
@@ -121,12 +121,12 @@ class SettingsUserController extends Controller
 
         if ($user->save()) {
             // Call the new method to update or create a record in app_subusers
-            $this->updateOrCreateSubUser($user->email);
+            OnboardController::updateOrCreateSubUser($user->email);
 
             return response()->json([
                 'success' => true,
                 'message' => $message,
-                'getOtherDatabases' => json_encode(getOtherDatabases($user->email))
+                'getOtherDatabases' => json_encode(OnboardController::getOtherDatabases($user->email))
             ], 200);
 
         } else {
@@ -208,94 +208,6 @@ class SettingsUserController extends Controller
         }
     }
 
-    /**
-     * Get the password of a user from other smApp databases.
-     *
-     * @param string $email The user's email.
-     * @return string|null The user's password or null if not found.
-     */
-    protected function getPasswordFromOtherDatabases($email)
-    {
-        // Get the list of other smApp databases from smOnboard
-        $otherDatabases = getOtherDatabases($email);
-
-        foreach ($otherDatabases as $databaseName) {
-            // Skip the current database
-            if ($databaseName == config('database.connections.smAppTemplate.database')) {
-                continue;
-            }
-
-            // Set the database connection configuration for the other database
-            config([
-                'database.connections.otherDatabase' => [
-                    'driver' => 'mysql',
-                    'host' => env('DB_HOST'),
-                    'port' => env('DB_PORT'),
-                    'database' => $databaseName,
-                    'username' => env('DB_USERNAME'),
-                    'password' => env('DB_PASSWORD'),
-                    'charset' => 'utf8mb4',
-                    'collation' => 'utf8mb4_unicode_ci',
-                    'prefix' => '',
-                    'strict' => true,
-                    'engine' => null,
-                ],
-            ]);
-
-            // Check if the user exists in the other database
-            $user = DB::connection('otherDatabase')
-                ->table('users')
-                ->where('email', $email)
-                ->where('status', 1)
-                ->first();
-
-            if ($user) {
-                // Return the user's password
-                return $user->password;
-            }
-            // Disconnect from the other database
-            DB::disconnect('otherDatabase');
-        }
-
-        // User not found in other databases
-        return null;
-    }
-
-    /**
-     * Update/Create subusers in smOnboard
-     */
-    protected function updateOrCreateSubUser($email)
-    {
-        $databaseConnection = config('database.connections.smAppTemplate.database');
-
-        // Get the ID of the current database connection. It is a helper function
-        $databaseId = extractDatabaseId($databaseConnection);
-
-        // Update or create a record in app_subusers
-        $onboardConnection = DB::connection('smOnboard');
-        $subuser = $onboardConnection->table('app_subusers')
-            ->where('sub_user_email', $email)
-            ->first();
-
-        if ($subuser) {
-            // Update the app_IDs column to include the new app_ID
-            $appIds = json_decode($subuser->app_IDs, true);
-            if (!in_array($databaseId, $appIds)) {
-                $appIds[] = $databaseId;
-                $onboardConnection->table('app_subusers')
-                    ->where('sub_user_email', $email)
-                    ->update(['app_IDs' => json_encode($appIds)]);
-            }
-        } else {
-            // Create a new record with the given email and app_ID
-            $appIds = array($databaseId);
-            $onboardConnection->table('app_subusers')
-                ->insert([
-                    'sub_user_email' => $email,
-                    'app_IDs' => json_encode($appIds),
-                ]);
-        }
-    }
 
     /**
      * Update or create a user's meta data.
@@ -317,7 +229,7 @@ class SettingsUserController extends Controller
     protected function updatePasswordInOtherDatabases($email, $hashedPassword)
     {
         // Get the list of other smApp databases
-        $otherDatabases = getOtherDatabases($email);
+        $otherDatabases = OnboardController::getOtherDatabases($email);
 
         // Update the password in each database
         foreach ($otherDatabases as $databaseName) {

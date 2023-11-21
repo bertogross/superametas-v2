@@ -24,11 +24,23 @@
     <?php echo $__env->make('components.alerts', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
     <?php
+        //appPrintR(count($surveys));
         //appPrintR($data);
         $templateId = $data->id ?? '';
         $title = $data->title ?? '';
         $description = $data->description ?? '';
+
+        $countSurveys = count($surveys);
+        $countSurveysText = $countSurveys > 1 ? 'Este modelo está sendo utilizado em '.$countSurveys.' vistorias. A edição deste não influênciará nos dados das rotinas que estão em andamento.' : 'Este modelo está sendo utilizado em uma vistoria. A edição deste não influênciará nos dados da rotina que está em andamento.';
+        $countSurveysText .= '<br><br>Se a intenção for a de modificar processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho ideal será encerrar determinada vistoria e gerar um novo registro. Se este for o caso, prossiga com a edição deste modelo e reutilize-o depois.'
     ?>
+
+    <?php if($countSurveys): ?>
+        <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+            <i class="ri-alert-line label-icon"></i> <?php echo $countSurveysText; ?>
+
+        </div>
+    <?php endif; ?>
 
     <div class="card">
         <div class="card-header">
@@ -63,7 +75,7 @@
 
                             <div>
                                 <label for="description" class="form-label">Descrição:</label>
-                                <textarea name="description" class="form-control maxlength" maxlength="1000" id="description" rows="3" maxlength="500" placeholder="Descreva, por exemplo, a funcionalidade ou destino deste modelo..."><?php echo e($description); ?></textarea>
+                                <textarea name="description" class="form-control maxlength" id="description" rows="3" maxlength="500" placeholder="Descreva, por exemplo, a funcionalidade ou destino deste modelo..."><?php echo e($description); ?></textarea>
                                 <div class="form-text">Opcional</div>
                             </div>
 

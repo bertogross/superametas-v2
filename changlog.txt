@@ -7,7 +7,14 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 https://laravel-news.com/openai-for-laravel
 
 
-Version 2.0.26 - [2023-11-18]
+
+
+Version 2.0.26 - [2023-11-21]
+
+
+
+
+Version 2.0.26 - [2023-11-18 - 2023-11-20]
 - [Added] Stripe
 - [Updated] settings/account views
 

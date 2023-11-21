@@ -31,24 +31,47 @@
             <div class="row">
                 <div class="col-lg-2">
                     <div class="nav nav-pills flex-column nav-pills-tab verti-nav-pills custom-verti-nav-pills nav-pills-theme" role="tablist" aria-orientation="vertical">
-                        <a class="nav-link text-uppercase <?php echo e(session('active_tab') == 'account' || session('active_tab') == '' ? 'active show' : ''); ?>" href="#v-pills-account" id="v-pills-account-tab" data-bs-toggle="pill" role="tab" aria-controls="v-pills-account" aria-selected="true">Dados da Conta</a>
-                        <a class="nav-link text-uppercase <?php echo e(session('active_tab') == 'stripe' ? 'active show' : ''); ?>" id="v-pills-stripe-tab" data-bs-toggle="pill" href="#v-pills-stripe" role="tab" aria-controls="v-pills-stripe" aria-selected="false">Faturamento da Assinatura</a>
+                        <a class="nav-link text-uppercase" href="#v-pills-account" id="v-pills-account-tab" data-bs-toggle="pill" role="tab" aria-controls="v-pills-account" aria-selected="true">Dados da Conta</a>
+
+                        <a class="nav-link text-uppercase" id="v-pills-invoices-tab" data-bs-toggle="pill" href="#v-pills-invoices" role="tab" aria-controls="v-pills-invoices" aria-selected="false">Faturamento</a>
+
+                        <a class="nav-link text-uppercase active show" id="v-pills-stripe-tab" data-bs-toggle="pill" href="#v-pills-stripe" role="tab" aria-controls="v-pills-stripe" aria-selected="false">Assinatura</a>
                     </div>
                 </div> <!-- end col-->
                 <div class="col-lg-10">
                     <div class="tab-content text-muted mt-3 mt-lg-2">
-                        <div class="tab-pane fade <?php echo e(session('active_tab') == 'account' || session('active_tab') == '' ? 'active show' : ''); ?>" id="v-pills-account" role="tabpanel" aria-labelledby="v-pills-account-tab">
+                        <div class="tab-pane fade" id="v-pills-account" role="tabpanel" aria-labelledby="v-pills-account-tab">
                             <?php echo $__env->make('settings.account-form', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                         </div><!--end tab-pane-->
 
-                        <div class="tab-pane fade <?php echo e(session('active_tab') == 'stripe' ? 'active show' : ''); ?>" id="v-pills-stripe" role="tabpanel" aria-labelledby="v-pills-stripe-tab">
-                            <?php echo $__env->make('settings.account-stripe', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                        <div class="tab-pane fade" id="v-pills-invoices" role="tabpanel" aria-labelledby="v-pills-invoices-tab">
+                            <?php echo $__env->make('settings.stripe.invoices', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                        </div><!--end tab-pane-->
+
+                        <div class="tab-pane fade active show" id="v-pills-stripe" role="tabpanel" aria-labelledby="v-pills-stripe-tab">
+                            <?php echo $__env->make('settings.stripe.subscription', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                         </div><!--end tab-pane-->
                     </div>
                 </div> <!-- end col-->
             </div> <!-- end row-->
         </div><!-- end card-body -->
     </div><!--end card-->
+
+    <div class="modal zoomIn" id="modalStripeSubscriptionDetails" tabindex="-1" data-bs-backdrop="static" aria-hidden="true" data-bs-focus="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header p-3 bg-soft-info">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="load-form">
+                    ...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php echo $__env->make('settings.stripe.modal-upcoming', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
@@ -65,6 +88,15 @@
         var uploadLogoURL = "<?php echo e(route('uploadLogoURL')); ?>";
     </script>
     <script src="<?php echo e(URL::asset('build/js/settings-account.js')); ?>" type="module"></script>
+
+    <script>
+        var stripeSubscriptionURL = "<?php echo e(route('stripeSubscriptionURL')); ?>";
+        var stripeSubscriptionDetailsURL = "<?php echo e(route('stripeSubscriptionDetailsURL')); ?>";
+        var stripeCartAddonURL = "<?php echo e(route('stripeCartAddonURL')); ?>";
+
+        var assetUrl = "<?php echo e(URL::asset('/')); ?>";
+    </script>
+    <script src="<?php echo e(URL::asset('build/js/settings-stripe.js')); ?>" type="module"></script>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/settings/account.blade.php ENDPATH**/ ?>

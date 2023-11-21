@@ -136,16 +136,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 })
                 .then(response => response.json())
-                .then(response => {
-                    if (response.success) {
-                        toastAlert(response.message, 'success', 10000);
+                .then(data => {
+                    if (data.success) {
+                        toastAlert(data.message, 'success', 10000);
                         setTimeout(() => {
                             location.reload();
                         }, form.dataset.id ? 5000 : 120000);
 
                         document.getElementById('btn-save-user').remove();
                     } else {
-                        toastAlert(response.message, 'danger', 60000);
+                        toastAlert(data.message, 'danger', 60000);
                     }
                 })
                 .catch(error => {

@@ -58,9 +58,21 @@ based on apps-crm-deals.blade.php
     <div class="col-sm-12 col-md-4">
         <div class="card">
             @if ($survey->status == 'new')
-                <button type="button" class="btn btn-lg btn-soft-theme btn-icon w-100 h-100 p-4" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Iniciar Rotina {{ $recurringLabel }}"><i class="ri-play-fill"></i></button>
+                <button type="button"
+                class="btn btn-lg btn-soft-theme btn-icon w-100 h-100 p-4"
+                id="btn-surveys-action"
+                data-survey-id="{{ $survey->id }}"
+                data-action="start"
+                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                title="Iniciar Rotina {{-- $recurringLabel --}}"><i class="ri-play-fill"></i></button>
             @else
-                <button type="button" class="btn btn-lg btn-soft-danger btn-icon w-100 h-100 p-4" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Parar Rotina {{ $recurringLabel }}"><i class="ri-stop-fill"></i></button>
+                <button type="button"
+                class="btn btn-lg btn-soft-danger btn-icon w-100 h-100 p-4"
+                id="btn-surveys-action"
+                data-survey-id="{{ $survey->id }}"
+                data-action="stop" data-action="stop"
+                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                title="Interromper Rotina {{-- $recurringLabel --}}"><i class="ri-stop-fill"></i></button>
             @endif
         </div>
         <div class="card">
@@ -70,33 +82,24 @@ based on apps-crm-deals.blade.php
                     <table class="table table-borderless mb-0">
                         <tbody>
                             <tr>
-                                <th class="ps-0" scope="row">Data de Início :</th>
-                                <td class="text-muted">dd/mm/YYYY</td>
+                                <th class="ps-0" scope="row">Data de Registro :</th>
+                                <td class="text-muted">{{ $survey->created_at  ? date("d/m/Y", strtotime($survey->created_at )) : '-' }}</td>
                             </tr>
-                            {{--
                             <tr>
-                                <th class="ps-0" scope="row">Envolvidos :</th>
-                                <td class="text-muted">
-                                    @php
-                                        $merged = array_merge($distributedData['audited_by'], $distributedData['delegated_to']);
-                                        $columns = array_column($merged, 'user_id');
-                                        $uniqued = count($columns) > 1 ? array_unique($columns) : $columns;
-                                        echo is_array($uniqued) ? count($uniqued) : 0;
-                                    @endphp
-                                </td>
+                                <th class="ps-0" scope="row">Data de Início :</th>
+                                <td class="text-muted">{{ $survey->started_at ? date("d/m/Y", strtotime($survey->started_at)) : '-' }}</td>
                             </tr>
-                            --}}
                             <tr>
                                 <th class="ps-0" scope="row">Falhas :</th>
-                                <td class="text-muted">??</td>
+                                <td class="text-muted">-</td>
                             </tr>
                             <tr>
                                 <th class="ps-0" scope="row">Em Progresso :</th>
-                                <td class="text-muted">??</td>
+                                <td class="text-muted">-</td>
                             </tr>
                             <tr>
                                 <th class="ps-0" scope="row">Concluídas :</th>
-                                <td class="text-muted">??</td>
+                                <td class="text-muted">-</td>
                             </tr>
                         </tbody>
                     </table>

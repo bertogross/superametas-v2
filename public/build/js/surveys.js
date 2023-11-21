@@ -44,6 +44,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    var btnAction = document.getElementById('btn-surveys-action');
+    if(btnAction){
+        btnAction.addEventListener('click', async function(event) {
+            event.preventDefault;
+
+            var surveyId = this.getAttribute("data-survey-id");
+
+            fetch(SurveysController, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                },
+                body: JSON.stringify({ id: surveyId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+
+                    toastAlert(data.message, 'success', 5000);
+                } else {
+                    // Handle error
+                    console.error('Error start/stop survey:', data.message);
+
+                    toastAlert(data.message, 'danger', 5000);
+                }
+
+                // Reload the terms form
+                reloadTermsForm();
+            })
+            .catch(error => console.error('Error:', error));
+
+        });
+    }
 
     function loadFormModal(Id = null) {
         var xhr = new XMLHttpRequest();
@@ -185,8 +219,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
     }
-
-
 
 
     // Make the preview request

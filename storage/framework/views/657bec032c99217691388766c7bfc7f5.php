@@ -79,6 +79,7 @@
         var surveysIndexURL = "<?php echo e(route('surveysIndexURL')); ?>";
         var surveysCreateURL = "<?php echo e(route('surveysCreateURL')); ?>";
         var surveysEditURL = "<?php echo e(route('surveysEditURL')); ?>";
+        var surveysActionURL = "<?php echo e(route('surveysActionURL')); ?>";
         var surveysShowURL = "<?php echo e(route('surveysShowURL')); ?>";
         var surveysStoreOrUpdateURL = "<?php echo e(route('surveysStoreOrUpdateURL')); ?>";
     </script>

@@ -20,9 +20,10 @@ return new class extends Migration
             $table->enum('recurring', ['once', 'daily', 'weekly', 'biweekly', 'monthly', 'annual'])->default('once');
             $table->json('distributed_data')->nullable()->comment('The json data to to use to populate the _assigments');
             $table->json('template_data')->nullable()->comment('The json data from survey_templates table');
-            $table->date('started_at')->nullable()->comment('The start date of the survey task');
+            $table->timestamp('started_at')->nullable()->comment('The start date of the survey task');
             $table->timestamp('completed_at')->nullable()->comment('The timestamp when the survey task was completed');
             $table->timestamp('audited_at')->nullable()->comment('The timestamp when the survey task was audited');
+            $table->enum('condition_of', ['publish', 'filed', 'deleted'])->default('publish');
             $table->timestamps();
         });
     }

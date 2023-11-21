@@ -517,8 +517,8 @@ class GoalSalesController extends Controller
                 }
 
                 // Create a tooltip with formatted goal, sales, and progress values.
-                $tooltip = "Meta: " . formatBrazilianReal($goal, 0) . "<br>";
-                $tooltip .= "Vendas: " . formatBrazilianReal($sales, 0) . "<br>";
+                $tooltip = "Meta: " . brazilianRealFormat($goal, 0) . "<br>";
+                $tooltip .= "Vendas: " . brazilianRealFormat($sales, 0) . "<br>";
                 $tooltip .= "Progresso: " . numberFormat($progress, 2) . '%';
 
                 // If the department is not already in the array, add it with calculated values.
@@ -536,7 +536,7 @@ class GoalSalesController extends Controller
                     $departments[$departmentId]->sales += $sales;
                     $departments[$departmentId]->goal += $goal;
                     $departments[$departmentId]->progress = intval($departments[$departmentId]->sales) > 0 && intval($departments[$departmentId]->goal) > 0 ? ($departments[$departmentId]->sales / $departments[$departmentId]->goal) * 100 : 0;
-                    $departments[$departmentId]->tooltip = "Meta: " . formatBrazilianReal($departments[$departmentId]->goal, 0) . "<br>Vendas: " . formatBrazilianReal($departments[$departmentId]->sales, 0) . "<br>Progresso: " . numberFormat($departments[$departmentId]->progress, 2) . '%';
+                    $departments[$departmentId]->tooltip = "Meta: " . brazilianRealFormat($departments[$departmentId]->goal, 0) . "<br>Vendas: " . brazilianRealFormat($departments[$departmentId]->sales, 0) . "<br>Progresso: " . numberFormat($departments[$departmentId]->progress, 2) . '%';
                 }
             }// foreach
         }// foreach

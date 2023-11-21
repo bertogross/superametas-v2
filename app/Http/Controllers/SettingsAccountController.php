@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+
 //use Illuminate\Support\Facades\Log;
 
 class SettingsAccountController extends Controller
@@ -21,7 +22,23 @@ class SettingsAccountController extends Controller
     public function show()
     {
         $settings = DB::connection($this->connection)->table('settings')->pluck('value', 'key')->toArray();
-        return view('settings.account', compact('settings'));
+
+        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+
+        $getStripeData = getStripeData();
+        $customerId = $getStripeData['customer_id'];
+        $subscriptionId = $getStripeData['subscription_id'];
+
+        $subscriptionItemId = '';
+
+        return view('settings.account', compact(
+                'settings',
+                'stripe',
+                'customerId',
+                'subscriptionId',
+                'subscriptionItemId'
+            )
+        );
     }
 
     public function storeOrUpdate(Request $request)
