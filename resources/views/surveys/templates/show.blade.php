@@ -18,16 +18,21 @@
     @endcomponent
 
     <div id="content" class="rounded rounded-2 mb-4">
-        <div class="bg-warning-subtle position-relative">
+        <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show">
+            <i class="ri-alert-line label-icon"></i> Este <strong>não</strong> é um formulário válido.<br>Esta demonstração é exibida durante a Pré-visualização na composição de um Modelo.
+        </div>
+
+        <div class="bg-primary-subtle position-relative">
             @if (!$edition)
                 <span class="float-start m-3 position-absolute">{!! statusBadge($data->status) !!}</span>
             @endif
 
             @if(!$preview && !$edition)
-                <a href="{{ route('surveyTemplateEditURL', ['id' => $data->id]) }}" class="btn btn-sm btn-light btn-icon waves-effect ms-2 float-end m-3" title="Editar registro: {{ limitChars($data->title ?? '', 20) }}"><i class="ri-edit-line"></i></a>
+                <a href="{{ route('surveysTemplateEditURL', ['id' => $data->id]) }}" class="btn btn-sm btn-light btn-icon waves-effect ms-2 float-end m-3" title="Editar registro: {{ limitChars($data->title ?? '', 20) }}"><i class="ri-edit-line"></i></a>
             @endif
 
             <div class="card-body p-5 text-center">
+                <h2 class="text-theme text-uppercase">Modelo</h2>
                 <h3>{{ $data ? $data->title : '' }}</h3>
                 <div class="mb-0 text-muted">
                     Atualizado em:
@@ -47,14 +52,11 @@
                 </svg>
             </div>
         </div>
-        @php
-            //appPrintR($result);
-        @endphp
 
         @if ($result)
-            @component('surveys.components.steps-card')
+            @component('surveys.layouts.form-step-cards')
                 @slot('data', $result)
-                @slot('edition', $edition)
+                @slot('purpose', 'fakeForm')
             @endcomponent
         @endif
     </div>

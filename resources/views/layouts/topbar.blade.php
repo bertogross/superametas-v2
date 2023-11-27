@@ -111,15 +111,17 @@
                                     </a>
                                 </div>
                                 -->
-                                <div class="col">
-                                    <a class="dropdown-icon-item" href="{{ route('surveysIndexURL') }}" title="Vistorias">
-                                        <i class="ri-survey-line text-theme fs-1"></i>
-                                        {{--
-                                        <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Vistorias">
-                                        --}}
-                                        <span>Vistorias</span>
-                                    </a>
-                                </div>
+                                @if(auth()->user()->hasRole(User::ROLE_ADMIN) || auth()->user()->hasRole(User::ROLE_CONTROLLERSHIP))
+                                    <div class="col">
+                                        <a class="dropdown-icon-item" href="{{ route('surveysIndexURL') }}" title="Vistorias">
+                                            <i class="ri-survey-line text-theme fs-1"></i>
+                                            {{--
+                                            <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Vistorias">
+                                            --}}
+                                            <span>Vistorias</span>
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -182,8 +184,8 @@
                         @endif
 
                         <a class="dropdown-item" href="{{ route('profileShowURL') }}">
-                            <i class="ri-account-box-fill  text-muted fs-16 align-middle me-1"></i>
-                            <span class="align-middle">Meu Perfil</span>
+                            <i class="ri-survey-line text-muted fs-16 align-middle me-1"></i>
+                            <span class="align-middle">Tarefas</span>
                         </a>
 
                         <!--

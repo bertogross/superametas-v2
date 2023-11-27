@@ -14,28 +14,19 @@ class SurveyResponse extends Model
     public $timestamps = true;
 
     protected $fillable = [
+        'company_id',
+        'surveyor_id',
+        'auditor_id',
+        'step_id',
         'topic_id',
         'survey_id',
-        'user_id',
-        'response',
-        'comment',
-        'photo_url'
+        'compliance_survey',
+        'compliance_audit',
+        'comment_survey',
+        'comment_audit',
+        'attachment_id_survey',
+        'attachment_id_audit'
     ];
-
-    public function topic()
-    {
-        return $this->belongsTo(SurveyTopic::class);
-    }
-
-    public function survey()
-    {
-        return $this->belongsTo(Survey::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
 
 }

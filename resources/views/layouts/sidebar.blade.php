@@ -47,7 +47,7 @@
     @endif
     {{--
     @if ( Request::is('surveys*') )
-        @component('surveys.components.nav')
+        @component('surveys.layouts.nav')
         @endcomponent
     @endif
     --}}

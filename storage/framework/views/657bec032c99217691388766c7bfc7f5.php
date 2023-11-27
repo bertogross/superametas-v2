@@ -1,17 +1,10 @@
-<?php
-// appPrintR($getSurveyStatusTranslations);
-
-?>
-
 <?php $__env->startSection('title'); ?>
     <?php echo app('translator')->get('translation.surveys'); ?>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('css'); ?>
-    <link href="<?php echo e(URL::asset('build/libs/sweetalert2/sweetalert2.min.css')); ?>" rel="stylesheet" type="text/css" />
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>
     
-
     <div class="row mb-3">
         <div class="col">
             <div class="row mb-3 pb-1">
@@ -65,7 +58,6 @@
             </div>
         </div>
     </div>
-
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
     <script src="<?php echo e(URL::asset('build/libs/flatpickr/flatpickr.min.js')); ?>"></script>
@@ -79,9 +71,13 @@
         var surveysIndexURL = "<?php echo e(route('surveysIndexURL')); ?>";
         var surveysCreateURL = "<?php echo e(route('surveysCreateURL')); ?>";
         var surveysEditURL = "<?php echo e(route('surveysEditURL')); ?>";
-        var surveysActionURL = "<?php echo e(route('surveysActionURL')); ?>";
+        var surveysChangeStatusURL = "<?php echo e(route('surveysChangeStatusURL')); ?>";
         var surveysShowURL = "<?php echo e(route('surveysShowURL')); ?>";
         var surveysStoreOrUpdateURL = "<?php echo e(route('surveysStoreOrUpdateURL')); ?>";
+        var formSurveyorAssignmentURL = "<?php echo e(route('formSurveyorAssignmentURL')); ?>";
+        var formAuditorAssignmentURL = "<?php echo e(route('formAuditorAssignmentURL')); ?>";
+        var changeAssignmentSurveyorStatusURL = "<?php echo e(route('changeAssignmentSurveyorStatusURL')); ?>";
+        var changeAssignmentAuditorStatusURL = "<?php echo e(route('changeAssignmentAuditorStatusURL')); ?>";
     </script>
     <script src="<?php echo e(URL::asset('build/js/surveys.js')); ?>" type="module"></script>
 <?php $__env->stopSection(); ?>

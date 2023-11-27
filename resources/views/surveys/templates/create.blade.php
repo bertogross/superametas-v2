@@ -24,15 +24,14 @@
     @include('components.alerts')
 
     @php
-        //appPrintR(count($surveys));
         //appPrintR($data);
         $templateId = $data->id ?? '';
         $title = $data->title ?? '';
         $description = $data->description ?? '';
 
-        $countSurveys = count($surveys);
+        $countSurveys = $data && is_array($data) ? count($data) : 0;
         $countSurveysText = $countSurveys > 1 ? 'Este modelo está sendo utilizado em '.$countSurveys.' vistorias. A edição deste não influênciará nos dados das rotinas que estão em andamento.' : 'Este modelo está sendo utilizado em uma vistoria. A edição deste não influênciará nos dados da rotina que está em andamento.';
-        $countSurveysText .= '<br><br>Se a intenção for a de modificar processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho ideal será encerrar determinada vistoria e gerar um novo registro. Se este for o caso, prossiga com a edição deste modelo e reutilize-o gerando uma nova tarefa.'
+        $countSurveysText .= '<br><br>Se a intenção for a de modificar tópicos dos processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho ideal será encerrar determinada vistoria e gerar um novo registro. Se este for o caso, prossiga com a edição deste modelo e reutilize-o gerando uma nova tarefa.'
     @endphp
 
     @if($countSurveys)
@@ -51,7 +50,9 @@
                     <button type="button" class="btn btn-sm btn-label right btn-outline-info" id="btn-surveys-clone" tabindex="-1"><i class="ri-file-copy-line label-icon align-middle fs-16 ms-2"></i>Clonar</button>
                     --}}
 
-                    <a href="{{ route('surveyTemplateShowURL', ['id' => $templateId]) }}" class="btn btn-sm btn-label right btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar em nova guia" target="_blank" tabindex="-1"><i class="ri-eye-line label-icon align-middle fs-16 ms-2"></i>Visualizar</a>
+                    {{--
+                    <a href="{{ route('surveysTemplateShowURL', ['id' => $templateId]) }}" class="btn btn-sm btn-label right btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar em nova guia" target="_blank" tabindex="-1"><i class="ri-eye-line label-icon align-middle fs-16 ms-2"></i>Visualizar</a>
+                    --}}
                 @else
                     <button type="button" class="btn btn-sm btn-label right btn-outline-theme" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Salvar</button>
                 @endif
@@ -131,8 +132,8 @@
 
     <script>
         var surveysIndexURL = "{{ route('surveysIndexURL') }}";
-        var surveyTemplateEditURL = "{{ route('surveyTemplateEditURL') }}";
-        var surveyTemplateShowURL = "{{ route('surveyTemplateShowURL') }}";
+        var surveysTemplateEditURL = "{{ route('surveysTemplateEditURL') }}";
+        var surveysTemplateShowURL = "{{ route('surveysTemplateShowURL') }}";
         var surveysTemplateStoreOrUpdateURL = "{{ route('surveysTemplateStoreOrUpdateURL') }}";
 
         var surveysTermsStoreOrUpdateURL = "{{ route('surveysTermsStoreOrUpdateURL') }}";

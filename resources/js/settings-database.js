@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <select id="month" class="form-select mb-2">
                     ${monthOptions}
                 </select>
-                <select id="year" class="form-select">
+                <select id="year" class="form-control form-select">
                     ${yearOptions}
                 </select>
             `,

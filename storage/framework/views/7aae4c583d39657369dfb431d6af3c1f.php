@@ -4,7 +4,7 @@
             <h5 class="card-title mb-0 flex-grow-1"><i class="ri-file-list-line fs-16 align-bottom text-theme me-2"></i>Modelos</h5>
             <div class="flex-shrink-0">
                 <div class="d-flex flex-wrap gap-2">
-                    <a class="btn btn-sm btn-label right btn-outline-theme float-end" href="<?php echo e(route('surveysTemplateCreateURL')); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Modelo">
+                    <a class="btn btn-sm btn-label right btn-outline-theme float-end waves-effect" href="<?php echo e(route('surveysTemplateCreateURL')); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Modelo">
                         <i class="ri-add-line label-icon align-middle fs-16 ms-2"></i>Modelo
                     </a>
                 </div>
@@ -44,10 +44,10 @@
                                             </a>
                                             <div class="dropdown-menu">
                                                 <li>
-                                                    <a href="<?php echo e(route('surveyTemplateEditURL', $template->id)); ?>" class="dropdown-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Editar">Editar</a>
+                                                    <a href="<?php echo e(route('surveysTemplateEditURL', $template->id)); ?>" class="dropdown-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Editar">Editar</a>
                                                 </li>
                                                 <li>
-                                                    <a href="<?php echo e(route('surveyTemplateShowURL', $template->id)); ?>" class="dropdown-item" target="_blank" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualizar Modelo em nova Janela">Visualizar</a>
+                                                    <a href="<?php echo e(route('surveysTemplateShowURL', $template->id)); ?>" class="dropdown-item" target="_blank" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualizar Modelo em nova Janela">Visualizar</a>
                                                 </li>
                                             </div>
                                         </div>

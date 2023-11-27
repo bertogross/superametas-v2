@@ -9,12 +9,21 @@ https://laravel-news.com/openai-for-laravel
 
 
 
-Version 2.0.26 - [2023-11-21]
+Version 2.0.27 - [2023-11-21 - 2023-11-27]
+- [Removed] model/SurveyAuditorAssigment
+- [Added] model/SurveyAssigments
+- [Updated] model/SurveyResponse
+- [Updated] custom.css
+- [Updated] routes/web.php
+- [Updated] surveys.js
+- [Updated] HTML: all blade pages (/surveys)
+- [Updated] HTML: form-surveyor blade page (/surveys)
+- [Added] HTML: form-auditor blade page (/surveys)
+- [Updated] SurveyResponsesController
 
 
 
-
-Version 2.0.26 - [2023-11-18 - 2023-11-20]
+Version 2.0.26 - [2023-11-18 - 2023-11-27]
 - [Added] Stripe
 - [Updated] settings/account views
 
@@ -23,7 +32,7 @@ Version 2.0.26 - [2023-11-18 - 2023-11-20]
 Version 2.0.25 - [2023-11-18]
 - [Added] app-custom.js
 - [Added] Overwrite the native app initModeSetting function
-- [Updated] acustom.css
+- [Updated] custom.css
 - [Updated] routes/web.php
 
 

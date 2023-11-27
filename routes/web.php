@@ -14,9 +14,11 @@ use App\Http\Controllers\{
     SurveysController,
     SurveysTemplatesController,
     SurveyTermsController,
+    SurveysResponsesController,
     //SurveysComposeController,
     //SurveyExecutionController,
     //SurveyTermsController,
+    SurveysAssignmentsController,
     SettingsApiKeysController,
     SettingsStripeController,
     StripeWebhookController,
@@ -44,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/update-profile/{id}', [ProfileController::class, 'updateProfile'])->name('updateProfileURL');
         Route::post('/update-password/{id}', [ProfileController::class, 'updatePassword'])->name('updatePasswordURL');
     });
-    Route::get('/profile/{id?}', [ProfileController::class, 'show'])->name('profileShowURL');
+    Route::get('/profile/{id?}', [ProfileController::class, 'index'])->name('profileShowURL');
     Route::post('/profile/layout-mode', [ProfileController::class, 'ChangeLayoutMode'])->name('profileChangeLayoutModeURL');
 
     // Goal Sales Routes
@@ -61,28 +63,24 @@ Route::middleware(['auth'])->group(function () {
 
     // Surveys Routes
     Route::prefix('surveys')->group(function () {
-        Route::get('/index', [SurveysController::class, 'index'])->name('surveysIndexURL');
+        Route::get('/', [SurveysController::class, 'index'])->name('surveysIndexURL');
         Route::get('/create', [SurveysController::class, 'create'])->name('surveysCreateURL');
         Route::get('/edit/{id?}', [SurveysController::class, 'edit'])->name('surveysEditURL')->where('id', '[0-9]+');
         Route::get('/{id?}', [SurveysController::class, 'show'])->name('surveysShowURL')->where('id', '[0-9]+');
         Route::post('/store/{id?}', [SurveysController::class, 'storeOrUpdate'])->name('surveysStoreOrUpdateURL');
-        Route::post('/action', [SurveysController::class, 'action'])->name('surveysActionURL');
+        Route::post('/status', [SurveysController::class, 'changeStatus'])->name('surveysChangeStatusURL');
 
             //Route::get('/listing', [SurveysTemplatesController::class, 'index'])->name('surveyTemplateIndexURL');
             Route::get('/template/create', [SurveysTemplatesController::class, 'create'])->name('surveysTemplateCreateURL');
-            Route::get('/template/edit/{id?}', [SurveysTemplatesController::class, 'edit'])->name('surveyTemplateEditURL')->where('id', '[0-9]+');
-            Route::get('/template/show/{id?}', [SurveysTemplatesController::class, 'show'])->name('surveyTemplateShowURL')->where('id', '[0-9]+');
+            Route::get('/template/edit/{id?}', [SurveysTemplatesController::class, 'edit'])->name('surveysTemplateEditURL')->where('id', '[0-9]+');
+            Route::get('/template/show/{id?}', [SurveysTemplatesController::class, 'show'])->name('surveysTemplateShowURL')->where('id', '[0-9]+');
             Route::post('/template/store/{id?}', [SurveysTemplatesController::class, 'storeOrUpdate'])->name('surveysTemplateStoreOrUpdateURL');
 
-            // Form Compose Routes
-            /*
-            Route::get('/compose/listing', [SurveysComposeController::class, 'index'])->name('surveysComposeIndexURL');
-            Route::get('/compose/create/{type?}', [SurveysComposeController::class, 'create'])->name('surveysComposeCreateURL')->where('type', 'custom|default');
-            Route::get('/compose/edit/{id?}', [SurveysComposeController::class, 'edit'])->name('surveysComposeEditURL');
-            Route::get('/compose/show/{id?}', [SurveysComposeController::class, 'show'])->name('surveysComposeShowURL');
-            Route::post('/compose/store/{id?}', [SurveysComposeController::class, 'storeOrUpdate'])->name('surveysComposeStoreOrUpdateURL');
-            Route::post('/compose/toggle-status/{id?}/{status?}', [SurveysComposeController::class, 'toggleStatus'])->name('surveysComposeToggleStatusURL');
-            */
+            Route::get('/assignment/surveyor-form/{id?}', [SurveysAssignmentsController::class, 'formSurveyorAssignment'])->name('formSurveyorAssignmentURL')->where('id', '[0-9]+');
+            Route::get('/assignment/auditor-form/{id?}', [SurveysAssignmentsController::class, 'formAuditorAssignment'])->name('formAuditorAssignmentURL')->where('id', '[0-9]+');
+            Route::post('/assignment/surveyor-status', [SurveysAssignmentsController::class, 'changeAssignmentSurveyorStatus'])->name('changeAssignmentSurveyorStatusURL');
+            Route::post('/assignment/auditor-status', [SurveysAssignmentsController::class, 'changeAssignmentAuditorStatus'])->name('changeAssignmentAuditorStatusURL');
+            Route::post('/responses/surveyor/store/{id?}', [SurveysResponsesController::class, 'responsesSurveyorStoreOrUpdate'])->name('responsesSurveyorStoreOrUpdateURL');
 
             // Terms Routes
             Route::get('/terms/listing', [SurveyTermsController::class, 'index'])->name('surveysTermsIndexURL');
@@ -91,7 +89,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/terms/edit/{id?}', [SurveyTermsController::class, 'edit'])->name('surveysTermsEditURL');
             Route::post('/terms/store/{id?}', [SurveyTermsController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
             Route::get('/terms/search', [SurveyTermsController::class, 'search'])->name('surveysTermsSearchURL');
-
 
     });
 

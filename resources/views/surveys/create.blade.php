@@ -7,7 +7,18 @@
     $distributedData = $data->distributed_data ?? null;
         $distributedData = $distributedData ? json_decode($distributedData, true) : '';
 
-    $recurring = $data && $data->recurring ? $data->recurring : '';
+    $recurring = $data->recurring ?? '';
+
+    $surveyStatus = $data->status ?? '';
+
+    $alertMessage = '<div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+            <i class="ri-alert-line label-icon"></i> Esta vistoria já foi iniciada e a alteração do Modelo/Recorrência não poderá ser efetuada. Prossiga se necessitar editar as atribuições.<br>
+            Se a intenção for a de modificar tópicos dos processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho ideal será encerrar esta vistoria e gerar um novo registro.
+        </div>';
+
+    $alertMessage2 = $recurring == 'daily' && $countResponses > 0 ? '<div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+            <i class="ri-alert-line label-icon"></i> Esta tarefa já está recebendo dados. Portanto, alterações em Atribuições poderão ser efetuadas mas só terão efeito a partir da próxima data.
+        </div>' : '';
 
     //appPrintR($data);
     //appPrintR($templates);
@@ -75,12 +86,17 @@
                             @else
                                 <div class="mb-3">
                                     <label for="template-field" class="form-label">Selecione o Modelo:</label>
-                                    <select name="template_id" id="template-field" class="form-control form-select" required>
-                                        <option value="" {{ empty($templateId) ? 'selected' : ''  }} disabled>- Selecione -</option>
-                                        @foreach ($templates as $template)
-                                            <option value="{{$template->id}}" {{ isset($template->id) && $template->id == $templateId ? 'selected' : ''}}>{{ $template->title ? e($template->title) : '' }} {{ $template->recurring ? ' [ Recorrência: '.$getSurveyRecurringTranslations[$template->recurring]['label'].' ]' : '' }}</option>
-                                        @endforeach
-                                    </select>
+                                    @if ($countResponses > 0)
+                                        {!! $alertMessage !!}
+                                        <input type="hidden" name="template_id" value="{{$templateId}}">
+                                    @else
+                                        <select name="template_id" id="template-field" class="form-control form-select" required {{ $countResponses > 0 ? 'readonly' : '' }}>
+                                            <option value="" {{ !$templateId ? 'selected' : 'disabled'  }}>- Selecione -</option>
+                                            @foreach ($templates as $template)
+                                                <option value="{{$template->id}}" {{ isset($template->id) && $template->id == $templateId ? 'selected' : ''}}>{{ $template->title ? e($template->title) : '' }} {{ $template->recurring ? ' [ Recorrência: '.$getSurveyRecurringTranslations[$template->recurring]['label'].' ]' : '' }}</option>
+                                            @endforeach
+                                        </select>
+                                    @endif
                                 </div>
 
                                 <div class="d-flex align-items-start gap-3 mt-4">
@@ -89,17 +105,20 @@
                             @endif
                         </div>
 
-                        <div class="tab-pane fade" role="tabpanel"
-                        id="steparrow-recurring-info"
-                        aria-labelledby="steparrow-recurring-info-tab">
+                        <div class="tab-pane fade" role="tabpanel" id="steparrow-recurring-info" aria-labelledby="steparrow-recurring-info-tab">
                             <div class="mb-3">
-                                <label for="date-recurring-field" class="form-label">Tipo de Recorrência:</label>
-                                <select id="date-recurring-field" class="form-select" name="recurring" required>
-                                    <option disabled {{ !$recurring ?? 'selected' }}>- Selecione -</option>
-                                    @foreach ($getSurveyRecurringTranslations as $index => $value)
-                                        <option value="{{$index}}" {{ $recurring == $index ? 'selected' : ''}}>{{ $value['label'] }}</option>
-                                    @endforeach
-                                </select>
+                                <label for="date-recurring-field" class="form-label">Tipo de Recorrência: {{ $getSurveyRecurringTranslations['$recurring'] ?? '' }}</label>
+                                @if ($countResponses > 0)
+                                    {!! $alertMessage !!}
+                                    <input type="hidden" name="recurring" value="{{$recurring}}">
+                                @else
+                                    <select name="recurring" id="date-recurring-field" class="form-control form-select" required {{ $countResponses > 0 ? 'readonly' : '' }}>
+                                        <option {{ !$recurring ? 'selected' : 'disabled' }}>- Selecione -</option>
+                                        @foreach ($getSurveyRecurringTranslations as $index => $value)
+                                            <option value="{{$index}}" {{ $recurring == $index ? 'selected' : ''}}>{{ $value['label'] }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
                             </div>
 
                             <div class="d-flex align-items-start gap-3 mt-4">
@@ -124,11 +143,13 @@
                                 <div>
                                     <label class="form-label mb-0">Atribuições para esta Vistoria:</label>
                                     <div class="form-text mt-0 mb-2">Selecione para cada das Lojas o colaborador(a) que irá proceder com a <strong>Vistoria</strong> e outro(a) na <strong>Auditoria</strong></div>
+
+                                    {!! $alertMessage2 !!}
                                     <div class="row">
                                         <div class="col-sm-6 col-md-4 col-lg-4 col-xxl-3">
                                             <div class="nav nav-pills flex-column nav-pills-tab verti-nav-pills custom-verti-nav-pills nav-pills-theme" role="tablist" aria-orientation="vertical">
                                                 @foreach ($getAuthorizedCompanies as $key => $companyId)
-                                                    <a class="nav-link text-uppercase {{ $key == 0 ? 'active' : '' }} text-uppercase" data-bs-target="#distributed-tab-company-{{ $companyId }}" id="distributed-tab-company-{{ $companyId }}-tab" data-bs-toggle="pill" role="tab" aria-controls="v-pills-account" aria-selected="true">{{ getCompanyAlias($companyId) }}</a>
+                                                    <a class="nav-link text-uppercase {{ $key == 0 ? 'active' : '' }} text-uppercase" data-bs-target="#distributed-tab-company-{{ $companyId }}" id="distributed-tab-company-{{ $companyId }}-tab" data-bs-toggle="pill" role="tab" aria-controls="v-pills-account" aria-selected="true">{{ getCompanyNameById($companyId) }}</a>
                                                 @endforeach
                                             </div>
                                         </div>

@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.querySelector('input[name="id"]').value = data.id; // Add id
 
                     // Make the preview request
-                    makeFormPreviewRequest(data.id, surveyTemplateShowURL);
+                    makeFormPreviewRequest(data.id, surveysTemplateShowURL);
 
                     sweetAlerts(data.message, surveysIndexURL);
                 } else {
@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         document.querySelector('input[name="id"]').value = data.id; // Add id
 
                         // Make the preview request
-                        makeFormPreviewRequest(data.id, surveyTemplateShowURL);
+                        makeFormPreviewRequest(data.id, surveysTemplateShowURL);
 
                         sweetAlerts(data.message, surveysIndexURL);
                     } else {
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Make the preview request after page load
     var idInput = document.querySelector('input[name="id"]');
     var idValue = idInput ? idInput.value : null;
-    makeFormPreviewRequest(idValue, surveyTemplateShowURL);
+    makeFormPreviewRequest(idValue, surveysTemplateShowURL);
 
 
     // Call the function when the DOM is fully loaded

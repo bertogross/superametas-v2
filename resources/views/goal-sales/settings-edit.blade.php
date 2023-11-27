@@ -35,7 +35,7 @@ $endYear = intval($currentMonth) >= (intval(date('Y'))+11) ? date('Y', strtotime
                     <ul class="nav nav-tabs nav-border-top nav-justified" role="tablist">
                         @foreach ($getAuthorizedCompanies as $key => $companyId)
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link {{ $key == 0 ? 'active' : '' }} text-uppercase" id="company-{{ $companyId }}-tab" data-bs-toggle="tab" data-bs-target="#company-{{ $companyId }}" type="button" role="tab" aria-controls="company-{{ $companyId }}" aria-selected="true">{{ getCompanyAlias($companyId) }}</button>
+                                <button class="nav-link {{ $key == 0 ? 'active' : '' }} text-uppercase" id="company-{{ $companyId }}-tab" data-bs-toggle="tab" data-bs-target="#company-{{ $companyId }}" type="button" role="tab" aria-controls="company-{{ $companyId }}" aria-selected="true">{{ getCompanyNameById($companyId) }}</button>
                             </li>
                         @endforeach
                     </ul>
@@ -47,7 +47,7 @@ $endYear = intval($currentMonth) >= (intval(date('Y'))+11) ? date('Y', strtotime
                                     <div class="accordion custom-accordionwithicon custom-accordion-border accordion-border-box mt-1" id="accordion-{{ $companyId }}">
                                         @foreach (range($endYear, $startYear) as $aYear)
                                             <div class="accordion-item">
-                                                <h2 class="accordion-header" id="accordion-{{ $companyId.$aYear }}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ getCompanyAlias($companyId) }} ano {{ $aYear }}">
+                                                <h2 class="accordion-header" id="accordion-{{ $companyId.$aYear }}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ getCompanyNameById($companyId) }} ano {{ $aYear }}">
                                                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accor-{{ $companyId.$aYear }}" aria-expanded="false" aria-controls="accor-{{ $companyId.$aYear }}">
                                                         <i class="ri-calendar-line me-1"></i> {{ $aYear }} <span class="badge badge-theme badge-border ms-2" id="count-year-posts-{{ $companyId }}-{{ $aYear }}"></span>
                                                     </button>
@@ -80,9 +80,9 @@ $endYear = intval($currentMonth) >= (intval(date('Y'))+11) ? date('Y', strtotime
                                                                         </td>
                                                                         <td class="align-middle pe-3 ps-3" width="80">
                                                                             @if (empty($Id))
-                                                                                <button type="button" class="btn btn-sm btn-outline-theme btn-goal-sales-edit waves-effect waves-light float-end w-100" data-meantime="{{ $period }}" data-company-id="{{ $companyId }}" data-company-name="{{ getCompanyAlias($companyId) }}" data-purpose="store" title="Adicionar Meta de Vendas {{ $period }} {{ count($getActiveCompanies) > 1 ? ':: '.getCompanyAlias($companyId) : '' }}" modal-title="Adicionar Meta de Vendas :: <span class='text-theme'>{{ getCompanyAlias($companyId) }}</span>">Adicionar</button>
+                                                                                <button type="button" class="btn btn-sm btn-outline-theme btn-goal-sales-edit waves-effect waves-light float-end w-100" data-meantime="{{ $period }}" data-company-id="{{ $companyId }}" data-company-name="{{ getCompanyNameById($companyId) }}" data-purpose="store" title="Adicionar Meta de Vendas {{ $period }} {{ count($getActiveCompanies) > 1 ? ':: '.getCompanyNameById($companyId) : '' }}" modal-title="Adicionar Meta de Vendas :: <span class='text-theme'>{{ getCompanyNameById($companyId) }}</span>">Adicionar</button>
                                                                             @else
-                                                                                <button type="button" class="btn btn-sm btn-theme btn-goal-sales-edit waves-effect waves-light float-end w-100" data-id="{{ $Id }}" data-meantime="{{ $period }}" data-company-id="{{ $companyId }}" data-company-name="{{ getCompanyAlias($companyId) }}" data-purpose="update" title="Editar Meta de Vendas {{ $period }} {{ getCompanyAlias($companyId) }}" modal-title="Editar Meta de Vendas :: <span class='text-theme'>{{ getCompanyAlias($companyId) }}</span>">Editar</button>
+                                                                                <button type="button" class="btn btn-sm btn-theme btn-goal-sales-edit waves-effect waves-light float-end w-100" data-id="{{ $Id }}" data-meantime="{{ $period }}" data-company-id="{{ $companyId }}" data-company-name="{{ getCompanyNameById($companyId) }}" data-purpose="update" title="Editar Meta de Vendas {{ $period }} {{ getCompanyNameById($companyId) }}" modal-title="Editar Meta de Vendas :: <span class='text-theme'>{{ getCompanyNameById($companyId) }}</span>">Editar</button>
                                                                             @endif
                                                                         </td>
                                                                     </tr>

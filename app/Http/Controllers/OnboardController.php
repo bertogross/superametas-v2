@@ -91,7 +91,7 @@ class OnboardController extends Controller
     }
 
     // Get the list of other smApp databases from smOnboard
-    protected function getOtherDatabases($email)
+    public static function getOtherDatabases($email)
     {
         if($email){
             $OnboardConnection = DB::connection('smOnboard');

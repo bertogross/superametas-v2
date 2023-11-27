@@ -7,6 +7,8 @@ export function toastAlert(message, type = 'success', duration = 6000) {
 
     // Define the HTML template for the toast
     const icon = type == 'success' ? 'ri-checkbox-circle-fill text-success' : 'ri-alert-fill text-' + type;
+    type = type == 'error' ? 'danger' : type;
+
     const ToastHtml = `
         <div class="toast-container position-fixed bottom-0 end-0 p-3">
             <div class="toast fade show toast-border-${type} overflow-hidden mt-3" role="alert" aria-live="assertive" aria-atomic="true">
@@ -57,9 +59,9 @@ export function sweetAlerts(message, urlToRedirect = false, icon = 'success'){
         icon: icon,
         showDenyButton: false,
         showCancelButton: true,
-        confirmButtonText: 'Finalizar',
+        confirmButtonText: 'Prosseguir',
         confirmButtonClass: 'btn btn-outline-success w-xs me-2',
-        cancelButtonClass: 'btn btn-outline-info w-xs',
+        cancelButtonClass: 'btn btn-sm btn-outline-info w-xs',
         denyButtonClass: 'btn btn-danger w-xs me-2',
         buttonsStyling: false,
         denyButtonText: 'Não',
@@ -73,7 +75,7 @@ export function sweetAlerts(message, urlToRedirect = false, icon = 'success'){
             Swal.fire({
                 title: 'Redirecionando...',
                 html: '',
-                timer: 4000,
+                timer: 3000,
                 timerProgressBar: true,
                 showCloseButton: false,
                 didOpen: function () {

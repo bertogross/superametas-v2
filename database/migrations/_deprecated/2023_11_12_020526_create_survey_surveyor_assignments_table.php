@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('survey_surveyor_assignments', function (Blueprint $table) {
-            $table->bigInteger('user_id')->nullable();
-            $table->foreignId('survey_id')->constrained('surveys')->onDelete('cascade');
-            $table->integer('company_id')->default(0);
+            $table->id();
+            $table->bigInteger('user_id')->nullable()->comment('The surveyor user_id');
+            $table->bigInteger('survey_id')->nullable();
+            $table->bigInteger('company_id')->default(0);
+            $table->enum('status', ['new', 'pending', 'in_progress', 'auditing', 'completed'])->default('new')->comment('The status of the survey task for this surveyor');
             $table->timestamps();
         });
     }

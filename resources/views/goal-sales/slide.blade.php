@@ -12,7 +12,7 @@
         <div class="swiper-wrapper">
             @foreach ($data as $companyId => $departments)
                 <div class="swiper-slide">
-                    <h2 class="text-center m-2 text-theme">{{ getCompanyAlias($companyId) }}</h2>
+                    <h2 class="text-center m-2 text-theme">{{ getCompanyNameById($companyId) }}</h2>
                     <hr class="mt-0">
                     <div class="row listing-chart">
                         @foreach ($departments as $departmentId => $values)
@@ -43,9 +43,9 @@
                             <div class="col-sm-6 col-md-4 col-lg-3 col-xxl-2 m-4 text-center text-uppercase">
                                 @php
                                     // Use number_format for display, not for calculations
-                                    echo goalsEmojiChart($ndxChartId, $goal, $sales, $departmentId, getDepartmentAlias($departmentId), getCompanyAlias($companyId), number_format($percent, 2), number_format($percentAccrued, 2));
+                                    echo goalsEmojiChart($ndxChartId, $goal, $sales, $departmentId, getDepartmentNameById($departmentId), getCompanyNameById($companyId), number_format($percent, 2), number_format($percentAccrued, 2));
                                 @endphp
-                                <div class="chart-label fw-bold">{{ getDepartmentAlias($departmentId) }}</div>
+                                <div class="chart-label fw-bold">{{ getDepartmentNameById($departmentId) }}</div>
                             </div>
                         @endforeach
 
@@ -59,7 +59,7 @@
                                 $totalPercentAccrued = (is_numeric($metric) && $metric > 0) ? ($totalPercentValue / $metric) * 100 : 0;
 
                                 // Use number_format for display, not for calculations
-                                echo goalsEmojiChart($ndxChartId, number_format($totalGoals[$companyId], 2), number_format($totalSales[$companyId], 2), 'general', 'Geral', getCompanyAlias($companyId), number_format($totalPercentValue, 2), number_format($totalPercentAccrued, 2), 'general');
+                                echo goalsEmojiChart($ndxChartId, number_format($totalGoals[$companyId], 2), number_format($totalSales[$companyId], 2), 'general', 'Geral', getCompanyNameById($companyId), number_format($totalPercentValue, 2), number_format($totalPercentAccrued, 2), 'general');
                                 @endphp
                                 <div class="chart-label fw-bold fs-4">Geral</div>
                             </div>

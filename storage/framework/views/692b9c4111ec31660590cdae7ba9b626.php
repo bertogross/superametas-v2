@@ -109,13 +109,15 @@
                                     </a>
                                 </div>
                                 -->
-                                <div class="col">
-                                    <a class="dropdown-icon-item" href="<?php echo e(route('surveysIndexURL')); ?>" title="Vistorias">
-                                        <i class="ri-survey-line text-theme fs-1"></i>
-                                        
-                                        <span>Vistorias</span>
-                                    </a>
-                                </div>
+                                <?php if(auth()->user()->hasRole(User::ROLE_ADMIN) || auth()->user()->hasRole(User::ROLE_CONTROLLERSHIP)): ?>
+                                    <div class="col">
+                                        <a class="dropdown-icon-item" href="<?php echo e(route('surveysIndexURL')); ?>" title="Vistorias">
+                                            <i class="ri-survey-line text-theme fs-1"></i>
+                                            
+                                            <span>Vistorias</span>
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -179,8 +181,8 @@
                         <?php endif; ?>
 
                         <a class="dropdown-item" href="<?php echo e(route('profileShowURL')); ?>">
-                            <i class="ri-account-box-fill  text-muted fs-16 align-middle me-1"></i>
-                            <span class="align-middle">Meu Perfil</span>
+                            <i class="ri-survey-line text-muted fs-16 align-middle me-1"></i>
+                            <span class="align-middle">Tarefas</span>
                         </a>
 
                         <!--

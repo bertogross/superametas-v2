@@ -16,7 +16,9 @@ return new class extends Migration
             $table->bigInteger('user_id')->nullable();
             $table->string('title', 191)->nullable();
             $table->longText('description')->nullable();
+            $table->enum('model', ['default', 'custom', 'both'])->default('both');
             $table->json('template_data')->nullable();
+            $table->enum('condition_of', ['publish', 'filed', 'deleted'])->default('publish');
             $table->timestamps();
         });
     }

@@ -7,7 +7,18 @@
     $distributedData = $data->distributed_data ?? null;
         $distributedData = $distributedData ? json_decode($distributedData, true) : '';
 
-    $recurring = $data && $data->recurring ? $data->recurring : '';
+    $recurring = $data->recurring ?? '';
+
+    $surveyStatus = $data->status ?? '';
+
+    $alertMessage = '<div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+            <i class="ri-alert-line label-icon"></i> Esta vistoria já foi iniciada e a alteração do Modelo/Recorrência não poderá ser efetuada. Prossiga se necessitar editar as atribuições.<br>
+            Se a intenção for a de modificar tópicos dos processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho ideal será encerrar esta vistoria e gerar um novo registro.
+        </div>';
+
+    $alertMessage2 = $recurring == 'daily' && $countResponses > 0 ? '<div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+            <i class="ri-alert-line label-icon"></i> Esta tarefa já está recebendo dados. Portanto, alterações em Atribuições poderão ser efetuadas mas só terão efeito a partir da próxima data.
+        </div>' : '';
 
     //appPrintR($data);
     //appPrintR($templates);
@@ -75,12 +86,18 @@
                             <?php else: ?>
                                 <div class="mb-3">
                                     <label for="template-field" class="form-label">Selecione o Modelo:</label>
-                                    <select name="template_id" id="template-field" class="form-control form-select" required>
-                                        <option value="" <?php echo e(empty($templateId) ? 'selected' : ''); ?> disabled>- Selecione -</option>
-                                        <?php $__currentLoopData = $templates; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $template): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($template->id); ?>" <?php echo e(isset($template->id) && $template->id == $templateId ? 'selected' : ''); ?>><?php echo e($template->title ? e($template->title) : ''); ?> <?php echo e($template->recurring ? ' [ Recorrência: '.$getSurveyRecurringTranslations[$template->recurring]['label'].' ]' : ''); ?></option>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </select>
+                                    <?php if($countResponses > 0): ?>
+                                        <?php echo $alertMessage; ?>
+
+                                        <input type="hidden" name="template_id" value="<?php echo e($templateId); ?>">
+                                    <?php else: ?>
+                                        <select name="template_id" id="template-field" class="form-control form-select" required <?php echo e($countResponses > 0 ? 'readonly' : ''); ?>>
+                                            <option value="" <?php echo e(!$templateId ? 'selected' : 'disabled'); ?>>- Selecione -</option>
+                                            <?php $__currentLoopData = $templates; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $template): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($template->id); ?>" <?php echo e(isset($template->id) && $template->id == $templateId ? 'selected' : ''); ?>><?php echo e($template->title ? e($template->title) : ''); ?> <?php echo e($template->recurring ? ' [ Recorrência: '.$getSurveyRecurringTranslations[$template->recurring]['label'].' ]' : ''); ?></option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </select>
+                                    <?php endif; ?>
                                 </div>
 
                                 <div class="d-flex align-items-start gap-3 mt-4">
@@ -89,17 +106,21 @@
                             <?php endif; ?>
                         </div>
 
-                        <div class="tab-pane fade" role="tabpanel"
-                        id="steparrow-recurring-info"
-                        aria-labelledby="steparrow-recurring-info-tab">
+                        <div class="tab-pane fade" role="tabpanel" id="steparrow-recurring-info" aria-labelledby="steparrow-recurring-info-tab">
                             <div class="mb-3">
-                                <label for="date-recurring-field" class="form-label">Tipo de Recorrência:</label>
-                                <select id="date-recurring-field" class="form-select" name="recurring" required>
-                                    <option disabled <?php echo e(!$recurring ?? 'selected'); ?>>- Selecione -</option>
-                                    <?php $__currentLoopData = $getSurveyRecurringTranslations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <option value="<?php echo e($index); ?>" <?php echo e($recurring == $index ? 'selected' : ''); ?>><?php echo e($value['label']); ?></option>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                </select>
+                                <label for="date-recurring-field" class="form-label">Tipo de Recorrência: <?php echo e($getSurveyRecurringTranslations['$recurring'] ?? ''); ?></label>
+                                <?php if($countResponses > 0): ?>
+                                    <?php echo $alertMessage; ?>
+
+                                    <input type="hidden" name="recurring" value="<?php echo e($recurring); ?>">
+                                <?php else: ?>
+                                    <select name="recurring" id="date-recurring-field" class="form-control form-select" required <?php echo e($countResponses > 0 ? 'readonly' : ''); ?>>
+                                        <option <?php echo e(!$recurring ? 'selected' : 'disabled'); ?>>- Selecione -</option>
+                                        <?php $__currentLoopData = $getSurveyRecurringTranslations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($index); ?>" <?php echo e($recurring == $index ? 'selected' : ''); ?>><?php echo e($value['label']); ?></option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </select>
+                                <?php endif; ?>
                             </div>
 
                             <div class="d-flex align-items-start gap-3 mt-4">
@@ -124,11 +145,14 @@
                                 <div>
                                     <label class="form-label mb-0">Atribuições para esta Vistoria:</label>
                                     <div class="form-text mt-0 mb-2">Selecione para cada das Lojas o colaborador(a) que irá proceder com a <strong>Vistoria</strong> e outro(a) na <strong>Auditoria</strong></div>
+
+                                    <?php echo $alertMessage2; ?>
+
                                     <div class="row">
                                         <div class="col-sm-6 col-md-4 col-lg-4 col-xxl-3">
                                             <div class="nav nav-pills flex-column nav-pills-tab verti-nav-pills custom-verti-nav-pills nav-pills-theme" role="tablist" aria-orientation="vertical">
                                                 <?php $__currentLoopData = $getAuthorizedCompanies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $companyId): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <a class="nav-link text-uppercase <?php echo e($key == 0 ? 'active' : ''); ?> text-uppercase" data-bs-target="#distributed-tab-company-<?php echo e($companyId); ?>" id="distributed-tab-company-<?php echo e($companyId); ?>-tab" data-bs-toggle="pill" role="tab" aria-controls="v-pills-account" aria-selected="true"><?php echo e(getCompanyAlias($companyId)); ?></a>
+                                                    <a class="nav-link text-uppercase <?php echo e($key == 0 ? 'active' : ''); ?> text-uppercase" data-bs-target="#distributed-tab-company-<?php echo e($companyId); ?>" id="distributed-tab-company-<?php echo e($companyId); ?>-tab" data-bs-toggle="pill" role="tab" aria-controls="v-pills-account" aria-selected="true"><?php echo e(getCompanyNameById($companyId)); ?></a>
                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </div>
                                         </div>

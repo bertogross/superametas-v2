@@ -1,67 +1,33 @@
 <?php
-appPrintR($distributedData);
+//appPrintR($distributedData);
 ?>
 
+<div class="card">
+    <div class="card-body">
+            <table class="table table-borderless mb-0">
+                <tbody>
+                    <tr class="text-muted text-center">
+                        <td>
+                            <div class="fw-bold">Registro</div>
+                            <?php echo e($survey->created_at  ? date("d/m/Y H:i", strtotime($survey->created_at )).'hs' : '-'); ?>
+
+                        </td>
+                        <td>
+                            <div class="fw-bold">Atualização</div>
+                            <?php echo e($survey->updated_at ? date("d/m/Y H:i", strtotime($survey->updated_at)).'hs' : '-'); ?>
+
+                        </td>
+                        
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div><!-- end card body -->
+</div>
 
 <div class="row">
-
-    <div class="col-sm-12 col-md-4">
-        <div class="card">
-            <?php if($survey->status == 'new'): ?>
-                <button type="button"
-                class="btn btn-lg btn-soft-theme btn-icon w-100 h-100 p-4"
-                id="btn-surveys-action"
-                data-survey-id="<?php echo e($survey->id); ?>"
-                data-action="start"
-                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
-                title="Iniciar Rotina "><i class="ri-play-fill"></i></button>
-            <?php else: ?>
-                <button type="button"
-                class="btn btn-lg btn-soft-danger btn-icon w-100 h-100 p-4"
-                id="btn-surveys-action"
-                data-survey-id="<?php echo e($survey->id); ?>"
-                data-action="stop" data-action="stop"
-                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
-                title="Interromper Rotina "><i class="ri-stop-fill"></i></button>
-            <?php endif; ?>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Informações</h5>
-                <div class="table-responsive">
-                    <table class="table table-borderless mb-0">
-                        <tbody>
-                            <tr>
-                                <th class="ps-0" scope="row">Data de Registro :</th>
-                                <td class="text-muted"><?php echo e($survey->created_at  ? date("d/m/Y", strtotime($survey->created_at )) : '-'); ?></td>
-                            </tr>
-                            <tr>
-                                <th class="ps-0" scope="row">Data de Início :</th>
-                                <td class="text-muted"><?php echo e($survey->started_at ? date("d/m/Y", strtotime($survey->started_at)) : '-'); ?></td>
-                            </tr>
-                            <tr>
-                                <th class="ps-0" scope="row">Falhas :</th>
-                                <td class="text-muted">-</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-0" scope="row">Em Progresso :</th>
-                                <td class="text-muted">-</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-0" scope="row">Concluídas :</th>
-                                <td class="text-muted">-</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div><!-- end card body -->
-        </div>
-
-        
-    </div>
-
-    <div class="col-sm-12 col-md-4">
-        <div class="card">
+    <div class="col-sm-12 col-md-6">
+        <div class="card mb-2">
             <a class="card-body bg-info-subtle"><!-- data-bs-toggle="collapse" href="#leadDiscovered" role="button"
                 aria-expanded="false" aria-controls="leadDiscovered" -->
                 <h5 class="card-title text-uppercase mb-1 fs-14">
@@ -81,7 +47,7 @@ appPrintR($distributedData);
             <?php $__currentLoopData = $distributedData['delegated_to']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <?php
                     $userId = $value['user_id'];
-                    $companyName = getCompanyAlias($value['company_id']);
+                    $companyName = getCompanyNameById($value['company_id']);
                     $avatar = getUserData($userId)['avatar'];
                     $name = getUserData($userId)['name'];
                 ?>
@@ -154,8 +120,8 @@ appPrintR($distributedData);
         </div>
     </div>
 
-    <div class="col-sm-12 col-md-4">
-        <div class="card">
+    <div class="col-sm-12 col-md-6">
+        <div class="card mb-2">
             <a class="card-body bg-primary-subtle"><!-- data-bs-toggle="collapse" href="#contactInitiated" role="button"
                 aria-expanded="false" aria-controls="contactInitiated" -->
                 <h5 class="card-title text-uppercase mb-1 fs-14">
@@ -164,7 +130,8 @@ appPrintR($distributedData);
                         $uniqued = count($columns) > 1 ? array_unique($columns) : $columns;
                         echo is_array($uniqued) ? count($uniqued) : 0;
                     ?>
-                     Auditores
+                     Auditor<?php echo e(count($uniqued) > 1 ? 'es' : ''); ?>
+
                 </h5>
                 <p class="text-muted mb-0"><span class="fw-medium"><?php echo e(is_array($distributedData['audited_by']) ? count($distributedData['audited_by']) : ''); ?> lojas</span></p>
             </a>
@@ -174,7 +141,7 @@ appPrintR($distributedData);
             <?php $__currentLoopData = $distributedData['audited_by']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <?php
                     $userId = $value['user_id'];
-                    $companyName = getCompanyAlias($value['company_id']);
+                    $companyName = getCompanyNameById($value['company_id']);
                     $avatar = getUserData($userId)['avatar'];
                     $name = getUserData($userId)['name'];
                 ?>
@@ -249,4 +216,4 @@ appPrintR($distributedData);
         </div>
     </div>
 </div>
-<?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/components/distributeds-card.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/layouts/listing-row-cards.blade.php ENDPATH**/ ?>

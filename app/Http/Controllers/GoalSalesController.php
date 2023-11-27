@@ -20,7 +20,7 @@ class GoalSalesController extends Controller
      */
     public function index(Request $request)
     {
-        $userId = auth()->id();
+        $currentUserId = auth()->id();
 
         $selectedCompanies = $request->input('companies');
         $selectedDepartments = $request->input('departments');
@@ -46,7 +46,7 @@ class GoalSalesController extends Controller
         $lastDate = $dateRange['last_date'];
 
         // If the user has analytic mode enabled
-        if (getUserMeta($userId, 'analytic-mode') == 'on') {
+        if (getUserMeta($currentUserId, 'analytic-mode') == 'on') {
             // Get sales data
             $resultsSales = $this->getSalesData($startDate, $endDate, $selectedCompanies, $selectedDepartments);
 
@@ -178,7 +178,7 @@ class GoalSalesController extends Controller
         $meantime = $data['meantime'];
         $type = $data['type'];
         $goals = $data['goals'];
-        $userId = auth()->id();
+        $currentUserId = auth()->id();
 
         $now = now();
 
@@ -211,13 +211,13 @@ class GoalSalesController extends Controller
                         ->where('meantime', $meantime)
                         ->where('type', $type)
                         ->update([
-                            'user_id' => $userId,
+                            'user_id' => $currentUserId,
                             'goal_value' => $goalValue,
                         ]);
                 } else {
                     // Insert new record
                     DB::connection($this->connection)->table('wlsm_goals')->insert([
-                        'user_id' => $userId,
+                        'user_id' => $currentUserId,
                         'company_id' => $companyId,
                         'department_id' => $departmentId,
                         'meantime' => $meantime,
@@ -524,7 +524,7 @@ class GoalSalesController extends Controller
                 // If the department is not already in the array, add it with calculated values.
                 if (!isset($departments[$departmentId])) {
                     $departments[$departmentId] = (object) [
-                        'name' => getDepartmentAlias($departmentId),
+                        'name' => getDepartmentNameById($departmentId),
                         'progress' => $progress,
                         'color' => $color,
                         'tooltip' => $tooltip,

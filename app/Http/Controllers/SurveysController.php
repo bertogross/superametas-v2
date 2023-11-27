@@ -6,20 +6,24 @@ use Carbon\Carbon;
 use App\Models\User;
 //use App\Models\SurveyCompose;
 use App\Models\Survey;
-use App\Models\SurveyTemplates;
+use App\Models\SurveyStep;
 //use App\Models\SurveyMeta;
 use App\Models\SurveyTerms;
-use App\Models\SurveyStep;
+use App\Models\SurveyTopic;
 use Illuminate\Http\Request;
+use App\Models\SurveyResponse;
+use App\Models\SurveyTemplates;
+use App\Models\SurveyAssignments;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class SurveysController extends Controller
 {
-
     public function index(Request $request)
     {
 
-        $userId = auth()->id();
+        $currentUserId = auth()->id();
 
         $created_at = $request->input('created_at');
         $status = $request->input('status');
@@ -31,10 +35,11 @@ class SurveysController extends Controller
          */
 
         //$queryTemplates = SurveyTemplates::findOrFail($id);
-        //$queryTemplates = SurveyTemplates::where('user_id', $userId)->first();
-        //$queryTemplates = SurveyTemplates::where('user_id', $userId)->get();
+        //$queryTemplates = SurveyTemplates::where('user_id', $currentUserId)->first();
+        //$queryTemplates = SurveyTemplates::where('user_id', $currentUserId)->get();
         $queryTemplates = SurveyTemplates::query();
-        $queryTemplates->where('user_id', $userId);
+        $queryTemplates->where('user_id', $currentUserId);
+        $queryTemplates->where('condition_of','publish');
 
         /*
         if ($created_at) {
@@ -49,7 +54,7 @@ class SurveysController extends Controller
             }
         }
         */
-        $templates = $queryTemplates->orderBy('updated_at')->paginate(10);
+        $templates = $queryTemplates->orderBy('created_at')->paginate(10);
         /**
          * END TEMPLATES QUERY
          */
@@ -61,7 +66,7 @@ class SurveysController extends Controller
         if ($status) {
             $query->where('status', $status);
         }
-        $query = $query->where('user_id', $userId);
+        $query = $query->where('user_id', $currentUserId);
         $query = $query->where('condition_of', 'publish');
 
         // Search by delegated_to and or audited_by
@@ -101,7 +106,7 @@ class SurveysController extends Controller
             }
         }
         */
-        $data = $query->orderBy('updated_at')->paginate(10);
+        $data = $query->orderBy('created_at')->paginate(10);
         /**
          * END SURVEYS QUERY
          */
@@ -137,17 +142,8 @@ class SurveysController extends Controller
 
         $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
 
-        $preview = $request->query('preview', false);
-
-        $edition = $request->query('edition', false);
-
         return view('surveys.show', compact(
             'data',
-            'result',
-            //'custom',
-            //'default',
-            'preview',
-            'edition',
             'getSurveyRecurringTranslations'
         ) );
     }
@@ -159,7 +155,7 @@ class SurveysController extends Controller
 
         session()->forget('success');
 
-        $userId = auth()->id();
+        $currentUserId = auth()->id();
 
         $data = null;
 
@@ -170,16 +166,19 @@ class SurveysController extends Controller
         $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
 
         $queryTemplates = SurveyTemplates::query();
-        $queryTemplates->where('user_id', $userId);
+        $queryTemplates->where('user_id', $currentUserId);
 
         $templates = $queryTemplates->orderBy('title')->paginate(50);
+
+        $countResponses = 0;
 
         return view('surveys.create', compact(
                 'data',
                 'templates',
                 'users',
                 'getAuthorizedCompanies',
-                'getSurveyRecurringTranslations'
+                'getSurveyRecurringTranslations',
+                'countResponses'
             )
         );
     }
@@ -190,7 +189,7 @@ class SurveysController extends Controller
 
         session()->forget('success');
 
-        $userId = auth()->id();
+        $currentUserId = auth()->id();
 
         if (!$id) {
             abort(404);
@@ -200,12 +199,12 @@ class SurveysController extends Controller
         /*
         $data = Survey::query();
         $data->where('id', $id);
-        $data->where('user_id', $userId);
+        $data->where('user_id', $currentUserId);
         */
 
         // Check if the current user is the creator
-        if ($userId != $data->user_id) {
-            return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro efetuado por outra pessoa']);
+        if ($currentUserId != $data->user_id) {
+            return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro gerado por outra pessoa']);
         }
 
         $users = getUsers();
@@ -215,77 +214,126 @@ class SurveysController extends Controller
         $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
 
         $queryTemplates = SurveyTemplates::query();
-        $queryTemplates->where('user_id', $userId);
+        $queryTemplates->where('user_id', $currentUserId);
         $templates = $queryTemplates->orderBy('title')->paginate(50);
+
+        $countResponses = countSurveyAllResponsesFromToday($id);
 
         return view('surveys.edit', compact(
                 'data',
                 'templates',
                 'users',
                 'getAuthorizedCompanies',
-                'getSurveyRecurringTranslations'
+                'getSurveyRecurringTranslations',
+                'countResponses'
             )
         );
     }
 
     //start/stop survey
-    public function action(Request $request)
+    public function changeStatus(Request $request)
     {
-        $userId = auth()->id();
+        $currentUserId = auth()->id();
 
-        $id = $request->input('id');
+        $surveyId = $request->input('id');
+        $surveyId = intval($surveyId);
 
-        $data = Survey::findOrFail($id);
+        $data = Survey::findOrFail($surveyId);
 
-        if ($userId != $data->user_id) {
+        $currentStatus = $data->status;
+
+        if ($currentUserId != $data->user_id) {
             return response()->json(['success' => false, 'message' => 'Você não possui autorização para Inicializar/Interromper a rotina registrada por outra pessoa']);
         }
 
-        // Change the status based on current status
-        if ($data->status != 'new') {
-            $data->status = 'stopped';
-        } else {
-            $data->status = 'pending';
+        $countResponses = countSurveyAllResponsesFromToday($surveyId);
+
+        if($countResponses > 0){
+            return response()->json(['success' => false, 'message' => 'Não será possível interromper esta tarefa pois dados já estão sendo coletados.']);
         }
 
-        /*
-        if( empty($data->started_at) ){
-            $data->started_at = date('Y-m-d H:i:s');
+        $distributedData = $data->distributed_data ?? null;
+
+        $oldStatus = $data->old_status ?? $currentStatus;
+
+        $message = 'Status da tarefa foi atualizado com sucesso';
+        $newStatus = $oldStatus;
+
+        // Change the status based on current status
+        if ($currentStatus == 'new' || $oldStatus == 'started') {
+            $message = 'Vistoria inicializada com sucesso';
+
+            $newStatus = 'started';
+
+            // Start the task by distributing to each party
+            SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+
+        }elseif ($currentStatus == 'stopped') {
+            $message = 'Vistoria reinicializada com sucesso';
+
+            $newStatus = $oldStatus;
+
+        }else{
+            // TODO
+            //return response()->json(['success' => false, 'message' => 'Não será possível alterar o status desta tarefa pois já há atividades em andamento']);
         }
-        */
+        $columns['status'] = $newStatus;
+        $columns['old_status'] = $currentStatus;
 
         // Save the changes
-        $data->save();
+        $data->update($columns);
+
+        $message = $newStatus == 'stopped' ? 'Vistoria foi interrompida' : $message;
 
         // Return a success response
-        return response()->json(['success' => true, 'message' => 'Status da rotina atualizado com sucesso']);
+        return response()->json(['success' => true, 'message' => $message]);
     }
 
     public function storeOrUpdate(Request $request, $id = null)
     {
         // Cache::flush();
+        $messages = [
+            'template_id.required' => 'Necessário selecionar um modelo',
+            'distributed_data.required' => 'Necessário delegar usuários para Vistoria e Auditoria',
+            'recurring.in' => 'Escolha a recorrência',
+        ];
 
-        $validatedData = $request->validate([
-            //'title' => 'required|string|max:191',
-            //'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
-            //'started_at' => 'nullable|date_format:d/m/Y',
-            //'description' => 'nullable|string|max:1000',
+        try {
+            $validatedData = Validator::make($request->all(), [
+                //'title' => 'required|string|max:191',
+                //'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
+                //'description' => 'nullable|string|max:1000',
+                'template_id' => 'required',
+                //'delegated_to' => 'required',
+                //'audited_by' => 'required',
+                'distributed_data' => 'required',
+                'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
+                //'current_user_editor' => 'nullable',
+                //'assigned_to' => 'nullable',
+                //'status' => 'required|in:new,stopped,trash,pending,in_progress,completed,auditing',
+                //'survey_compose_custom_id' => 'nullable',
+                //'survey_compose_default_id' => 'nullable',
+                //'custom_fields' => 'nullable|array',
+                //'custom_fields.*.type' => 'required_with:custom_fields|string|max:20',
+                //'custom_fields.*.name' => 'required_with:custom_fields|string|max:30',
+                //'custom_fields.*.label' => 'required_with:custom_fields|string|max:50',
+            ], $messages)->validate();
+        } catch (ValidationException $e) {
+            $errors = $e->errors();
 
-            'template_id' => 'required',
-            //'delegated_to' => 'required',
-            //'audited_by' => 'required',
-            'distributed_data' => 'required',
-            'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
-            //'current_user_editor' => 'nullable',
-            //'assigned_to' => 'nullable',
-            //'status' => 'required|in:new,stoped,trash,pending,in_progress,completed,audited',
-            //'survey_compose_custom_id' => 'nullable',
-            //'survey_compose_default_id' => 'nullable',
-            //'custom_fields' => 'nullable|array',
-            //'custom_fields.*.type' => 'required_with:custom_fields|string|max:20',
-            //'custom_fields.*.name' => 'required_with:custom_fields|string|max:30',
-            //'custom_fields.*.label' => 'required_with:custom_fields|string|max:50',
-        ]);
+            $errorMessages = '';
+            foreach ($errors as $field => $messages) {
+                foreach ($messages as $message) {
+                    $errorMessages = $message;
+                    break;
+                }
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => $errorMessages
+            ]);
+        }
 
         // Convert array inputs to JSON strings for storage
         $validatedData = array_map(function ($value) {
@@ -300,6 +348,10 @@ class SurveysController extends Controller
         //$validatedData['distributed_data'] = $distributed_data ?? null;
 
         $distributed_data = $validatedData['distributed_data'];
+
+        $templateId = $validatedData['template_id'];
+        $templateQuery = SurveyTemplates::findOrFail($templateId);
+        $templateData = $templateQuery->template_data ?? '';
 
         /*
         $jsonString = $request->input('delegated_to');
@@ -318,34 +370,46 @@ class SurveysController extends Controller
         $validatedData['audited_by'] = $distributed_data ?? null;
         */
 
-        $userId = auth()->id();
-        $validatedData['user_id'] = $userId;
+        $currentUserId = auth()->id();
+        $validatedData['user_id'] = $currentUserId;
 
-        // $validatedData['started_at'] = $validatedData['started_at'] ? Carbon::createFromFormat('d/m/Y', $validatedData['started_at'])->format('Y-m-d') : null;
+        /*
+        $recurring = $request->input('recurring');
+        $validatedData['recurring'] = !empty($recurring) && in_array($recurring, ['once','daily','weekly','biweekly','monthly','annual']) ? $recurring : 'once';
+        */
 
         if ($id) {
             // Update operation
             $survey = Survey::findOrFail($id);
 
+            if($survey->status == 'new'){
+                $validatedData['template_data'] = $templateData;
+            }
+
             // Check if the current user is the creator
-            if ($userId != $survey->user_id) {
-                return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro efetuado por outra pessoa']);
+            if ($currentUserId != $survey->user_id) {
+                return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro gerado por outra pessoa']);
             }
 
             $survey->update($validatedData);
 
             $surveyId = $survey->id;
 
-            SurveyStep::populateSurveySteps($validatedData['template_id'], $surveyId);
+            // Update from model if task is not started
+            if($survey->status == 'new'){
+                SurveyStep::populateSurveySteps($validatedData['template_id'], $surveyId);
+            }
 
             return response()->json([
                 'success' => true,
-                'message' => 'Vistoria atualizada!',
+                'message' => 'Dados atualizados!',
                 'id' => $surveyId,
                 'json' => $distributed_data
             ]);
         } else {
             // Store operation
+            $validatedData['template_data'] = $templateData;
+
             $survey = new Survey;
             $survey->fill($validatedData);
             $survey->save();
@@ -356,14 +420,12 @@ class SurveysController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Vistoria salva!',
+                'message' => 'Dados adicionados com sucesso!',
                 'id' => $surveyId,
                 'json' => $distributed_data
             ]);
         }
     }
-
-
 
 
 

@@ -1,5 +1,5 @@
 @php
-appPrintR($distributedData);
+//appPrintR($distributedData);
 @endphp
 {{--
 <!--
@@ -52,91 +52,47 @@ based on apps-crm-deals.blade.php
     </div>
 </div>
 --}}
+<div class="card">
+    <div class="card-body">
+            <table class="table table-borderless mb-0">
+                <tbody>
+                    <tr class="text-muted text-center">
+                        <td>
+                            <div class="fw-bold">Registro</div>
+                            {{ $survey->created_at  ? date("d/m/Y H:i", strtotime($survey->created_at )).'hs' : '-' }}
+                        </td>
+                        <td>
+                            <div class="fw-bold">Atualização</div>
+                            {{ $survey->updated_at ? date("d/m/Y H:i", strtotime($survey->updated_at)).'hs' : '-' }}
+                        </td>
+                        {{--
+                        <td>
+                            <div class="fw-bold">Quantidade</div>
+                            -
+                        </td>
+                        <td>
+                            <div class="fw-bold">Falhas</div>
+                            -
+                        </td>
+                        <td>
+                            <div class="fw-bold">Em Progresso</div>
+                            -
+                        </td>
+                        <td class="text-muted">
+                            <div class="fw-bold">Concluídas</div>
+                            -
+                        </td>
+                        --}}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div><!-- end card body -->
+</div>
 
 <div class="row">
-
-    <div class="col-sm-12 col-md-4">
-        <div class="card">
-            @if ($survey->status == 'new')
-                <button type="button"
-                class="btn btn-lg btn-soft-theme btn-icon w-100 h-100 p-4"
-                id="btn-surveys-action"
-                data-survey-id="{{ $survey->id }}"
-                data-action="start"
-                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
-                title="Iniciar Rotina {{-- $recurringLabel --}}"><i class="ri-play-fill"></i></button>
-            @else
-                <button type="button"
-                class="btn btn-lg btn-soft-danger btn-icon w-100 h-100 p-4"
-                id="btn-surveys-action"
-                data-survey-id="{{ $survey->id }}"
-                data-action="stop" data-action="stop"
-                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
-                title="Interromper Rotina {{-- $recurringLabel --}}"><i class="ri-stop-fill"></i></button>
-            @endif
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Informações</h5>
-                <div class="table-responsive">
-                    <table class="table table-borderless mb-0">
-                        <tbody>
-                            <tr>
-                                <th class="ps-0" scope="row">Data de Registro :</th>
-                                <td class="text-muted">{{ $survey->created_at  ? date("d/m/Y", strtotime($survey->created_at )) : '-' }}</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-0" scope="row">Data de Início :</th>
-                                <td class="text-muted">{{ $survey->started_at ? date("d/m/Y", strtotime($survey->started_at)) : '-' }}</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-0" scope="row">Falhas :</th>
-                                <td class="text-muted">-</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-0" scope="row">Em Progresso :</th>
-                                <td class="text-muted">-</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-0" scope="row">Concluídas :</th>
-                                <td class="text-muted">-</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div><!-- end card body -->
-        </div>
-
-        {{--
-        <div class="row">
-            @foreach ($getSurveyStatusTranslations as $key => $value)
-                <div class="col-12">
-                    <div class="card mb-1" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $value['description'] }}">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <p class="fw-medium text-muted mb-0">{{ $value['label'] }}</p>
-                                    <h2 class="mt-0 mb-0 ff-secondary fw-semibold"><span class="counter-value" data-target="{{ $distributedDatatatusCount[$key] ?? 0 }}"></span></h2>
-                                </div>
-                                <div>
-                                    <div class="avatar-sm flex-shrink-0">
-                                        <span class="avatar-title bg-{{ $value['color'] }}-subtle text-{{ $value['color'] }} rounded-circle fs-6 p-3">
-                                            <i class="{{ !empty($value['icon']) ? $value['icon'] : 'ri-ticket-2-line' }}"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div><!-- end card body -->
-                    </div>
-                </div>
-                <!--end col-->
-            @endforeach
-        </div>
-        --}}
-    </div>
-
-    <div class="col-sm-12 col-md-4">
-        <div class="card">
+    <div class="col-sm-12 col-md-6">
+        <div class="card mb-2">
             <a class="card-body bg-info-subtle"><!-- data-bs-toggle="collapse" href="#leadDiscovered" role="button"
                 aria-expanded="false" aria-controls="leadDiscovered" -->
                 <h5 class="card-title text-uppercase mb-1 fs-14">
@@ -155,7 +111,7 @@ based on apps-crm-deals.blade.php
             @foreach ($distributedData['delegated_to'] as $index => $value)
                 @php
                     $userId = $value['user_id'];
-                    $companyName = getCompanyAlias($value['company_id']);
+                    $companyName = getCompanyNameById($value['company_id']);
                     $avatar = getUserData($userId)['avatar'];
                     $name = getUserData($userId)['name'];
                 @endphp
@@ -233,8 +189,8 @@ based on apps-crm-deals.blade.php
         </div>
     </div>
 
-    <div class="col-sm-12 col-md-4">
-        <div class="card">
+    <div class="col-sm-12 col-md-6">
+        <div class="card mb-2">
             <a class="card-body bg-primary-subtle"><!-- data-bs-toggle="collapse" href="#contactInitiated" role="button"
                 aria-expanded="false" aria-controls="contactInitiated" -->
                 <h5 class="card-title text-uppercase mb-1 fs-14">
@@ -243,7 +199,7 @@ based on apps-crm-deals.blade.php
                         $uniqued = count($columns) > 1 ? array_unique($columns) : $columns;
                         echo is_array($uniqued) ? count($uniqued) : 0;
                     @endphp
-                     Auditores
+                     Auditor{{ count($uniqued) > 1 ? 'es' : '' }}
                 </h5>
                 <p class="text-muted mb-0"><span class="fw-medium">{{ is_array($distributedData['audited_by']) ? count($distributedData['audited_by']) : ''}} lojas</span></p>
             </a>
@@ -253,7 +209,7 @@ based on apps-crm-deals.blade.php
             @foreach ($distributedData['audited_by'] as $index => $value)
                 @php
                     $userId = $value['user_id'];
-                    $companyName = getCompanyAlias($value['company_id']);
+                    $companyName = getCompanyNameById($value['company_id']);
                     $avatar = getUserData($userId)['avatar'];
                     $name = getUserData($userId)['name'];
                 @endphp

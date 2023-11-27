@@ -27,9 +27,13 @@ class SurveyStep extends Model
         return $this->belongsTo(Survey::class);
     }
 
+    public function topics()
+    {
+        return $this->hasMany(SurveyTopic::class, 'step_id');
+    }
 
     public static function populateSurveySteps($templateId, $surveyId){
-        $userId = auth()->id();
+        $currentUserId = auth()->id();
 
         // Delete existing survey steps for the given surveyId
         SurveyStep::where('survey_id', $surveyId)->delete();
@@ -55,7 +59,7 @@ class SurveyStep extends Model
 
             $topics = $step['topics'] ?? null;
 
-            $fill['user_id'] = $userId;
+            $fill['user_id'] = $currentUserId;
             $fill['survey_id'] = intval($surveyId);
             $fill['term_id'] = intval($termId);
             $fill['step_order'] = intval($newPosition);
@@ -71,5 +75,6 @@ class SurveyStep extends Model
         }
 
     }
+
 
 }

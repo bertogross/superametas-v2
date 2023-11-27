@@ -21,7 +21,7 @@ import {
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    var btnCreate = document.getElementById('btn-surveys-create');
+    const btnCreate = document.getElementById('btn-surveys-create');
     if(btnCreate){
         btnCreate.addEventListener('click', async function(event) {
             event.preventDefault;
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listeners for each 'Edit' buttonS
-    var editButtons = document.querySelectorAll('.btn-surveys-edit');
+    const editButtons = document.querySelectorAll('.btn-surveys-edit');
     if(editButtons){
         editButtons.forEach(function(button) {
             button.addEventListener('click', function(event) {
@@ -44,38 +44,369 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    var btnAction = document.getElementById('btn-surveys-action');
-    if(btnAction){
-        btnAction.addEventListener('click', async function(event) {
-            event.preventDefault;
+    const changeStatusButtons = document.querySelectorAll('.btn-surveys-change-status');
+    if(changeStatusButtons){
+        changeStatusButtons.forEach(function(button) {
+            button.addEventListener('click', async function(event) {
+                event.preventDefault;
 
-            var surveyId = this.getAttribute("data-survey-id");
+                var purpose = this.getAttribute("data-purpose");
 
-            fetch(SurveysController, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
-                },
-                body: JSON.stringify({ id: surveyId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+                var surveyId = this.getAttribute("data-survey-id");
+                surveyId = parseInt(surveyId);
 
-                    toastAlert(data.message, 'success', 5000);
-                } else {
-                    // Handle error
-                    console.error('Error start/stop survey:', data.message);
+                if( purpose && purpose == 'stop' ){
+                    var isConfirmed = confirm('Certeza que deseja Interromper esta Tarefa?');
+                    if (!isConfirmed) {
+                        event.stopPropagation();
 
-                    toastAlert(data.message, 'danger', 5000);
+                        return;
+                    }
                 }
 
-                // Reload the terms form
-                reloadTermsForm();
-            })
-            .catch(error => console.error('Error:', error));
+                fetch(surveysChangeStatusURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                    },
+                    body: JSON.stringify({ id: surveyId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toastAlert(data.message, 'success');
 
+                        location.reload(true);
+                    } else {
+                        // Handle error
+                        console.error('Error start/stop survey:', data.message);
+
+                        toastAlert(data.message, 'danger', 5000);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+
+            });
+        });
+    }
+
+    // Event listeners for each 'btn-assignment-surveyor-action' to change task status from current to the next
+    // This Button are in resources\views\surveys\layouts\profile-surveyors-box.blade.php
+    const assignmentActionSurveyorButtons = document.querySelectorAll('.btn-assignment-surveyor-action');
+    if(assignmentActionSurveyorButtons){
+        assignmentActionSurveyorButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                var surveyId = this.getAttribute("data-survey-id");
+                surveyId = parseInt(surveyId);
+
+                var assignmentId = this.getAttribute("data-assignment-id");
+                assignmentId = parseInt(assignmentId);
+
+                var currentStatus = this.getAttribute("data-current-status"); // new  |  pending  |  in_progress  |  auditing
+
+                var url = changeAssignmentSurveyorStatusURL
+
+                if(currentStatus == 'new'){
+                    // Use only to change status to pending
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                        },
+                        body: JSON.stringify({ assignment_id: assignmentId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            /*
+                            toastAlert(data.message, 'success');
+
+                            setTimeout(function () {
+                                location.reload(true);
+                            }, 1000);
+                            */
+                            toastAlert('Redirecionando ao formulário...', 'success');
+
+                            setTimeout(function () {
+                                window.location.href = formSurveyorAssignmentURL + '/' +assignmentId;
+                            }, 1000);
+                        } else {
+                            // Handle error
+                            console.error('Error:', data.message);
+
+                            toastAlert(data.message, 'danger', 5000);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                 }else{
+                    toastAlert('Redirecionando ao formulário...', 'warning');
+
+                    setTimeout(function () {
+                        window.location.href = formSurveyorAssignmentURL + '/' +assignmentId;
+                    }, 1000);
+                 }
+            });
+        });
+    }
+
+
+    // Event listeners for each 'btn-assignment-auditor-action' to change task status from current to the next
+    // This Button are in resources\views\surveys\layouts\profile-surveyors-box.blade.php
+    const assignmentActionAuditorButtons = document.querySelectorAll('.btn-assignment-auditor-action');
+    if(assignmentActionAuditorButtons){
+        assignmentActionAuditorButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                var surveyId = this.getAttribute("data-survey-id");
+                surveyId = parseInt(surveyId);
+
+                var assignmentId = this.getAttribute("data-assignment-id");
+                assignmentId = parseInt(assignmentId);
+
+                var currentStatus = this.getAttribute("data-current-status"); // new  |  pending  |  in_progress  |  auditing
+
+                var url = changeAssignmentAuditorStatusURL
+
+                if(currentStatus == 'new'){
+                    // Use only to change status to pending
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                        },
+                        body: JSON.stringify({ assignment_id: assignmentId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            toastAlert(data.message, 'success');
+
+                            setTimeout(function () {
+                                location.reload(true);
+                            }, 1000);
+                        } else {
+                            // Handle error
+                            console.error('Error:', data.message);
+
+                            toastAlert(data.message, 'danger', 5000);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                 }else{
+                    toastAlert('Redirecionando ao formulário...', 'warning');
+
+                    setTimeout(function () {
+                        window.location.href = formAuditorAssignmentURL + '/' +assignmentId;
+                    }, 1000);
+                 }
+            });
+        });
+    }
+
+    // Event listeners for each 'btn-response-survey-update' to update/store form data to the 'survey_responses' table
+    const responseSurveyUpdateButtons = document.querySelectorAll('.btn-response-survey-update');
+    if(responseSurveyUpdateButtons){
+        responseSurveyUpdateButtons.forEach(button => {
+            button.addEventListener('click', event => {
+                event.preventDefault();
+
+                const container = document.getElementById('survey-assignment-container');
+                if (!container) {
+                    console.error('Container not found');
+                    return;
+                }
+
+                const responsesData = button.closest('.responses-data-container');
+                if (!responsesData) {
+                    console.error('Responses data container not found');
+                    return;
+                }
+
+                const countTopics = document.querySelectorAll('.btn-response-survey-update').length;
+                //console.log('countTopics', countTopics);
+
+                const surveyId = parseInt(container.querySelector('input[name="survey_id"]')?.value || 0);
+                const companyId = parseInt(container.querySelector('input[name="company_id"]')?.value || 0);
+                const assignmentId = parseInt(button.getAttribute('data-assignment-id'));
+                const stepId = parseInt(button.getAttribute('data-step-id'));
+                const topicId = parseInt(button.getAttribute('data-topic-id'));
+
+                var responseId = responsesData.querySelector('input[name="response_id"]').value;
+                responseId = responseId ? parseInt(responseId) : null;
+
+                const compliance = responsesData.querySelector('input[name="compliance_survey"]:checked')?.value || '';
+                const comment = responsesData.querySelector('textarea[name="comment_survey"]')?.value || '';
+                const attachmentId = responsesData.querySelector('input[name="attachment_id_survey"]')?.value || '';
+
+                const formData = {
+                    assignment_id: assignmentId,
+                    company_id: companyId,
+                    survey_id: surveyId,
+                    step_id: stepId,
+                    topic_id: topicId,
+                    compliance_survey: compliance,
+                    comment_survey: comment,
+                    attachment_id_survey: attachmentId
+                };
+                //console.log(JSON.stringify(formData, null, 2));
+                //return;
+
+                if(responseId){
+                    var url = responsesSurveyorStoreOrUpdateURL + '/' + responseId
+                }else{
+                    var url = responsesSurveyorStoreOrUpdateURL
+                }
+
+                // AJAX call to store or update the 'survey_responses' table where step_id, topic_id, survey_id
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toastAlert(data.message, 'success');
+
+                        const responseId = data.id;
+                        const countFinishedTopics = parseInt(data.count || 0);
+                        //console.log('countFinishedTopics', countFinishedTopics);
+
+                        responsesData.querySelector('input[name="response_id"]').value = responseId;
+
+                        var pendingIcon = responsesData.querySelector('.ri-time-line');
+                        var completedIcon = responsesData.querySelector('.ri-check-double-fill');
+
+                        if (responseId) {
+                            // If responseId is set, show the completed icon and hide the pending icon
+                            if (pendingIcon) pendingIcon.classList.add('d-none');
+                            if (completedIcon) completedIcon.classList.remove('d-none');
+                        } else {
+                            // If responseId is not set, show the pending icon and hide the completed icon
+                            if (pendingIcon) pendingIcon.classList.remove('d-none');
+                            if (completedIcon) completedIcon.classList.add('d-none');
+                        }
+
+                        if (responseId) {
+                            button.querySelector('i').classList.add('ri-refresh-line');
+                            button.querySelector('i').classList.remove('ri-save-3-line');
+                            button.setAttribute('title', 'Atualizar');
+                            button.setAttribute('data-bs-original-title', 'Atualizar');
+                        }
+
+                        if( countTopics === countFinishedTopics ){
+                            // TODO:
+                            // enable button to finish
+                            document.querySelector('#btn-response-surveyor-assignment-finalize').classList.remove('d-none');
+
+                        }
+                    } else {
+                        // Handle error
+                        console.error('Error start/stop survey:', data.message);
+
+                        toastAlert(data.message, 'danger', 5000);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+
+            });
+        });
+    }
+
+    // When Surveyor finish your taks, transfer to Auditor make revision
+    var responseSurveyorAssignmentFinalizedButton = document.getElementById('btn-response-surveyor-assignment-finalize');
+    if(responseSurveyorAssignmentFinalizedButton){
+        responseSurveyorAssignmentFinalizedButton.addEventListener('click', async function(event) {
+            event.preventDefault();
+
+            const container = document.getElementById('survey-assignment-container');
+            if (!container) {
+                console.error('Container not found');
+                return;
+            }
+            const surveyId = parseInt(container.querySelector('input[name="survey_id"]')?.value || 0);
+
+            const assignmentId = parseInt(this.getAttribute('data-assignment-id'));
+
+            Swal.fire({
+                title: 'A tarefa foi concluída!',
+                icon: 'success',
+                showDenyButton: false,
+                showCancelButton: true,
+                confirmButtonText: 'Enviar para Auditoria',
+                confirmButtonClass: 'btn btn-outline-success w-xs me-2',
+                cancelButtonClass: 'btn btn-sm btn-outline-info w-xs',
+                denyButtonClass: 'btn btn-danger w-xs me-2',
+                buttonsStyling: false,
+                denyButtonText: 'Não',
+                cancelButtonText: 'Continuar Editando',
+                showCloseButton: false,
+                allowOutsideClick: false
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    //Ajax to change 'surveys' table column status to 'auditing' and if the response is success call Swal.fire to redirect
+                    fetch(changeAssignmentSurveyorStatusURL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                        },
+                        body: JSON.stringify({ assignment_id: assignmentId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            toastAlert(data.message, 'success');
+
+                            var timerInterval;
+
+                            Swal.fire({
+                                title: 'Redirecionando...',
+                                html: '',
+                                timer: 3000,
+                                timerProgressBar: true,
+                                showCloseButton: false,
+                                didOpen: function () {
+                                    Swal.showLoading()
+                                    timerInterval = setInterval(function () {
+                                        var content = Swal.getHtmlContainer()
+                                        if (content) {
+                                            var b = content.querySelector('b')
+                                            if (b) {
+                                                b.textContent = Swal.getTimerLeft()
+                                            }
+                                        }
+                                    }, 100)
+                                },
+                                onClose: function () {
+                                    clearInterval(timerInterval)
+                                }
+                            }).then(function (result) {
+                                if (result.dismiss === Swal.DismissReason.timer) {
+                                    //console.log('I was closed by the timer')
+                                    window.location.href = profileShowURL;
+                                }
+                            });
+                        } else {
+                            // Handle error
+                            console.error('Survey status error:', data.message);
+
+                            toastAlert(data.message, 'danger', 5000);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+
+                }
+            })
         });
     }
 

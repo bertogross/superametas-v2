@@ -41,7 +41,6 @@ class SurveysTemplatesController extends Controller
         ) );
     }
 
-
     // Add
     public function create()
     {
@@ -91,12 +90,12 @@ class SurveysTemplatesController extends Controller
 
         session()->forget('success');
 
-        $userId = auth()->id();
+        $currentUserId = auth()->id();
 
         $data = SurveyTemplates::findOrFail($id);
 
         $surveys = Survey::where('template_id', $id)
-            ->where('user_id', $userId)
+            ->where('user_id', $currentUserId)
             ->where('condition_of', '!=', 'deleted')
             ->get();
 
@@ -106,8 +105,8 @@ class SurveysTemplatesController extends Controller
 
         // Check if the current user is the creator
         /*
-        if ($userId == $data->user_id) {
-            return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro efetuado por outra pessoa']);
+        if ($currentUserId == $data->user_id) {
+            return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro gerado por outra pessoa']);
         }
         */
 
@@ -144,21 +143,19 @@ class SurveysTemplatesController extends Controller
 
         $result = array_merge($default, $custom);
 
-        $view = view('surveys.templates.edit', compact(
+        return view('surveys.templates.edit', compact(
                 'data',
                 'surveys',
                 'result',
                 'terms',
             )
         );
-
-        return $view;
     }
 
     public function storeOrUpdate(Request $request, $id = null)
     {
         // Cache::flush();
-        $userId = auth()->id();
+        $currentUserId = auth()->id();
 
         $validatedData = $request->validate([
             'title' => 'required|string|max:191',
@@ -173,15 +170,15 @@ class SurveysTemplatesController extends Controller
 
         $template_data = $validatedData['template_data'];
 
-        $validatedData['user_id'] = $userId;
+        $validatedData['user_id'] = $currentUserId;
 
         if ($id) {
             // Update operation
             $templates = SurveyTemplates::findOrFail($id);
 
             // Check if the current user is the creator
-            if ($userId != $templates->user_id) {
-                return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro efetuado por outra pessoa']);
+            if ($currentUserId != $templates->user_id) {
+                return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro gerado por outra pessoa']);
             }
 
             $templates->update($validatedData);
@@ -206,4 +203,6 @@ class SurveysTemplatesController extends Controller
             ]);
         }
     }
+
+
 }

@@ -1,13 +1,8 @@
-@php
-// appPrintR($getSurveyStatusTranslations);
-
-@endphp
 @extends('layouts.master')
 @section('title')
     @lang('translation.surveys')
 @endsection
 @section('css')
-    <link href="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
     {{--
@@ -21,7 +16,6 @@
         @endslot
     @endcomponent
     --}}
-
     <div class="row mb-3">
         <div class="col">
             <div class="row mb-3 pb-1">
@@ -106,7 +100,6 @@
             </div>
         </div>
     </div>
-
 @endsection
 @section('script')
     <script src="{{ URL::asset('build/libs/flatpickr/flatpickr.min.js') }}"></script>
@@ -120,9 +113,13 @@
         var surveysIndexURL = "{{ route('surveysIndexURL') }}";
         var surveysCreateURL = "{{ route('surveysCreateURL') }}";
         var surveysEditURL = "{{ route('surveysEditURL') }}";
-        var surveysActionURL = "{{ route('surveysActionURL') }}";
+        var surveysChangeStatusURL = "{{ route('surveysChangeStatusURL') }}";
         var surveysShowURL = "{{ route('surveysShowURL') }}";
         var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
+        var formSurveyorAssignmentURL = "{{ route('formSurveyorAssignmentURL') }}";
+        var formAuditorAssignmentURL = "{{ route('formAuditorAssignmentURL') }}";
+        var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";
+        var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
     </script>
     <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
 @endsection

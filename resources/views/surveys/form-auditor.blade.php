@@ -1,0 +1,3 @@
+@php
+    appPrintR($data);
+@endphp

@@ -27,17 +27,17 @@ class SurveyTopic extends Model
     }
 
     public static function populateSurveyTopics($topics, $stepId, $surveyId){
-        $userId = auth()->id();
+        $currentUserId = auth()->id();
 
         if( $topics && $stepId && $surveyId){
-            
+
             foreach($topics as $topicIndex => $topic){
                 $question = $topic['question'] ?? '';
                 $originalPosition = $topic['original_position'] ?? $topicIndex;
                 $newPosition = $topic['new_position'] ?? $originalPosition;
 
                 if($question){
-                    $fill['user_id'] = $userId;
+                    $fill['user_id'] = $currentUserId;
                     $fill['survey_id'] = $surveyId;
                     $fill['step_id'] = $stepId;
                     $fill['question'] = $question;

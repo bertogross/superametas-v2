@@ -14,7 +14,7 @@
                     <th scope="col" class="bg-transparent fs-20 text-center invisible"></th>
                     @foreach ($data as $companyId => $departments)
                         <th scope="col" class="text-center" data-company-id="{{ $companyId }}">
-                            {{ getCompanyAlias(intval($companyId)) }}
+                            {{ getCompanyNameById(intval($companyId)) }}
                         </th>
                     @endforeach
                 </tr>
@@ -23,7 +23,7 @@
                 @foreach ($data as $companyId => $departments)
                     @foreach ($departments as $departmentId => $values)
                         @php
-                            $uniqueDepartments[$departmentId] = getDepartmentAlias(intval($departmentId));
+                            $uniqueDepartments[$departmentId] = getDepartmentNameById(intval($departmentId));
                         @endphp
                     @endforeach
                 @endforeach
@@ -53,7 +53,7 @@
                             @endphp
                             <td class="text-center align-middle" data-company-id="{{ $companyId }}" data-chart-id="{{ $ndxChartId }}">
                                 @php
-                                    echo goalsEmojiChart($ndxChartId, $goal, $sales, $departmentId, getDepartmentAlias($departmentId), getCompanyAlias($companyId), $percent, $percentAccrued);
+                                    echo goalsEmojiChart($ndxChartId, $goal, $sales, $departmentId, getDepartmentNameById($departmentId), getCompanyNameById($companyId), $percent, $percentAccrued);
                                 @endphp
                             </td>
                         @endforeach
@@ -74,7 +74,7 @@
                             @endphp
                             <td class="text-center align-middle @if (!empty($filterDepartments) && count($filterDepartments) == 1)  d-none @endif" data-company-id="{{ $companyId }}" data-chart-id="{{ $ndxChartId }}">
                                 @php
-                                    echo goalsEmojiChart($ndxChartId, floatval($totalGoals[$companyId]), floatval($totalSales[$companyId]), 'general', 'Geral', getCompanyAlias($companyId), $totalPercentValue, $totalPercentAccrued, 'general');
+                                    echo goalsEmojiChart($ndxChartId, floatval($totalGoals[$companyId]), floatval($totalSales[$companyId]), 'general', 'Geral', getCompanyNameById($companyId), $totalPercentValue, $totalPercentAccrued, 'general');
                                 @endphp
                             </td>
                         @endforeach
@@ -87,7 +87,7 @@
                     <th scope="col" class="bg-transparent invisible"></th>
                     @foreach ($data as $companyId => $departments)
                         <th scope="col" class="text-center" data-company-id="{{ $companyId }}">
-                            {{ getCompanyAlias(intval($companyId)) }}
+                            {{ getCompanyNameById(intval($companyId)) }}
                         </th>
                     @endforeach
                 </tr>

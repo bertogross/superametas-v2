@@ -1,5 +1,5 @@
 @php
-    $userId = auth()->id();
+    $currentUserId = auth()->id();
 
     $totalPercentAccrued = $ndxChartId = 0;
 
@@ -83,7 +83,7 @@
                 <div class="col-sm-12 col-md col-lg" title="Exibir somente Lojas selecionadas">
                     <select class="form-control" data-choices data-choices-removeItem name="companies[]" id="filter-companies" multiple data-placeholder="Loja">
                         @foreach ($getAuthorizedCompanies as $company)
-                            <option {{ in_array($company, $filterCompanies) ? 'selected' : '' }} value="{{ $company }}">{{ getCompanyAlias($company) }}</option>
+                            <option {{ in_array($company, $filterCompanies) ? 'selected' : '' }} value="{{ $company }}">{{ getCompanyNameById($company) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -100,30 +100,32 @@
             @endif
 
             <div class="col-sm-12 col-md-auto col-lg-auto wrap-form-btn">{{-- d-none --}}
-                <button type="submit" class="btn btn-theme w-100 init-loader" title="Filtrar"><i class="ri-equalizer-fill me-1 align-bottom"></i> Filtrar</button>
+                <button type="submit" name="filter" value="true" class="btn btn-theme waves-effect w-100 init-loader" title="Filtrar"><i class="ri-equalizer-fill me-1 align-bottom"></i> Filtrar</button>
             </div>
         </form>
     </div>
 
-    @if(!$data)
-        <div class="alert alert-warning alert-label-icon label-arrow fade show" role="alert">
-            <i class="ri-alert-fill label-icon"></i>Não há dados
-        </div>
-    @endif
-
-    @if (getUserMeta($userId, 'analytic-mode') == 'on')
-        @include('goal-sales/analytic')
-    @elseif (getUserMeta($userId, 'slide-mode') == 'on')
-        @if (count($filterCompanies) == 1 || count($getAuthorizedCompanies) == 1)
-            @include('goal-sales/single')
-        @else
-            @include('goal-sales/slide')
-        @endif
+    @if( !$data )
+        @component('components.nothing')
+            {{--
+            @slot('url', route('surveysCreateURL'))
+            --}}
+        @endcomponent
     @else
-        @if (count($filterCompanies) == 1 || count($getAuthorizedCompanies) == 1)
-            @include('goal-sales/single')
+        @if (getUserMeta($currentUserId, 'analytic-mode') == 'on')
+            @include('goal-sales/analytic')
+        @elseif (getUserMeta($currentUserId, 'slide-mode') == 'on')
+            @if (count($filterCompanies) == 1 || count($getAuthorizedCompanies) == 1)
+                @include('goal-sales/single')
+            @else
+                @include('goal-sales/slide')
+            @endif
         @else
-            @include('goal-sales/table')
+            @if (count($filterCompanies) == 1 || count($getAuthorizedCompanies) == 1)
+                @include('goal-sales/single')
+            @else
+                @include('goal-sales/table')
+            @endif
         @endif
     @endif
 

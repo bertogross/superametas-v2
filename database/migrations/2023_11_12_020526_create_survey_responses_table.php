@@ -13,12 +13,18 @@ return new class extends Migration
     {
         Schema::create('survey_responses', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id')->nullable();
-            $table->foreignId('topic_id')->constrained('survey_topics')->onDelete('cascade');
-            $table->foreignId('survey_id')->constrained('surveys')->onDelete('cascade');
-            $table->enum('response', ['yes', 'no', 'na']);
-            $table->text('comment')->nullable();
-            $table->string('photo_url', 255)->nullable();
+            $table->bigInteger('surveyor_id')->nullable();
+            $table->bigInteger('auditor_id')->nullable();
+            $table->bigInteger('step_id')->nullable();
+            $table->bigInteger('topic_id')->nullable();
+            $table->bigInteger('survey_id')->nullable();
+            $table->bigInteger('company_id')->nullable();
+            $table->enum('compliance_survey', ['yes', 'no'])->nullable();
+            $table->enum('compliance_audit', ['yes', 'no'])->nullable();
+            $table->text('comment_survey')->nullable();
+            $table->text('comment_audit')->nullable();
+            $table->text('attachment_id_survey')->nullable();
+            $table->text('attachment_id_audit')->nullable();
             $table->timestamps();
         });
     }

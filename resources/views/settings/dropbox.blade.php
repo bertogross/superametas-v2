@@ -126,7 +126,7 @@
                         </h5>
                         <div class="col-auto text-end">
                             <div class="d-flex gap-2 align-items-start">
-                                <select class="form-select" id="file-type" onchange="filterByFileType()">
+                                <select class="form-control form-select" id="file-type" onchange="filterByFileType()">
                                     <option value="" disabled>Tipos de Arquivo</option>
                                     <option value="All" selected>Todos</option>
                                     <option value="Video">Vídeo</option>

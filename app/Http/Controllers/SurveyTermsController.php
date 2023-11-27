@@ -42,10 +42,10 @@ class SurveyTermsController extends Controller
             return response()->json(['success' => false, 'message' => 'Termo já existe!']);
         }
 
-        $userId = auth()->id();
+        $currentUserId = auth()->id();
 
         $term = new SurveyTerms;
-        $term->user_id = $userId;
+        $term->user_id = $currentUserId;
         $term->name = $termName;
         $term->slug = $this->createUniqueSlug($termName);
         $term->save();

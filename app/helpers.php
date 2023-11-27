@@ -1,10 +1,14 @@
 <?php
 
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Survey;
 use App\Models\UserMeta;
 use App\Models\SurveyTerms;
+use App\Models\SurveyTopic;
+use App\Models\SurveyResponse;
 use App\Models\SurveyTemplates;
-
+use App\Models\SurveyAssignments;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\SettingsStripeController;
 
@@ -255,8 +259,8 @@ if (!function_exists('getActiveCompanies')) {
 }
 
 // Get the company alias based on the company ID
-if (!function_exists('getCompanyAlias')) {
-    function getCompanyAlias($companyId){
+if (!function_exists('getCompanyNameById')) {
+    function getCompanyNameById($companyId){
         if($companyId){
             $companyId = intval($companyId);
 
@@ -286,8 +290,8 @@ if (!function_exists('getActiveDepartments')) {
 }
 
 // Get the department alias based on the department ID
-if (!function_exists('getDepartmentAlias')) {
-    function getDepartmentAlias($departmentId){
+if (!function_exists('getDepartmentNameById')) {
+    function getDepartmentNameById($departmentId){
         $departmentId = intval($departmentId);
 
         $departmentAlias = DB::connection('smAppTemplate')
@@ -485,6 +489,121 @@ if (!function_exists('getTemplateRecurringById')) {
         return $template ? $template->recurring : null;
     }
 }
+
+// Count the number of topics that have been finished
+if (!function_exists('countSurveyTopics')) {
+    function countSurveyTopics($surveyId) {
+        return SurveyTopic::where([
+            'survey_id' => $surveyId
+        ])->count();
+    }
+}
+
+// Count the number of steps that have been finished
+if (!function_exists('countSurveySurveyorResponses')) {
+    function countSurveySurveyorResponses($surveyorId, $surveyId, $companyId) {
+        $today = Carbon::today();
+
+        return SurveyResponse::where('survey_id', $surveyId)
+            ->where('surveyor_id', $surveyorId)
+            ->where('company_id', $companyId)
+            ->whereDate('created_at', '=', $today)
+            ->count();
+
+    }
+}
+
+
+// Count the number of steps that have been finished
+if (!function_exists('countSurveyAuditorResponses')) {
+    function countSurveyAuditorResponses($auditorId, $surveyId, $companyId) {
+        $today = Carbon::today();
+
+        return SurveyResponse::where('survey_id', $surveyId)
+            ->where('auditor_id', $auditorId)
+            ->where('company_id', $companyId)
+            ->whereDate('created_at', '=', $today)
+            ->count();
+    }
+}
+
+if (!function_exists('countSurveyAllResponsesFromToday')){
+    function countSurveyAllResponsesFromToday($surveyId){
+        $today = Carbon::today();
+
+        return SurveyResponse::where('survey_id', $surveyId)
+            ->whereDate('created_at', '=', $today)
+            ->count();
+    }
+}
+
+// Check the 'survey_assignments' table to see which tasks were not completed by yesterday and change the status to 'losted'
+if (!function_exists('checkSurveyAssignmentUntilYesterday')){
+    function checkSurveyAssignmentUntilYesterday($surveyId){
+        $yesterday = Carbon::yesterday();
+
+        // Get all survey assignments that were not completed by yesterday
+        $assignments = SurveyAssignments::where('survey_id', $surveyId)
+            ->whereDate('created_at', '<=', $yesterday)
+            ->get();
+
+        foreach ($assignments as $assignment) {
+            if ($assignment->surveyor_status === 'auditing' && $assignment->auditor_status !== 'completed') {
+                // Change auditor_status to 'losted' and surveyor_status to 'completed'
+                $assignment->auditor_status = 'losted';
+                $assignment->surveyor_status = 'completed';
+            } elseif ($assignment->surveyor_status !== 'auditing') {
+                // Change surveyor_status to 'losted' and auditor_status to 'losted'
+                $assignment->surveyor_status = 'losted';
+                $assignment->auditor_status = 'losted';
+            }
+
+            $assignment->save();
+        }
+    }
+}
+
+if (!function_exists('startNewAssignmentIfSurveyIsRecurring')){
+    function startNewAssignmentIfSurveyIsRecurring($surveyId){
+        $today = Carbon::today();
+        $survey = Survey::findOrFail($surveyId);
+
+        $status = $survey->status;
+
+        if($status == 'started'){
+            $recurring = $survey->recurring;
+            $distributedData = $survey->distributed_data ?? null;
+
+            // Check if there are survey assignments for today
+            $assignmentsCount = SurveyAssignments::where('survey_id', $surveyId)
+                ->whereDate('created_at', '=', $today)
+                ->count();
+
+            // If there are no assignments for today, check the recurrence pattern
+            if ($assignmentsCount == 0) {
+                switch ($recurring) {
+                    case 'daily':
+                        SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                        break;
+                    case 'weekly':
+                        // Check if today is the specific day of the week for weekly recurrence
+                        // Example: if ($today->isMonday()) { ... }
+                        break;
+                    case 'biweekly':
+                        // Check if today is the 1st or 15th of the month for biweekly recurrence
+                        break;
+                    case 'monthly':
+                        // Check if today matches the specific day of the month for monthly recurrence
+                        break;
+                    case 'annual':
+                        // Check if today matches the specific day and month for annual recurrence
+                        break;
+                }
+            }
+        }
+    }
+}
+
 
 if( !function_exists('goalsEmojiChart') ){
 	function goalsEmojiChart($nChartId, $goal, $sale, $departmentId, $departmentName, $companyName, $percent, $percentAccrued, $style = ''){

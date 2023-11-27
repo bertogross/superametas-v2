@@ -1,5 +1,5 @@
 @php
-    $userId = auth()->id();
+    $currentUserId = auth()->id();
 
     $explodeMeantime = $getCustomMeantime ? explode(' até ', $getCustomMeantime) : '';
 
@@ -67,12 +67,12 @@
                             </div>
 
                             <div class="form-check form-switch form-switch-theme mb-2" data-bs-toggle="tooltip" data-bs-placement="left" title="O Modo Slide requer 2 ou mais Lojas">
-                                <input class="form-check-input slide-mode" type="radio" role="switch" name="mode" @if (getUserMeta($userId, 'slide-mode') == 'on') checked @endif id="slide-mode">
+                                <input class="form-check-input slide-mode" type="radio" role="switch" name="mode" @if (getUserMeta($currentUserId, 'slide-mode') == 'on') checked @endif id="slide-mode">
                                 <label class="form-check-label" for="slide-mode">Modo Slide</label>
                             </div>
 
                             <div class="form-check form-switch form-switch-theme mb-2" data-bs-toggle="tooltip" data-bs-placement="left" title="Ativar/Desativar Modo Analítico">
-                                <input class="form-check-input analytic-mode" type="radio" role="switch" name="mode" @if (getUserMeta($userId, 'analytic-mode') == 'on') checked @endif id="analytic-mode">
+                                <input class="form-check-input analytic-mode" type="radio" role="switch" name="mode" @if (getUserMeta($currentUserId, 'analytic-mode') == 'on') checked @endif id="analytic-mode">
                                 <label class="form-check-label" for="analytic-mode">Modo Analítico</label>
                             </div>
                         </li>
