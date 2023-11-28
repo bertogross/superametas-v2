@@ -105,11 +105,11 @@
                                 <div class="row mt-3">
                                     <div class="col-auto">
                                         <div class="form-check form-switch form-switch-sm form-switch-theme mb-4" title="Em conformidade">
-                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="YesSwitchCheck{{ $topicIndex.$radioIndex }}" {{$surveyorStatus == 'auditing' ? 'disabled' : ''}} value="yes" {{$complianceSurvey && $complianceSurvey == 'yes' ? 'checked' : ''}}>
+                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="YesSwitchCheck{{ $topicIndex.$radioIndex }}" {{$surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled' : ''}} value="yes" {{$complianceSurvey && $complianceSurvey == 'yes' ? 'checked' : ''}}>
                                             <label class="form-check-label" for="YesSwitchCheck{{ $topicIndex.$radioIndex }}">Conforme</label>
                                         </div>
                                         <div class="form-check form-switch form-switch-sm form-switch-danger" title="Não conforme">
-                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="NoSwitchCheck{{ $topicIndex.$radioIndex }}" {{$surveyorStatus == 'auditing' ? 'disabled' : ''}} value="no" {{$complianceSurvey && $complianceSurvey == 'no' ? 'checked' : ''}}>
+                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="NoSwitchCheck{{ $topicIndex.$radioIndex }}" {{$surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled' : ''}} value="no" {{$complianceSurvey && $complianceSurvey == 'no' ? 'checked' : ''}}>
                                             <label class="form-check-label" for="NoSwitchCheck{{ $topicIndex.$radioIndex }}">Não Conforme</label>
                                         </div>
                                     </div>
@@ -121,7 +121,7 @@
 
                                             <input type="hidden" name="attachment_id_survey">
 
-                                            <textarea tabindex="-1" class="form-control border-light" maxlength="1000" rows="3" name="comment_survey" placeholder="Observações..." {{$surveyorStatus == 'auditing' ? 'disabled readonly' : ''}}>{{$commentSurvey ?? ''}}</textarea>
+                                            <textarea tabindex="-1" class="form-control border-light" maxlength="1000" rows="3" name="comment_survey" placeholder="Observações..." {{$surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled readonly' : ''}}>{{$commentSurvey ?? ''}}</textarea>
 
                                             @if($surveyorStatus != 'auditing')
                                                 <button tabindex="-1"
@@ -150,7 +150,7 @@
         @endif
     @endforeach
 
-    @if ( isset($purpose) && $purpose == 'validForm' && $surveyorStatus != 'auditing' )
+    @if ( isset($purpose) && $purpose == 'validForm' && $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' )
         <button tabindex="-1" type="button"
         class="btn btn-theme waves-effect w-100 {{ $countFinished < $countTopics ? 'd-none' : '' }}"
         id="btn-response-surveyor-assignment-finalize" data-assignment-id="{{$surveyorAssignmentId}}"

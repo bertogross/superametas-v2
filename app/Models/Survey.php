@@ -73,14 +73,12 @@ class Survey extends Model
                 'label' => 'Aguardando',
                 'reverse' => '',
                 'description' => 'Aguardando finalização da Vistoria',
-                'purpose' => '',
                 'icon' => 'ri-pause-mini-line',
                 'color' => 'primary'
             ],
             'started' => [
                 'label' => 'Ativa',
                 'reverse' => 'Interromper',
-                'purpose' => 'stop',
                 'description' => 'Tarefa Inicializada',
                 'icon' => 'ri-pause-mini-line',
                 'color' => 'success'
@@ -88,7 +86,6 @@ class Survey extends Model
             'new' => [
                 'label' => 'Nova',
                 'reverse' => 'Iniciar',
-                'purpose' => '',
                 'description' => 'Tarefa registrada mas não inicializada',
                 'icon' => 'ri-play-fill',
                 'color' => 'primary'
@@ -96,7 +93,6 @@ class Survey extends Model
             'stopped' => [
                 'label' => 'Parado',
                 'reverse' => 'Reiniciar',
-                'purpose' => '',
                 'description' => 'Tarefa interrompida',
                 'icon' => 'ri-stop-mini-fill',
                 'color' => 'danger'
@@ -104,7 +100,6 @@ class Survey extends Model
             'pending' => [
                 'label' => 'Pendente',
                 'reverse' => 'Abrir Formulário',
-                'purpose' => '',
                 'description' => 'Tarefa que foi inicializada mas ainda não possui dados de progresso',
                 'icon' => 'ri-survey-line',
                 'color' => 'warning'
@@ -112,7 +107,6 @@ class Survey extends Model
             'in_progress' => [
                 'label' => 'Em Progresso',
                 'reverse' => 'Abrir Formulário',
-                'purpose' => '',
                 'description' => 'Tarefa que está em andamento',
                 'icon' => 'ri-time-line',
                 'color' => 'info'
@@ -120,7 +114,6 @@ class Survey extends Model
             'auditing' => [
                 'label' => 'Em Auditoria',
                 'reverse' => '',
-                'purpose' => '',
                 'description' => 'Tarefa que está sendo revisada/auditada',
                 'icon' => 'ri-todo-line',
                 'color' => 'secondary'
@@ -128,7 +121,6 @@ class Survey extends Model
             'completed' => [
                 'label' => 'Concluída',
                 'reverse' => '',
-                'purpose' => '',
                 'description' => 'Tarefa que foi concluída',
                 'icon' => 'ri-check-double-fill',
                 'color' => 'success'
@@ -136,7 +128,6 @@ class Survey extends Model
             'losted' => [
                 'label' => 'Perdida',
                 'reverse' => '',
-                'purpose' => '',
                 'description' => 'Tarefa não concluída no prazo',
                 'icon' => 'ri-skull-line',
                 'color' => 'danger'

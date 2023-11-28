@@ -72,7 +72,7 @@
         ?>
         <div class="card tasks-box bg-body" data-assignment-id="<?php echo e($assignmentId); ?>">
             <div class="card-body">
-                <div class="row mb-2">
+                <div class="row mb-0">
                     <div class="col text-theme fw-medium fs-15">
                         <?php echo e(getCompanyNameById($companyId)); ?>
 
@@ -85,7 +85,11 @@
                         <?php endif; ?>
                     </div>
                 </div>
-                <h5 class="fs-13 text-truncate task-title mb-0">
+                <span data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="A data em que esta tarefa deverá ser desempenhada">
+                    <?php echo e($assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-'); ?>
+
+                </span>
+                <h5 class="fs-13 text-truncate task-title mb-0 mt-2">
                     <?php echo e($templateName); ?>
 
                 </h5>
@@ -105,10 +109,51 @@
             <div class="card-footer border-top-dashed bg-body">
                 <div class="row">
                     <div class="col small">
-                        <span data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="A data em que esta tarefa deverá ser desempenhada">
-                            <i class="ri-time-line align-bottom"></i> <?php echo e($assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-'); ?>
+                        <div class="avatar-group ps-0">
+                            <?php if($surveyorId === $auditorId): ?>
+                                <!--
+                                    href="javascript:void(0);" onclick="alert('Message feature under development');"
+                                    <br>Clique para enviar uma mensagem.
+                                -->
+                                <a href="<?php echo e(route('profileShowURL', $surveyorId)); ?>" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas de Vistoria e Auditoria delegadas a <u><?php echo e($surveyorName); ?></u>">
+                                    <img
+                                    <?php if( empty(trim($surveyorAvatar)) ): ?>
+                                        src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
+                                    <?php else: ?>
+                                        src="<?php echo e(URL::asset('storage/' .$surveyorAvatar )); ?>"
+                                    <?php endif; ?>
+                                    alt="<?php echo e($surveyorName); ?>" class="rounded-circle avatar-xxs">
+                                </a>
+                            <?php else: ?>
+                                <!--
+                                    href="javascript:void(0);" onclick="alert('Message feature under development');"
+                                    <br>Clique para enviar uma mensagem.
+                                -->
+                                <a href="<?php echo e(route('profileShowURL', $surveyorId)); ?>" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Vistoria delegada a <u><?php echo e($surveyorName); ?></u>">
+                                    <img
+                                    <?php if( empty(trim($surveyorAvatar)) ): ?>
+                                        src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
+                                    <?php else: ?>
+                                        src="<?php echo e(URL::asset('storage/' .$surveyorAvatar )); ?>"
+                                    <?php endif; ?>
+                                    alt="<?php echo e($surveyorName); ?>" class="rounded-circle avatar-xxs">
+                                </a>
 
-                        </span>
+                                <!--
+                                    href="javascript:void(0);" onclick="alert('Message feature under development');"
+                                    <br>Clique para enviar uma mensagem.
+                                -->
+                                <a href="<?php echo e(route('profileShowURL', $auditorId)); ?>" class="d-inline-block ms-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Auditoria delegada a <u><?php echo e($auditorName); ?></u>">
+                                    <img
+                                    <?php if( empty(trim($auditorAvatar)) ): ?>
+                                        src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
+                                    <?php else: ?>
+                                        src="<?php echo e(URL::asset('storage/' .$auditorAvatar )); ?>"
+                                    <?php endif; ?>
+                                    alt="<?php echo e($auditorName); ?>" class="rounded-circle avatar-xxs">
+                                </a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     <div class="col-auto">
                         <?php if($currentUserId == $designatedUserId && in_array($statusKey, ['new','pending','in_progress']) ): ?>
@@ -117,59 +162,13 @@
                                 data-bs-trigger="hover"
                                 data-bs-placement="top"
                                 title="<?php echo e($status['reverse']); ?>"
-                                class="btn btn-sm btn-label right waves-effect btn-soft-<?php echo e($status['color']); ?> btn-assignment-surveyor-action"
+                                class="btn btn-sm btn-label right waves-effect btn-soft-<?php echo e($status['color']); ?> <?php echo e($designated == 'surveyor' ? 'btn-assignment-surveyor-action' : 'btn-assignment-auditor-action'); ?>"
                                 data-survey-id="<?php echo e($surveyId); ?>"
                                 data-assignment-id="<?php echo e($assignmentId); ?>"
                                 data-current-status="<?php echo e($statusKey); ?>">
                                 <i class="<?php echo e($status['icon']); ?> label-icon align-middle fs-16"></i> <?php echo e($status['reverse']); ?>
 
                             </button>
-                        <?php else: ?>
-                            <div class="avatar-group">
-                                <?php if($surveyorId === $auditorId): ?>
-                                    <!--
-                                        href="javascript:void(0);" onclick="alert('Message feature under development');"
-                                        <br>Clique para enviar uma mensagem.
-                                    -->
-                                    <a href="<?php echo e(route('profileShowURL', $surveyorId)); ?>" class="d-inline-block" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas de Vistoria e Auditoria delegadas a <u><?php echo e($surveyorName); ?></u>">
-                                        <img
-                                        <?php if( empty(trim($surveyorAvatar)) ): ?>
-                                            src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
-                                        <?php else: ?>
-                                            src="<?php echo e(URL::asset('storage/' .$surveyorAvatar )); ?>"
-                                        <?php endif; ?>
-                                        alt="<?php echo e($surveyorName); ?>" class="rounded-circle avatar-xxs">
-                                    </a>
-                                <?php else: ?>
-                                    <!--
-                                        href="javascript:void(0);" onclick="alert('Message feature under development');"
-                                        <br>Clique para enviar uma mensagem.
-                                    -->
-                                    <a href="<?php echo e(route('profileShowURL', $surveyorId)); ?>" class="d-inline-block ms-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Vistoria delegada a <u><?php echo e($surveyorName); ?></u>">
-                                        <img
-                                        <?php if( empty(trim($surveyorAvatar)) ): ?>
-                                            src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
-                                        <?php else: ?>
-                                            src="<?php echo e(URL::asset('storage/' .$surveyorAvatar )); ?>"
-                                        <?php endif; ?>
-                                        alt="<?php echo e($surveyorName); ?>" class="rounded-circle avatar-xxs">
-                                    </a>
-
-                                    <!--
-                                        href="javascript:void(0);" onclick="alert('Message feature under development');"
-                                        <br>Clique para enviar uma mensagem.
-                                    -->
-                                    <a href="<?php echo e(route('profileShowURL', $auditorId)); ?>" class="d-inline-block ms-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Auditoria delegada a <u><?php echo e($auditorName); ?></u>">
-                                        <img
-                                        <?php if( empty(trim($auditorAvatar)) ): ?>
-                                            src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
-                                        <?php else: ?>
-                                            src="<?php echo e(URL::asset('storage/' .$auditorAvatar )); ?>"
-                                        <?php endif; ?>
-                                        alt="<?php echo e($auditorName); ?>" class="rounded-circle avatar-xxs">
-                                    </a>
-                                <?php endif; ?>
-                            </div>
                         <?php endif; ?>
                     </div>
                 </div>

@@ -46,6 +46,7 @@
                 <?php if($companyName ): ?>
                     <h2 class="text-theme text-uppercase"><?php echo e($companyName); ?></h2>
                 <?php endif; ?>
+                <h2>Vistoria</h2>
                 <h3><?php echo e($templateName); ?></h3>
                 <div class="mb-0 text-muted">
                     Atualizado em:
@@ -94,7 +95,6 @@
             </div>
         <?php endif; ?>
     </div>
-
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
     <script>

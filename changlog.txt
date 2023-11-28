@@ -8,6 +8,10 @@ https://laravel-news.com/openai-for-laravel
 
 
 
+Version 2.0.28 - [2023-11-28]
+- [Started] SurveyAssigments auditor form
+
+
 
 Version 2.0.27 - [2023-11-21 - 2023-11-27]
 - [Removed] model/SurveyAuditorAssigment

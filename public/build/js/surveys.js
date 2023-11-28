@@ -50,12 +50,12 @@ document.addEventListener('DOMContentLoaded', function() {
             button.addEventListener('click', async function(event) {
                 event.preventDefault;
 
-                var purpose = this.getAttribute("data-purpose");
+                var currentStatus = this.getAttribute("data-current-status");
 
                 var surveyId = this.getAttribute("data-survey-id");
                 surveyId = parseInt(surveyId);
 
-                if( purpose && purpose == 'stop' ){
+                if( currentStatus && currentStatus == 'started' ){
                     var isConfirmed = confirm('Certeza que deseja Interromper esta Tarefa?');
                     if (!isConfirmed) {
                         event.stopPropagation();

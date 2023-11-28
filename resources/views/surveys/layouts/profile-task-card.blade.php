@@ -72,7 +72,7 @@
         @endphp
         <div class="card tasks-box bg-body" data-assignment-id="{{$assignmentId}}">
             <div class="card-body">
-                <div class="row mb-2">
+                <div class="row mb-0">
                     <div class="col text-theme fw-medium fs-15">
                         {{ getCompanyNameById($companyId) }}
                     </div>
@@ -84,7 +84,10 @@
                         @endif
                     </div>
                 </div>
-                <h5 class="fs-13 text-truncate task-title mb-0">
+                <span data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="A data em que esta tarefa deverá ser desempenhada">
+                    {{ $assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-' }}
+                </span>
+                <h5 class="fs-13 text-truncate task-title mb-0 mt-2">
                     {{ $templateName }}
                 </h5>
                 @if ( $designated == 'auditor' && $surveyorStatus == 'losted' && $auditorStatus == 'losted' )
@@ -103,9 +106,51 @@
             <div class="card-footer border-top-dashed bg-body">
                 <div class="row">
                     <div class="col small">
-                        <span data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="A data em que esta tarefa deverá ser desempenhada">
-                            <i class="ri-time-line align-bottom"></i> {{ $assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-' }}
-                        </span>
+                        <div class="avatar-group ps-0">
+                            @if ($surveyorId === $auditorId)
+                                <!--
+                                    href="javascript:void(0);" onclick="alert('Message feature under development');"
+                                    <br>Clique para enviar uma mensagem.
+                                -->
+                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas de Vistoria e Auditoria delegadas a <u>{{ $surveyorName }}</u>">
+                                    <img
+                                    @if( empty(trim($surveyorAvatar)) )
+                                        src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
+                                    @else
+                                        src="{{ URL::asset('storage/' .$surveyorAvatar ) }}"
+                                    @endif
+                                    alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
+                                </a>
+                            @else
+                                <!--
+                                    href="javascript:void(0);" onclick="alert('Message feature under development');"
+                                    <br>Clique para enviar uma mensagem.
+                                -->
+                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Vistoria delegada a <u>{{ $surveyorName }}</u>">
+                                    <img
+                                    @if( empty(trim($surveyorAvatar)) )
+                                        src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
+                                    @else
+                                        src="{{ URL::asset('storage/' .$surveyorAvatar ) }}"
+                                    @endif
+                                    alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
+                                </a>
+
+                                <!--
+                                    href="javascript:void(0);" onclick="alert('Message feature under development');"
+                                    <br>Clique para enviar uma mensagem.
+                                -->
+                                <a href="{{ route('profileShowURL', $auditorId) }}" class="d-inline-block ms-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Auditoria delegada a <u>{{ $auditorName }}</u>">
+                                    <img
+                                    @if( empty(trim($auditorAvatar)) )
+                                        src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
+                                    @else
+                                        src="{{ URL::asset('storage/' .$auditorAvatar ) }}"
+                                    @endif
+                                    alt="{{ $auditorName }}" class="rounded-circle avatar-xxs">
+                                </a>
+                            @endif
+                        </div>
                     </div>
                     <div class="col-auto">
                         @if ($currentUserId == $designatedUserId && in_array($statusKey, ['new','pending','in_progress']) )
@@ -114,58 +159,12 @@
                                 data-bs-trigger="hover"
                                 data-bs-placement="top"
                                 title="{{$status['reverse']}}"
-                                class="btn btn-sm btn-label right waves-effect btn-soft-{{$status['color']}} btn-assignment-surveyor-action"
+                                class="btn btn-sm btn-label right waves-effect btn-soft-{{$status['color']}} {{ $designated == 'surveyor' ? 'btn-assignment-surveyor-action' : 'btn-assignment-auditor-action' }}"
                                 data-survey-id="{{$surveyId}}"
                                 data-assignment-id="{{$assignmentId}}"
                                 data-current-status="{{$statusKey}}">
                                 <i class="{{$status['icon']}} label-icon align-middle fs-16"></i> {{$status['reverse']}}
                             </button>
-                        @else
-                            <div class="avatar-group">
-                                @if ($surveyorId === $auditorId)
-                                    <!--
-                                        href="javascript:void(0);" onclick="alert('Message feature under development');"
-                                        <br>Clique para enviar uma mensagem.
-                                    -->
-                                    <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas de Vistoria e Auditoria delegadas a <u>{{ $surveyorName }}</u>">
-                                        <img
-                                        @if( empty(trim($surveyorAvatar)) )
-                                            src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                        @else
-                                            src="{{ URL::asset('storage/' .$surveyorAvatar ) }}"
-                                        @endif
-                                        alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
-                                    </a>
-                                @else
-                                    <!--
-                                        href="javascript:void(0);" onclick="alert('Message feature under development');"
-                                        <br>Clique para enviar uma mensagem.
-                                    -->
-                                    <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block ms-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Vistoria delegada a <u>{{ $surveyorName }}</u>">
-                                        <img
-                                        @if( empty(trim($surveyorAvatar)) )
-                                            src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                        @else
-                                            src="{{ URL::asset('storage/' .$surveyorAvatar ) }}"
-                                        @endif
-                                        alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
-                                    </a>
-
-                                    <!--
-                                        href="javascript:void(0);" onclick="alert('Message feature under development');"
-                                        <br>Clique para enviar uma mensagem.
-                                    -->
-                                    <a href="{{ route('profileShowURL', $auditorId) }}" class="d-inline-block ms-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Auditoria delegada a <u>{{ $auditorName }}</u>">
-                                        <img
-                                        @if( empty(trim($auditorAvatar)) )
-                                            src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                        @else
-                                            src="{{ URL::asset('storage/' .$auditorAvatar ) }}"
-                                        @endif
-                                        alt="{{ $auditorName }}" class="rounded-circle avatar-xxs">
-                                    </a>
-                                @endif
-                            </div>
                         @endif
                     </div>
                 </div>

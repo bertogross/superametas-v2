@@ -45,6 +45,7 @@
                 @if ($companyName )
                     <h2 class="text-theme text-uppercase">{{ $companyName }}</h2>
                 @endif
+                <h2>Vistoria</h2>
                 <h3>{{ $templateName }}</h3>
                 <div class="mb-0 text-muted">
                     Atualizado em:
@@ -71,9 +72,14 @@
             </div>
         @else
             @if ($surveyorStatus == 'auditing')
-            <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                <i class="ri-alert-line label-icon"></i> Esta Vistoria já foi enviada para Auditoria e não poderá ser editada.
-            </div>
+                <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
+                    <i class="ri-alert-line label-icon"></i> Esta Vistoria já foi enviada para Auditoria e não poderá ser editada.
+                </div>
+            @endif
+            @if ($surveyorStatus == 'losted')
+                <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
+                    <i class="ri-alert-line label-icon"></i> Esta Vistoria foi perdida e não poderá ser editada.
+                </div>
             @endif
             <div id="survey-assignment-container">
                 @csrf
@@ -81,7 +87,7 @@
                 <input type="hidden" name="company_id" value="{{$companyId}}">
 
                 @if ($surveyData)
-                    @component('surveys.layouts.form-step-cards')
+                    @component('surveys.layouts.form-surveyor-step-cards')
                         @slot('data', $stepsWithTopics)
                         @slot('responsesData', $responsesData)
                         @slot('purpose', 'validForm')
@@ -92,7 +98,6 @@
             </div>
         @endif
     </div>
-
 @endsection
 @section('script')
     <script>

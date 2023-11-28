@@ -98,8 +98,11 @@
                         $countFilteredSurveyorData = is_array($filteredSurveyorData) ? count($filteredSurveyorData) : 0;
 
                         $countFilteredAuditorData = is_array($filteredAuditorData) ? count($filteredAuditorData) : 0;
+
+                        $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
                     @endphp
-                    <div class="tasks-list p-2">
+
+                    <div class="tasks-list p-2 {{ in_array($key, ['wainting', 'pending', 'auditing', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
                         <div class="d-flex mb-3">
                             <div class="flex-grow-1">
                                 <h6 class="fs-14 text-uppercase fw-semibold mb-0">
@@ -107,7 +110,7 @@
                                         {{$status['label']}}
                                     </span>
                                     <small class="badge bg-{{$status['color']}} align-bottom ms-1 totaltask-badge">
-                                        {{ $countFilteredSurveyorData + $countFilteredAuditorData }}
+                                        {{ $countTotal }}
                                     </small>
                                 </h6>
                             </div>
@@ -151,6 +154,14 @@
                     </div>
                     <!--end tasks-list-->
                 @endforeach
+
+                {{--
+                @if ($countTasks === 0)
+                    <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show ms-auto me-auto" role="alert">
+                        <i class="ri-alert-line label-icon"></i> Tarefas ainda não lhe foram atribuídas
+                    </div>
+                @endif
+                --}}
 
             </div>
             <!--end task-board-->

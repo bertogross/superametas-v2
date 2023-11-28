@@ -54,7 +54,7 @@
         </div>
 
         @if ($result)
-            @component('surveys.layouts.form-step-cards')
+            @component('surveys.layouts.form-surveyor-step-cards')
                 @slot('data', $result)
                 @slot('purpose', 'fakeForm')
             @endcomponent

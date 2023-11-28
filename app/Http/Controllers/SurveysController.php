@@ -69,31 +69,6 @@ class SurveysController extends Controller
         $query = $query->where('user_id', $currentUserId);
         $query = $query->where('condition_of', 'publish');
 
-        // Search by delegated_to and or audited_by
-        /*
-        if ($delegated_to) {
-            $query->whereIn('delegated_to', $delegated_to);
-        } elseif ($audited_by) {
-            $query->whereIn('audited_by', $audited_by);
-        } elseif ($audited_by && $delegated_to) {
-            $query->whereIn('audited_by', $audited_by)->orWhereIn('delegated_to', $delegated_to);
-        }
-        */
-
-        /*
-        if ($delegated_to && $audited_by) {
-            $query->where(function ($query) use ($delegated_to, $audited_by) {
-                $query->whereIn('delegated_to', $delegated_to)
-                      ->orWhereIn('audited_by', $audited_by);
-            });
-        } elseif ($delegated_to) {
-            $query->whereIn('delegated_to', $delegated_to);
-        } elseif ($audited_by) {
-            $query->whereIn('audited_by', $audited_by);
-        }
-        */
-
-        /*
         if ($created_at) {
             $dates = explode(' até ', $created_at);
             if (is_array($dates) && count($dates) === 2) {
@@ -105,7 +80,7 @@ class SurveysController extends Controller
                 $query->whereDate('created_at', '=', $start_date);
             }
         }
-        */
+
         $data = $query->orderBy('created_at')->paginate(10);
         /**
          * END SURVEYS QUERY
@@ -254,31 +229,39 @@ class SurveysController extends Controller
 
         $distributedData = $data->distributed_data ?? null;
 
-        $oldStatus = $data->old_status ?? $currentStatus;
+        //$oldStatus = $data->old_status ?? $currentStatus;
 
-        $message = 'Status da tarefa foi atualizado com sucesso';
-        $newStatus = $oldStatus;
+        //$message = 'Status da tarefa foi atualizado com sucesso';
+        //$newStatus = $oldStatus;
 
-        // Change the status based on current status
-        if ($currentStatus == 'new' || $oldStatus == 'started') {
-            $message = 'Vistoria inicializada com sucesso';
+        switch ($currentStatus) {
+            case 'new':
+                $newStatus = 'started';
 
-            $newStatus = 'started';
+                $message = 'Vistoria inicializada com sucesso';
 
-            // Start the task by distributing to each party
-            SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                // Start the task by distributing to each party
+                SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                break;
+            case 'stopped':
+                $newStatus = 'started';
 
-        }elseif ($currentStatus == 'stopped') {
-            $message = 'Vistoria reinicializada com sucesso';
+                $message = 'Vistoria reinicializada com sucesso';
 
-            $newStatus = $oldStatus;
+                // Restart the task by distributing to each party
+                SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                break;
+            case 'started':
+                $newStatus = 'stopped';
 
-        }else{
-            // TODO
-            //return response()->json(['success' => false, 'message' => 'Não será possível alterar o status desta tarefa pois já há atividades em andamento']);
+                $message = 'Vistoria interrompida';
+                break;
+            default:
+               echo "i is not equal to 0, 1 or 2";
         }
+
         $columns['status'] = $newStatus;
-        $columns['old_status'] = $currentStatus;
+        //$columns['old_status'] = $currentStatus;
 
         // Save the changes
         $data->update($columns);

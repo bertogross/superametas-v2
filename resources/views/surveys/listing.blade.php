@@ -39,6 +39,7 @@
                     <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="Período" data-min-date="{{ $firstDate }}" data-max-date="{{ $lastDate }}" value="{{ request('created_at') }}">
                 </div>
 
+                {{--
                 <div class="col-sm-12 col-md col-lg">
                     <div class="input-light">
                         <select class="form-control form-select" name="status">
@@ -49,6 +50,7 @@
                         </select>
                     </div>
                 </div>
+                --}}
 
                 <div class="col-sm-12 col-md-auto col-lg-auto wrap-form-btn">{{-- d-none --}}
                     <button type="submit" name="filter" value="true" class="btn btn-theme waves-effect w-100 init-loader"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Filtrar</button>
@@ -76,8 +78,10 @@
                             <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Data de Execução da Vistoria">Vistoria</th>
                             <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Data de Execução da Auditoria">Auditoria</th>
                             --}}
+                            {{--
                             <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Colaboradores que receberam a tarefa de Vistoria">Vistoriadores</th>
                             <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Colaboradores que receberam a tarefa de Auditoria">Auditores</th>
+                            --}}
                             <th class="text-center" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-html="true" data-bs-placement="top" data-bs-title="Recorrências Possíveis" data-bs-content="{{ implode('<br>', array_column($getSurveyRecurringTranslations, 'label')) }}">Recorrência</th>
                             <th class="text-center" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-html="true" data-bs-placement="top" data-bs-title="Status Possíveis" data-bs-content="{{ implode('<br>', array_column($getSurveyStatusTranslations, 'label')) }}">Status</th>
                             {{--
@@ -124,6 +128,7 @@
                                 <td class="text-center">
                                     {{ $survey->created_at ? date("d/m/Y", strtotime($survey->created_at)) : '-' }}
                                 </td>
+                                {{--
                                 <td>
                                     @if ($delegatedToIds)
                                         <div class="avatar-group">
@@ -141,7 +146,7 @@
                                                             src="{{ URL::asset('storage/' .$avatar ) }}"
                                                         @endif
                                                         alt="{{ $name }}" class="rounded-circle avatar-xxs">
-                                                    </a> {{-- $name --}}
+                                                    </a>
                                                 </div>
                                             @endforeach
                                         </div>
@@ -166,7 +171,7 @@
                                                             src="{{ URL::asset('storage/' .$avatar ) }}"
                                                         @endif
                                                         alt="{{ $name }}" class="rounded-circle avatar-xxs">
-                                                    </a> {{-- $name --}}
+                                                    </a>
                                                 </div>
                                             @endforeach
                                         </div>
@@ -174,6 +179,7 @@
                                         -
                                     @endif
                                 </td>
+                                --}}
                                 <td class="text-center">
                                     <span class="badge bg-{{ $getSurveyRecurringTranslations[$recurring]['color'] }}-subtle text-{{ $getSurveyRecurringTranslations[$recurring]['color'] }} text-uppercase" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $getSurveyRecurringTranslations[$recurring]['description'] }}">
                                      {{ $recurringLabel }}
@@ -199,7 +205,7 @@
                                         <button type="button" data-survey-id="{{ $survey->id }}"
                                             data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
                                             class="btn btn-sm btn-label right waves-effect btn-soft-{{ $getSurveyStatusTranslations[$surveyStatus]['color'] }} btn-surveys-change-status"
-                                            data-purpose="{{ $getSurveyStatusTranslations[$surveyStatus]['purpose'] }}"
+                                            data-current-status="{{ $surveyStatus }}"
                                             title="{{ $getSurveyStatusTranslations[$surveyStatus]['reverse'] }}">
                                                 <i class="{{ $getSurveyStatusTranslations[$surveyStatus]['icon'] }} label-icon align-middle fs-16 ms-2"></i> {{ $getSurveyStatusTranslations[$surveyStatus]['reverse'] }}
                                         </button>
@@ -208,15 +214,18 @@
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-soft-dark waves-effect btn-surveys-edit ri-edit-line" data-survey-id="{{$surveyId}}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Editar"></button>
 
-                                        <a href="{{ route('surveysShowURL', $surveyId) }}" class="btn btn-sm btn-soft-dark waves-effect ri-line-chart-fill" target="_blank" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualizar Dados dos Processos de Vistoria em nova Janela"></a>
+                                        <a href="{{ route('surveysShowURL', $surveyId) }}" class="btn btn-sm btn-soft-dark waves-effect ri-line-chart-fill" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualizar Dados Analíticos"></a>
 
+                                        {{--
                                         <button type="button" class="btn btn-sm btn-soft-dark waves-effect btn-toggle-row-detail" data-id="{{ $surveyId }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Expand/Collapse this row">
                                             <i class="ri-folder-line"></i>
                                             <i class="ri-folder-open-line d-none"></i>
                                         </button>
+                                        --}}
                                     </div>
                                 </td>
                             </tr>
+                            {{--
                             <tr class="details-row d-none bg-body-tertiary" data-details-for="{{ $surveyId }}">
                                 <td colspan="9">
                                     <div class="load-row-content" data-survey-id="{{ $surveyId }}">
@@ -229,6 +238,7 @@
                                     </div>
                                 </td>
                             </tr>
+                            --}}
                         @endforeach
                     </tbody>
                 </table>

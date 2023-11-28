@@ -13,7 +13,7 @@
 
     $alertMessage = '<div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show" role="alert">
             <i class="ri-alert-line label-icon"></i> Esta vistoria já foi iniciada e a alteração do Modelo/Recorrência não poderá ser efetuada. Prossiga se necessitar editar as atribuições.<br>
-            Se a intenção for a de modificar tópicos dos processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho ideal será encerrar esta vistoria e gerar um novo registro.
+            Se a intenção for a de modificar tópicos dos processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho ideal será encerrar esta atividade e gerar um novo registro.
         </div>';
 
     $alertMessage2 = $recurring == 'daily' && $countResponses > 0 ? '<div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">

@@ -60,6 +60,53 @@ class SurveysAssignmentsController extends Controller
         ));
     }
 
+    public function formAuditorAssignment(Request $request, $assignmentId)
+    {
+        if (!$assignmentId) {
+            abort(404);
+        }
+
+        $auditorAssignmentData = SurveyAssignments::findOrFail($assignmentId) ?? null;
+
+        $surveyId = $auditorAssignmentData->survey_id;
+
+        $surveyData = Survey::findOrFail($surveyId);
+
+        $decodedData = isset($surveyData->template_data) ? json_decode($surveyData->template_data, true) : $surveyData->template_data;
+        $reorderingData = SurveyTemplates::reorderingData($decodedData);
+        $templateData = $reorderingData;
+
+        $stepsWithTopics = SurveyStep::with(['topics' => function($query) {
+                $query->orderBy('topic_order');
+            }])
+            ->where('survey_id', $surveyId)
+            ->orderBy('step_order')
+            ->get()
+            ->map(function ($step) {
+                return [
+                    'id' => $step->id,
+                    'survey_id' => $step->survey_id,
+                    'step_id' => $step->id,
+                    'step_order' => $step->step_order,
+                    'term_id' => $step->term_id,
+                    'topics' => $step->topics->map(function ($topic) {
+                        return [
+                            'topic_id' => $topic->id,
+                            'question' => $topic->question
+                        ];
+                    })
+                ];
+            });
+        $stepsWithTopics = json_decode($stepsWithTopics, true);
+
+        return view('surveys.form-auditor', compact(
+            'surveyData',
+            'templateData',
+            'auditorAssignmentData',
+            'stepsWithTopics'
+        ));
+    }
+
     public function changeAssignmentSurveyorStatus(Request $request)
     {
         $currentUserId = auth()->id();
@@ -85,6 +132,10 @@ class SurveysAssignmentsController extends Controller
             $newStatus = 'auditing';
 
             $message = 'Dados enviados para Auditoria';
+        }else{
+            $message = 'Status inalterado';
+
+            $newStatus = $currentStatus;
         }
 
         SurveyAssignments::changeSurveyorAssignmentStatus($assignmentId, $newStatus);
@@ -92,17 +143,45 @@ class SurveysAssignmentsController extends Controller
         return response()->json(['success' => true, 'message' => $message]);
     }
 
-
-    public function formAuditorAssignment(Request $request, $assignmentId)
+    public function changeAssignmentAuditorStatus(Request $request)
     {
-        if (!$assignmentId) {
-            abort(404);
+        $currentUserId = auth()->id();
+
+        $assignmentId = $request->input('assignment_id');
+        $assignmentId = intval($assignmentId);
+
+        $data = SurveyAssignments::findOrFail($assignmentId);
+
+        if ($currentUserId != $data->auditor_id) {
+            return response()->json(['success' => false, 'message' => 'Você não possui autorização para prosseguir com a tarefa delegada a outra pessoa']);
         }
 
-        // TODO
+        $currentStatus = $data->auditor_status;
 
+        if($currentStatus == 'new'){
+            // [if currentStatus is new] Change to pending.
+            $newStatus = 'pending';
 
-        return view('surveys.form-auditor', compact());
+            $message = 'Formulário gerado com sucesso';
+        }
+        /*
+        elseif($currentStatus == 'in_progress'){
+            // [if currentStatus is in_progress] Change to completed.
+            $newStatus = 'completed';
+
+            $message = 'Auditoria finalizada';
+        }
+        */
+        else{
+            $message = 'Status inalterado';
+
+            $newStatus = $currentStatus;
+        }
+
+        SurveyAssignments::changeAuditorAssignmentStatus($assignmentId, $newStatus);
+
+        return response()->json(['success' => true, 'message' => $message]);
     }
+
 
 }

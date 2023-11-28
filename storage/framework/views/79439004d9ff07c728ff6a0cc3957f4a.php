@@ -86,8 +86,11 @@
                         $countFilteredSurveyorData = is_array($filteredSurveyorData) ? count($filteredSurveyorData) : 0;
 
                         $countFilteredAuditorData = is_array($filteredAuditorData) ? count($filteredAuditorData) : 0;
+
+                        $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
                     ?>
-                    <div class="tasks-list p-2">
+
+                    <div class="tasks-list p-2 <?php echo e(in_array($key, ['wainting', 'pending', 'auditing', 'losted']) && $countTotal < 1 ? 'd-none' : ''); ?>">
                         <div class="d-flex mb-3">
                             <div class="flex-grow-1">
                                 <h6 class="fs-14 text-uppercase fw-semibold mb-0">
@@ -96,7 +99,7 @@
 
                                     </span>
                                     <small class="badge bg-<?php echo e($status['color']); ?> align-bottom ms-1 totaltask-badge">
-                                        <?php echo e($countFilteredSurveyorData + $countFilteredAuditorData); ?>
+                                        <?php echo e($countTotal); ?>
 
                                     </small>
                                 </h6>
@@ -129,6 +132,8 @@
                     </div>
                     <!--end tasks-list-->
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                
 
             </div>
             <!--end task-board-->
