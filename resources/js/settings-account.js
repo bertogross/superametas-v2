@@ -1,7 +1,10 @@
 import {
-    toastAlert,
-    attachImage
+    toastAlert
 } from './helpers.js';
+
+import {
+    attachImage
+} from './attachments.js';
 
 document.addEventListener('DOMContentLoaded', function() {
 

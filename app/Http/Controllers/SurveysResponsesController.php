@@ -19,7 +19,6 @@ class SurveysResponsesController extends Controller
             'topic_id.required' => 'O campo topic_id é obrigatório',
             'compliance_survey.required' => 'Marque: Conforme ou Não Conforme',
             'compliance_survey.in' => 'Marque Apenas se Conforme ou Não Conforme',//'O campo compliance_survey deve ser yes, no ou na.',
-            //'attachment_id_survey' => 'Envie uma foto'
         ];
 
         try {
@@ -30,7 +29,6 @@ class SurveysResponsesController extends Controller
                 'topic_id' => 'required',
                 'compliance_survey' => 'required|in:yes,no,na',
                 //'comment_survey' => 'sometimes|string',
-                //'attachment_id_survey' => 'required'
             ], $messages)->validate();
         } catch (ValidationException $e) {
             $errors = $e->errors();
@@ -52,11 +50,39 @@ class SurveysResponsesController extends Controller
         // Get authenticated user ID
         $currentUserId = auth()->id();
 
+        $attachmentIds = $request->input('attachment_ids');
+        if(!$attachmentIds){
+            return response()->json([
+                'success' => false,
+                'message' => 'Necessário enviar ao menos uma foto'
+            ]);
+        }
+        $attachmentIdsInt = array_map('intval', $attachmentIds);
+
         $assignmentId = $request->input('assignment_id');
 
+        $surveyorAssignmentData = SurveyAssignments::findOrFail($assignmentId) ?? null;
+
+        $surveyorStatus = $surveyorAssignmentData->surveyor_status;
+        if( $surveyorStatus == 'auditing' ){
+            return response()->json([
+                'success' => false,
+                'message' => 'Esta Vistoria já foi enviada para Auditoria e não poderá ser editada',
+            ]);
+        }
+        if($surveyorStatus == 'losted' ){
+            return response()->json([
+                'success' => false,
+                'message' => 'Esta Vistoria foi perdida pois o prezo expirou e por isso não poderá mais ser editada',
+            ]);
+        }
+
         // Prepare data for saving
-        $data = $request->only(['company_id', 'survey_id', 'step_id', 'topic_id', 'compliance_survey', 'comment_survey', 'attachment_id_survey']);
+        $data = $request->only(['company_id', 'survey_id', 'step_id', 'topic_id', 'compliance_survey', 'comment_survey']);
+
         $data['surveyor_id'] = $currentUserId;
+
+        $data['attachments_survey'] = $attachmentIdsInt ? json_encode($attachmentIdsInt) : '';
 
         if ($id) {
             // Update existing survey response
@@ -76,7 +102,7 @@ class SurveysResponsesController extends Controller
         // Return success response
         return response()->json([
             'success' => true,
-            'message' => $id ? 'Dados foram atualizados!' : 'Dados foram salvos!',
+            'message' => $id ? 'Os dados deste tópico foram atualizados' : 'Os dados deste tópico foram salvos',
             'id' => $SurveyResponse->id,
             'count' => $countResponses,
         ]);

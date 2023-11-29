@@ -8,8 +8,13 @@ https://laravel-news.com/openai-for-laravel
 
 
 
-Version 2.0.28 - [2023-11-28]
+Version 2.0.29 - [2023-11-29]
 - [Started] SurveyAssigments auditor form
+
+
+
+Version 2.0.28 - [2023-11-28]
+- [Finished] SurveyAssigments surveyor form
 
 
 
@@ -195,7 +200,7 @@ Version 2.0.13 - [2023-10-17]
 - [Added] middleware CheckUserStatus
 - [Updated] LoginController ( Check if the user's status is 0 and prevent login)
 - [Updated] SettingsAccountController
-- [Updated] UploadController
+- [Updated] UserUploadController
 - [Updated] blade templates
 - [Added] settings-account.js
 - [Updated] settings-users.js

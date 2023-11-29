@@ -10,7 +10,8 @@ import {
     multipleModal,
     bsPopoverTooltip,
     layouRightSide,
-    toggleTableRows
+    toggleTableRows,
+    lightbox
 } from './helpers.js';
 
 /*
@@ -209,8 +210,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Event listeners for each 'btn-response-survey-update' to update/store form data to the 'survey_responses' table
-    const responseSurveyUpdateButtons = document.querySelectorAll('.btn-response-survey-update');
+    // Event listeners for each 'btn-response-surveyor-update' to update/store form data to the 'survey_responses' table
+    const responseSurveyUpdateButtons = document.querySelectorAll('.btn-response-surveyor-update');
     if(responseSurveyUpdateButtons){
         responseSurveyUpdateButtons.forEach(button => {
             button.addEventListener('click', event => {
@@ -228,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                const countTopics = document.querySelectorAll('.btn-response-survey-update').length;
+                const countTopics = document.querySelectorAll('.btn-response-surveyor-update').length;
                 //console.log('countTopics', countTopics);
 
                 const surveyId = parseInt(container.querySelector('input[name="survey_id"]')?.value || 0);
@@ -242,7 +243,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const compliance = responsesData.querySelector('input[name="compliance_survey"]:checked')?.value || '';
                 const comment = responsesData.querySelector('textarea[name="comment_survey"]')?.value || '';
-                const attachmentId = responsesData.querySelector('input[name="attachment_id_survey"]')?.value || '';
+                const attachmentInputs = responsesData.querySelectorAll('input[name="attachment_id[]"]');
+                const attachmentIds = Array.from(attachmentInputs).map(input => input.value);
 
                 const formData = {
                     assignment_id: assignmentId,
@@ -252,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     topic_id: topicId,
                     compliance_survey: compliance,
                     comment_survey: comment,
-                    attachment_id_survey: attachmentId
+                    attachment_ids: attachmentIds
                 };
                 //console.log(JSON.stringify(formData, null, 2));
                 //return;
@@ -275,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        toastAlert(data.message, 'success');
+                        toastAlert(data.message, 'success', 5000);
 
                         const responseId = data.id;
                         const countFinishedTopics = parseInt(data.count || 0);
@@ -304,16 +306,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
 
                         if( countTopics === countFinishedTopics ){
-                            // TODO:
                             // enable button to finish
                             document.querySelector('#btn-response-surveyor-assignment-finalize').classList.remove('d-none');
-
                         }
                     } else {
                         // Handle error
-                        console.error('Error start/stop survey:', data.message);
+                        console.error('Erro:', data.message);
 
-                        toastAlert(data.message, 'danger', 5000);
+                        button.querySelector('i').classList.remove('ri-refresh-line');
+                        button.querySelector('i').classList.add('ri-save-3-line');
+
+                        toastAlert(data.message, 'danger', 10000);
                     }
                 })
                 .catch(error => console.error('Error:', error));
@@ -323,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // When Surveyor finish your taks, transfer to Auditor make revision
-    var responseSurveyorAssignmentFinalizedButton = document.getElementById('btn-response-surveyor-assignment-finalize');
+    const responseSurveyorAssignmentFinalizedButton = document.getElementById('btn-response-surveyor-assignment-finalize');
     if(responseSurveyorAssignmentFinalizedButton){
         responseSurveyorAssignmentFinalizedButton.addEventListener('click', async function(event) {
             event.preventDefault();
@@ -564,6 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
     maxLengthTextarea();
     layouRightSide();
     toggleTableRows();
+    lightbox();
    // choicesListeners(surveysTermsSearchURL, surveysStoreOrUpdateURL, choicesSelectorClass);
 
 });

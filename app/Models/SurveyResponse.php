@@ -24,8 +24,8 @@ class SurveyResponse extends Model
         'compliance_audit',
         'comment_survey',
         'comment_audit',
-        'attachment_id_survey',
-        'attachment_id_audit'
+        'attachments_survey',
+        'attachments_audit'
     ];
 
 

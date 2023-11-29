@@ -6,7 +6,7 @@ use App\Http\Controllers\{
     Auth\LoginController,
     HomeController,
     ProfileController,
-    UploadController,
+    UserUploadController,
     SettingsUserController,
     SettingsDatabaseController,
     SettingsAccountController,
@@ -21,6 +21,7 @@ use App\Http\Controllers\{
     SurveysAssignmentsController,
     SettingsApiKeysController,
     SettingsStripeController,
+    AttachmentsController,
     StripeWebhookController,
     DropboxController,
     ClarifaiImageController,
@@ -90,6 +91,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/terms/store/{id?}', [SurveyTermsController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
             Route::get('/terms/search', [SurveyTermsController::class, 'search'])->name('surveysTermsSearchURL');
 
+
+
     });
 
 
@@ -128,10 +131,14 @@ Route::middleware(['auth'])->group(function () {
 
     // File Upload Routes
     Route::prefix('upload')->group(function () {
-        Route::post('/avatar', [UploadController::class, 'uploadAvatar'])->name('uploadAvatarURL');
-        Route::post('/cover', [UploadController::class, 'uploadCover'])->name('uploadCoverURL');
-        Route::post('/logo', [UploadController::class, 'uploadLogo'])->name('uploadLogoURL');
-        Route::delete('/logo', [UploadController::class, 'deleteLogo'])->name('deleteLogoURL');
+        Route::post('/avatar', [UserUploadController::class, 'uploadAvatar'])->name('uploadAvatarURL');
+        Route::post('/cover', [UserUploadController::class, 'uploadCover'])->name('uploadCoverURL');
+        Route::post('/logo', [UserUploadController::class, 'uploadLogo'])->name('uploadLogoURL');
+        Route::delete('/delete/logo', [UserUploadController::class, 'deleteLogo']);
+
+        Route::post('/photo', [AttachmentsController::class, 'uploadPhoto'])->name('uploadPhotoURL');
+        Route::delete('/delete/photo/{id?}', [AttachmentsController::class, 'deletePhoto'])->name('deletePhotoURL');
+
     });
 });
 

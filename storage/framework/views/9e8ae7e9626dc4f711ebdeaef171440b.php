@@ -26,6 +26,7 @@
     Formulário de Vistoria
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('css'); ?>
+    <link rel="stylesheet" href="<?php echo e(URL::asset('build/libs/glightbox/css/glightbox.min.css')); ?>">
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>
     <?php $__env->startComponent('components.breadcrumb'); ?>
@@ -74,9 +75,14 @@
             </div>
         <?php else: ?>
             <?php if($surveyorStatus == 'auditing'): ?>
-            <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                <i class="ri-alert-line label-icon"></i> Esta Vistoria já foi enviada para Auditoria e não poderá ser editada.
-            </div>
+                <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
+                    <i class="ri-alert-line label-icon"></i> Esta Vistoria já foi enviada para Auditoria e não poderá ser editada.
+                </div>
+            <?php endif; ?>
+            <?php if($surveyorStatus == 'losted'): ?>
+                <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
+                    <i class="ri-alert-line label-icon"></i> O prazo expirou e esta Vistoria foi perdida. Por isso não poderá mais ser editada.
+                </div>
             <?php endif; ?>
             <div id="survey-assignment-container">
                 <?php echo csrf_field(); ?>
@@ -84,7 +90,7 @@
                 <input type="hidden" name="company_id" value="<?php echo e($companyId); ?>">
 
                 <?php if($surveyData): ?>
-                    <?php $__env->startComponent('surveys.layouts.form-step-cards'); ?>
+                    <?php $__env->startComponent('surveys.layouts.form-surveyor-step-cards'); ?>
                         <?php $__env->slot('data', $stepsWithTopics); ?>
                         <?php $__env->slot('responsesData', $responsesData); ?>
                         <?php $__env->slot('purpose', 'validForm'); ?>
@@ -97,6 +103,8 @@
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('script'); ?>
+    <script src="<?php echo e(URL::asset('build/libs/glightbox/js/glightbox.min.js')); ?>"></script>
+
     <script>
         var profileShowURL = "<?php echo e(route('profileShowURL')); ?>";
         var surveysIndexURL = "<?php echo e(route('surveysIndexURL')); ?>";
@@ -111,6 +119,12 @@
         var responsesSurveyorStoreOrUpdateURL = "<?php echo e(route('responsesSurveyorStoreOrUpdateURL')); ?>";
     </script>
     <script src="<?php echo e(URL::asset('build/js/surveys.js')); ?>" type="module"></script>
+
+    <script>
+        var uploadPhotoURL = "<?php echo e(route('uploadPhotoURL')); ?>";
+        var deletePhotoURL = "<?php echo e(route('deletePhotoURL')); ?>";
+    </script>
+    <script src="<?php echo e(URL::asset('build/js/attachments.js')); ?>" type="module"></script>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/form-surveyor.blade.php ENDPATH**/ ?>

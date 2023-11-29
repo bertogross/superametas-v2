@@ -102,7 +102,7 @@
                         $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
                     @endphp
 
-                    <div class="tasks-list p-2 {{ in_array($key, ['wainting', 'pending', 'auditing', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
+                    <div class="tasks-list p-2 {{ in_array($key, ['wainting', 'auditing', 'pending', 'completed', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
                         <div class="d-flex mb-3">
                             <div class="flex-grow-1">
                                 <h6 class="fs-14 text-uppercase fw-semibold mb-0">

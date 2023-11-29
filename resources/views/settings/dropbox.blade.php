@@ -50,7 +50,7 @@
                                 @csrf
                                 <div class="input-group text-theme">
                                     <input type="file" name="file[]" required class="form-control" id="inputGroupFile" multiple>
-                                    <label class="input-group-text btn-theme" for="inputGroupFile" id="btn-upload-file">Enviar Arquivos</label>
+                                    <label class="input-group-text btn-theme" for="inputGroupFile">Enviar Arquivos</label>
                                 </div>
                             </form>
                         </div>

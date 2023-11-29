@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
-class UploadController extends Controller
+class UserUploadController extends Controller
 {
     // Define the custom database connection name
     protected $connection = 'smAppTemplate';
@@ -87,7 +87,7 @@ class UploadController extends Controller
                 return response()->json(['success' => true, 'message' => ucfirst($type) . ' uploaded successfully!', 'path' => $filePath], 200);
             }
 
-            return response()->json(['success' => false, 'message' => 'File not provided'], 422);
+            return response()->json(['success' => false, 'message' => 'Arquivo não fornecido'], 422);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
@@ -137,7 +137,7 @@ class UploadController extends Controller
                 return response()->json(['success' => true, 'message' => 'Logo uploaded successfully!', 'path' => $filePath], 200);
             }
 
-            return response()->json(['success' => false, 'message' => 'File not provided'], 422);
+            return response()->json(['success' => false, 'message' => 'Arquivo não fornecido'], 422);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }

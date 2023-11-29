@@ -83,7 +83,7 @@ class ScenexImageController extends Controller
                 ]);
             }
 
-            return response()->json(['success' => false, 'message' => 'File not provided'], 422);
+            return response()->json(['success' => false, 'message' => 'Arquivo não fornecido'], 422);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }

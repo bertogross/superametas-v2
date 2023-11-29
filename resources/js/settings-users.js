@@ -1,8 +1,11 @@
 import {
     toastAlert,
-    attachImage,
     bsPopoverTooltip
 } from './helpers.js';
+
+import {
+    attachImage
+} from './attachments.js';
 
 document.addEventListener('DOMContentLoaded', function() {
 

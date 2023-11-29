@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 //console.log('File:', file);
 
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    const data = e.target.result;
+                reader.onload = function(event) {
+                    const data = event.target.result;
 
                     fetch(DropboxUploadURL, {
                         method: 'POST',
@@ -74,36 +74,41 @@ document.addEventListener('DOMContentLoaded', function() {
     function deleteFile(){
         const deleteButtons = document.querySelectorAll('.btn-delete-file');
         deleteButtons.forEach(button => {
-            button.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (confirm('Are you sure you want to delete this file?')) {
-                    const path = this.dataset.path;
-                    const fileId = this.dataset.id;
-                    fetch(DropboxDeleteURL + '?path=' + encodeURIComponent(path), {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Authorization': 'Bearer ' + DropboxAccessToken,
-                        },
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        //console.log(data);
+            if(deleteButtons){
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
 
-                        if (data.success) {
-                            deleteFileRow(fileId);
+                    this.blur();
 
-                            toastAlert('Success to delete file', 'success', 10000);
-                        } else {
-                            toastAlert('Failed to delete file', 'danger', 10000);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error deleting file:', error);
-                        toastAlert('Error deleting file', 'danger', 10000);
-                    });
-                }
-            });
+                    if (confirm('Tem certeza de que deseja excluir este arquivo?')) {
+                        const path = this.dataset.path;
+                        const fileId = this.dataset.id;
+                        fetch(DropboxDeleteURL + '?path=' + encodeURIComponent(path), {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Authorization': 'Bearer ' + DropboxAccessToken,
+                            },
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            //console.log(data);
+
+                            if (data.success) {
+                                deleteFileRow(fileId);
+
+                                toastAlert('Success to delete file', 'success', 10000);
+                            } else {
+                                toastAlert('Failed to delete file', 'danger', 10000);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error deleting file:', error);
+                            toastAlert('Error deleting file', 'danger', 10000);
+                        });
+                    }
+                });
+            }
         });
     }
 

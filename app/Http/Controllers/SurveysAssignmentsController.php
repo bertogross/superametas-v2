@@ -122,6 +122,19 @@ class SurveysAssignmentsController extends Controller
 
         $currentStatus = $data->surveyor_status;
 
+        if( $currentStatus == 'auditing' ){
+            return response()->json([
+                'success' => false,
+                'message' => 'Esta Vistoria já foi enviada para Auditoria e não poderá ser editada.',
+            ]);
+        }
+        if($currentStatus == 'losted' ){
+            return response()->json([
+                'success' => false,
+                'message' => 'O prazo expirou e esta Vistoria foi perdida. Por isso não poderá mais ser editada.',
+            ]);
+        }
+
         if($currentStatus == 'new'){
             // [if currentStatus is new] Change to pending.
             $newStatus = 'pending';

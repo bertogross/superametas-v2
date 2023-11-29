@@ -23,8 +23,8 @@ return new class extends Migration
             $table->enum('compliance_audit', ['yes', 'no'])->nullable();
             $table->text('comment_survey')->nullable();
             $table->text('comment_audit')->nullable();
-            $table->text('attachment_id_survey')->nullable();
-            $table->text('attachment_id_audit')->nullable();
+            $table->json('attachments_survey')->nullable();
+            $table->json('attachments_audit')->nullable();
             $table->timestamps();
         });
     }

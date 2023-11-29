@@ -26,6 +26,7 @@
     Formulário de Vistoria
 @endsection
 @section('css')
+    <link rel="stylesheet" href="{{ URL::asset('build/libs/glightbox/css/glightbox.min.css') }}">
 @endsection
 @section('content')
     @component('components.breadcrumb')
@@ -78,7 +79,7 @@
             @endif
             @if ($surveyorStatus == 'losted')
                 <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                    <i class="ri-alert-line label-icon"></i> Esta Vistoria foi perdida e não poderá ser editada.
+                    <i class="ri-alert-line label-icon"></i> O prazo expirou e esta Vistoria foi perdida. Por isso não poderá mais ser editada.
                 </div>
             @endif
             <div id="survey-assignment-container">
@@ -100,6 +101,8 @@
     </div>
 @endsection
 @section('script')
+    <script src="{{ URL::asset('build/libs/glightbox/js/glightbox.min.js') }}"></script>
+
     <script>
         var profileShowURL = "{{ route('profileShowURL') }}";
         var surveysIndexURL = "{{ route('surveysIndexURL') }}";
@@ -114,4 +117,10 @@
         var responsesSurveyorStoreOrUpdateURL = "{{ route('responsesSurveyorStoreOrUpdateURL') }}";
     </script>
     <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
+
+    <script>
+        var uploadPhotoURL = "{{ route('uploadPhotoURL') }}";
+        var deletePhotoURL = "{{ route('deletePhotoURL') }}";
+    </script>
+    <script src="{{ URL::asset('build/js/attachments.js') }}" type="module"></script>
 @endsection
