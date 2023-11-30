@@ -4,11 +4,14 @@
     $surveyId = $surveyData->id ?? '';
     $templateName = $surveyData ? getTemplateNameById($surveyData->template_id) : '';
 
-    $surveyorAssignmentId = $surveyorAssignmentData->id ?? null;
-    $surveyorStatus = $surveyorAssignmentData->surveyor_status ?? null;
+    $assignmentId = $assignmentData->id ?? null;
+    $surveyorStatus = $assignmentData->surveyor_status ?? null;
 
-    $companyId = $surveyorAssignmentData->company_id ?? '';
+    $companyId = $assignmentData->company_id ?? '';
     $companyName = $companyId ? getCompanyNameById($companyId) : '';
+
+    $auditorId = $assignmentData->auditor_id ?? null;
+    $auditorName = getUserData($auditorId)['name'];
 
     use Carbon\Carbon;
     use App\Models\SurveyResponse;
@@ -47,10 +50,12 @@
                     <h2 class="text-theme text-uppercase">{{ $companyName }}</h2>
                 @endif
                 <h2>Vistoria</h2>
+                <p>Auditoria será realizada por <u>{{$auditorName}}</u></p>
                 <h3>{{ $templateName }}</h3>
                 <div class="mb-0 text-muted">
-                    Atualizado em:
-                    {{ $surveyData->updated_at ? \Carbon\Carbon::parse($surveyData->updated_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY - HH:mm:ss') . 'hs' : '-' }}
+                    Executar em:
+                    {{-- $surveyData->updated_at ? \Carbon\Carbon::parse($surveyData->updated_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY - HH:mm:ss') . 'hs' : '-' --}}
+                    {{ $surveyData->created_at ? \Carbon\Carbon::parse($surveyData->created_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}
                 </div>
             </div>
             <div class="shape">
@@ -67,7 +72,7 @@
             </div>
         </div>
 
-        @if ($currentUserId != $surveyorAssignmentData->surveyor_id)
+        @if ($currentUserId != $assignmentData->surveyor_id)
             <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
                 <i class="ri-alert-line label-icon"></i> Você não possui autorização para prosseguir com a tarefa delegada a outra pessoa
             </div>
@@ -82,7 +87,7 @@
                     <i class="ri-alert-line label-icon"></i> O prazo expirou e esta Vistoria foi perdida. Por isso não poderá mais ser editada.
                 </div>
             @endif
-            <div id="survey-assignment-container">
+            <div id="assignment-container">
                 @csrf
                 <input type="hidden" name="survey_id" value="{{$surveyId}}">
                 <input type="hidden" name="company_id" value="{{$companyId}}">
@@ -93,8 +98,12 @@
                         @slot('responsesData', $responsesData)
                         @slot('purpose', 'validForm')
                         @slot('surveyorStatus', $surveyorStatus)
-                        @slot('surveyorAssignmentId', $surveyorAssignmentId)
+                        @slot('assignmentId', $assignmentId)
                     @endcomponent
+                @else
+                    <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+                        <i class="ri-alert-line label-icon"></i> Não há dados para gerar os campos deste formulário de Vistoria
+                    </div>
                 @endif
             </div>
         @endif
@@ -104,23 +113,26 @@
     <script src="{{ URL::asset('build/libs/glightbox/js/glightbox.min.js') }}"></script>
 
     <script>
-        var profileShowURL = "{{ route('profileShowURL') }}";
         var surveysIndexURL = "{{ route('surveysIndexURL') }}";
         var surveysCreateURL = "{{ route('surveysCreateURL') }}";
         var surveysEditURL = "{{ route('surveysEditURL') }}";
         var surveysChangeStatusURL = "{{ route('surveysChangeStatusURL') }}";
         var surveysShowURL = "{{ route('surveysShowURL') }}";
         var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
-        var formSurveyorAssignmentURL = "{{ route('formSurveyorAssignmentURL') }}";
-        var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";
-        var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
-        var responsesSurveyorStoreOrUpdateURL = "{{ route('responsesSurveyorStoreOrUpdateURL') }}";
     </script>
     <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
+
+    <script>
+        var formSurveyorAssignmentURL = "{{ route('formSurveyorAssignmentURL') }}";
+        var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";
+        var responsesSurveyorStoreOrUpdateURL = "{{ route('responsesSurveyorStoreOrUpdateURL') }}";
+        var profileShowURL = "{{ route('profileShowURL') }}";
+    </script>
+    <script src="{{ URL::asset('build/js/surveys-surveyor.js') }}" type="module"></script>
 
     <script>
         var uploadPhotoURL = "{{ route('uploadPhotoURL') }}";
         var deletePhotoURL = "{{ route('deletePhotoURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/attachments.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys-attachments.js') }}" type="module"></script>
 @endsection

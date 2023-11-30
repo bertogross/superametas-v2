@@ -7,13 +7,21 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 https://laravel-news.com/openai-for-laravel
 
 
+Version 2.0.30 - [2023-11-29]
+- [Started] Code Factorization
+
+
 
 Version 2.0.29 - [2023-11-29]
-- [Started] SurveyAssigments auditor form
+- [Added] SurveyAssigments auditor form
 
 
 
 Version 2.0.28 - [2023-11-28]
+- [Added] AttachmentsController
+- [Added] attachments.js
+- [Updated] HTML: form-surveyor blade page (/surveys)
+- [Updated] routes/web.php
 - [Finished] SurveyAssigments surveyor form
 
 

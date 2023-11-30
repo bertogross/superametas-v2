@@ -37,12 +37,12 @@
             $countResponses = 0;
 
             if( in_array($statusKey, ['auditing']) && $designated == 'surveyor' ){
-                $countResponses = countSurveyAuditorResponses($auditorId, $surveyId, $companyId);
+                $countResponses = countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId);
             }else{
                 if($designated == 'auditor'){
-                    $countResponses = countSurveyAuditorResponses($auditorId, $surveyId, $companyId);
+                    $countResponses = countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId);
                 }elseif($designated == 'surveyor'){
-                    $countResponses = countSurveySurveyorResponses($surveyorId, $surveyId, $companyId);
+                    $countResponses = countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId);
                 }
             }
 

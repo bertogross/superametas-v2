@@ -226,76 +226,76 @@ p:empty,
   background-color: var(--vz-theme);
 }
 
-pre{
-  word-break: break-all !important;
-  word-wrap: break-word !important;
-  white-space: pre-wrap !important;
-	position: fixed !important;
-  z-index: 12000;
-  height: 80px;
-  width: 100px;
-  max-width: 100px;
-  bottom: 0px;
-  margin-bottom: 0px;
-  border-radius: 0px;
-  background-color: #000;
-  color: var(--vz-theme);
-  overflow:auto !important;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 12px;
-  line-height: 14px;
-  letter-spacing: 1px;
-  opacity: 0.3;
-  padding: 20px;
+pre code{
+    word-break: break-all !important;
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+    position: fixed !important;
+    z-index: 12000;
+    height: 90px;
+    width: 100px;
+    max-width: 100px;
+    bottom: 0px;
+    margin-bottom: 0px;
+    border-radius: 0px;
+    background-color: #000;
+    color: var(--vz-theme);
+    overflow:auto !important;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    line-height: 14px;
+    letter-spacing: 1px;
+    opacity: 0.3;
+    padding: 20px;
 }
-pre:hover{
-	height: 80%;
-  width: auto;
-  max-width: 90%;
-  overflow: auto;
-  scrollbar-width: thin;
-  z-index: 1999;
-  opacity: 1;
-  padding-bottom: 100px;
+pre code:hover{
+    height: 80%;
+    width: auto;
+    max-width: 90%;
+    overflow: auto;
+    scrollbar-width: thin;
+    z-index: 1999;
+    opacity: 1;
+    padding-bottom: 100px;
 }
 
-pre:nth-of-type(1){
+pre code:nth-of-type(1){
   left: 102px;
 }
-pre:nth-of-type(2){
+pre code:nth-of-type(2){
   left: 204px;
 }
-pre:nth-of-type(3){
+pre code:nth-of-type(3){
   left: 306px;
 }
-pre:nth-of-type(4){
+pre code:nth-of-type(4){
   left: 406px;
 }
-pre:nth-of-type(5){
+pre code:nth-of-type(5){
   left: 506px;
 }
-pre:nth-of-type(6){
+pre code:nth-of-type(6){
   left: 606px;
 }
-pre:nth-of-type(7){
+pre code:nth-of-type(7){
   left: 706px;
 }
-pre:nth-of-type(8){
+pre code:nth-of-type(8){
   left: 806px;
 }
-pre:nth-of-type(9){
+pre code:nth-of-type(9){
   left: 906px;
 }
-pre:nth-of-type(10){
+pre code:nth-of-type(10){
   left: 1006px;
 }
-pre:nth-of-type(11){
+pre code:nth-of-type(11){
   left: 1106px;
 }
-pre:nth-of-type(12){
+pre code:nth-of-type(12){
   left: 1206px;
 }
-pre:empty{
+pre code:empty{
   display: none !important;
 }
 

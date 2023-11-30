@@ -95,12 +95,13 @@ class SurveyAssignments extends Model
         $surveyId = $data->survey_id;
         $companyId = $data->company_id;
 
+        // If newStatus was 'completed', change the surveyor_status
         if($status == 'completed'){
             $column['surveyor_status'] = $status;
             $data->update($column);
         }
 
-        // new status
+        // Change auditor_status
         $column['auditor_status'] = $status;
         $data->update($column);
 

@@ -108,44 +108,35 @@
                                     </div>
                                 </div>
                                 <div class="row mt-3">
-                                    <div class="col-auto">
-                                        <div class="form-check form-switch form-switch-sm form-switch-theme mb-4" title="Em conformidade">
-                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="YesSwitchCheck{{ $topicIndex.$radioIndex }}" {{$surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled' : ''}} value="yes" {{$complianceSurvey && $complianceSurvey == 'yes' ? 'checked' : ''}}>
-                                            <label class="form-check-label" for="YesSwitchCheck{{ $topicIndex.$radioIndex }}">Conforme</label>
-                                        </div>
-                                        <div class="form-check form-switch form-switch-sm form-switch-danger" title="Não conforme">
-                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="NoSwitchCheck{{ $topicIndex.$radioIndex }}" {{$surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled' : ''}} value="no" {{$complianceSurvey && $complianceSurvey == 'no' ? 'checked' : ''}}>
-                                            <label class="form-check-label" for="NoSwitchCheck{{ $topicIndex.$radioIndex }}">Não Conforme</label>
-                                        </div>
-                                    </div>
                                     <div class="col">
                                         <div class="input-group">
                                             @if( $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' )
-                                                <label for="attachment-{{$responseId ? $responseId : $radioIndex}}" class="btn btn-outline-light waves-effect waves-light ps-1 pe-1 mb-0 d-flex align-content-center flex-wrap" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Anexar fotografia" data-step-id="{{$stepId}}" data-topic-id="{{$topicId}}">
+                                                <label for="input-attachment-{{$radioIndex}}" class="btn btn-outline-light waves-effect waves-light ps-1 pe-1 mb-0 d-flex align-content-center flex-wrap" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Anexar fotografia" data-step-id="{{$stepId}}" data-topic-id="{{$topicId}}">
                                                     <i class="ri-image-add-fill text-body fs-5 m-2"></i>
                                                 </label>
-                                                <input type="file" id="attachment-{{$responseId ? $responseId : $radioIndex}}" class="input-upload-photo d-none" accept="image/jpeg" {{ isset($purpose) && $purpose == 'validForm' ? '' : 'disabled' }}>
+                                                <input type="file" id="input-attachment-{{$radioIndex}}" class="input-upload-photo d-none" accept="image/jpeg" {{ isset($purpose) && $purpose == 'validForm' ? '' : 'disabled' }}>
                                             @endif
 
-                                            <textarea tabindex="-1" class="form-control border-light" maxlength="1000" rows="3" name="comment_survey" placeholder="Observações..." {{$surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled readonly' : ''}}>{{$commentSurvey ?? ''}}</textarea>
-
-                                            @if( $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' )
-                                                <button tabindex="-1"
-                                                    type="button"
-                                                    @if ( isset($purpose) && $purpose == 'validForm' )
-                                                        data-assignment-id="{{$surveyorAssignmentId}}"
-                                                        data-step-id="{{$stepId}}"
-                                                        data-topic-id="{{$topicId}}"
-                                                    @endif
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-trigger="hover"
-                                                    data-bs-placement="left"
-                                                    title="{{ $responseId ? 'Atualizar' : 'Salvar'}}"
-                                                    class="btn btn-outline-light waves-effect waves-light ps-1 pe-1 {{ isset($purpose) && $purpose == 'validForm' ? 'btn-response-surveyor-update' : '' }}">
-                                                        <i class="{{ $responseId ? 'ri-refresh-line' : 'ri-save-3-line'}} text-theme fs-3 m-2"></i>
-                                                </button>
-                                            @endif
+                                            <textarea tabindex="-1" class="form-control border-light" maxlength="1000" rows="3" name="comment_survey" placeholder="Observações..." {{$surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled readonly' : ''}} style="max-height: 70px;">{{$commentSurvey ?? ''}}</textarea>
                                         </div>
+
+                                        @if( $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' )
+                                            <button tabindex="-1"
+                                                type="button"
+                                                @if ( isset($purpose) && $purpose == 'validForm' )
+                                                    data-assignment-id="{{$assignmentId}}"
+                                                    data-step-id="{{$stepId}}"
+                                                    data-topic-id="{{$topicId}}"
+                                                @endif
+                                                data-bs-toggle="tooltip"
+                                                data-bs-trigger="hover"
+                                                data-bs-placement="left"
+                                                title="{{ $responseId ? 'Atualizar' : 'Salvar'}}"
+                                                class="btn btn-outline-light waves-effect waves-light ps-1 pe-1 {{ isset($purpose) && $purpose == 'validForm' ? 'btn-response-update' : '' }} d-none">
+                                                    <i class="{{ $responseId ? 'ri-refresh-line' : 'ri-save-3-line'}} text-theme fs-3 m-2"></i>
+                                            </button>
+                                        @endif
+
                                         <div class="gallery-wrapper mt-2 row">
                                             @if ( !empty($attachmentIds) && is_array($attachmentIds) )
                                                 @foreach ($attachmentIds as $attachmentId)
@@ -158,7 +149,7 @@
                                                         }
                                                     @endphp
                                                     @if ($attachmentUrl)
-                                                        <div id="attachment-{{$attachmentId}}" class="element-item col-auto">
+                                                        <div id="element-attachment-{{$attachmentId}}" class="element-item col-auto">
                                                             <div class="gallery-box card p-0">
                                                                 <div class="gallery-container">
                                                                     <a href="{{ $attachmentUrl }}" class="image-popup" title="Fotografia capturada em {{$dateAttachment}}hs">
@@ -187,6 +178,16 @@
                                             @endif
                                         </div>
                                     </div>
+                                    <div class="col-auto">
+                                        <div class="form-check form-switch form-switch-sm form-switch-theme mb-4" title="Em conformidade">
+                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="YesSwitchCheck{{ $topicIndex.$radioIndex }}" {{$surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled' : ''}} value="yes" {{$complianceSurvey && $complianceSurvey == 'yes' ? 'checked' : ''}}>
+                                            <label class="form-check-label" for="YesSwitchCheck{{ $topicIndex.$radioIndex }}">Conforme</label>
+                                        </div>
+                                        <div class="form-check form-switch form-switch-sm form-switch-danger" title="Não conforme">
+                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="NoSwitchCheck{{ $topicIndex.$radioIndex }}" {{$surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled' : ''}} value="no" {{$complianceSurvey && $complianceSurvey == 'no' ? 'checked' : ''}}>
+                                            <label class="form-check-label" for="NoSwitchCheck{{ $topicIndex.$radioIndex }}">Não Conforme</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -197,10 +198,12 @@
     @endforeach
 
     @if ( isset($purpose) && $purpose == 'validForm' && $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' )
-        <button tabindex="-1" type="button"
-        class="btn btn-theme waves-effect w-100 {{ $countFinished < $countTopics ? 'd-none' : '' }}"
-        id="btn-response-surveyor-assignment-finalize" data-assignment-id="{{$surveyorAssignmentId}}"
-        title="Finalizar e Enviar para Auditoria">
+        <button tabindex="-1"
+            type="button"
+            class="btn btn-lg btn-theme waves-effect w-100 {{ $countFinished < $countTopics ? 'd-none' : '' }}"
+            id="btn-response-finalize"
+            data-assignment-id="{{$assignmentId}}"
+            title="Finalizar e Enviar para Auditoria">
             <i class="ri-send-plane-fill align-bottom m-2"></i> Finalizar e Enviar para Auditoria
         </button>
     @endif

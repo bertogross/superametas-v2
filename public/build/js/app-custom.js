@@ -1,6 +1,5 @@
 import {
-    toastAlert,
-    sweetAlerts
+    toastAlert
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {

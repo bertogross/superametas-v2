@@ -20,6 +20,7 @@ class SurveyResponse extends Model
         'step_id',
         'topic_id',
         'survey_id',
+        'assignment_id',
         'compliance_survey',
         'compliance_audit',
         'comment_survey',

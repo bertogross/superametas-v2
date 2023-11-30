@@ -19,9 +19,9 @@ class SurveysAssignmentsController extends Controller
             abort(404);
         }
 
-        $surveyorAssignmentData = SurveyAssignments::findOrFail($assignmentId) ?? null;
+        $assignmentData = SurveyAssignments::findOrFail($assignmentId) ?? null;
 
-        $surveyId = $surveyorAssignmentData->survey_id;
+        $surveyId = $assignmentData->survey_id;
 
         $surveyData = Survey::findOrFail($surveyId);
 
@@ -55,7 +55,7 @@ class SurveysAssignmentsController extends Controller
         return view('surveys.form-surveyor', compact(
             'surveyData',
             'templateData',
-            'surveyorAssignmentData',
+            'assignmentData',
             'stepsWithTopics'
         ));
     }
@@ -66,9 +66,9 @@ class SurveysAssignmentsController extends Controller
             abort(404);
         }
 
-        $auditorAssignmentData = SurveyAssignments::findOrFail($assignmentId) ?? null;
+        $assignmentData = SurveyAssignments::findOrFail($assignmentId) ?? null;
 
-        $surveyId = $auditorAssignmentData->survey_id;
+        $surveyId = $assignmentData->survey_id;
 
         $surveyData = Survey::findOrFail($surveyId);
 
@@ -102,7 +102,7 @@ class SurveysAssignmentsController extends Controller
         return view('surveys.form-auditor', compact(
             'surveyData',
             'templateData',
-            'auditorAssignmentData',
+            'assignmentData',
             'stepsWithTopics'
         ));
     }
@@ -122,7 +122,7 @@ class SurveysAssignmentsController extends Controller
 
         $currentStatus = $data->surveyor_status;
 
-        if( $currentStatus == 'auditing' ){
+        if($currentStatus == 'auditing'){
             return response()->json([
                 'success' => false,
                 'message' => 'Esta Vistoria já foi enviada para Auditoria e não poderá ser editada.',
@@ -171,26 +171,37 @@ class SurveysAssignmentsController extends Controller
 
         $currentStatus = $data->auditor_status;
 
+        if($currentStatus == 'completed'){
+            return response()->json([
+                'success' => false,
+                'message' => 'Esta Auditoria já foi finalizada não poderá mais ser editada.',
+            ]);
+        }
+        if($currentStatus == 'losted' ){
+            return response()->json([
+                'success' => false,
+                'message' => 'O prazo expirou e esta Auditoria foi perdida. Por isso não poderá mais ser editada.',
+            ]);
+        }
+
         if($currentStatus == 'new'){
             // [if currentStatus is new] Change to pending.
             $newStatus = 'pending';
 
             $message = 'Formulário gerado com sucesso';
         }
-        /*
         elseif($currentStatus == 'in_progress'){
             // [if currentStatus is in_progress] Change to completed.
             $newStatus = 'completed';
 
             $message = 'Auditoria finalizada';
-        }
-        */
-        else{
+        }else{
             $message = 'Status inalterado';
 
             $newStatus = $currentStatus;
         }
 
+        // Change auditor_status. So... if newStatus was 'completed', change the surveyor_status to
         SurveyAssignments::changeAuditorAssignmentStatus($assignmentId, $newStatus);
 
         return response()->json(['success' => true, 'message' => $message]);

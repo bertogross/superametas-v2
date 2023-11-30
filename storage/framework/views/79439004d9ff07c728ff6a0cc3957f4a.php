@@ -9,7 +9,7 @@
         $profileUserId = $user->id;
         $phone = getUserMeta($profileUserId, 'phone');
         $phone = formatPhoneNumber($phone);
-        //appPrintR($assignmentData);
+        appPrintR($assignmentData);
         //appPrintR($auditorData);
         //appPrintR($filteredStatuses);
     ?>

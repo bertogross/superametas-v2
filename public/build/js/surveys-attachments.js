@@ -1,57 +1,10 @@
 
 import {
     toastAlert,
-    sweetAlerts,
     lightbox
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
-
-    /*
-    const uploadSurveyPhotoInputs = document.querySelectorAll('.input-upload-photo');
-    if(uploadSurveyPhotoInputs){
-        uploadSurveyPhotoInputs.forEach(function(input) {
-            input.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    const uploadUrl = uploadPhotoURL;
-                    attachPhoto(this, uploadUrl, function(inputFile, data) {
-                        const parentForm = inputFile.closest('.responses-data-container');
-
-                        // Update the input value with the attachment ID
-                        //parentForm.querySelector('input[name="attachment_id[]"]').value = data.id;
-
-                        // Handle successful upload
-                        const galleryWrapper = parentForm.querySelector('.gallery-wrapper');
-                        if (galleryWrapper) {
-                            const galleryItemHtml = `
-                                <div id="attachment-${data.id}" class="element-item col-auto">
-                                    <div class="gallery-box card p-0">
-                                        <div class="gallery-container">
-                                            <a href="/storage/${data.path}" class="image-popup">
-                                                <img class="rounded gallery-img" alt="image" height="70" src="/storage/${data.path}">
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="position-absolute translate-middle mt-n3">
-                                        <div class="avatar-xs">
-                                            <button type="button" class="avatar-title bg-light border-0 rounded-circle text-danger cursor-pointer btn-delete-photo" data-attachment-id="${data.id}" title="Deletar Arquivo">
-                                                <i class="ri-delete-bin-2-line"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <input type="hidden" name="attachment_id[]" value="${data.id}">
-                                </div>`;
-                            galleryWrapper.insertAdjacentHTML('beforeend', galleryItemHtml);
-
-                            lightbox();
-                            deletePhotoButtonsListener();
-                        }
-                    });
-                }
-            });
-        });
-    }
-    */
 
     // Attach event listeners for Photos image upload
     function attachPhoto(inputFile, uploadUrl, onSuccess) {
@@ -125,9 +78,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 onSuccess(inputFile, data); // Call the callback function
 
                                 // Trigger a click event on the closest update button
-                                const closestContainer = document.querySelector(`#attachment-${data.id}`).closest('.responses-data-container');
-                                if (closestContainer) {
-                                    const updateButton = closestContainer.querySelector('.btn-response-surveyor-update');
+                                const container = document.querySelector(`#element-attachment-${data.id}`).closest('.responses-data-container');
+                                if (container) {
+                                    const updateButton = container.querySelector('.btn-response-update');
                                     if (updateButton) {
                                         setTimeout(() => {
                                             updateButton.click();
@@ -178,9 +131,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
 
                 // Trigger a click event on the closest update button
-                const closestContainer = document.querySelector(`#attachment-${fileId}`).closest('.responses-data-container');
-                if (closestContainer) {
-                    const updateButton = closestContainer.querySelector('.btn-response-surveyor-update');
+                const container = document.querySelector(`#element-attachment-${fileId}`).closest('.responses-data-container');
+                if (container) {
+                    const updateButton = container.querySelector('.btn-response-update');
                     if (updateButton) {
                         setTimeout(() => {
                             updateButton.click();
@@ -190,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 console.log('File deleted successfully');
                 // Remove the element from the UI
-                document.querySelector(`#attachment-${fileId}`).remove();
+                document.querySelector(`#element-attachment-${fileId}`).remove();
 
                 toastAlert(data.message, 'warning', 5000);
             } else {
@@ -242,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const galleryWrapper = parentForm.querySelector('.gallery-wrapper');
                         if (galleryWrapper) {
                             const galleryItemHtml = `
-                                <div id="attachment-${data.id}" class="element-item col-auto">
+                                <div id="element-attachment-${data.id}" class="element-item col-auto">
                                     <div class="gallery-box card p-0">
                                         <div class="gallery-container">
                                             <a href="/storage/${data.path}" class="image-popup">

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    Visualização do Modelo de Vistoria
+    Pré-visualização do Modelo de Vistoria
 @endsection
 @section('css')
 @endsection
@@ -35,8 +35,9 @@
                 <h2 class="text-theme text-uppercase">Modelo</h2>
                 <h3>{{ $data ? $data->title : '' }}</h3>
                 <div class="mb-0 text-muted">
-                    Atualizado em:
-                    {{ $data->updated_at ? \Carbon\Carbon::parse($data->updated_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY - HH:mm:ss') . 'hs' : '-' }}
+                    Executar em:
+                    {{-- $data->created_at ? \Carbon\Carbon::parse($data->created_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY - HH:mm:ss') . 'hs' : '-' --}}
+                    {{ $data->created_at ? \Carbon\Carbon::parse($data->created_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}
                 </div>
             </div>
             <div class="shape">

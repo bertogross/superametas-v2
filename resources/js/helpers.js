@@ -55,8 +55,7 @@ export function toastAlert(message, type = 'success', duration = 10000) {
 }
 
 
-
-export function sweetAlerts(message, urlToRedirect = false, icon = 'success'){
+export function sweetWizardAlert(message, urlToRedirect = false, icon = 'success', Trigger = false){
     Swal.fire({
         title: message,
         icon: icon,
@@ -100,9 +99,17 @@ export function sweetAlerts(message, urlToRedirect = false, icon = 'success'){
                 /* Read more about handling dismissals below */
                 if (result.dismiss === Swal.DismissReason.timer) {
                     //console.log('I was closed by the timer')
-                    if(urlToRedirect){
-                        window.location.href = urlToRedirect;
+
+                    if(Trigger){
+
                     }
+
+                    setTimeout(() => {
+                        if(urlToRedirect){
+                            window.location.href = urlToRedirect;
+                        }
+                    }, 1000);
+
                 }
             });
         }
@@ -963,15 +970,25 @@ export function makeFormPreviewRequest(idValue, url, target = 'load-preview', pa
     }
 }
 
-
+    // Debounce function to limit the rate of invoking the save action
+    export function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this, args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
 
 // GLightbox Popup
 // https://github.com/biati-digital/glightbox
 export function lightbox(){
-    var lightbox = GLightbox({
-        selector: '.image-popup',
-        title: false,
-    });
+    if(document.querySelectorAll('.image-popup').length){
+        var lightbox = GLightbox({
+            selector: '.image-popup',
+            title: false,
+        });
+    }
 }
 
 

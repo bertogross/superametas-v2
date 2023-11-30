@@ -501,13 +501,14 @@ if (!function_exists('countSurveyTopics')) {
 
 // Count the number of steps that have been finished
 if (!function_exists('countSurveySurveyorResponses')) {
-    function countSurveySurveyorResponses($surveyorId, $surveyId, $companyId) {
-        $today = Carbon::today();
+    function countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId) {
+        //$today = Carbon::today();
 
         return SurveyResponse::where('survey_id', $surveyId)
             ->where('surveyor_id', $surveyorId)
             ->where('company_id', $companyId)
-            ->whereDate('created_at', '=', $today)
+            ->where('assignment_id', $assignmentId)
+            //->whereDate('created_at', '=', $today)
             ->count();
 
     }
@@ -516,13 +517,15 @@ if (!function_exists('countSurveySurveyorResponses')) {
 
 // Count the number of steps that have been finished
 if (!function_exists('countSurveyAuditorResponses')) {
-    function countSurveyAuditorResponses($auditorId, $surveyId, $companyId) {
+    function countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId) {
         $today = Carbon::today();
 
         return SurveyResponse::where('survey_id', $surveyId)
             ->where('auditor_id', $auditorId)
             ->where('company_id', $companyId)
-            ->whereDate('created_at', '=', $today)
+            ->where('assignment_id', $assignmentId)
+            ->whereNotNull('compliance_audit')
+            //->whereDate('created_at', '=', $today)
             ->count();
     }
 }
@@ -655,9 +658,9 @@ if (!function_exists('limitChars')) {
 if(!function_exists('appPrintR')){
 	function appPrintR($data){
 		if( !empty($data) ){
-			print '<pre>';
+			print '<pre class="language-markup"><code>';
 				print_r( $data );
-			print '</pre>';
+			print '</code></pre>';
 		}
 	}
 }
@@ -666,7 +669,7 @@ if(!function_exists('appPrintR')){
 if(!function_exists('appPrintR2')){
 	function appPrintR2($data){
 		if( !empty($data) ){
-			print '<div style="font-family: inherit; white-space: pre-wrap; color: #87DF01;">'.var_export( $data, true).'</div>';
+			print '<pre class="language-markup" style="font-family: inherit; white-space: pre-wrap; color: #87DF01;">'.var_export( $data, true).'</pre>';
 		}
 	}
 }

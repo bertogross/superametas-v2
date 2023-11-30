@@ -109,44 +109,35 @@
                                     </div>
                                 </div>
                                 <div class="row mt-3">
-                                    <div class="col-auto">
-                                        <div class="form-check form-switch form-switch-sm form-switch-theme mb-4" title="Em conformidade">
-                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="YesSwitchCheck<?php echo e($topicIndex.$radioIndex); ?>" <?php echo e($surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled' : ''); ?> value="yes" <?php echo e($complianceSurvey && $complianceSurvey == 'yes' ? 'checked' : ''); ?>>
-                                            <label class="form-check-label" for="YesSwitchCheck<?php echo e($topicIndex.$radioIndex); ?>">Conforme</label>
-                                        </div>
-                                        <div class="form-check form-switch form-switch-sm form-switch-danger" title="Não conforme">
-                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="NoSwitchCheck<?php echo e($topicIndex.$radioIndex); ?>" <?php echo e($surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled' : ''); ?> value="no" <?php echo e($complianceSurvey && $complianceSurvey == 'no' ? 'checked' : ''); ?>>
-                                            <label class="form-check-label" for="NoSwitchCheck<?php echo e($topicIndex.$radioIndex); ?>">Não Conforme</label>
-                                        </div>
-                                    </div>
                                     <div class="col">
                                         <div class="input-group">
                                             <?php if( $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' ): ?>
-                                                <label for="attachment-<?php echo e($responseId ? $responseId : $radioIndex); ?>" class="btn btn-outline-light waves-effect waves-light ps-1 pe-1 mb-0 d-flex align-content-center flex-wrap" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Anexar fotografia" data-step-id="<?php echo e($stepId); ?>" data-topic-id="<?php echo e($topicId); ?>">
+                                                <label for="input-attachment-<?php echo e($radioIndex); ?>" class="btn btn-outline-light waves-effect waves-light ps-1 pe-1 mb-0 d-flex align-content-center flex-wrap" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Anexar fotografia" data-step-id="<?php echo e($stepId); ?>" data-topic-id="<?php echo e($topicId); ?>">
                                                     <i class="ri-image-add-fill text-body fs-5 m-2"></i>
                                                 </label>
-                                                <input type="file" id="attachment-<?php echo e($responseId ? $responseId : $radioIndex); ?>" class="input-upload-photo d-none" accept="image/jpeg" <?php echo e(isset($purpose) && $purpose == 'validForm' ? '' : 'disabled'); ?>>
+                                                <input type="file" id="input-attachment-<?php echo e($radioIndex); ?>" class="input-upload-photo d-none" accept="image/jpeg" <?php echo e(isset($purpose) && $purpose == 'validForm' ? '' : 'disabled'); ?>>
                                             <?php endif; ?>
 
-                                            <textarea tabindex="-1" class="form-control border-light" maxlength="1000" rows="3" name="comment_survey" placeholder="Observações..." <?php echo e($surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled readonly' : ''); ?>><?php echo e($commentSurvey ?? ''); ?></textarea>
-
-                                            <?php if( $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' ): ?>
-                                                <button tabindex="-1"
-                                                    type="button"
-                                                    <?php if( isset($purpose) && $purpose == 'validForm' ): ?>
-                                                        data-assignment-id="<?php echo e($surveyorAssignmentId); ?>"
-                                                        data-step-id="<?php echo e($stepId); ?>"
-                                                        data-topic-id="<?php echo e($topicId); ?>"
-                                                    <?php endif; ?>
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-trigger="hover"
-                                                    data-bs-placement="left"
-                                                    title="<?php echo e($responseId ? 'Atualizar' : 'Salvar'); ?>"
-                                                    class="btn btn-outline-light waves-effect waves-light ps-1 pe-1 <?php echo e(isset($purpose) && $purpose == 'validForm' ? 'btn-response-surveyor-update' : ''); ?>">
-                                                        <i class="<?php echo e($responseId ? 'ri-refresh-line' : 'ri-save-3-line'); ?> text-theme fs-3 m-2"></i>
-                                                </button>
-                                            <?php endif; ?>
+                                            <textarea tabindex="-1" class="form-control border-light" maxlength="1000" rows="3" name="comment_survey" placeholder="Observações..." <?php echo e($surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled readonly' : ''); ?> style="max-height: 70px;"><?php echo e($commentSurvey ?? ''); ?></textarea>
                                         </div>
+
+                                        <?php if( $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' ): ?>
+                                            <button tabindex="-1"
+                                                type="button"
+                                                <?php if( isset($purpose) && $purpose == 'validForm' ): ?>
+                                                    data-assignment-id="<?php echo e($assignmentId); ?>"
+                                                    data-step-id="<?php echo e($stepId); ?>"
+                                                    data-topic-id="<?php echo e($topicId); ?>"
+                                                <?php endif; ?>
+                                                data-bs-toggle="tooltip"
+                                                data-bs-trigger="hover"
+                                                data-bs-placement="left"
+                                                title="<?php echo e($responseId ? 'Atualizar' : 'Salvar'); ?>"
+                                                class="btn btn-outline-light waves-effect waves-light ps-1 pe-1 <?php echo e(isset($purpose) && $purpose == 'validForm' ? 'btn-response-update' : ''); ?> d-none">
+                                                    <i class="<?php echo e($responseId ? 'ri-refresh-line' : 'ri-save-3-line'); ?> text-theme fs-3 m-2"></i>
+                                            </button>
+                                        <?php endif; ?>
+
                                         <div class="gallery-wrapper mt-2 row">
                                             <?php if( !empty($attachmentIds) && is_array($attachmentIds) ): ?>
                                                 <?php $__currentLoopData = $attachmentIds; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attachmentId): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -159,7 +150,7 @@
                                                         }
                                                     ?>
                                                     <?php if($attachmentUrl): ?>
-                                                        <div id="attachment-<?php echo e($attachmentId); ?>" class="element-item col-auto">
+                                                        <div id="element-attachment-<?php echo e($attachmentId); ?>" class="element-item col-auto">
                                                             <div class="gallery-box card p-0">
                                                                 <div class="gallery-container">
                                                                     <a href="<?php echo e($attachmentUrl); ?>" class="image-popup" title="Fotografia capturada em <?php echo e($dateAttachment); ?>hs">
@@ -188,6 +179,16 @@
                                             <?php endif; ?>
                                         </div>
                                     </div>
+                                    <div class="col-auto">
+                                        <div class="form-check form-switch form-switch-sm form-switch-theme mb-4" title="Em conformidade">
+                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="YesSwitchCheck<?php echo e($topicIndex.$radioIndex); ?>" <?php echo e($surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled' : ''); ?> value="yes" <?php echo e($complianceSurvey && $complianceSurvey == 'yes' ? 'checked' : ''); ?>>
+                                            <label class="form-check-label" for="YesSwitchCheck<?php echo e($topicIndex.$radioIndex); ?>">Conforme</label>
+                                        </div>
+                                        <div class="form-check form-switch form-switch-sm form-switch-danger" title="Não conforme">
+                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_survey" role="switch" id="NoSwitchCheck<?php echo e($topicIndex.$radioIndex); ?>" <?php echo e($surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled' : ''); ?> value="no" <?php echo e($complianceSurvey && $complianceSurvey == 'no' ? 'checked' : ''); ?>>
+                                            <label class="form-check-label" for="NoSwitchCheck<?php echo e($topicIndex.$radioIndex); ?>">Não Conforme</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -200,7 +201,7 @@
     <?php if( isset($purpose) && $purpose == 'validForm' && $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' ): ?>
         <button tabindex="-1" type="button"
         class="btn btn-theme waves-effect w-100 <?php echo e($countFinished < $countTopics ? 'd-none' : ''); ?>"
-        id="btn-response-surveyor-assignment-finalize" data-assignment-id="<?php echo e($surveyorAssignmentId); ?>"
+        id="btn-response-surveyor-assignment-finalize" data-assignment-id="<?php echo e($assignmentId); ?>"
         title="Finalizar e Enviar para Auditoria">
             <i class="ri-send-plane-fill align-bottom m-2"></i> Finalizar e Enviar para Auditoria
         </button>

@@ -1,6 +1,6 @@
 import {
     toastAlert,
-    sweetAlerts,
+    sweetWizardAlert,
     initFlatpickr,
     initFlatpickrRange,
     maxLengthTextarea,
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Make the preview request
                     makeFormPreviewRequest(data.id, surveysTemplateShowURL);
 
-                    sweetAlerts(data.message, surveysIndexURL);
+                    sweetWizardAlert(data.message, surveysIndexURL);
                 } else {
                     toastAlert(data.message, 'danger', 60000);
                 }
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Make the preview request
                         makeFormPreviewRequest(data.id, surveysTemplateShowURL);
 
-                        sweetAlerts(data.message, surveysIndexURL);
+                        sweetWizardAlert(data.message, surveysIndexURL);
                     } else {
                         toastAlert(data.message, 'danger', 60000);
                     }

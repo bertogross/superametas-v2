@@ -18,6 +18,7 @@ return new class extends Migration
             $table->bigInteger('step_id')->nullable();
             $table->bigInteger('topic_id')->nullable();
             $table->bigInteger('survey_id')->nullable();
+            $table->bigInteger('assignment_id')->nullable();
             $table->bigInteger('company_id')->nullable();
             $table->enum('compliance_survey', ['yes', 'no'])->nullable();
             $table->enum('compliance_audit', ['yes', 'no'])->nullable();
