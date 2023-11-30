@@ -185,7 +185,18 @@ class SurveysResponsesController extends Controller
         if( $complianceAudit == 'no' && !$attachmentIds ){
             return response()->json([
                 'success' => false,
-                'message' => 'Necessário enviar ao menos uma foto comprovando o motivo da Não Conformidade',
+                'message' => 'Necessário enviar ao menos uma foto comprovando o motivo de haver Indeferido',
+                'action' => 'changeToPending'
+            ]);
+        }
+
+        $comment = $request->input('comment_audit');
+        $comment = trim($comment);
+
+        if( $complianceAudit == 'no' && empty($comment) ){
+            return response()->json([
+                'success' => false,
+                'message' => 'Necessário descrever o motivo de haver Indeferido',
                 'action' => 'changeToPending'
             ]);
         }

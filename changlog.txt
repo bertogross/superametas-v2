@@ -7,7 +7,16 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 https://laravel-news.com/openai-for-laravel
 
 
-Version 2.0.30 - [2023-11-29]
+Version 2.0.32 - [2023-12-01]
+
+
+
+Version 2.0.31 - [2023-11-30]
+- [merged] Survey Template Form with Survey Form
+
+
+
+Version 2.0.30 - [2023-11-30]
 - [Started] Code Factorization
 
 

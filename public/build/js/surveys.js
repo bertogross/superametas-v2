@@ -212,8 +212,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         sweetWizardAlert(data.message, surveysIndexURL);
 
-                        // Make the preview request
-                        //makeFormPreviewRequest(data.id, surveysShowURL);
                     } else {
                         toastAlert(data.message, 'danger', 60000);
                     }
@@ -228,9 +226,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Make the preview request
     var idInput = document.querySelector('input[name="id"]');
-    var idValue = idInput ? idInput.value : null;
-    makeFormPreviewRequest(idValue, surveysShowURL);
-
+    if(idInput){
+        var idValue = idInput ? idInput.value : null;
+        makeFormPreviewRequest(idValue, surveysShowURL);
+    }
 
     // Call the function when the DOM is fully loaded
     initFlatpickrRange();

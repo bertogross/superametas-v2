@@ -1,5 +1,6 @@
 import {
-    toastAlert
+    toastAlert,
+    lightbox
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -51,5 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
+    lightbox();
 
 });

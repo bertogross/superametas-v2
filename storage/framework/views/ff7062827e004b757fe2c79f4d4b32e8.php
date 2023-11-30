@@ -1,11 +1,11 @@
-@php
+<?php
     use App\Models\Survey;
 
     $currentUserId = auth()->id();
-@endphp
-@if ( !empty($data) && is_array($data) )
-    @foreach ($data as $key => $assignment)
-        @php
+?>
+<?php if( !empty($data) && is_array($data) ): ?>
+    <?php $__currentLoopData = $data; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $assignment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php
             $assignmentId = intval($assignment['id']);
             $surveyId = intval($assignment['survey_id']);
             $companyId = intval($assignment['company_id']);
@@ -69,104 +69,108 @@
             if ($percentage >= 100) {
                 $progressBarClass = 'success';
             }
-        @endphp
-        <div class="card tasks-box bg-body" data-assignment-id="{{$assignmentId}}">
+        ?>
+        <div class="card tasks-box bg-body" data-assignment-id="<?php echo e($assignmentId); ?>">
             <div class="card-body">
                 <div class="row mb-0">
                     <div class="col text-theme fw-medium fs-15">
-                        {{ getCompanyNameById($companyId) }}
+                        <?php echo e(getCompanyNameById($companyId)); ?>
+
                     </div>
                     <div class="col-auto">
-                        @if ($designated == 'auditor')
+                        <?php if($designated == 'auditor'): ?>
                             <span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>
-                        @elseif($designated == 'surveyor')
+                        <?php elseif($designated == 'surveyor'): ?>
                             <span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
                 <span data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="A data em que esta tarefa deverá ser desempenhada">
-                    {{ $assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-' }}
+                    <?php echo e($assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-'); ?>
+
                 </span>
                 <h5 class="fs-13 text-truncate task-title mb-0 mt-2">
-                    {{ $templateName }}
+                    <?php echo e($templateName); ?>
+
                 </h5>
-                @if ( $designated == 'auditor' && $surveyorStatus == 'losted' && $auditorStatus == 'losted' )
+                <?php if( $designated == 'auditor' && $surveyorStatus == 'losted' && $auditorStatus == 'losted' ): ?>
                     <div class="text-danger small mt-2">Esta <u>Auditoria</u> foi perdida pois a <u>Vistoria</u> não foi efetuada na data prevista</div>
-                @endif
+                <?php endif; ?>
 
-                @if ( $designated == 'surveyor' && $surveyorStatus == 'losted' )
+                <?php if( $designated == 'surveyor' && $surveyorStatus == 'losted' ): ?>
                     <div class="text-danger small mt-2">Esta <u>Vistoria</u> foi perdida pois não foi efetuada na data prevista</div>
-                @endif
+                <?php endif; ?>
 
-                @if ( $surveyorStatus == 'completed' && $auditorStatus == 'completed' )
+                <?php if( $surveyorStatus == 'completed' && $auditorStatus == 'completed' ): ?>
                     <div class="text-success small mt-2"><u>Vistoria</u> e <u>Auditoria</u> concluídas</div>
-                @endif
+                <?php endif; ?>
             </div>
             <!--end card-body-->
             <div class="card-footer border-top-dashed bg-body">
                 <div class="row">
                     <div class="col small">
                         <div class="avatar-group ps-0">
-                            @if ($surveyorId === $auditorId)
+                            <?php if($surveyorId === $auditorId): ?>
                                 <!--
                                     href="javascript:void(0);" onclick="alert('Message feature under development');"
                                     <br>Clique para enviar uma mensagem.
                                 -->
-                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas de Vistoria e Auditoria delegadas a <u>{{ $surveyorName }}</u>">
+                                <a href="<?php echo e(route('profileShowURL', $surveyorId)); ?>" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas de Vistoria e Auditoria delegadas a <u><?php echo e($surveyorName); ?></u>">
                                     <img
-                                    @if( empty(trim($surveyorAvatar)) )
-                                        src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                    @else
-                                        src="{{ URL::asset('storage/' .$surveyorAvatar ) }}"
-                                    @endif
-                                    alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
+                                    <?php if( empty(trim($surveyorAvatar)) ): ?>
+                                        src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
+                                    <?php else: ?>
+                                        src="<?php echo e(URL::asset('storage/' .$surveyorAvatar )); ?>"
+                                    <?php endif; ?>
+                                    alt="<?php echo e($surveyorName); ?>" class="rounded-circle avatar-xxs">
                                 </a>
-                            @else
+                            <?php else: ?>
                                 <!--
                                     href="javascript:void(0);" onclick="alert('Message feature under development');"
                                     <br>Clique para enviar uma mensagem.
                                 -->
-                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Vistoria delegada a <u>{{ $surveyorName }}</u>">
+                                <a href="<?php echo e(route('profileShowURL', $surveyorId)); ?>" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Vistoria delegada a <u><?php echo e($surveyorName); ?></u>">
                                     <img
-                                    @if( empty(trim($surveyorAvatar)) )
-                                        src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                    @else
-                                        src="{{ URL::asset('storage/' .$surveyorAvatar ) }}"
-                                    @endif
-                                    alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
+                                    <?php if( empty(trim($surveyorAvatar)) ): ?>
+                                        src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
+                                    <?php else: ?>
+                                        src="<?php echo e(URL::asset('storage/' .$surveyorAvatar )); ?>"
+                                    <?php endif; ?>
+                                    alt="<?php echo e($surveyorName); ?>" class="rounded-circle avatar-xxs">
                                 </a>
 
                                 <!--
                                     href="javascript:void(0);" onclick="alert('Message feature under development');"
                                     <br>Clique para enviar uma mensagem.
                                 -->
-                                <a href="{{ route('profileShowURL', $auditorId) }}" class="d-inline-block ms-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Auditoria delegada a <u>{{ $auditorName }}</u>">
+                                <a href="<?php echo e(route('profileShowURL', $auditorId)); ?>" class="d-inline-block ms-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Auditoria delegada a <u><?php echo e($auditorName); ?></u>">
                                     <img
-                                    @if( empty(trim($auditorAvatar)) )
-                                        src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                    @else
-                                        src="{{ URL::asset('storage/' .$auditorAvatar ) }}"
-                                    @endif
-                                    alt="{{ $auditorName }}" class="rounded-circle avatar-xxs">
+                                    <?php if( empty(trim($auditorAvatar)) ): ?>
+                                        src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
+                                    <?php else: ?>
+                                        src="<?php echo e(URL::asset('storage/' .$auditorAvatar )); ?>"
+                                    <?php endif; ?>
+                                    alt="<?php echo e($auditorName); ?>" class="rounded-circle avatar-xxs">
                                 </a>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="col-auto">
-                        @if ($currentUserId == $designatedUserId && in_array($statusKey, ['new','pending','in_progress']) )
+                        <?php if($currentUserId == $designatedUserId && in_array($statusKey, ['new','pending','in_progress']) ): ?>
                             <button type="button"
                                 data-bs-toggle="tooltip"
                                 data-bs-trigger="hover"
                                 data-bs-placement="top"
-                                title="{{$status['reverse']}}"
-                                class="btn btn-sm btn-label right waves-effect btn-soft-{{$status['color']}} {{ $designated == 'surveyor' ? 'btn-assignment-surveyor-action' : 'btn-assignment-auditor-action' }}"
-                                data-survey-id="{{$surveyId}}"
-                                data-assignment-id="{{$assignmentId}}"
-                                data-current-status="{{$statusKey}}">
-                                <i class="{{$status['icon']}} label-icon align-middle fs-16"></i> {{$status['reverse']}}
+                                title="<?php echo e($status['reverse']); ?>"
+                                class="btn btn-sm btn-label right waves-effect btn-soft-<?php echo e($status['color']); ?> <?php echo e($designated == 'surveyor' ? 'btn-assignment-surveyor-action' : 'btn-assignment-auditor-action'); ?>"
+                                data-survey-id="<?php echo e($surveyId); ?>"
+                                data-assignment-id="<?php echo e($assignmentId); ?>"
+                                data-current-status="<?php echo e($statusKey); ?>">
+                                <i class="<?php echo e($status['icon']); ?> label-icon align-middle fs-16"></i> <?php echo e($status['reverse']); ?>
+
                             </button>
-                        @elseif( $currentUserId == $designatedUserId && in_array($statusKey, ['completed', 'losted']) )
-                            <a href="{{ route('assignmentShowURL', $assignmentId) }}"
+                        <?php elseif( $currentUserId == $designatedUserId && in_array($statusKey, ['completed']) ): ?>
+                            <a href="<?php echo e(route('assignmentShowURL', $assignmentId)); ?>"
                                 data-bs-toggle="tooltip"
                                 data-bs-trigger="hover"
                                 data-bs-placement="top"
@@ -174,16 +178,17 @@
                                 class="btn btn-sm btn-label right waves-effect btn-soft-success">
                                 <i class="ri-eye-line label-icon align-middle fs-16"></i> Visualizar
                             </a>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
             <!--end card-body-->
-            @if ( in_array($statusKey, ['in_progress']) || ( in_array($statusKey, ['auditing']) && $designated == 'surveyor' ) )
-                <div class="progress progress-sm" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $percentage }}%">
-                    <div class="progress-bar bg-{{ $progressBarClass }}" role="progressbar" style="width: {{ $percentage }}%" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+            <?php if( in_array($statusKey, ['in_progress']) || ( in_array($statusKey, ['auditing']) && $designated == 'surveyor' ) ): ?>
+                <div class="progress progress-sm" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="<?php echo e($percentage); ?>%">
+                    <div class="progress-bar bg-<?php echo e($progressBarClass); ?>" role="progressbar" style="width: <?php echo e($percentage); ?>%" aria-valuenow="<?php echo e($percentage); ?>" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
-    @endforeach
-@endif
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+<?php endif; ?>
+<?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/layouts/profile-task-card.blade.php ENDPATH**/ ?>

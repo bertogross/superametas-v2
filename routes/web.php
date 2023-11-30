@@ -67,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [SurveysController::class, 'index'])->name('surveysIndexURL');
         Route::get('/create', [SurveysController::class, 'create'])->name('surveysCreateURL');
         Route::get('/edit/{id?}', [SurveysController::class, 'edit'])->name('surveysEditURL')->where('id', '[0-9]+');
-        Route::get('/{id?}', [SurveysController::class, 'show'])->name('surveysShowURL')->where('id', '[0-9]+');
+        Route::get('/show/{id?}', [SurveysController::class, 'show'])->name('surveysShowURL')->where('id', '[0-9]+');
         Route::post('/store/{id?}', [SurveysController::class, 'storeOrUpdate'])->name('surveysStoreOrUpdateURL');
         Route::post('/status', [SurveysController::class, 'changeStatus'])->name('surveysChangeStatusURL');
 
@@ -76,6 +76,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/template/edit/{id?}', [SurveysTemplatesController::class, 'edit'])->name('surveysTemplateEditURL')->where('id', '[0-9]+');
             Route::get('/template/show/{id?}', [SurveysTemplatesController::class, 'show'])->name('surveysTemplateShowURL')->where('id', '[0-9]+');
             Route::post('/template/store/{id?}', [SurveysTemplatesController::class, 'storeOrUpdate'])->name('surveysTemplateStoreOrUpdateURL');
+
+            Route::get('/assignment/{id}', [SurveysAssignmentsController::class, 'show'])->name('assignmentShowURL')->where('id', '[0-9]+');
 
             Route::get('/assignment/surveyor-form/{id?}', [SurveysAssignmentsController::class, 'formSurveyorAssignment'])->name('formSurveyorAssignmentURL')->where('id', '[0-9]+');
             Route::post('/assignment/surveyor-status', [SurveysAssignmentsController::class, 'changeAssignmentSurveyorStatus'])->name('changeAssignmentSurveyorStatusURL');

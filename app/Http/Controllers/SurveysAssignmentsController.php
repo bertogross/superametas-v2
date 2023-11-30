@@ -13,6 +13,53 @@ use App\Models\SurveyAssignments;
 
 class SurveysAssignmentsController extends Controller
 {
+    public function show(Request $request, $assignmentId = null)
+    {
+        if (!$assignmentId) {
+            abort(404);
+        }
+
+        $assignmentData = SurveyAssignments::findOrFail($assignmentId) ?? null;
+
+        $surveyId = $assignmentData->survey_id;
+
+        $surveyData = Survey::findOrFail($surveyId);
+
+        $decodedData = isset($surveyData->template_data) ? json_decode($surveyData->template_data, true) : $surveyData->template_data;
+        $reorderingData = SurveyTemplates::reorderingData($decodedData);
+        $templateData = $reorderingData;
+
+        $stepsWithTopics = SurveyStep::with(['topics' => function($query) {
+                $query->orderBy('topic_order');
+            }])
+            ->where('survey_id', $surveyId)
+            ->orderBy('step_order')
+            ->get()
+            ->map(function ($step) {
+                return [
+                    'id' => $step->id,
+                    'survey_id' => $step->survey_id,
+                    'step_id' => $step->id,
+                    'step_order' => $step->step_order,
+                    'term_id' => $step->term_id,
+                    'topics' => $step->topics->map(function ($topic) {
+                        return [
+                            'topic_id' => $topic->id,
+                            'question' => $topic->question
+                        ];
+                    })
+                ];
+            });
+        $stepsWithTopics = json_decode($stepsWithTopics, true);
+
+        return view('surveys.assignment.show', compact(
+            'surveyData',
+            'templateData',
+            'assignmentData',
+            'stepsWithTopics'
+        ) );
+    }
+
     public function formSurveyorAssignment(Request $request, $assignmentId)
     {
         if (!$assignmentId) {
@@ -52,7 +99,7 @@ class SurveysAssignmentsController extends Controller
             });
         $stepsWithTopics = json_decode($stepsWithTopics, true);
 
-        return view('surveys.form-surveyor', compact(
+        return view('surveys.assignment.form-surveyor', compact(
             'surveyData',
             'templateData',
             'assignmentData',
@@ -99,7 +146,7 @@ class SurveysAssignmentsController extends Controller
             });
         $stepsWithTopics = json_decode($stepsWithTopics, true);
 
-        return view('surveys.form-auditor', compact(
+        return view('surveys.assignment.form-auditor', compact(
             'surveyData',
             'templateData',
             'assignmentData',
