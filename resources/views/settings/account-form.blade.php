@@ -24,7 +24,7 @@
                         <label for="logo-image-input" class="mb-0" data-bs-toggle="tooltip" data-bs-placement="right" title="Clique aqui e envie o logotipo de sua empresa">
                             <div class="avatar-xs">
                                 <div class="avatar-title bg-light border rounded-circle text-muted cursor-pointer">
-                                    <i class="ri-image-fill text-white"></i>
+                                    <i class="ri-image-fill text-theme"></i>
                                 </div>
                             </div>
                         </label>

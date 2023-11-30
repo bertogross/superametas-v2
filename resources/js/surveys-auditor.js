@@ -37,10 +37,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            /*
                             toastAlert(data.message, 'success');
 
                             setTimeout(function () {
                                 location.reload(true);
+                            }, 1000);
+                            */
+                            toastAlert('Redirecionando ao formulário...', 'primary');
+
+                            setTimeout(function () {
+                                window.location.href = formAuditorAssignmentURL + '/' +assignmentId;
                             }, 1000);
                         } else {
                             // Handle error
@@ -82,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 const countTopics = document.querySelectorAll('.btn-response-update').length;
-                console.log('countTopics', countTopics);
+                //console.log('countTopics', countTopics);
 
                 const surveyId = parseInt(container.querySelector('input[name="survey_id"]')?.value || 0);
                 const companyId = parseInt(container.querySelector('input[name="company_id"]')?.value || 0);
@@ -123,17 +130,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(data => {
+
+                    var pendingIcon = responsesData.querySelector('.ri-time-line');
+                    var completedIcon = responsesData.querySelector('.ri-check-double-fill');
+
                     if (data.success) {
                         toastAlert(data.message, 'success', 5000);
 
                         const responseId = data.id;
                         const countFinishedTopics = parseInt(data.count || 0);
-                        console.log('countFinishedTopics', countFinishedTopics);
+                        //console.log('countFinishedTopics', countFinishedTopics);
 
                         responsesData.querySelector('input[name="response_id"]').value = responseId;
-
-                        var pendingIcon = responsesData.querySelector('.ri-time-line');
-                        var completedIcon = responsesData.querySelector('.ri-check-double-fill');
 
                         if (responseId) {
                             // If responseId is set, show the completed icon and hide the pending icon
@@ -162,6 +170,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         button.querySelector('i').classList.remove('ri-refresh-line');
                         button.querySelector('i').classList.add('ri-save-3-line');
+
+                        if(data.action == 'changeToPending'){
+                            if (pendingIcon) pendingIcon.classList.remove('d-none');
+                            if (completedIcon) completedIcon.classList.add('d-none');
+                        }
 
                         toastAlert(data.message, 'danger', 10000);
                     }

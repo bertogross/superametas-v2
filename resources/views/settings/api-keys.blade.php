@@ -31,20 +31,22 @@
                 </tr>
             </thead>
             <tbody class="list form-check-all">
-                <tr>
-                    <td>Sysmo API</td>
-                    <td>
-                        -
-                    </td>
-                    <td>
-                        -
-                    </td>
-                    <td>
-                        <span class="badge bg-success-subtle text-success">Ativo</span>
-                    </td>
-                    <td class="text-end">
-                    </td>
-                </tr>
+                @if (getERP())
+                    <tr>
+                        <td class="text-uppercase">{{getERP()}} API</td>
+                        <td>
+                            -
+                        </td>
+                        <td>
+                            -
+                        </td>
+                        <td>
+                            <span class="badge bg-success-subtle text-success">Ativo</span>
+                        </td>
+                        <td class="text-end">
+                        </td>
+                    </tr>
+                @endif
                 <tr>
                     <td>Dropbox API</td>
                     <td>{{ !empty($DropBoxUserAccountInfo) ? $DropBoxUserAccountInfo['name']['display_name'] : '-' }}</td>

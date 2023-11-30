@@ -59,6 +59,9 @@ class ClarifaiImageController extends Controller
                 if (!Storage::disk('public')->exists($path)) {
                     Storage::disk('public')->makeDirectory($path);
                 }
+                /*if (!file_exists($path)) {
+                    mkdir($path, 0777, true);
+                }*/
 
                 $filePath = $file->store($path, 'public');
                 $absoluteFilePath = Storage::disk('public')->path($filePath);

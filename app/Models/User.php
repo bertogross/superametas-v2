@@ -16,6 +16,31 @@ class User extends Authenticatable
 
     public $timestamps = true;
 
+    // Attributes that are mass assignable
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+        'status',
+        'capabilities',
+        'avatar',
+        'cover',
+        'email_verified_at',
+        'remember_token'
+    ];
+
+    // Attributes that should be hidden for arrays
+    protected $hidden = [
+        'password',
+        'remember_token'
+    ];
+
+    // Attributes that should be cast to native types
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
     // Constants representing user roles
     const ROLE_ADMIN = 1;
     const ROLE_EDITOR = 2;
@@ -50,28 +75,6 @@ class User extends Authenticatable
     {
         return self::CAPABILITY_TRANSLATIONS[$capability] ?? ucfirst(str_replace('_', ' ', $capability));
     }
-
-    // Attributes that are mass assignable
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
-        //'status',
-        //'avatar',
-        //'cover',
-    ];
-
-    // Attributes that should be hidden for arrays
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    // Attributes that should be cast to native types
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
 
     /**
      * Get the human-readable name of the user's role.

@@ -17,9 +17,14 @@ class AttachmentsController extends Controller
 
         try {
             // Validate the incoming request data
+            $messages = [
+                'file.mimes' => 'Envie somente extensão JPG',
+                'file.max' => 'O arquivo deve pesar no máximo 5MB',
+            ];
+
             $request->validate([
                 'file' => 'required|file|mimes:jpeg,jpg|max:5120',
-            ]);
+            ], $messages);
 
             $currentUserId = auth()->id();
 
@@ -35,7 +40,19 @@ class AttachmentsController extends Controller
 
                 $path = "{$dbName}/" . $folder . '/' . date('Y') . '/' . date('m');
 
+                // Ensure the directory exists
+                if (!Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->makeDirectory($path);
+                }
+                /*if (!file_exists($path)) {
+                    mkdir($path, 0777, true);
+                }*/
+
                 $filePath = $file->store($path, 'public');
+
+                if(!$filePath){
+                    return response()->json(['success' => false, 'message' => 'Falha ao armazenar o arquivo'], 422);
+                }
 
                 // Inside uploadFile method
                 $attachment = new Attachments();
@@ -50,7 +67,7 @@ class AttachmentsController extends Controller
                 // Save the updated user data to the database
                 $attachment->save();
 
-                return response()->json(['success' => true, 'message' => 'Arquivo armazenado!', 'path' => $filePath, 'id' => $attachment->id], 200);
+                return response()->json(['success' => true, 'message' => 'Arquivo armazenado', 'path' => $filePath, 'id' => $attachment->id], 200);
             }
 
             return response()->json(['success' => false, 'message' => 'Arquivo não fornecido'], 422);

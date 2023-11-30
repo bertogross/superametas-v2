@@ -82,7 +82,7 @@ class HomeController extends Controller
 
         $user->update();
         if ($user) {
-            Session::flash('message', 'User Details Updated successfully!');
+            Session::flash('message', 'Dados de usuário foram atualizados');
             Session::flash('alert-class', 'alert-success');
             // return response()->json([
             //     'isSuccess' => true,

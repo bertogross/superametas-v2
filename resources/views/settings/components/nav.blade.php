@@ -37,11 +37,13 @@
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->is('settings/database') ? 'active' : '' }}" href="{{ route('settingsDatabaseIndexURL') }}">
-                    <i class="ri-database-2-line"></i> @lang('translation.your-erp')
-                </a>
-            </li>
+            @if (getERP())
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->is('settings/database') ? 'active' : '' }}" href="{{ route('settingsDatabaseIndexURL') }}">
+                        <i class="ri-database-2-line"></i> @lang('translation.your-erp')
+                    </a>
+                </li>
+            @endif
 
             <li class="nav-item">
                 <a class="nav-link menu-link {{ request()->is('settings/api-keys') ? 'active' : '' }}" href="{{ route('settingsApiKeysURL') }}">

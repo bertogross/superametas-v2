@@ -21,7 +21,7 @@
                            </div>
                         </div>
                         <div class="col text-end dropdown">
-                            <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false"> <i class="ri-more-fill fs-17 text-theme"></i> </a>
+                            <button type="button"  data-bs-toggle="dropdown" class="btn btn-sm btn-soft-dark ri-more-fill text-theme fs-17 rounded-pill" aria-expanded="false"></button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item btn-edit-user cursor-pointer" data-user-id="{{ $id }}" data-user-name="@if(isset($name)) {{ $name }} @endif"><i class="ri-pencil-line me-2 align-bottom text-muted"></i>Editar</a></li>
                             </ul>

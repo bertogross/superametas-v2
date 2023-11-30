@@ -185,7 +185,8 @@ class SurveysResponsesController extends Controller
         if( $complianceAudit == 'no' && !$attachmentIds ){
             return response()->json([
                 'success' => false,
-                'message' => 'Necessário enviar ao menos uma foto comprovando o motivo da Não Conformidade'
+                'message' => 'Necessário enviar ao menos uma foto comprovando o motivo da Não Conformidade',
+                'action' => 'changeToPending'
             ]);
         }
 

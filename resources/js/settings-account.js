@@ -4,7 +4,7 @@ import {
 
 import {
     attachImage
-} from './attachments.js';
+} from './settings-attachments.js';
 
 document.addEventListener('DOMContentLoaded', function() {
 

@@ -165,6 +165,15 @@
                                 data-current-status="{{$statusKey}}">
                                 <i class="{{$status['icon']}} label-icon align-middle fs-16"></i> {{$status['reverse']}}
                             </button>
+                        @elseif( $currentUserId == $designatedUserId && in_array($statusKey, ['completed']) )
+                            <a href="#" onclick="alert('In development');"
+                                data-bs-toggle="tooltip"
+                                data-bs-trigger="hover"
+                                data-bs-placement="top"
+                                title="Visualizar"
+                                class="btn btn-sm btn-label right waves-effect btn-soft-success">
+                                <i class="ri-eye-line label-icon align-middle fs-16"></i> Visualizar
+                            </a>
                         @endif
                     </div>
                 </div>

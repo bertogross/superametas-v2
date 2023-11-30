@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class UserUploadController extends Controller
 {
@@ -31,64 +32,72 @@ class UserUploadController extends Controller
 
     /**
      * Generic method to handle file uploads.
-     *
-     * @param Request $request The incoming request object
-     * @param string $type The type of file being uploaded (avatar or cover)
-     * @param string $folder The storage folder for the uploaded file
-     * @return \Illuminate\Http\Response
      */
     private function uploadFile(Request $request, $type, $folder)
     {
         try {
             // Validate the incoming request data
+            $messages = [
+                'file.mimes' => 'Envie somente extensão JPG',
+                'file.max' => 'O arquivo deve pesar no máximo 5MB',
+            ];
+
             $request->validate([
                 'file' => 'required|file|mimes:jpeg,jpg|max:5120',
                 'user_id' => 'required|integer|exists:smAppTemplate.users,id'
-            ]);
+            ], $messages);
 
-            // Extract the user ID from the request
             $userID = intval(e($request->input('user_id')));
-
-            // Retrieve the user from the database using the custom connection
             $user = User::on($this->connection)->find($userID);
 
-            // Check if the user exists
             if (!$user) {
                 return response()->json(['success' => false, 'message' => 'User not found'], 404);
             }
 
-            // Check if a file was provided in the request
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
-
-                // Get the database name from the connection configuration
                 $config = config("database.connections.{$this->connection}");
                 $dbName = $config['database'];
-
                 $path = "{$dbName}/" . $folder . '/' . date('Y') . '/' . date('m');
+
+                // Ensure the directory exists
+                if (!Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->makeDirectory($path);
+                }
+                /*if (!file_exists($path)) {
+                    mkdir($path, 0777, true);
+                }*/
 
                 $filePath = $file->store($path, 'public');
 
-                // Delete old avatar
-                if ($type === 'avatar' && $user->avatar) {
-                    Storage::disk('public')->delete($user->avatar);
+                if ($type === 'avatar') {
+                    if ($user->avatar) {
+                        Storage::disk('public')->delete($user->avatar);
+                    }
                     $user->avatar = $filePath;
-                }
-
-                // Delete old cover image
-                elseif ($type === 'cover' && $user->cover) {
-                    Storage::disk('public')->delete($user->cover);
+                } elseif ($type === 'cover') {
+                    if ($user->cover) {
+                        Storage::disk('public')->delete($user->cover);
+                    }
                     $user->cover = $filePath;
                 }
 
-                // Save the updated user data to the database
-                $user->save();
+                if ($user->isDirty()) {
+                    $user->save();
 
-                return response()->json(['success' => true, 'message' => ucfirst($type) . ' uploaded successfully!', 'path' => $filePath], 200);
+                    return response()->json(['success' => true, 'message' => ucfirst($type) . ' uploaded successfully!', 'path' => $filePath, 'userId' => $user->id], 200);
+                } else {
+                    Log::info('No changes detected for user: ' . $user->id);
+
+                    Storage::disk('public')->delete($filePath);
+
+                    return response()->json(['success' => false, 'message' => 'No changes detected or save operation failed'], 422);
+                }
             }
 
             return response()->json(['success' => false, 'message' => 'Arquivo não fornecido'], 422);
         } catch (\Exception $e) {
+            Log::error("File upload error: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -97,10 +106,10 @@ class UserUploadController extends Controller
     {
         try {
             $messages = [
-                'file.required' => 'A file is required.',
-                'file.file' => 'The uploaded item must be a file.',
-                'file.mimes' => 'Only JPEG images are allowed.',
-                'file.max' => 'The image may not be greater than 5 megabytes.',
+                'file.required' => 'Envie um arquivo de imagem',
+                'file.file' => 'O arquivo deve ser uma imagem',
+                'file.mimes' => 'Envie somente extensão JPG ou PNG',
+                'file.max' => 'O arquivo não deve pesar mais de 5MB',
             ];
 
             // Validate the uploaded file
@@ -125,6 +134,14 @@ class UserUploadController extends Controller
                 $folder = 'logo';
 
                 $path = "{$dbName}/" . $folder . '/' . date('Y') . '/' . date('m');
+
+                // Ensure the directory exists
+                if (!Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->makeDirectory($path);
+                }
+                /*if (!file_exists($path)) {
+                    mkdir($path, 0777, true);
+                }*/
 
                 $filePath = $file->store($path, 'public');
 

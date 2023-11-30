@@ -101,7 +101,7 @@
                                                 </h6>
                                             </div>
                                             <div class="card-body bg-dark">
-                                                {!! $commentSurvey ? '<p>'.$commentSurvey.'</p>' : '' !!}
+                                                {!! $commentSurvey ? '<p>'.nl2br($commentSurvey).'</p>' : '' !!}
 
                                                 <div class="mt-2 row">
                                                     @if ( !empty($surveyAttachmentIds) && is_array($surveyAttachmentIds) )

@@ -130,7 +130,7 @@ class SettingsUserController extends Controller
             ], 200);
 
         } else {
-            return response()->json(['success' => false, 'message' => "Error saving user"], 200);
+            return response()->json(['success' => false, 'message' => "Erro ao salvar dados de usuário"], 200);
         }
     }
 
@@ -202,9 +202,9 @@ class SettingsUserController extends Controller
 
 
         if ($user->update()) {
-            return response()->json(['success' => true, 'message' => "User Details Updated"], 200);
+            return response()->json(['success' => true, 'message' => "Dados de usuário foram atualizados"], 200);
         } else {
-            return response()->json(['success' => false, 'message' => "Error saving user"], 200);
+            return response()->json(['success' => false, 'message' => "Erro ao salvar dados de usuário"], 200);
         }
     }
 

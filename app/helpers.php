@@ -114,6 +114,7 @@ if (!function_exists('getERPdata')) {
             $term = $ERPdata['api']['term'];
 
             return [
+                'erp' => $user_erp,
                 'customer' => $customer,
                 'username' => $username,
                 'password' => $password,
@@ -123,12 +124,14 @@ if (!function_exists('getERPdata')) {
             return null;
         }
 
+        /*
         return view('settings/database', [
             'onboard_id' => $customer,
             'target' => 'sales',
             'key' => 'ffs64DSA2ds4',
             'meantime' => date('Y-m'),
         ]);
+        */
     }
 }
 
@@ -154,6 +157,18 @@ if (!function_exists('getStripeData')) {
         $stripeData['subscription_quantity'] = $OnboardConnection->table('app_users')->where('ID', $databaseId)->value('user_stripe_subscription_quantity');
 
         return $stripeData ?? null;
+    }
+}
+
+if (!function_exists('getERP')) {
+    function getERP(){
+        $databaseName = config('database.connections.smAppTemplate.database');
+        $databaseId = !empty($databaseConnection) ? intval($databaseConnection) : extractDatabaseId($databaseName);
+
+        // Set the database connection to smOnboard
+        $OnboardConnection = DB::connection('smOnboard');
+
+        return $OnboardConnection->table('app_users')->where('ID', $databaseId)->value('user_erp') ?? null;
     }
 }
 

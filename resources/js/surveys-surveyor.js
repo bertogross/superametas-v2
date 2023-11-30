@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 location.reload(true);
                             }, 1000);
                             */
-                            toastAlert('Redirecionando ao formulário...', 'success');
+                            toastAlert('Redirecionando ao formulário...', 'primary');
 
                             setTimeout(function () {
                                 window.location.href = formSurveyorAssignmentURL + '/' +assignmentId;

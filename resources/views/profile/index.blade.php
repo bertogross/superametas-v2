@@ -9,7 +9,7 @@
         $profileUserId = $user->id;
         $phone = getUserMeta($profileUserId, 'phone');
         $phone = formatPhoneNumber($phone);
-        appPrintR($assignmentData);
+        //appPrintR($assignmentData);
         //appPrintR($auditorData);
         //appPrintR($filteredStatuses);
     @endphp
@@ -102,7 +102,7 @@
                         $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
                     @endphp
 
-                    <div class="tasks-list p-2 {{ in_array($key, ['wainting', 'auditing', 'pending', 'completed', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
+                    <div class="tasks-list p-2 {{ in_array($key, ['waiting', 'auditing', 'pending', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
                         <div class="d-flex mb-3">
                             <div class="flex-grow-1">
                                 <h6 class="fs-14 text-uppercase fw-semibold mb-0">
@@ -185,4 +185,19 @@
     var profileShowURL = "{{ route('profileShowURL') }}";
 </script>
 <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
+
+<script>
+    var formSurveyorAssignmentURL = "{{ route('formSurveyorAssignmentURL') }}";
+    var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";
+    var responsesSurveyorStoreOrUpdateURL = "{{ route('responsesSurveyorStoreOrUpdateURL') }}";
+    var profileShowURL = "{{ route('profileShowURL') }}";
+</script>
+<script src="{{ URL::asset('build/js/surveys-surveyor.js') }}" type="module"></script>
+
+<script>
+    var profileShowURL = "{{ route('profileShowURL') }}";
+    var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
+    var responsesAuditorStoreOrUpdateURL = "{{ route('responsesAusitorStoreOrUpdateURL') }}";
+</script>
+<script src="{{ URL::asset('build/js/surveys-auditor.js') }}" type="module"></script>
 @endsection
