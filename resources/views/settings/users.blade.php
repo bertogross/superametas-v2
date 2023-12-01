@@ -88,6 +88,9 @@
     <script>
         var uploadAvatarURL = "{{ route('uploadAvatarURL') }}";
         var uploadCoverURL = "{{ route('uploadCoverURL') }}";
+        var getUserModalContentURL = "{{ route('getUserModalContentURL') }}";
+        var settingsUsersStoreURL = "{{ route('settingsUsersStoreURL') }}";
+        var settingsUsersUpdateURL = "{{ route('settingsUsersUpdateURL') }}";
     </script>
     <script src="{{ URL::asset('build/js/settings-users.js') }}" type="module"></script>
 @endsection

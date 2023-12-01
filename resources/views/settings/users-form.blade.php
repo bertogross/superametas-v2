@@ -39,14 +39,14 @@ if (is_object($getActiveCompanies)) {
                                 <div class="flex-shrink-0">
                                     <div class="d-flex gap-3 align-items-center">
                                         <div>
-                                            <label for="cover-image-input" class="mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Cover Image">
+                                            <label for="cover-image-input" class="mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Alterar imagem">
                                                 <div class="avatar-xs">
                                                     <div class="avatar-title bg-light border rounded-circle text-muted cursor-pointer">
                                                         <i class="ri-image-fill text-theme"></i>
                                                     </div>
                                                 </div>
                                             </label>
-                                            <input class="form-control d-none" name="cover" id="cover-image-input" type="file" accept="image/png, image/gif, image/jpeg">
+                                            <input class="d-none" name="cover" id="cover-image-input" type="file" accept="image/png, image/gif, image/jpeg">
                                         </div>
                                         <button type="button" class="btn-close btn-close-white" id="createMemberBtn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
@@ -59,14 +59,14 @@ if (is_object($getActiveCompanies)) {
                     <div class="text-center mb-4 mt-n5 pt-2">
                         <div class="position-relative d-inline-block">
                             <div class="position-absolute bottom-0 end-0">
-                                <label for="member-image-input" class="mb-0" data-bs-toggle="tooltip" data-bs-placement="right" title="Select Member Image">
+                                <label for="member-image-input" class="mb-0" data-bs-toggle="tooltip" data-bs-placement="right" title="Alterar Avatar">
                                     <div class="avatar-xs">
                                         <div class="avatar-title bg-light border rounded-circle text-muted cursor-pointer">
-                                            <i class="ri-image-fill text-theme"></i>
+                                            <i class="ri-camera-fill text-theme"></i>
                                         </div>
                                     </div>
                                 </label>
-                                <input class="form-control d-none" name="avatar" id="member-image-input" type="file" accept="image/jpeg">
+                                <input class="d-none" name="avatar" id="member-image-input" type="file" accept="image/jpeg">
                             </div>
                             <div class="avatar-lg">
                                 <div class="avatar-title bg-light rounded-circle">

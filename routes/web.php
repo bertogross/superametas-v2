@@ -111,9 +111,9 @@ Route::middleware(['auth'])->group(function () {
                 Route::put('/companies/store', [SettingsDatabaseController::class, 'updateCompanies'])->name('settingsCompaniesUpdateURL');
 
             Route::get('/users', [SettingsUserController::class, 'index'])->name('settingsUsersIndexURL');
-            Route::post('/users/store', [SettingsUserController::class, 'create']);
-                Route::post('/users/update/{id}', [SettingsUserController::class, 'update']);
-                Route::get('/users/modal-form/{id?}', [SettingsUserController::class, 'getUserModalContent']);
+            Route::post('/users/store', [SettingsUserController::class, 'store'])->name('settingsUsersStoreURL');
+                Route::post('/users/update/{id?}', [SettingsUserController::class, 'update'])->name('settingsUsersUpdateURL');
+                Route::get('/users/modal-form/{id?}', [SettingsUserController::class, 'getUserModalContent'])->name('getUserModalContentURL');
 
             Route::post('/stripe/subscription', [SettingsStripeController::class, 'createStripeSession'])->name('stripeSubscriptionURL');
             Route::post('/stripe/subscription/details', [SettingsStripeController::class, 'updateSubscriptionItem'])->name('stripeSubscriptionDetailsURL');

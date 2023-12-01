@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadUserSettingsModal(userId = null, userName = '') {
         var xhr = new XMLHttpRequest();
 
-        var url = '/settings/users/modal-form';
+        var url = getUserModalContentURL;
         if (userId) {
             url += '/' + userId;
         }
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 let formData = new FormData(form);
 
-                let url = form.dataset.id ? `/settings/users/update/${form.dataset.id}` : '/settings/users/store';
+                let url = form.dataset.id ? settingsUsersUpdateURL + `/${form.dataset.id}` : settingsUsersStoreURL;
 
                 fetch(url, {
                     method: 'POST',
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         toastAlert(data.message, 'success', 10000);
                         setTimeout(() => {
                             location.reload();
-                        }, form.dataset.id ? 5000 : 120000);
+                        }, form.dataset.id ? 1000 : 120000);
 
                         document.getElementById('btn-save-user').remove();
                     } else {

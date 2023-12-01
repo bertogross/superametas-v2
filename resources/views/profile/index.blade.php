@@ -16,7 +16,7 @@
     <div class="profile-foreground position-relative mx-n5 mt-n4">
         <div class="profile-wid-bg mx-n5">
             <img
-            @if( empty(trim($user->cover)) || !file_exists(URL::asset('storage/' . $user->cover)) )
+            @if( empty(trim($user->cover)))
                 src="{{URL::asset('build/images/small/img-9.jpg')}}"
             @else
                 src="{{ URL::asset('storage/' . $user->cover) }}"
@@ -28,14 +28,24 @@
     <div class="pt-4 mb-2 mb-lg-1 pb-lg-4 profile-wrapper">
         <div class="row g-4">
             <div class="col-auto">
-                <div class="avatar-lg">
-                    <img
+                <div class="avatar-lg profile-user position-relative d-inline-block">
+                    <img id="avatar-img"
                     @if( empty(trim($user->avatar)) )
                         src="{{URL::asset('build/images/users/user-dummy-img.jpg')}}"
                     @else
                         src="{{ URL::asset('storage/' . $user->avatar) }}"
                     @endif
                     alt="avatar" class="img-thumbnail rounded-circle" />
+                    @if($user->id == auth()->id())
+                        <div class="avatar-xs p-0 rounded-circle profile-photo-edit" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="right" title="Alterar Avatar">
+                            <input class="d-none" name="avatar" id="member-image-input" type="file" accept="image/jpeg">
+                            <label for="member-image-input" class="profile-photo-edit avatar-xs">
+                                <span class="avatar-title rounded-circle bg-light text-body">
+                                    <i class="ri-camera-fill"></i>
+                                </span>
+                            </label>
+                        </div>
+                    @endif
                 </div>
             </div>
             <div class="col">
@@ -200,4 +210,12 @@
     var responsesAuditorStoreOrUpdateURL = "{{ route('responsesAusitorStoreOrUpdateURL') }}";
 </script>
 <script src="{{ URL::asset('build/js/surveys-auditor.js') }}" type="module"></script>
+
+<script type="module">
+    import { attachImage } from '{{ URL::asset('build/js/settings-attachments.js') }}';
+
+    var uploadAvatarURL = "{{ route('uploadAvatarURL') }}";
+
+    attachImage("#member-image-input", "#avatar-img", uploadAvatarURL, false);
+</script>
 @endsection

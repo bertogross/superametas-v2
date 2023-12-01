@@ -72,14 +72,28 @@ class SurveysResponsesController extends Controller
             ]);
         }
 
+        $complianceSurvey = $request->input('compliance_survey');
+
         $attachmentIds = $request->input('attachment_ids');
-        if(!$attachmentIds){
+
+        if( $complianceSurvey == 'no' && !$attachmentIds ){
             return response()->json([
                 'success' => false,
-                'message' => 'Necessário enviar ao menos uma foto'
+                'message' => 'Necessário enviar ao menos uma foto apontando o motivo da Não Conformidade'
             ]);
         }
         $attachmentIdsInt = $attachmentIds ? array_map('intval', $attachmentIds) : [];
+
+        $comment = $request->input('comment_survey');
+        $comment = trim($comment);
+
+        if( $complianceSurvey == 'no' && empty($comment) ){
+            return response()->json([
+                'success' => false,
+                'message' => 'Necessário descrever o motivo da Não Conformidade',
+                'action' => 'changeToPending'
+            ]);
+        }
 
         // Prepare data for saving
         $data = $request->only(['assignment_id', 'company_id', 'survey_id', 'step_id', 'topic_id', 'compliance_survey', 'comment_survey']);

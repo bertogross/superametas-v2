@@ -63,7 +63,7 @@ class SettingsUserController extends Controller
      * @param \Illuminate\Http\Request $request The incoming request.
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function create(Request $request)
+    public function store(Request $request)
     {
         // Custom error messages
         $messages = [
@@ -166,6 +166,10 @@ class SettingsUserController extends Controller
         ], $messages);
 
         $user = User::find($id);
+
+        if( !$user ){
+            return response()->json(['success' => false, 'message' => "ID de Usuário não corresponde a esta base de dados"], 200);
+        }
 
         // Check and set role based on conditions
         if ($user->id != 1 && ( empty($request->role) || ( intval($request->role) > 5 || intval($request->role) < 1 ) )) {

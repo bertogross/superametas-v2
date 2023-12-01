@@ -38,7 +38,7 @@
                             @else
                                 src="{{URL::asset('build/images/logo.png')}}"
                             @endif
-                            id="logo-img" alt="logo" data-user-id="1" style="max-height: 100px;" />
+                            id="logo-img" alt="logo" data-user-id="{{ base64_encode(1) }}" style="max-height: 100px;" />
                         </div>
                     </div>
                 </div>

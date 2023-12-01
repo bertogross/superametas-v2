@@ -69,7 +69,7 @@ if (!function_exists('canManageGoalSales')) {
     function canManageGoalSales() {
         $user = auth()->user();
 
-        return $user && $user->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) && request()->is('goal-sales');
+        return $user && $user->hasAnyRole([User::ROLE_ADMIN, User::ROLE_EDITOR]) && request()->is('goal-sales');
     }
 }
 
@@ -562,16 +562,16 @@ if( !function_exists('goalsEmojiChart') ){
 
 		$bsTitle = !empty($companyName) ? $companyName.' :: '.$departmentName : ':: '.$departmentName;
 
-		if( $goal == 0 && $sale > 0 && $departmentId != 'general' && ( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) ) ){
+		if( $goal == 0 && $sale > 0 && $departmentId != 'general' && ( auth()->user()->hasAnyRole([User::ROLE_ADMIN, User::ROLE_EDITOR]) ) ){
 			$html .= '<i class="text-danger blink ri-error-warning-line fw-bold position-relatvie w-auto mx-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Existe um conflito entre valor de Meta e Vendas para departamento '.$departmentName.'. Não há Meta ou não deveria haver vendas para este departamento no estabelecimento '.$companyName.'" style="z-index:2;"></i>';
 		}
 
 		$html .= '<div id="goal-chart-'.$nChartId.'" class="goal-chart text-center d-inline-block" ';
-            if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) ) {
+            if( auth()->user()->hasAnyRole([User::ROLE_ADMIN, User::ROLE_EDITOR]) ) {
                 $html .=  'data-sale="'.$sale.'" data-goal="'.$goal.'" ';
             }
 		    $html .= 'data-percent="'.$percent.'" data-percent-from-metric="'.$percentAccrued.'" data-department-name="'.$departmentName.'" data-department="'.$departmentId.'" ';
-			if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) ) {
+			if( auth()->user()->hasAnyRole([User::ROLE_ADMIN, User::ROLE_EDITOR]) ) {
 				$html .= 'data-bs-toggle="popover" data-bs-placement="top" data-bs-trigger="hover focus" data-bs-title="'.$bsTitle.'" data-bs-content="';
 				$html .= "<i class='text-theme ri-checkbox-blank-circle-fill align-bottom me-1'></i>Vendas: ".brazilianRealFormat($sale, 0)."<br>";
 

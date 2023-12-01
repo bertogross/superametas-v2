@@ -84,6 +84,13 @@
                                 <span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>
                             @endif
                         @endif
+                        @if ( in_array($statusKey, ['completed']) && $surveyorStatus == 'completed' && $auditorStatus == 'completed' )
+                            <div class="flex-shrink-0 avatar-xs acitivity-avatar mt-n2 me-n2">
+                                <div data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-html="true" class="avatar-title bg-success-subtle text-success rounded-circle float-end" title="<u>Vistoria</u> e <u>Auditoria</u> concluídas">
+                                    <i class="ri-check-double-fill"></i>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <span data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="A data em que esta tarefa deverá ser desempenhada">
@@ -92,17 +99,14 @@
                 <h5 class="fs-13 text-truncate task-title mb-0 mt-2">
                     {{ $templateName }}
                 </h5>
-                @if ( $designated == 'auditor' && $surveyorStatus == 'losted' && $auditorStatus == 'losted' )
+                {{--
+                @if ( $designated == 'auditor' || $designated == 'surveyor' && ( $surveyorStatus == 'losted' && $auditorStatus == 'losted' && in_array($statusKey, ['losted']) ) )
                     <div class="text-danger small mt-2">Esta <u>Auditoria</u> foi perdida pois a <u>Vistoria</u> não foi efetuada na data prevista</div>
+                @elseif ( in_array($statusKey, ['losted']) && $designated == 'auditor' && $auditorStatus == 'losted' && $surveyorStatus == 'auditing' )
+                    <div class="text-warning small mt-2">Esta <u>Auditoria</u> foi perdida pois não foi efetuada na data prevista</div>
                 @endif
+                --}}
 
-                @if ( $designated == 'surveyor' && $surveyorStatus == 'losted' )
-                    <div class="text-danger small mt-2">Esta <u>Vistoria</u> foi perdida pois não foi efetuada na data prevista</div>
-                @endif
-
-                @if ( $surveyorStatus == 'completed' && $auditorStatus == 'completed' )
-                    <div class="text-success small mt-2"><u>Vistoria</u> e <u>Auditoria</u> concluídas</div>
-                @endif
             </div>
             <!--end card-body-->
             <div class="card-footer border-top-dashed bg-body">
@@ -155,7 +159,7 @@
                         </div>
                     </div>
                     <div class="col-auto">
-                        @if ($currentUserId == $designatedUserId && in_array($statusKey, ['new','pending','in_progress']) )
+                        @if ($currentUserId === $designatedUserId && in_array($statusKey, ['new','pending','in_progress']) )
                             <button type="button"
                                 data-bs-toggle="tooltip"
                                 data-bs-trigger="hover"
@@ -167,7 +171,7 @@
                                 data-current-status="{{$statusKey}}">
                                 <i class="{{$status['icon']}} label-icon align-middle fs-16"></i> {{$status['reverse']}}
                             </button>
-                        @elseif( $currentUserId == $designatedUserId && in_array($statusKey, ['completed', 'losted']) )
+                        @elseif( $currentUserId === $designatedUserId && in_array($statusKey, ['completed']) )
                             <a href="{{ route('assignmentShowURL', $assignmentId) }}"
                                 data-bs-toggle="tooltip"
                                 data-bs-trigger="hover"
@@ -176,6 +180,10 @@
                                 class="btn btn-sm btn-label right waves-effect btn-soft-success">
                                 <i class="ri-eye-line label-icon align-middle fs-16"></i> Visualizar
                             </a>
+                        @endif
+
+                        @if ( $currentUserId === $designatedUserId && $designated === 'surveyor' && $surveyorId === $auditorId && in_array($statusKey, ['auditing']) )
+                            <i class="text-theme ri-questionnaire-fill" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Ao mesmo tempo você trata da Vistoria e Auditoria. Procure o card para iniciar a tarefa de vistoria na coluna <b>Nova</b>"></i>
                         @endif
                     </div>
                 </div>

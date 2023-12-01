@@ -44,10 +44,11 @@ class UserUploadController extends Controller
 
             $request->validate([
                 'file' => 'required|file|mimes:jpeg,jpg|max:5120',
-                'user_id' => 'required|integer|exists:smAppTemplate.users,id'
+                //'user_id' => 'required|integer|exists:smAppTemplate.users,id'
             ], $messages);
 
-            $userID = intval(e($request->input('user_id')));
+            $userID = $request->input('user_id');
+            $userID = $userID ? intval($userID) : auth()->id();
             $user = User::on($this->connection)->find($userID);
 
             if (!$user) {
@@ -85,7 +86,7 @@ class UserUploadController extends Controller
                 if ($user->isDirty()) {
                     $user->save();
 
-                    return response()->json(['success' => true, 'message' => ucfirst($type) . ' uploaded successfully!', 'path' => $filePath, 'userId' => $user->id], 200);
+                    return response()->json(['success' => true, 'message' => ucfirst($type) . ' carregado com sucesso', 'path' => $filePath, 'userId' => $user->id], 200);
                 } else {
                     Log::info('No changes detected for user: ' . $user->id);
 

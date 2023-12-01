@@ -114,7 +114,7 @@ class Survey extends Model
             ],
             'auditing' => [
                 'label' => 'Em Auditoria',
-                'reverse' => '',
+                'reverse' => 'Abrir Formulário',
                 'description' => 'Tarefa que está sendo revisada/auditada',
                 'icon' => 'ri-todo-line',
                 'color' => 'secondary'

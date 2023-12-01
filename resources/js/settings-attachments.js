@@ -3,17 +3,22 @@ import {
 } from './helpers.js';
 
 // Attach event listeners for Avatar and Cover image upload
-export function attachImage(inputSelector, imageSelector, uploadUrl) {
+export function attachImage(inputSelector, imageSelector, uploadUrl, withPreviewCard = false) {
     const inputFile = document.querySelector(inputSelector);
 
     if (inputFile) {
         inputFile.addEventListener("change", function() {
             const preview = document.querySelector(imageSelector);
 
-            const userID = preview.getAttribute("data-user-id");
+            const userID = preview.getAttribute("data-user-id") ?? false;
 
-            const previewCard = document.querySelector(`${imageSelector}-${userID}`);
+            //console.log("userID:", userID);
+            //console.log("Selector:", `${imageSelector}-${userID}`);
 
+            var previewCard = false;
+            if( withPreviewCard && userID){
+                previewCard = document.querySelector(imageSelector+'-'+userID);
+            }
             const file = inputFile.files[0];
             const reader = new FileReader();
 
@@ -112,7 +117,9 @@ export function attachImage(inputSelector, imageSelector, uploadUrl) {
                     canvas.toBlob(function(blob) {
                         const formData = new FormData();
                         formData.append('file', blob, file.name);
-                        formData.append('user_id', userID);
+                        if(userID){
+                            formData.append('user_id', userID);
+                        }
 
                         //console.log("Blob size:", blob.size);
 
