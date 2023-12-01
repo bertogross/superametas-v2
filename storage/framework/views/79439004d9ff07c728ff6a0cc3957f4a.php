@@ -60,7 +60,7 @@
 
     <div class="card">
         <div class="card-header align-items-center d-flex">
-            <h5 class="card-title mb-0 flex-grow-1"><i class="ri-survey-line fs-16 align-bottom text-theme me-2"></i>Tarefas</h5>
+            <h5 class="card-title mb-0 flex-grow-1"><i class="ri-calendar-check-fill fs-16 align-bottom text-theme me-2"></i>Tarefas</h5>
         </div>
         <div class="card-body">
             <div class="tasks-board mb-0 position-relative" id="kanbanboard">

@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Survey extends Model
 {
@@ -151,8 +152,8 @@ class Survey extends Model
         ];
     }
 
-
-    public static function getSurveyRecurringTranslations() {
+    public static function getSurveyRecurringTranslations()
+    {
         return [
             'once' => [
                 'label' => 'Uma vez',
@@ -185,6 +186,71 @@ class Survey extends Model
         ];
     }
 
+    // Check the 'survey_assignments' table to see which tasks were not completed by yesterday and change the status to 'losted'
+    public static function checkSurveyAssignmentUntilYesterday($surveyId)
+    {
+        $yesterday = Carbon::yesterday();
+
+        // Get all survey assignments that were not completed by yesterday
+        $assignments = SurveyAssignments::where('survey_id', $surveyId)
+            ->whereDate('created_at', '<=', $yesterday)
+            ->get();
+
+        foreach ($assignments as $assignment) {
+            if ($assignment->surveyor_status === 'auditing' && $assignment->auditor_status !== 'completed') {
+                // Change auditor_status to 'losted' and surveyor_status to 'completed'
+                $assignment->auditor_status = 'losted';
+                $assignment->surveyor_status = 'completed';
+            } elseif ($assignment->surveyor_status !== 'auditing') {
+                // Change surveyor_status to 'losted' and auditor_status to 'losted'
+                $assignment->surveyor_status = 'losted';
+                $assignment->auditor_status = 'losted';
+            }
+
+            $assignment->save();
+        }
+    }
+
+    public static function startNewAssignmentIfSurveyIsRecurring($surveyId)
+    {
+
+        $today = Carbon::today();
+        $survey = Survey::findOrFail($surveyId);
+
+        $status = $survey->status;
+
+        if($status == 'started'){
+            $recurring = $survey->recurring;
+            $distributedData = $survey->distributed_data ?? null;
+
+            // Check if there are survey assignments for today
+            $assignmentsCount = SurveyAssignments::where('survey_id', $surveyId)
+                ->whereDate('created_at', '=', $today)
+                ->count();
+
+            // If there are no assignments for today, check the recurrence pattern
+            if ($assignmentsCount == 0) {
+                switch ($recurring) {
+                    case 'daily':
+                        SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                        break;
+                    case 'weekly':
+                        // Check if today is the specific day of the week for weekly recurrence
+                        // Example: if ($today->isMonday()) { ... }
+                        break;
+                    case 'biweekly':
+                        // Check if today is the 1st or 15th of the month for biweekly recurrence
+                        break;
+                    case 'monthly':
+                        // Check if today matches the specific day of the month for monthly recurrence
+                        break;
+                    case 'annual':
+                        // Check if today matches the specific day and month for annual recurrence
+                        break;
+                }
+            }
+        }
+    }
 
 
 }

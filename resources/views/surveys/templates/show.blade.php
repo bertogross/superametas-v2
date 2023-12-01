@@ -10,16 +10,26 @@
             {{ route('surveysIndexURL') }}
         @endslot
         @slot('li_1')
-            Formulários
+            Vistorias
         @endslot
         @slot('title')
-            Visualização<small><i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i> #<span class="text-theme">{{$data->id}}</span> {{ limitChars($data->title ?? '', 20) }}</small>
+            Visualização
+            <small>
+                <i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i>
+                #<span class="text-theme">{{$data->id}}</span> {{ limitChars($data->title ?? '', 20) }}
+            </small>
         @endslot
     @endcomponent
-
+    @php
+        use App\Models\User;
+        $authorId = $data->user_id;
+        $getUserData = getUserData($authorId);
+        $roleName = (new User)->getRoleName($getUserData['role']);
+        $description = trim($data->description) ? nl2br($data->description) : '';
+    @endphp
     <div id="content" class="rounded rounded-2 mb-4">
         <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show">
-            <i class="ri-alert-line label-icon"></i> Este <strong>não</strong> é um formulário válido.<br>Esta demonstração é exibida durante a Pré-visualização na composição de um Modelo.
+            <i class="ri-alert-line label-icon"></i> <strong class="text-uppercase">Demonstrativo</strong><br>Este formulário serve de demonstração na Pré-visualização em uma composição de Modelo.
         </div>
 
         <div class="bg-primary-subtle position-relative">
@@ -54,10 +64,13 @@
             </div>
         </div>
 
+        {!! !empty($description) ? '<div class="blockquote custom-blockquote blockquote-outline blockquote-dark rounded mt-2 mb-2"><p class="text-body mb-2">'.$description.'</p><footer class="blockquote-footer mt-0">'.$getUserData['name'].' <cite title="'.$roleName.'">'.$roleName.'</cite></footer></div>' : '' !!}
+
         @if ($result)
             @component('surveys.layouts.form-surveyor-step-cards')
                 @slot('data', $result)
                 @slot('purpose', 'fakeForm')
+                @slot('surveyorStatus', null)
             @endcomponent
         @endif
     </div>

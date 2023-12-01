@@ -494,7 +494,7 @@ export function bsPopoverTooltip() {
                 allPopovers.push(new bootstrap.Popover(toggle));
             }
         });
-    }, 1000);
+    }, 100);
 }
 
 

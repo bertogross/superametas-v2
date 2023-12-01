@@ -26,6 +26,7 @@
     @php
         //appPrintR($data);
         $templateId = $data->id ?? '';
+        $authorId = $data->user_id ?? '';
         $title = $data->title ?? '';
         $description = $data->description ?? '';
 
@@ -34,91 +35,98 @@
         $countSurveysText .= '<br><br>Se a intenção for a de modificar tópicos dos processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho ideal será encerrar determinada vistoria e gerar um novo registro. Se este for o caso, prossiga com a edição deste modelo e reutilize-o gerando uma nova tarefa.'
     @endphp
 
-    @if($countSurveys)
-        <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show" role="alert">
-            <i class="ri-alert-line label-icon"></i> {!! $countSurveysText !!}
+    @if( $authorId && $authorId != auth()->id())
+        <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
+            <i class="ri-alert-line label-icon blink"></i> Você não possui autorização para editar um registro gerado por outra pessoa
         </div>
-    @endif
-
-    <div class="card">
-        <div class="card-header">
-            <div class="float-end">
-                @if ($data)
-                    <button type="button" class="btn btn-sm btn-label right btn-outline-theme" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Atualizar</button>
-
-                    {{--
-                    <button type="button" class="btn btn-sm btn-label right btn-outline-info" id="btn-surveys-clone" tabindex="-1"><i class="ri-file-copy-line label-icon align-middle fs-16 ms-2"></i>Clonar</button>
-                    --}}
-
-                    {{--
-                    <a href="{{ route('surveysTemplateShowURL', ['id' => $templateId]) }}" class="btn btn-sm btn-label right btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar em nova guia" target="_blank" tabindex="-1"><i class="ri-eye-line label-icon align-middle fs-16 ms-2"></i>Visualizar</a>
-                    --}}
-                @else
-                    <button type="button" class="btn btn-sm btn-label right btn-outline-theme" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Salvar</button>
-                @endif
+    @else
+        @if($countSurveys)
+            <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+                <i class="ri-alert-line label-icon"></i> {!! $countSurveysText !!}
             </div>
-            <h4 class="card-title mb-0"><i class="ri-survey-line fs-16 align-middle text-theme me-2"></i>{{ $data->title ?? 'Formulário' }}</h4>
-         </div>
-        <div class="card-body">
-            <form id="surveyTemplateForm" method="POST" class="needs-validation" novalidate autocomplete="off">
-                @csrf
-                <div class="row">
-                    <div class="col-sm-12 col-md-6 col-lg-6 col-xxl-6">
-                        <div class="p-3">
-                            <p class="text-body mb-4">Composição do Modelo:</p>
+        @endif
 
-                            <input type="hidden" name="id" value="{{ $templateId }}">
+        <div class="card">
+            <div class="card-header">
+                <div class="float-end">
 
-                            <div class="mb-4">
-                                <label for="title" class="form-label">Título:</label>
-                                <input type="text" id="title" name="title" class="form-control" value="{{ $title }}" maxlength="100" required>
-                                <div class="form-text">Exemplo: Checklist Abertura de Loja</div>
-                            </div>
+                </div>
+                <h4 class="card-title mb-0"><i class="ri-survey-line fs-16 align-middle text-theme me-2"></i>{{ $data->title ?? 'Formulário' }}</h4>
+            </div>
+            <div class="card-body">
+                <form id="surveyTemplateForm" method="POST" class="needs-validation" novalidate autocomplete="off">
+                    @csrf
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 col-lg-6 col-xxl-6">
+                            <div class="p-3">
+                                <p class="text-body fw-bold mb-4">Composição do Modelo</p>
 
-                            <div>
-                                <label for="description" class="form-label">Descrição:</label>
-                                <textarea name="description" class="form-control maxlength" id="description" rows="3" maxlength="500" placeholder="Descreva, por exemplo, a funcionalidade ou destino deste modelo...">{{ $description }}</textarea>
-                                <div class="form-text">Opcional</div>
-                            </div>
+                                <input type="hidden" name="id" value="{{ $templateId }}">
 
-                            <hr class="w-50 start-50 position-relative translate-middle-x clearfix mt-4 mb-4">
-
-                            <div id="nested-compose-area" style="min-height: 250px;">
-                                <div class="accordion list-group nested-list nested-sortable-block">@if ($result)
-                                    @include('surveys.templates.form', ['data' => $result] )
-                                @endif</div>
-
-                                <div class="clearfix mt-3">
-                                    <button type="button" class="btn btn-sm btn-outline-theme btn-label right float-end" data-bs-toggle="modal" data-bs-target="#addStepModal" tabindex="-1" title="Adicionar Etapa/Setor/Departamento"><i class="ri-terminal-window-line label-icon align-middle fs-16 ms-2"></i>Adicionar</button>
+                                <div class="mb-4">
+                                    <label for="title" class="form-label">Título:</label>
+                                    <input type="text" id="title" name="title" class="form-control" value="{{ $title }}" maxlength="100" required>
+                                    <div class="form-text">Exemplo: Checklist Abertura de Loja</div>
                                 </div>
-                            </div>
 
+                                <div>
+                                    <label for="description" class="form-label">Descrição:</label>
+                                    <textarea name="description" class="form-control maxlength" id="description" rows="3" maxlength="500" placeholder="Descreva, por exemplo, a funcionalidade ou destino deste modelo...">{{ $description }}</textarea>
+                                    <div class="form-text">Opcional</div>
+                                </div>
+
+                                <hr class="w-50 start-50 position-relative translate-middle-x clearfix mt-4 mb-4">
+
+                                <div id="nested-compose-area" style="min-height: 250px;">
+                                    <div class="accordion list-group nested-list nested-sortable-block">@if ($result)
+                                        @include('surveys.templates.form', ['data' => $result] )
+                                    @endif</div>
+
+                                    <div class="clearfix mt-3">
+                                        @if ($data)
+                                            <button type="button" class="btn btn-label right btn-theme float-end mt-5" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Atualizar Formulário</button>
+
+                                            {{--
+                                            <button type="button" class="btn btn-sm btn-label right btn-outline-info" id="btn-surveys-clone" tabindex="-1"><i class="ri-file-copy-line label-icon align-middle fs-16 ms-2"></i>Clonar</button>
+                                            --}}
+
+                                            {{--
+                                            <a href="{{ route('surveysTemplateShowURL', ['id' => $templateId]) }}" class="btn btn-sm btn-label right btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar em nova guia" target="_blank" tabindex="-1"><i class="ri-eye-line label-icon align-middle fs-16 ms-2"></i>Visualizar</a>
+                                            --}}
+                                        @else
+                                            <button type="button" class="btn btn-label right btn-theme float-end mt-5" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Salvar Formulário</button>
+                                        @endif
+
+                                        <button type="button" class="btn btn-sm btn-outline-theme btn-label right" data-bs-toggle="modal" data-bs-target="#addStepModal" tabindex="-1" title="Adicionar Etapa/Setor/Departamento"><i class="ri-terminal-window-line label-icon align-middle fs-16 ms-2"></i>Adicionar Bloco</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-6 col-xxl-6">
+                            <div id="load-preview" class="p-3 border border-1 border-light rounded"></div>
                         </div>
                     </div>
-                    <div class="col-sm-12 col-md-6 col-lg-6 col-xxl-6">
-                        <p class="text-body mb-1 p-3">Pré-visualização:</p>
-                        <div id="load-preview" class="p-3 border border-1 border-light rounded"></div>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <div id="addStepModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-right">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalgridLabel">Termos</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body" id="load-terms-form">
-                        @include('surveys.terms.form', ['terms' => $terms] )
+        <div id="addStepModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-right">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalgridLabel">Termos</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="load-terms-form">
+                            @include('surveys.terms.form', ['terms' => $terms] )
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 
 @endsection
 @section('script')

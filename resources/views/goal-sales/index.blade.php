@@ -1,4 +1,6 @@
 @php
+    use App\Models\User;
+
     $currentUserId = auth()->id();
 
     $totalPercentAccrued = $ndxChartId = 0;
@@ -149,4 +151,13 @@
         var goalSalesDefaultModeURL = "{{ route('goalSalesDefaultModeURL') }}";
     </script>
     <script src="{{ URL::asset('build/js/goal-sales.js') }}" type="module"></script>
+
+    @if (auth()->user()->hasAnyRole(User::ROLE_OPERATIONAL))
+    <script>
+        setInterval(function() {
+            window.location.reload();
+        }, 600000); // 600000 milliseconds = 10 minutes
+    </script>
+    @endif
+
 @endsection

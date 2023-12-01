@@ -15,9 +15,6 @@ use App\Http\Controllers\{
     SurveysTemplatesController,
     SurveyTermsController,
     SurveysResponsesController,
-    //SurveysComposeController,
-    //SurveyExecutionController,
-    //SurveyTermsController,
     SurveysAssignmentsController,
     SettingsApiKeysController,
     SettingsStripeController,
@@ -37,7 +34,6 @@ Route::get('index/{locale}', [HomeController::class, 'lang']);
 
 //
 Route::middleware(['auth'])->group(function () {
-
     // Root
     //Route::get('/', [HomeController::class, 'root'])->name('root');
     Route::get('/', [GoalSalesController::class, 'index'])->name('root');
@@ -85,8 +81,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/assignment/auditor-form/{id?}', [SurveysAssignmentsController::class, 'formAuditorAssignment'])->name('formAuditorAssignmentURL')->where('id', '[0-9]+');
             Route::post('/assignment/auditor-status', [SurveysAssignmentsController::class, 'changeAssignmentAuditorStatus'])->name('changeAssignmentAuditorStatusURL');
 
+            Route::get('/assignment/activities', [SurveysAssignmentsController::class, 'getRecentActivities'])->name('getRecentActivitiesURL');
+
             Route::post('/responses/surveyor/store/{id?}', [SurveysResponsesController::class, 'responsesSurveyorStoreOrUpdate'])->name('responsesSurveyorStoreOrUpdateURL');
             Route::post('/responses/auditor/store/{id?}', [SurveysResponsesController::class, 'responsesAuditorStoreOrUpdate'])->name('responsesAusitorStoreOrUpdateURL');
+
 
             // Terms Routes
             Route::get('/terms/listing', [SurveyTermsController::class, 'index'])->name('surveysTermsIndexURL');
@@ -96,10 +95,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/terms/store/{id?}', [SurveyTermsController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
             Route::get('/terms/search', [SurveyTermsController::class, 'search'])->name('surveysTermsSearchURL');
 
-
-
     });
-
 
     // Admin Settings
     Route::middleware(['admin'])->group(function () {
@@ -129,7 +125,6 @@ Route::middleware(['auth'])->group(function () {
 
             Route::post('/clarifai', [ClarifaiImageController::class, 'submit'])->name('ClarifaiSubmitURL');
             Route::post('/scenex', [ScenexImageController::class, 'submit'])->name('ScenexSubmitURL');
-
 
         });
     });

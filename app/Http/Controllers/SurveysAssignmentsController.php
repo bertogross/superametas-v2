@@ -254,5 +254,110 @@ class SurveysAssignmentsController extends Controller
         return response()->json(['success' => true, 'message' => $message]);
     }
 
+    public function getRecentActivities()
+    {
+        $today = Carbon::today();
 
+        $query = SurveyAssignments::query();
+        $query->where('surveyor_status', '!=', 'new');
+        $query->where('auditor_status', '!=', 'new');
+        $query->whereDate('created_at', '=', $today);
+        $data = $query->orderBy('updated_at', 'desc')->limit(100)->get()->toArray();
+
+        $activities = [];
+        if ( !empty($data) && is_array($data) ) {
+            foreach ($data as $key => $assignment){
+                $assignmentId = intval($assignment['id']);
+                $surveyId = intval($assignment['survey_id']);
+                $companyId = intval($assignment['company_id']);
+                $updatedAt = $assignment['updated_at'];
+
+                $companyName = getCompanyNameById($assignment['company_id']);
+
+                $surveyorId = isset($assignment['surveyor_id']) ? intval($assignment['surveyor_id']) : null;
+                $auditorId = isset($assignment['auditor_id']) ? intval($assignment['auditor_id']) : null;
+
+                $surveyorStatus = $assignment['surveyor_status'] ?? null;
+                $auditorStatus = $assignment['auditor_status'] ?? null;
+
+                $surveyorAvatar = getUserData($surveyorId)['avatar'];
+                $surveyorName = getUserData($surveyorId)['name'];
+
+                $auditorAvatar = getUserData($auditorId)['avatar'];
+                $auditorName = getUserData($auditorId)['name'];
+
+                $survey = Survey::findOrFail($surveyId);
+                $templateName = getTemplateNameById($survey->template_id);
+
+                // Count the number of steps that have been finished
+                $countTopics = countSurveyTopics($surveyId);
+
+                $countResponses = 0;
+
+                if( $auditorStatus && $auditorStatus != 'waiting' && $auditorStatus != 'new' ){
+                    $countResponses = countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId);
+
+                    $assignmentStatus = $auditorStatus;
+                    $designatedUserId = $auditorId;
+                    $designatedUserName = $auditorName;
+                    $designatedUserAvatar = $auditorAvatar;
+                    $label = '<span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>';
+                }else if($surveyorStatus == 'in_progress' || $surveyorStatus == 'pending'){
+                    $countResponses = countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId);
+
+                    $assignmentStatus = $surveyorStatus;
+                    $designatedUserId = $surveyorId;
+                    $designatedUserName = $surveyorName;
+                    $designatedUserAvatar = $surveyorAvatar;
+                    $label = '<span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>';
+                }
+
+                // Calculate the percentage
+                $percentage = 0;
+                if ($countTopics > 0) {
+                    $percentage = ($countResponses / $countTopics) * 100;
+                }
+
+                // Determine the progress bar class based on the percentage
+                $progressBarClass = 'danger'; // default class
+                if ($percentage > 25) {
+                    $progressBarClass = 'warning';
+                }
+                if ($percentage > 50) {
+                    $progressBarClass = 'primary';
+                }
+                if ($percentage > 75) {
+                    $progressBarClass = 'info';
+                }
+                if ($percentage > 95) {
+                    $progressBarClass = 'secondary';
+                }
+                if ($percentage >= 100) {
+                    $progressBarClass = 'success';
+                }
+
+                $activities[] = [
+                    'assignmentId' => $assignmentId,
+                    'surveyId' => $surveyId,
+                    'companyId' => $companyId,
+                    'companyName' => limitChars($companyName, 20),
+                    'templateName' => limitChars($templateName, 26),
+                    'assignmentStatus' => $assignmentStatus,
+                    'designatedUserId' => $designatedUserId,
+                    'designatedUserName' => limitChars($designatedUserName, 20),
+                    'designatedUserAvatar' => $designatedUserAvatar,
+                    'designatedUserProfileURL' => route('profileShowURL', $designatedUserId),
+                    'label' => $label,
+                    'percentage' => $percentage,
+                    'progressBarClass' => $progressBarClass,
+                    'updatedAt' => $updatedAt
+                ];
+            }
+        }
+
+        return response()->json($activities);
+    }
+
+
+    
 }

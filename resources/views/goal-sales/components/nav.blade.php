@@ -3,7 +3,7 @@
 
     $explodeMeantime = $getCustomMeantime ? explode(' até ', $getCustomMeantime) : '';
 
-    $lastUpdate = getLastUpdate('wlsm_sales', 'd/m/Y H:i');
+    $lastUpdate = getLastSalesUpdate('wlsm_sales', 'd/m/Y H:i');
 @endphp
 <div class="row">
     <div class="col-12">

@@ -95,8 +95,8 @@ class SurveysTemplatesController extends Controller
         $data = SurveyTemplates::findOrFail($id);
 
         $surveys = Survey::where('template_id', $id)
-            ->where('user_id', $currentUserId)
-            ->where('condition_of', '!=', 'deleted')
+            //->where('user_id', $currentUserId)
+            ->where('condition_of', '==', 'publish')
             ->get();
 
         $getActiveDepartments = getActiveDepartments();

@@ -153,7 +153,7 @@
                                                         <div id="element-attachment-<?php echo e($attachmentId); ?>" class="element-item col-auto">
                                                             <div class="gallery-box card p-0">
                                                                 <div class="gallery-container">
-                                                                    <a href="<?php echo e($attachmentUrl); ?>" class="image-popup" title="Fotografia capturada em <?php echo e($dateAttachment); ?>hs">
+                                                                    <a href="<?php echo e($attachmentUrl); ?>" class="image-popup" title="Imagem capturada em <?php echo e($dateAttachment); ?>hs" data-gallery="gallery-<?php echo e($radioIndex); ?>">
                                                                         <img class="rounded gallery-img" alt="image" height="70" src="<?php echo e($attachmentUrl); ?>">
 
                                                                         <div class="gallery-overlay">

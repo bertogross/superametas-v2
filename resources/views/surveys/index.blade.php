@@ -5,6 +5,9 @@
 @section('css')
 @endsection
 @section('content')
+    @php
+        use App\Models\User;
+    @endphp
     {{--
     @component('components.breadcrumb')
         @slot('url')
@@ -70,35 +73,43 @@
                 </div>
                 --}}
             </div>
+            @if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_CONTROLLERSHIP) )
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-4 col-xxl-3">
+                        @include('surveys.templates.listing')
+                    </div>
 
-            <div class="row">
-                <div class="col-sm-12 col-md-12 col-lg-4 col-xxl-3">
-                    @include('surveys.templates.listing')
+                    <div class="col-sm-12 col-md-12 col-lg-8 col-xxl-9">
+                        @include('surveys.listing')
+                    </div>
                 </div>
-
-                <div class="col-sm-12 col-md-12 col-lg-8 col-xxl-9">
-                    @include('surveys.listing')
-                </div>
-            </div>
+            @else
+                <div class="alert alert-danger">Acesso não autorizado</div>
+            @endif
         </div>
 
-        <div class="col-auto layout-rightside-col d-block">
-            <div class="overlay"></div>
+        @if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_CONTROLLERSHIP) )
+            <div class="col-auto layout-rightside-col d-block">
+                <div class="overlay"></div>
 
-            <div class="layout-rightside h-100 pb-1">
-                <div class="card h-100 rounded-0">
-                    <div class="card-body p-0">
-                        <div class="p-3">
-                            <h6 class="text-muted mb-0 text-uppercase fw-semibold">Atividades Recentes</h6>
+                <div class="layout-rightside h-100 pb-1">
+                    <div class="card h-100 rounded-0">
+                        <div class="card-body p-0">
+                            <div class="p-3">
+                                <h6 class="text-muted mb-0 text-uppercase fw-semibold">Atividades Recentes</h6>
+                            </div>
+                            <div class="p-3" id="load-surveys-activities">
+                                <div class="text-center">
+                                    <div class="spinner-border text-theme" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-3">
-                            TODO
-                        </div>
-
                     </div>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
 @endsection
 @section('script')
@@ -116,6 +127,7 @@
         var surveysChangeStatusURL = "{{ route('surveysChangeStatusURL') }}";
         var surveysShowURL = "{{ route('surveysShowURL') }}";
         var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
+        var getRecentActivitiesURL = "{{ route('getRecentActivitiesURL') }}";
     </script>
     <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
 @endsection

@@ -54,8 +54,8 @@ if( !function_exists('getUserData') ){
                 'name' => $user->name,
                 'email' => $user->email,
                 'status' => $user->status,
-                'avatar' => $user->avatar,
-                'cover' => $user->cover,
+                'avatar' => $user->avatar ? URL::asset('storage/' . $user->avatar) : URL::asset('build/images/users/user-dummy-img.jpg'),
+                'cover' => $user->cover ? URL::asset('storage/' . $user->cover) : URL::asset('build/images/small/img-9.jpg'),
                 'role' => $user->role,
                 'created_at' => $user->created_at->format('Y-m-d H:i:s'),
             );
@@ -114,7 +114,6 @@ if (!function_exists('getERPdata')) {
             $term = $ERPdata['api']['term'];
 
             return [
-                'erp' => $user_erp,
                 'customer' => $customer,
                 'username' => $username,
                 'password' => $password,
@@ -213,7 +212,7 @@ if (!function_exists('getIPCAdata')) {
 
             if (!empty($queryResult)) {
                 if (!empty($queryResult[onlyNumber($meantime)]) && !empty($meantime)) {
-                    $return = array(
+                    return array(
                         'period' => $meantime,
                         'value' => $queryResult[onlyNumber($meantime)]
                     );
@@ -222,7 +221,7 @@ if (!function_exists('getIPCAdata')) {
                     $lastKey = key($queryResult);
 
                     $date = substr($lastKey, 0, -2) . '-' . substr($lastKey, -2, 6);
-                    $return = isset($queryResult[$lastKey]) ? array(
+                    return isset($queryResult[$lastKey]) ? array(
                         'period' => date('Y-m', strtotime($date)),
                         'value' => $queryResult[$lastKey]
                     ) : '';
@@ -434,15 +433,15 @@ if (!function_exists('convertToNumeric')) {
     }
 }
 
-if (!function_exists('getLastUpdate')) {
-    function getLastUpdate($tableName, $dateFormat = "Y-m-d") {
+if (!function_exists('getLastSalesUpdate')) {
+    function getLastSalesUpdate($tableName, $dateFormat = "Y-m-d") {
         try {
             // Get the last updated date from the table
             $lastUpdate = DB::connection('smAppTemplate')
                 ->table($tableName)
-                ->orderBy('updated_at', 'desc')
+                ->orderBy('created_at', 'desc')
                 ->limit(1)
-                ->value('updated_at');
+                ->value('created_at');
 
             // Check if there is a result
             if ($lastUpdate) {
@@ -451,7 +450,7 @@ if (!function_exists('getLastUpdate')) {
                 \Carbon\Carbon::setLocale('pt_BR');
 
                 // Parse the date using Carbon, format it, and return it
-                return \Carbon\Carbon::parse($lastUpdate)->isoFormat('D [de] MMMM, YYYY - HH:mm:ss') . 'hs';
+                return \Carbon\Carbon::parse($lastUpdate)->isoFormat('D [de] MMMM, YYYY - HH:mm') . 'hs';
 
             } else {
                 return '';
@@ -555,72 +554,6 @@ if (!function_exists('countSurveyAllResponsesFromToday')){
     }
 }
 
-// Check the 'survey_assignments' table to see which tasks were not completed by yesterday and change the status to 'losted'
-if (!function_exists('checkSurveyAssignmentUntilYesterday')){
-    function checkSurveyAssignmentUntilYesterday($surveyId){
-        $yesterday = Carbon::yesterday();
-
-        // Get all survey assignments that were not completed by yesterday
-        $assignments = SurveyAssignments::where('survey_id', $surveyId)
-            ->whereDate('created_at', '<=', $yesterday)
-            ->get();
-
-        foreach ($assignments as $assignment) {
-            if ($assignment->surveyor_status === 'auditing' && $assignment->auditor_status !== 'completed') {
-                // Change auditor_status to 'losted' and surveyor_status to 'completed'
-                $assignment->auditor_status = 'losted';
-                $assignment->surveyor_status = 'completed';
-            } elseif ($assignment->surveyor_status !== 'auditing') {
-                // Change surveyor_status to 'losted' and auditor_status to 'losted'
-                $assignment->surveyor_status = 'losted';
-                $assignment->auditor_status = 'losted';
-            }
-
-            $assignment->save();
-        }
-    }
-}
-
-if (!function_exists('startNewAssignmentIfSurveyIsRecurring')){
-    function startNewAssignmentIfSurveyIsRecurring($surveyId){
-        $today = Carbon::today();
-        $survey = Survey::findOrFail($surveyId);
-
-        $status = $survey->status;
-
-        if($status == 'started'){
-            $recurring = $survey->recurring;
-            $distributedData = $survey->distributed_data ?? null;
-
-            // Check if there are survey assignments for today
-            $assignmentsCount = SurveyAssignments::where('survey_id', $surveyId)
-                ->whereDate('created_at', '=', $today)
-                ->count();
-
-            // If there are no assignments for today, check the recurrence pattern
-            if ($assignmentsCount == 0) {
-                switch ($recurring) {
-                    case 'daily':
-                        SurveyAssignments::distributingAssignments($surveyId, $distributedData);
-                        break;
-                    case 'weekly':
-                        // Check if today is the specific day of the week for weekly recurrence
-                        // Example: if ($today->isMonday()) { ... }
-                        break;
-                    case 'biweekly':
-                        // Check if today is the 1st or 15th of the month for biweekly recurrence
-                        break;
-                    case 'monthly':
-                        // Check if today matches the specific day of the month for monthly recurrence
-                        break;
-                    case 'annual':
-                        // Check if today matches the specific day and month for annual recurrence
-                        break;
-                }
-            }
-        }
-    }
-}
 
 
 if( !function_exists('goalsEmojiChart') ){

@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <div class="gallery-box card p-0">
                                         <div class="gallery-container">
                                             <a href="/storage/${data.path}" class="image-popup">
-                                                <img class="rounded gallery-img" alt="image" height="70" src="/storage/${data.path}">
+                                                <img class="rounded gallery-img" alt="image" height="70" src="${assetUrl}storage/${data.path}">
                                             </a>
                                         </div>
                                     </div>

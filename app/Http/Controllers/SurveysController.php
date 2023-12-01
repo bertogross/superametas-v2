@@ -34,11 +34,8 @@ class SurveysController extends Controller
          * START TEMPLATES QUERY
          */
 
-        //$queryTemplates = SurveyTemplates::findOrFail($id);
-        //$queryTemplates = SurveyTemplates::where('user_id', $currentUserId)->first();
-        //$queryTemplates = SurveyTemplates::where('user_id', $currentUserId)->get();
         $queryTemplates = SurveyTemplates::query();
-        $queryTemplates->where('user_id', $currentUserId);
+        //$queryTemplates->where('user_id', $currentUserId);
         $queryTemplates->where('condition_of','publish');
 
         /*
@@ -66,7 +63,7 @@ class SurveysController extends Controller
         if ($status) {
             $query->where('status', $status);
         }
-        $query = $query->where('user_id', $currentUserId);
+        //$query = $query->where('user_id', $currentUserId);
         $query = $query->where('condition_of', 'publish');
 
         if ($created_at) {
@@ -95,6 +92,9 @@ class SurveysController extends Controller
         $dateRange = Survey::getSurveysDateRange();
         $firstDate = $dateRange['first_date'];
         $lastDate = $dateRange['last_date'];
+
+        // usefull if crontab is losted
+        $this->populateRecurringSurveys();
 
         return view('surveys.index', compact(
             'data',
@@ -141,7 +141,7 @@ class SurveysController extends Controller
         $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
 
         $queryTemplates = SurveyTemplates::query();
-        $queryTemplates->where('user_id', $currentUserId);
+        //$queryTemplates->where('user_id', $currentUserId);
 
         $templates = $queryTemplates->orderBy('title')->paginate(50);
 
@@ -189,7 +189,7 @@ class SurveysController extends Controller
         $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
 
         $queryTemplates = SurveyTemplates::query();
-        $queryTemplates->where('user_id', $currentUserId);
+        //$queryTemplates->where('user_id', $currentUserId);
         $templates = $queryTemplates->orderBy('title')->paginate(50);
 
         $countResponses = countSurveyAllResponsesFromToday($id);
@@ -362,6 +362,7 @@ class SurveysController extends Controller
         */
 
         if ($id) {
+
             // Update operation
             $survey = Survey::findOrFail($id);
 
@@ -382,6 +383,13 @@ class SurveysController extends Controller
             if($survey->status == 'new'){
                 SurveyStep::populateSurveySteps($validatedData['template_id'], $surveyId);
             }
+
+            $countResponses = countSurveyAllResponsesFromToday($surveyId);
+
+            $distributedData = $survey->distributed_data ?? null;
+
+            // Start the task by distributing to each party
+            SurveyAssignments::distributingAssignments($surveyId, $distributedData);
 
             return response()->json([
                 'success' => true,
@@ -410,6 +418,33 @@ class SurveysController extends Controller
         }
     }
 
+    // A crontab to start recurring tasks
+    public function populateRecurringSurveys($database = null)
+    {
+        // Set the database connection name dynamically
+        if ($database) {
+            $databaseName = 'smApp' . $database;
+            config(['database.connections.smAppTemplate.database' => $databaseName]);
+        }
+
+        try {
+            $surveys = Survey::where('status', 'started')
+                            ->where('condition_of', 'publish')
+                            ->where('recurring', '!=', 'once')
+                            ->orderBy('created_at')
+                            ->paginate(50);
+
+            if ($surveys->count() > 0) {
+                foreach ($surveys as $survey) {
+                    Survey::checkSurveyAssignmentUntilYesterday($survey->id);
+                    Survey::startNewAssignmentIfSurveyIsRecurring($survey->id);
+                }
+            }
+        } catch (\Exception $e) {
+            // Handle the exception or log it
+            Log::error('Error in loadRecurringSurveys: ' . $e->getMessage());
+        }
+    }
 
 
 }

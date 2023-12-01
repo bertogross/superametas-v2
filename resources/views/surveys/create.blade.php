@@ -1,4 +1,5 @@
 @php
+    $authorId = $data && $data->user_id ? $data->user_id : '';
     $surveyId = $data && $data->id ? $data->id : '';
     $templateId = $data && $data->template_id ? $data->template_id : '';
     $startDate = $data ? $data->start_date : null;
@@ -11,17 +12,19 @@
 
     $surveyStatus = $data->status ?? '';
 
-    $alertMessage = '<div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show" role="alert">
-            <i class="ri-alert-line label-icon"></i> Esta vistoria já foi iniciada e a alteração do Modelo/Recorrência não poderá ser efetuada. Prossiga se necessitar editar as atribuições.<br>
-            Se a intenção for a de modificar tópicos dos processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho ideal será encerrar esta atividade e gerar um novo registro.
-        </div>';
-
-    $alertMessage2 = $recurring == 'daily' && $countResponses > 0 ? '<div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">
-            <i class="ri-alert-line label-icon"></i> Esta tarefa já está recebendo dados. Portanto, alterações em Atribuições poderão ser efetuadas mas só terão efeito a partir da próxima data.
+    $alertMessage0 = $data ? '<div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+            <i class="ri-alert-line label-icon"></i> Esta interação já foi iniciada e a alteração do Modelo não poderá ser efetuada. Prossiga se necessitar editar as atribuições.<br>
+            Se a intenção for a de modificar tópicos dos processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho adequado será o de encerrar/arquivar esta atividade e gerar um novo registro.
+        </div>' : '';
+    $alertMessage1 = $data ? '<div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+            <i class="ri-alert-line label-icon"></i> Esta interação já foi iniciada e a alteração da Recorrência não poderá ser efetuada. Prossiga se necessitar editar as atribuições.<br>
+            Se a intenção for a de modificar a recorrência de processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho adequado será o de encerrar/arquivar esta atividade e gerar um novo registro.
         </div>' : '';
 
-    //appPrintR($data);
-    //appPrintR($templates);
+    $alertMessage2 = $data && $recurring != 'once' && $countResponses > 0 ? '<div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+            <i class="ri-alert-line label-icon"></i> Esta tarefa já está recebendo dados. Portanto, alterações em Atribuições poderão ser efetuadas mas só terão efeito a partir do próxima interação. No caso de tarefas recorrentes, a próxima interação ocorrerá, por exemplo quando Diária, amanhã.
+        </div>' : '';
+
 @endphp
 <div class="modal fade" id="surveysModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -37,6 +40,14 @@
                 <button type="button" class="btn-close btn-destroy" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                @if( $data && $authorId && $authorId != auth()->id())
+                    <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
+                        <i class="ri-alert-line label-icon blink"></i> Você não possui autorização para editar um registro gerado por outra pessoa
+                    </div>
+                    @php
+                        exit;
+                    @endphp
+                @endif
                 <form id="surveysForm" method="POST" class="needs-validation form-steps" novalidate autocomplete="off">
                     @csrf
                     <input type="hidden" name="id" value="{{ $surveyId }}">
@@ -86,8 +97,8 @@
                             @else
                                 <div class="mb-3">
                                     <label for="template-field" class="form-label">Selecione o Modelo:</label>
-                                    @if ($countResponses > 0)
-                                        {!! $alertMessage !!}
+                                    @if ($data && $countResponses > 0 && $surveyStatus != 'new')
+                                        {!! $alertMessage0 !!}
                                         <input type="hidden" name="template_id" value="{{$templateId}}">
                                     @else
                                         <select name="template_id" id="template-field" class="form-control form-select" required {{ $countResponses > 0 ? 'readonly' : '' }}>
@@ -108,8 +119,8 @@
                         <div class="tab-pane fade" role="tabpanel" id="steparrow-recurring-info" aria-labelledby="steparrow-recurring-info-tab">
                             <div class="mb-3">
                                 <label for="date-recurring-field" class="form-label">Tipo de Recorrência: {{ $getSurveyRecurringTranslations['$recurring'] ?? '' }}</label>
-                                @if ($countResponses > 0)
-                                    {!! $alertMessage !!}
+                                @if ($data && $countResponses > 0 && $surveyStatus != 'new')
+                                    {!! $alertMessage1 !!}
                                     <input type="hidden" name="recurring" value="{{$recurring}}">
                                 @else
                                     <select name="recurring" id="date-recurring-field" class="form-control form-select" required {{ $countResponses > 0 ? 'readonly' : '' }}>

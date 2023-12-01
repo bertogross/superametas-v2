@@ -22,7 +22,7 @@
                 <button type="button" class="btn-close btn-destroy" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @unless( !auth()->user()->hasAnyRole([User::ROLE_ADMIN, User::ROLE_EDITOR]))
+                @unless( !auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR))
                     <div class="alert alert-danger">Acesso não autorizado</div>
                     @php exit; @endphp
                 @endunless
@@ -34,7 +34,7 @@
                     if( empty($salesYearBefore) ){
                         echo '<div class="alert alert-solid alert-label-icon alert-info mb-3 small"><i class="ri-alert-line label-icon"></i><strong class="text-uppercase">Atenção</strong><br>Não há dados do REALIZADO de <strong>'.strftime(date("m/Y", strtotime($previousMeantimeYearBefore))).'</strong> e por isso o Autopreenchimento foi desabilitado.</div>';
                     }
-                    if( !empty($getIPC) && $getIPCA['period'] != date("Y-m", strtotime($meantime)) ){
+                    if( !empty($getIPCA) && $getIPCA['period'] != date("Y-m", strtotime($meantime)) ){
                         echo '<div class="alert alert-solid alert-label-icon alert-danger mb-3 small"><i class="ri-alert-line label-icon"></i><strong class="text-uppercase">Atenção</strong><br>IPCA <u>'.date("m/Y", strtotime($meantime)).'</u> indisponível.<br>Portanto, o Autopreenchimento irá calcular sobre o dado forcecido pelo IBGE e relacionado ao período recente: <u>'.date("m/Y", strtotime($getIPCA['period'])).'</u>.</div>';
                     }
                 @endphp

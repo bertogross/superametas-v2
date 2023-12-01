@@ -1,4 +1,16 @@
 @php
+    use Carbon\Carbon;
+    use App\Models\SurveyResponse;
+    use App\Models\SurveyTemplates;
+    use App\Models\User;
+
+    $templateData = SurveyTemplates::findOrFail($surveyData->template_id);
+
+    $authorId = $templateData->user_id;
+    $getAuthorData = getUserData($authorId);
+    $authorRoleName = (new User)->getRoleName($getAuthorData['role']);
+    $description = trim($templateData->description) ? nl2br($templateData->description) : '';
+
     $currentUserId = auth()->id();
 
     $surveyId = $surveyData->id ?? '';
@@ -12,9 +24,6 @@
 
     $auditorId = $assignmentData->auditor_id ?? null;
     $auditorName = getUserData($auditorId)['name'];
-
-    use Carbon\Carbon;
-    use App\Models\SurveyResponse;
 
     $today = Carbon::today();
     $responsesData = SurveyResponse::where('survey_id', $surveyId)
@@ -87,6 +96,9 @@
                     <i class="ri-alert-line label-icon blink"></i> O prazo expirou e esta Vistoria foi perdida. Por isso não poderá mais ser editada
                 </div>
             @endif
+
+            {!! !empty($description) ? '<div class="blockquote custom-blockquote blockquote-outline blockquote-dark rounded mt-2 mb-2"><p class="text-body mb-2">'.$description.'</p><footer class="blockquote-footer mt-0">'.$getAuthorData['name'].' <cite title="'.$authorRoleName.'">'.$authorRoleName.'</cite></footer></div>' : '' !!}
+
             <div id="assignment-container">
                 @csrf
                 <input type="hidden" name="survey_id" value="{{$surveyId}}">
@@ -133,6 +145,7 @@
     <script>
         var uploadPhotoURL = "{{ route('uploadPhotoURL') }}";
         var deletePhotoURL = "{{ route('deletePhotoURL') }}";
+        var assetUrl = "{{ URL::asset('/') }}";
     </script>
     <script src="{{ URL::asset('build/js/surveys-attachments.js') }}" type="module"></script>
 @endsection

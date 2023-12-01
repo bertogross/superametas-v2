@@ -5,7 +5,7 @@
             @if( empty(trim($cover)) )
                 src="{{ URL::asset('build/images/small/img-9.jpg') }}"
             @else
-                src="{{ URL::asset('storage/' . $cover) }}"
+                src="{{ $cover }}"
             @endif
             alt="@if(isset($name)){{ $name }}@endif" class="img-fluid" height="140" id="cover-img-@if(isset($id)){{ $id }}@endif">
         </div>

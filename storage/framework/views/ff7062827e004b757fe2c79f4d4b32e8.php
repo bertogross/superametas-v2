@@ -78,10 +78,12 @@
 
                     </div>
                     <div class="col-auto">
-                        <?php if($designated == 'auditor'): ?>
-                            <span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>
-                        <?php elseif($designated == 'surveyor'): ?>
-                            <span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>
+                        <?php if( $surveyorStatus != 'completed' && $auditorStatus != 'completed' ): ?>
+                            <?php if($designated == 'auditor'): ?>
+                                <span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>
+                            <?php elseif($designated == 'surveyor'): ?>
+                                <span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -120,7 +122,7 @@
                                     <?php if( empty(trim($surveyorAvatar)) ): ?>
                                         src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
                                     <?php else: ?>
-                                        src="<?php echo e(URL::asset('storage/' .$surveyorAvatar )); ?>"
+                                        src="<?php echo e($surveyorAvatar); ?>"
                                     <?php endif; ?>
                                     alt="<?php echo e($surveyorName); ?>" class="rounded-circle avatar-xxs">
                                 </a>
@@ -134,7 +136,7 @@
                                     <?php if( empty(trim($surveyorAvatar)) ): ?>
                                         src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
                                     <?php else: ?>
-                                        src="<?php echo e(URL::asset('storage/' .$surveyorAvatar )); ?>"
+                                        src="<?php echo e($surveyorAvatar); ?>"
                                     <?php endif; ?>
                                     alt="<?php echo e($surveyorName); ?>" class="rounded-circle avatar-xxs">
                                 </a>
@@ -148,7 +150,7 @@
                                     <?php if( empty(trim($auditorAvatar)) ): ?>
                                         src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
                                     <?php else: ?>
-                                        src="<?php echo e(URL::asset('storage/' .$auditorAvatar )); ?>"
+                                        src="<?php echo e($auditorAvatar); ?>"
                                     <?php endif; ?>
                                     alt="<?php echo e($auditorName); ?>" class="rounded-circle avatar-xxs">
                                 </a>
@@ -169,7 +171,7 @@
                                 <i class="<?php echo e($status['icon']); ?> label-icon align-middle fs-16"></i> <?php echo e($status['reverse']); ?>
 
                             </button>
-                        <?php elseif( $currentUserId == $designatedUserId && in_array($statusKey, ['completed']) ): ?>
+                        <?php elseif( $currentUserId == $designatedUserId && in_array($statusKey, ['completed', 'losted']) ): ?>
                             <a href="<?php echo e(route('assignmentShowURL', $assignmentId)); ?>"
                                 data-bs-toggle="tooltip"
                                 data-bs-trigger="hover"

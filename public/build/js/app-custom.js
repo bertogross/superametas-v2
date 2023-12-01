@@ -42,16 +42,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
 
                 if (!data.success) {
-                    toastAlert(data.message, 'danger', 60000);
+                    toastAlert(data.message, 'danger');
                 }
             } catch (error) {
-                toastAlert('Error: ' + error, 'danger', 60000);
+                toastAlert('Error: ' + error, 'danger');
                 console.error('Error:', error);
             }
         });
     }
 
-
+    // initialize GLightbox
     lightbox();
 
 });

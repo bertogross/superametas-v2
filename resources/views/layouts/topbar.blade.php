@@ -100,9 +100,10 @@
                                         {{--
                                         <img src="{{ URL::asset('build/images/svg/happy.png') }}" alt="Meta de Vendas">
                                         --}}
-                                        <span>Meta de Vendas</span>
+                                        <span>Vendas</span>
                                     </a>
                                 </div>
+
                                 <!--
                                 <div class="col">
                                     <a class="dropdown-icon-item" href="{{-- route('goalResultsIndexURL') --}}#" title="Meta de Resultados">
@@ -111,6 +112,7 @@
                                     </a>
                                 </div>
                                 -->
+
                                 @if(auth()->user()->hasRole(User::ROLE_ADMIN) || auth()->user()->hasRole(User::ROLE_CONTROLLERSHIP))
                                     <div class="col">
                                         <a class="dropdown-icon-item" href="{{ route('surveysIndexURL') }}" title="Vistorias">
@@ -122,6 +124,13 @@
                                         </a>
                                     </div>
                                 @endif
+
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="{{ route('profileShowURL') }}" title="Tarefas">
+                                        <i class="ri-calendar-check-fill text-theme fs-1"></i>
+                                        <span>Tarefas</span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -148,7 +157,7 @@
                 <div class="dropdown ms-sm-3 header-item topbar-user">
                     <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="d-flex align-items-center">
-                            <img class="rounded-circle header-profile-user" src="{{ $getUserData['avatar'] ? URL::asset('storage/' . $getUserData['avatar']) :  URL::asset('build/images/users/user-dummy-img.jpg') }}" alt="{{$getUserData['name']}}">
+                            <img class="rounded-circle header-profile-user" src="{{ $getUserData['avatar'] ? $getUserData['avatar'] :  URL::asset('build/images/users/user-dummy-img.jpg') }}" alt="{{$getUserData['name']}}">
                             <span class="text-start ms-xl-2">
                                 <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{$getUserData['name']}}</span>
                                 <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">
@@ -184,8 +193,8 @@
                         @endif
 
                         <a class="dropdown-item" href="{{ route('profileShowURL') }}">
-                            <i class="ri-survey-line text-muted fs-16 align-middle me-1"></i>
-                            <span class="align-middle">Tarefas</span>
+                            <i class="ri-user-3-fill text-muted fs-16 align-middle me-1"></i>
+                            <span class="align-middle">Meu Perfil</span>
                         </a>
 
                         <!--

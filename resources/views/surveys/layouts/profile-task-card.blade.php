@@ -77,10 +77,12 @@
                         {{ getCompanyNameById($companyId) }}
                     </div>
                     <div class="col-auto">
-                        @if ($designated == 'auditor')
-                            <span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>
-                        @elseif($designated == 'surveyor')
-                            <span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>
+                        @if( $surveyorStatus != 'completed' && $auditorStatus != 'completed' )
+                            @if ($designated == 'auditor')
+                                <span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>
+                            @elseif($designated == 'surveyor')
+                                <span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>
+                            @endif
                         @endif
                     </div>
                 </div>
@@ -117,7 +119,7 @@
                                     @if( empty(trim($surveyorAvatar)) )
                                         src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
                                     @else
-                                        src="{{ URL::asset('storage/' .$surveyorAvatar ) }}"
+                                        src="{{ $surveyorAvatar }}"
                                     @endif
                                     alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
                                 </a>
@@ -131,7 +133,7 @@
                                     @if( empty(trim($surveyorAvatar)) )
                                         src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
                                     @else
-                                        src="{{ URL::asset('storage/' .$surveyorAvatar ) }}"
+                                        src="{{ $surveyorAvatar }}"
                                     @endif
                                     alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
                                 </a>
@@ -145,7 +147,7 @@
                                     @if( empty(trim($auditorAvatar)) )
                                         src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
                                     @else
-                                        src="{{ URL::asset('storage/' .$auditorAvatar ) }}"
+                                        src="{{ $auditorAvatar }}"
                                     @endif
                                     alt="{{ $auditorName }}" class="rounded-circle avatar-xxs">
                                 </a>

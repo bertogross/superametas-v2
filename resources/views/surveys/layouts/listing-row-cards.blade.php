@@ -125,7 +125,7 @@ based on apps-crm-deals.blade.php
                                 @if( empty(trim($avatar)) )
                                     src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
                                 @else
-                                    src="{{ URL::asset('storage/' .$avatar ) }}"
+                                    src="{{ $avatar }}"
                                 @endif
                                 alt="{{ $name }}"
                                 class="avatar-xs rounded-circle" />
@@ -223,7 +223,7 @@ based on apps-crm-deals.blade.php
                                 @if( empty(trim($avatar)) )
                                     src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
                                 @else
-                                    src="{{ URL::asset('storage/' .$avatar ) }}"
+                                    src="{{ $avatar }}"
                                 @endif
                                 alt="{{ $name }}"
                                 class="avatar-xs rounded-circle" />

@@ -195,7 +195,8 @@
 
 @endsection
 @section('script')
-
+    <script>
+        var updateSalesFromSysmoURL = "{{ route('updateSalesFromSysmoURL') }}";
+    </script>
     <script src="{{ URL::asset('build/js/settings-database.js') }}" type="module"></script>
-
 @endsection

@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
             //document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">A importação poderá levar algum tempo. Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
             document.querySelector('.synchronization-percent-text').innerHTML = `Sincronização <span class="text-theme">${convertMeantimeToPortuguese(meantime)}</span> em andamento<br><br><small class="text-warning">Não feche o navegador e nem atualize a página até que o processo seja concluído.</small>`;
 
-            const response = await sendRequest(`/api/process-sysmo-api/${meantime}`);
+            const response = await sendRequest(updateSalesFromSysmoURL + '/' + meantime);
             //console.log(response);
             if (!response || ( response.success === false && !response.motive) ) {
                 finalizeSynchronization('error', response.message, '0%');
@@ -95,14 +95,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Populate the <li> elements with concluded meantimes
             const ulElement = document.querySelector('.concluded-meantimes');
             const liElement = document.createElement('li');
-            if(response.success === false && response.motive){
+            if(response.success === false && response.motive == 'noData'){
                 toastAlert(response.message, 'warning', 10000);
 
                 liElement.innerHTML = `<span data-bs-toggle="tooltip" data-bs-placement="top" title="${response.message}"><i class="ri-error-warning-fill text-warning align-bottom me-2"></i>${convertMeantimeToPortuguese(meantime)}</span>`;
             }else{
                 toastAlert(response.message, 'success', 10000);
 
-                liElement.innerHTML = `<span data-bs-toggle="tooltip" data-bs-placement="top" title="Dados recebidos com sucesso"><i class="ri-checkbox-circle-fill text-success align-bottom me-2"></i>${convertMeantimeToPortuguese(meantime)}</span>`;
+                liElement.innerHTML = `<span data-bs-toggle="tooltip" data-bs-placement="top" title="Dados ${convertMeantimeToPortuguese(meantime)} recebidos"><i class="ri-checkbox-circle-fill text-success align-bottom me-2"></i>${convertMeantimeToPortuguese(meantime)}</span>`;
             }
 
             bsPopoverTooltip();

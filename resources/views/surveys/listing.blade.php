@@ -4,7 +4,13 @@
             <h5 class="card-title mb-0 flex-grow-1"><i class="ri-survey-line fs-16 align-bottom text-theme me-2"></i>Vistorias</h5>
             <div class="flex-shrink-0">
                 <div class="d-flex flex-wrap gap-2">
-                    <button class="btn btn-sm btn-label right btn-outline-theme float-end waves-effect" id="btn-surveys-create" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Tarefa de Vistoria">
+                    <button class="btn btn-sm btn-label right btn-outline-theme float-end waves-effect"
+                    @if( is_object($templates) && count($templates) > 0 )
+                        id="btn-surveys-create"
+                    @else
+                        onclick="alert('Você deverá primeiramente registrar um Modelo');"
+                    @endif
+                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Tarefa de Vistoria">
                         <i class="ri-add-line label-icon align-middle fs-16 ms-2"></i>Vistoria
                     </button>
                 </div>
@@ -72,6 +78,7 @@
                 <table class="table align-middle table-nowrap mb-0 table-striped" id="tasksTable">
                     <thead class="table-light text-muted text-uppercase">
                         <tr>
+                            <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Usuário autor deste registro" width="50"></th>
                             <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Título do modelo que serviu de base para gerar os tópicos desta vistoria">Modelo</th>
                             <th class="text-center" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Data de Registro não é necessáriamente a data de início das vistorias">Registro</th>
                             {{--
@@ -93,11 +100,9 @@
                     <tbody>
                         @foreach ($data as $survey)
                             @php
+                                $authorId = $survey->user_id;
+
                                 $surveyId = $survey->id;
-
-                                checkSurveyAssignmentUntilYesterday($surveyId);
-
-                                startNewAssignmentIfSurveyIsRecurring($surveyId);
 
                                 $distributedData = $survey->distributed_data;
                                 $decodedData = json_decode($distributedData, true);
@@ -122,6 +127,20 @@
                                 $getTemplateNameById = getTemplateNameById($survey->template_id);
                             @endphp
                             <tr class="main-row" data-id="{{ $surveyId }}">
+                                <td>
+                                    <div class="avatar-group">
+                                        @php
+                                            $avatar = getUserData($authorId)['avatar'];
+                                            $name = getUserData($authorId)['name'];
+                                        @endphp
+                                        <div class="avatar-group-item">
+                                            <a href="{{ route('profileShowURL', $authorId) }}" class="d-inline-block" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $name }} é o autor deste registro">
+                                                <img src="{{ $avatar }}"
+                                                alt="{{ $name }}" class="rounded-circle avatar-xxs">
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
                                 <td title="{{ $getTemplateNameById }}">
                                     {{ limitChars($getTemplateNameById, 30) }}
                                 </td>
@@ -143,7 +162,7 @@
                                                         @if( empty(trim($avatar)) )
                                                             src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
                                                         @else
-                                                            src="{{ URL::asset('storage/' .$avatar ) }}"
+                                                            src="{{ $avatar }}"
                                                         @endif
                                                         alt="{{ $name }}" class="rounded-circle avatar-xxs">
                                                     </a>
@@ -168,7 +187,7 @@
                                                         @if( empty(trim($avatar)) )
                                                             src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
                                                         @else
-                                                            src="{{ URL::asset('storage/' .$avatar ) }}"
+                                                            src="{{ $avatar }}"
                                                         @endif
                                                         alt="{{ $name }}" class="rounded-circle avatar-xxs">
                                                     </a>
@@ -212,7 +231,15 @@
                                     @endif
 
                                     <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-soft-dark waves-effect btn-surveys-edit ri-edit-line" data-survey-id="{{$surveyId}}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Editar"></button>
+                                        <button type="button"
+                                        @if ($authorId != auth()->id())
+                                            class="btn btn-sm btn-soft-dark waves-effect ri-edit-line"
+                                            onclick="alert('Você não possui autorização para editar um registro gerado por outra pessoa');"
+                                        @else
+                                            class="btn btn-sm btn-soft-dark waves-effect btn-surveys-edit ri-edit-line"
+                                            data-survey-id="{{$surveyId}}"
+                                        @endif
+                                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Editar"></button>
 
                                         <a href="{{ route('surveysShowURL', $surveyId) }}" class="btn btn-sm btn-soft-dark waves-effect ri-line-chart-fill" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualizar Dados Analíticos"></a>
 

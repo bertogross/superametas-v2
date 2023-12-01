@@ -224,6 +224,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
     }
 
+    if( document.getElementById('load-surveys-activities') && getRecentActivitiesURL ){
+        function getRecentActivities() {
+            fetch(getRecentActivitiesURL)
+                .then(response => response.json())
+                .then(activities => {
+                    //console.log(JSON.stringify(activities, null, 2));
+
+                    const container = document.getElementById('load-surveys-activities');
+                    container.innerHTML = '';
+
+                    if(activities){
+                        activities.forEach(activity => {
+                            const activityElement = document.createElement('div');
+                            activityElement.className = 'card';
+                            activityElement.innerHTML = `
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-xs flex-shrink-0 me-1">
+                                        <img src="${activity.designatedUserAvatar}" alt="" class="img-fluid rounded-circle">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fs-11 mb-0 fw-bold"><a href="${activity.designatedUserProfileURL}" class="text-body d-block">${activity.designatedUserName}</a></div>
+                                        <div class="fs-10 mb-0 text-muted">${activity.templateName}</div>
+                                    </div>
+                                    <div class="flex-shrink-0">
+                                        ${activity.label}
+                                        <div class="fs-10 mb-0 text-muted">${activity.companyName}</div>
+                                    </div>
+                                </div>
+                                <div class="progress progress-sm mt-1" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="${activity.percentage}%" style="height: 3px;">
+                                    <div class="progress-bar bg-${activity.progressBarClass}" role="progressbar" style="width: ${activity.percentage}%" aria-valuenow="${activity.percentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            `;
+                            container.appendChild(activityElement);
+                        });
+
+                        bsPopoverTooltip();
+                    }else{
+                        container.innerHTML = 'Ainda não há dados de hoje';
+                    }
+                })
+                .catch(error => console.error('Error:', error)
+            );
+        }
+        getRecentActivities();
+        setInterval(function () {
+            getRecentActivities();
+        }, 60000);// 60000 = 1 minute
+    }
+
+
     // Make the preview request
     var idInput = document.querySelector('input[name="id"]');
     if(idInput){

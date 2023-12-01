@@ -40,26 +40,43 @@
                                         <p class="text-uppercase fw-medium text-body text-truncate mb-0">{{ limitChars($template->title, 30) }}</p>
                                     </div>
                                     <div class="flex-shrink-0">
-                                        <div class="dropdown dropstart">
+                                        <div class="dropdown dropstart me-n2">
                                             <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <span class="text-theme fs-18"><i class="ri-more-2-line"></i></span>
                                             </a>
                                             <div class="dropdown-menu">
                                                 <li>
-                                                    <a href="{{ route('surveysTemplateEditURL', $template->id) }}" class="dropdown-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Editar">Editar</a>
+                                                    <a
+                                                    @if ($template->user_id != auth()->id())
+                                                        href="javascript:void(0);"
+                                                        onclick="alert('Você não possui autorização para editar um registro gerado por outra pessoa');"
+                                                    @else
+                                                        href="{{ route('surveysTemplateEditURL', $template->id) }}"
+                                                    @endif
+                                                    class="dropdown-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Editar">Editar</a>
                                                 </li>
                                                 <li>
-                                                    <a href="{{ route('surveysTemplateShowURL', $template->id) }}" class="dropdown-item" target="_blank" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualizar Modelo em nova Janela">Visualizar</a>
+                                                    <a href="{{ route('surveysTemplateShowURL', $template->id) }}" class="dropdown-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualizar Modelo">Visualizar</a>
                                                 </li>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center mt-2">
-                                    <div class="flex-grow-1">
-                                        <h3 class="fs-14 fw-semibold ff-secondary mb-0">
+                                    <div class="flex-shrink-0 avatar-xxs text-muted">
+                                        @php
+                                            $avatar = getUserData($template->user_id)['avatar'];
+                                            $name = getUserData($template->user_id)['name'];
+                                        @endphp
+                                        <a href="{{ route('profileShowURL', $template->user_id) }}" class="d-inline-block" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $name }} é o autor deste registro">
+                                            <img src="{{ $avatar }}"
+                                            alt="{{ $name }}" class="rounded-circle avatar-xxs">
+                                        </a>
+                                    </div>
+                                    <div class="flex-grow-1 text-end">
+                                        <span class="fs-12 fw-semibold ff-secondary mb-0" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Data de registro">
                                             {{ date("d/m/Y", strtotime($template->created_at)) }}
-                                        </h3>
+                                        </span>
                                     </div>
                                 </div>
                             </div>

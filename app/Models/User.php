@@ -45,7 +45,7 @@ class User extends Authenticatable
     const ROLE_ADMIN = 1;
     const ROLE_EDITOR = 2;
     const ROLE_CONTROLLERSHIP = 3;
-    const ROLE_USER = 4;
+    const ROLE_OPERATIONAL = 4;
     const ROLE_PARTNER = 5;
 
     // Capabilities for each role
@@ -53,7 +53,7 @@ class User extends Authenticatable
         self::ROLE_ADMIN => ['manage', 'edit', 'controllership', 'view'],
         self::ROLE_EDITOR => ['edit', 'view'],
         self::ROLE_CONTROLLERSHIP => ['controllership', 'view'],
-        self::ROLE_USER => ['partial_view'],
+        self::ROLE_OPERATIONAL => ['partial_view'],
         self::ROLE_PARTNER => ['view'],
     ];
 
@@ -88,7 +88,7 @@ class User extends Authenticatable
             self::ROLE_ADMIN => 'Administração',
             self::ROLE_EDITOR => 'Gerência',
             self::ROLE_CONTROLLERSHIP => 'Controladoria',
-            self::ROLE_USER => 'Operacional',
+            self::ROLE_OPERATIONAL => 'Operacional',
             self::ROLE_PARTNER => 'Sócio Investidor',
         ];
 

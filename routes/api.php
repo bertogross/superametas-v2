@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DropboxController;
+use App\Http\Controllers\SurveysController;
 use App\Http\Controllers\GoogleDriveController;
 use App\Http\Controllers\ClarifaiImageController;
 use App\Http\Controllers\SettingsDatabaseController;
@@ -12,8 +13,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+// IBGE IPCA API
+Route::get('/ipca', [SettingsDatabaseController::class, 'updateIPCAfromIBGE'])->name('updateIPCAfromIBGEURL');
+
 // Sysmo API
-Route::get('/process-sysmo-api/{meantime}/{database?}', [SettingsDatabaseController::class, 'updateSales'])->name('updateSales');
+Route::get('/process-sysmo-api/{meantime?}/{database?}', [SettingsDatabaseController::class, 'updateSalesFromSysmo'])->name('updateSalesFromSysmoURL');
+
+// IBGE IPCA API
+Route::get('/surveys/{database?}', [SurveysController::class, 'populateRecurringSurveys'])->name('populateRecurringSurveysURL');
+
 
 // Google Drive API
 Route::get('/google-drive/redirect', [GoogleDriveController::class, 'redirect'])->name('GoogleDriveRedirectURL');
