@@ -25,9 +25,8 @@ class SurveysAssignmentsController extends Controller
 
         $surveyData = Survey::findOrFail($surveyId);
 
-        $decodedData = isset($surveyData->template_data) ? json_decode($surveyData->template_data, true) : $surveyData->template_data;
-        $reorderingData = SurveyTemplates::reorderingData($decodedData);
-        $templateData = $reorderingData;
+        $reorderingData = SurveyTemplates::reorderingData($surveyData);
+        $templateData = $reorderingData ?? null;
 
         $stepsWithTopics = SurveyStep::with(['topics' => function($query) {
                 $query->orderBy('topic_order');
@@ -50,13 +49,44 @@ class SurveysAssignmentsController extends Controller
                     })
                 ];
             });
-        $stepsWithTopics = json_decode($stepsWithTopics, true);
+        $stepsWithTopics = $stepsWithTopics ? json_decode($stepsWithTopics, true) : null;
+
+
+        $analyticTermsData = Survey::fetchAndTransformSurveyDataByTerms($surveyId, $assignmentId);
+
+        /**
+         * START get terms
+         */
+        $terms = [];
+        $departmentsQuery = DB::connection('smAppTemplate')
+            ->table('wlsm_departments')
+            ->get()
+            ->toArray();
+        foreach ($departmentsQuery as $department) {
+            $terms[$department->department_id] = [
+                'name' => strtoupper($department->department_alias),
+            ];
+        }
+        $termsQuery = DB::connection('smAppTemplate')
+            ->table('survey_terms')
+            ->get()
+            ->toArray();
+        foreach ($termsQuery as $term) {
+            $terms[$term->id] = [
+                'name' => strtoupper($term->name),
+            ];
+        }
+        /**
+         * END get terms
+         */
 
         return view('surveys.assignment.show', compact(
             'surveyData',
             'templateData',
             'assignmentData',
-            'stepsWithTopics'
+            'stepsWithTopics',
+            'analyticTermsData',
+            'terms'
         ) );
     }
 
@@ -72,8 +102,7 @@ class SurveysAssignmentsController extends Controller
 
         $surveyData = Survey::findOrFail($surveyId);
 
-        $decodedData = isset($surveyData->template_data) ? json_decode($surveyData->template_data, true) : $surveyData->template_data;
-        $reorderingData = SurveyTemplates::reorderingData($decodedData);
+        $reorderingData = SurveyTemplates::reorderingData($surveyData);
         $templateData = $reorderingData;
 
         $stepsWithTopics = SurveyStep::with(['topics' => function($query) {
@@ -97,7 +126,7 @@ class SurveysAssignmentsController extends Controller
                     })
                 ];
             });
-        $stepsWithTopics = json_decode($stepsWithTopics, true);
+        $stepsWithTopics = $stepsWithTopics ? json_decode($stepsWithTopics, true) : null;
 
         return view('surveys.assignment.form-surveyor', compact(
             'surveyData',
@@ -119,8 +148,7 @@ class SurveysAssignmentsController extends Controller
 
         $surveyData = Survey::findOrFail($surveyId);
 
-        $decodedData = isset($surveyData->template_data) ? json_decode($surveyData->template_data, true) : $surveyData->template_data;
-        $reorderingData = SurveyTemplates::reorderingData($decodedData);
+        $reorderingData = SurveyTemplates::reorderingData($surveyData);
         $templateData = $reorderingData;
 
         $stepsWithTopics = SurveyStep::with(['topics' => function($query) {
@@ -144,7 +172,7 @@ class SurveysAssignmentsController extends Controller
                     })
                 ];
             });
-        $stepsWithTopics = json_decode($stepsWithTopics, true);
+        $stepsWithTopics = $stepsWithTopics ? json_decode($stepsWithTopics, true) : null;
 
         return view('surveys.assignment.form-auditor', compact(
             'surveyData',
@@ -189,7 +217,8 @@ class SurveysAssignmentsController extends Controller
             $message = 'Formulário gerado com sucesso';
         }elseif($currentStatus == 'in_progress'){
             // [if currentStatus is in_progress] Change to auditing.
-            $newStatus = 'auditing';
+            //$newStatus = 'auditing';
+            $newStatus = 'completed';
 
             $message = 'Dados enviados para Auditoria';
         }else{
@@ -258,106 +287,102 @@ class SurveysAssignmentsController extends Controller
     {
         $today = Carbon::today();
 
-        $query = SurveyAssignments::query();
-        $query->where('surveyor_status', '!=', 'new');
-        $query->where('auditor_status', '!=', 'new');
-        $query->whereDate('created_at', '=', $today);
-        $data = $query->orderBy('updated_at', 'desc')->limit(100)->get()->toArray();
+        $surveyorArrStatus = ['pending', 'in_progress', 'auditing', 'completed'];
 
-        $activities = [];
-        if ( !empty($data) && is_array($data) ) {
-            foreach ($data as $key => $assignment){
-                $assignmentId = intval($assignment['id']);
-                $surveyId = intval($assignment['survey_id']);
-                $companyId = intval($assignment['company_id']);
-                $updatedAt = $assignment['updated_at'];
+        $auditorArrStatus = ['in_progress', 'completed']; //'waiting', 'pending',
 
-                $companyName = getCompanyNameById($assignment['company_id']);
+        // Fetching surveyor assignments
+        $surveyorAssignments = SurveyAssignments::whereIn('surveyor_status', $surveyorArrStatus)
+                                                ->whereDate('created_at', '=', $today)
+                                                ->orderBy('updated_at', 'desc')
+                                                ->limit(100)
+                                                ->get();
 
-                $surveyorId = isset($assignment['surveyor_id']) ? intval($assignment['surveyor_id']) : null;
-                $auditorId = isset($assignment['auditor_id']) ? intval($assignment['auditor_id']) : null;
+        // Fetching auditor assignments
+        $auditorAssignments = SurveyAssignments::whereIn('auditor_status', $auditorArrStatus)
+                                            ->whereDate('created_at', '=', $today)
+                                            ->orderBy('updated_at', 'desc')
+                                            ->limit(100)
+                                            ->get();
 
-                $surveyorStatus = $assignment['surveyor_status'] ?? null;
-                $auditorStatus = $assignment['auditor_status'] ?? null;
+        if($surveyorAssignments){
 
-                $surveyorAvatar = getUserData($surveyorId)['avatar'];
-                $surveyorName = getUserData($surveyorId)['name'];
+            $activities = [];
 
-                $auditorAvatar = getUserData($auditorId)['avatar'];
-                $auditorName = getUserData($auditorId)['name'];
-
-                $survey = Survey::findOrFail($surveyId);
-                $templateName = getTemplateNameById($survey->template_id);
-
-                // Count the number of steps that have been finished
-                $countTopics = countSurveyTopics($surveyId);
-
-                $countResponses = 0;
-
-                if( $auditorStatus && $auditorStatus != 'waiting' && $auditorStatus != 'new' ){
-                    $countResponses = countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId);
-
-                    $assignmentStatus = $auditorStatus;
-                    $designatedUserId = $auditorId;
-                    $designatedUserName = $auditorName;
-                    $designatedUserAvatar = $auditorAvatar;
-                    $label = '<span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>';
-                }else if($surveyorStatus == 'in_progress' || $surveyorStatus == 'pending'){
-                    $countResponses = countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId);
-
-                    $assignmentStatus = $surveyorStatus;
-                    $designatedUserId = $surveyorId;
-                    $designatedUserName = $surveyorName;
-                    $designatedUserAvatar = $surveyorAvatar;
-                    $label = '<span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>';
-                }
-
-                // Calculate the percentage
-                $percentage = 0;
-                if ($countTopics > 0) {
-                    $percentage = ($countResponses / $countTopics) * 100;
-                }
-
-                // Determine the progress bar class based on the percentage
-                $progressBarClass = 'danger'; // default class
-                if ($percentage > 25) {
-                    $progressBarClass = 'warning';
-                }
-                if ($percentage > 50) {
-                    $progressBarClass = 'primary';
-                }
-                if ($percentage > 75) {
-                    $progressBarClass = 'info';
-                }
-                if ($percentage > 95) {
-                    $progressBarClass = 'secondary';
-                }
-                if ($percentage >= 100) {
-                    $progressBarClass = 'success';
-                }
-
-                $activities[] = [
-                    'assignmentId' => $assignmentId,
-                    'surveyId' => $surveyId,
-                    'companyId' => $companyId,
-                    'companyName' => limitChars($companyName, 20),
-                    'templateName' => limitChars($templateName, 26),
-                    'assignmentStatus' => $assignmentStatus,
-                    'designatedUserId' => $designatedUserId,
-                    'designatedUserName' => limitChars($designatedUserName, 20),
-                    'designatedUserAvatar' => $designatedUserAvatar,
-                    'designatedUserProfileURL' => route('profileShowURL', $designatedUserId),
-                    'label' => $label,
-                    'percentage' => $percentage,
-                    'progressBarClass' => $progressBarClass,
-                    'updatedAt' => $updatedAt
-                ];
+            // Process surveyor assignments
+            foreach ($surveyorAssignments as $assignment) {
+                $activities[] = $this->processAssignment($assignment, 'surveyor');
             }
+
+            // Process auditor assignments
+            foreach ($auditorAssignments as $assignment) {
+                $activities[] = $this->processAssignment($assignment, 'auditor');
+            }
+
+            $activities = array_filter($activities);
+
+            //return response()->json($activities);
+            if(is_array($activities) && count($activities) > 0 ){
+                return response()->json(['success' => true, 'activities' => $activities]);
+            }else{
+                return response()->json(['success' => false, 'message' => 'Ainda não há dados']);
+
+            }
+        }else{
+            return response()->json(['success' => false, 'message' => 'Ainda não há dados']);
         }
 
-        return response()->json($activities);
+    }
+
+    private function processAssignment($assignment, $designated)
+    {
+
+        $assignmentId = $assignment->id;
+
+        $surveyId = $assignment->survey_id;
+        $survey = Survey::findOrFail($surveyId);
+        $templateName = getTemplateNameById($survey->template_id);
+
+        $companyId = $assignment->company_id;
+        $companyName = getCompanyNameById($companyId);
+
+        $surveyorId = $assignment->surveyor_id ?? null;
+        $auditorId = $assignment->auditor_id ?? null;
+
+        $assignmentStatus = $assignment->{$designated . '_status'} ?? null;
+
+        $percentage = calculatePercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated);
+        $progressBarClass = getProgressBarClass($percentage);
+
+        $label = $designated == 'surveyor' ? '<span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>'
+                                        : '<span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>';
+
+        if($designated == 'auditor'){
+            $designatedUserId = $auditorId;
+        }elseif($designated == 'surveyor'){
+            $designatedUserId = $surveyorId;
+        }
+
+        return [
+            'assignmentId' => $assignmentId,
+            'surveyId' => $surveyId,
+            'companyId' => $companyId,
+            'companyName' => limitChars($companyName, 20),
+            'templateName' => limitChars($templateName, 26),
+            'assignmentStatus' => $assignmentStatus,
+            'designatedUserId' => $designatedUserId,
+            'designatedUserName' => limitChars(getUserData($designatedUserId)['name'], 20),
+            'designatedUserAvatar' => getUserData($designatedUserId)['avatar'],
+            'designatedUserProfileURL' => route('profileShowURL', $designatedUserId),
+            'label' => $label,
+            'percentage' => $percentage,
+            'progressBarClass' => $progressBarClass,
+            'createddAt' => $assignment->created_at->toDateTimeString(),
+            'updatedAt' => $assignment->updated_at->toDateTimeString()
+        ];
     }
 
 
-    
+
+
 }

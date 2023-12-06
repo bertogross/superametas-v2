@@ -42,4 +42,10 @@ return [
         'webhook' => env('STRIPE_WEBHOOK_SECRET_KEY'),
     ],
 
+    'zoho' => [
+        'client_id' => env('ZOHO_CLIENT_ID'),
+        'client_secret' => env('ZOHO_CLIENT_SECRET'),
+        'redirect' => env('ZOHO_REDIRECT_URI'),
+    ],
+
 ];

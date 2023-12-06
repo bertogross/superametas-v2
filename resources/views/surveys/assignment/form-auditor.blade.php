@@ -17,6 +17,8 @@
     $templateName = $surveyData ? getTemplateNameById($surveyData->template_id) : '';
 
     $assignmentId = $assignmentData->id ?? null;
+    $assignmentCreatedAt = $assignmentData->created_at ?? null;
+
     $auditorStatus = $assignmentData->auditor_status ?? null;
     $auditorId = $assignmentData->auditor_id ?? null;
 
@@ -66,11 +68,11 @@
                 @endif
                 <h2 class="text-secondary">Auditoria</h2>
                 <p>A Vistoria foi realizada por <u>{{$surveyorName}}</u></p>
-                <h3>{{ $templateName }}</h3>
+                <h3>{{ $templateName ? ucfirst($templateName) : 'NI' }}</h3>
                 <div class="mb-0 text-muted">
                     Executar em:
                     {{-- $surveyData->updated_at ? \Carbon\Carbon::parse($surveyData->updated_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY - HH:mm:ss') . 'hs' : '-' --}}
-                    {{ $surveyData->created_at ? \Carbon\Carbon::parse($surveyData->created_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}
+                    {{ $assignmentCreatedAt ? \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}
                 </div>
             </div>
             <div class="shape">

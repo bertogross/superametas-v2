@@ -69,7 +69,7 @@ if (!function_exists('canManageGoalSales')) {
     function canManageGoalSales() {
         $user = auth()->user();
 
-        return $user && $user->hasAnyRole([User::ROLE_ADMIN, User::ROLE_EDITOR]) && request()->is('goal-sales');
+        return $user && $user->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) && request()->is('goal-sales');
     }
 }
 
@@ -143,21 +143,35 @@ if (!function_exists('getStripeData')) {
         // Set the database connection to smOnboard
         $OnboardConnection = DB::connection('smOnboard');
 
-        // Fetch user_erp_data where ID is 1
-        $stripeData = [];
-        $stripeData['customer_id'] = $OnboardConnection->table('app_users')->where('ID', $databaseId)->value('user_stripe_customer_id');
+        // Fetch user_erp_data where ID is $databaseId
+        $userData = $OnboardConnection->table('app_users')
+            ->where('ID', $databaseId)
+            ->select([
+                'user_stripe_customer_id',
+                'user_stripe_products',
+                'user_stripe_subscription_id',
+                'user_stripe_subscription_status',
+                'user_stripe_subscription_quantity'
+            ])
+            ->first();
 
-        $stripeData['products'] = $OnboardConnection->table('app_users')->where('ID', $databaseId)->value('user_stripe_products');
+        if ($userData) {
+            // Map the fetched data to the $stripeData array
+            $stripeData = [
+                'customer_id' => $userData->user_stripe_customer_id,
+                'products' => $userData->user_stripe_products,
+                'subscription_id' => $userData->user_stripe_subscription_id,
+                'subscription_status' => $userData->user_stripe_subscription_status,
+                'subscription_quantity' => $userData->user_stripe_subscription_quantity,
+            ];
 
-        $stripeData['subscription_id'] = $OnboardConnection->table('app_users')->where('ID', $databaseId)->value('user_stripe_subscription_id');
+            return $stripeData;
+        }
 
-        $stripeData['subscription_status'] = $OnboardConnection->table('app_users')->where('ID', $databaseId)->value('user_stripe_subscription_status');
-
-        $stripeData['subscription_quantity'] = $OnboardConnection->table('app_users')->where('ID', $databaseId)->value('user_stripe_subscription_quantity');
-
-        return $stripeData ?? null;
+        return null;
     }
 }
+
 
 if (!function_exists('getERP')) {
     function getERP(){
@@ -279,9 +293,9 @@ if (!function_exists('getCompanyNameById')) {
             $companyId = intval($companyId);
 
             $companyAlias = DB::connection('smAppTemplate')
-                ->table('wlsm_companies') // replace with your companies table name
+                ->table('wlsm_companies')
                 ->where('company_id', $companyId)
-                ->value('company_alias'); // replace with the column name that stores the company alias
+                ->value('company_alias');
 
             return $companyAlias ?: null;
         }
@@ -496,6 +510,14 @@ if (!function_exists('getTemplateNameById')) {
     }
 }
 
+if (!function_exists('getTemplateDescriptionById')) {
+    function getTemplateDescriptionById($templateId) {
+        $template = $templateId ? SurveyTemplates::find($templateId) : null;
+
+        return $template ? $template->description : null;
+    }
+}
+
 if (!function_exists('getTemplateRecurringById')) {
     function getTemplateRecurringById($templateId) {
         $template = $templateId ? SurveyTemplates::find($templateId) : null;
@@ -520,8 +542,10 @@ if (!function_exists('countSurveySurveyorResponses')) {
 
         return SurveyResponse::where('survey_id', $surveyId)
             ->where('surveyor_id', $surveyorId)
-            ->where('company_id', $companyId)
+            //->where('company_id', $companyId)
             ->where('assignment_id', $assignmentId)
+            ->whereNotNull('compliance_survey')
+            ->whereNotNull('attachments_survey')
             //->whereDate('created_at', '=', $today)
             ->count();
 
@@ -536,7 +560,7 @@ if (!function_exists('countSurveyAuditorResponses')) {
 
         return SurveyResponse::where('survey_id', $surveyId)
             ->where('auditor_id', $auditorId)
-            ->where('company_id', $companyId)
+            //->where('company_id', $companyId)
             ->where('assignment_id', $assignmentId)
             ->whereNotNull('compliance_audit')
             //->whereDate('created_at', '=', $today)
@@ -562,16 +586,16 @@ if( !function_exists('goalsEmojiChart') ){
 
 		$bsTitle = !empty($companyName) ? $companyName.' :: '.$departmentName : ':: '.$departmentName;
 
-		if( $goal == 0 && $sale > 0 && $departmentId != 'general' && ( auth()->user()->hasAnyRole([User::ROLE_ADMIN, User::ROLE_EDITOR]) ) ){
+		if( $goal == 0 && $sale > 0 && $departmentId != 'general' && ( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) ) ){
 			$html .= '<i class="text-danger blink ri-error-warning-line fw-bold position-relatvie w-auto mx-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Existe um conflito entre valor de Meta e Vendas para departamento '.$departmentName.'. Não há Meta ou não deveria haver vendas para este departamento no estabelecimento '.$companyName.'" style="z-index:2;"></i>';
 		}
 
 		$html .= '<div id="goal-chart-'.$nChartId.'" class="goal-chart text-center d-inline-block" ';
-            if( auth()->user()->hasAnyRole([User::ROLE_ADMIN, User::ROLE_EDITOR]) ) {
+            if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) ) {
                 $html .=  'data-sale="'.$sale.'" data-goal="'.$goal.'" ';
             }
 		    $html .= 'data-percent="'.$percent.'" data-percent-from-metric="'.$percentAccrued.'" data-department-name="'.$departmentName.'" data-department="'.$departmentId.'" ';
-			if( auth()->user()->hasAnyRole([User::ROLE_ADMIN, User::ROLE_EDITOR]) ) {
+			if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) ) {
 				$html .= 'data-bs-toggle="popover" data-bs-placement="top" data-bs-trigger="hover focus" data-bs-title="'.$bsTitle.'" data-bs-content="';
 				$html .= "<i class='text-theme ri-checkbox-blank-circle-fill align-bottom me-1'></i>Vendas: ".brazilianRealFormat($sale, 0)."<br>";
 
@@ -602,13 +626,93 @@ if (!function_exists('limitChars')) {
     }
 }
 
+// Calculate the progress percentage
+if (!function_exists('calculatePercentage')) {
+    function calculatePercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated){
+        // Assuming you have a method to count the total number of topics/questions in a survey
+        $totalTopics = countSurveyTopics($surveyId);
+
+        $countSurveyAuditor = countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId);
+        $countSurveySurveyor = countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId);
+
+        if($auditorId === $surveyId){
+            $countResponses = ($countSurveySurveyor + $countSurveyAuditor) / 2;
+        }elseif($designated == 'auditor'){
+            $countResponses = $countSurveyAuditor;
+        }elseif($designated == 'surveyor'){
+            $countResponses = $countSurveySurveyor;
+        }else{
+            $countResponses = ($countSurveySurveyor + $countSurveyAuditor) / 2;
+        }
+
+        // Calculate the percentage
+        $percentage = 0;
+        if ($totalTopics > 0) {
+            $percentage = ($countResponses / $totalTopics) * 100;
+        }
+
+        return $percentage ? number_format($percentage, 2) : 0;
+    }
+}
+
+// Get the progress bar class based on the completion percentage
+if (!function_exists('getProgressBarClass')) {
+    function getProgressBarClass($percentage){
+        if ($percentage >= 100) {
+            return 'success'; // Completed
+        } elseif ($percentage > 75) {
+            return 'info'; // High progress
+        } elseif ($percentage > 50) {
+            return 'primary'; // Moderate progress
+        } elseif ($percentage > 25) {
+            return 'warning'; // Low progress
+        } else {
+            return 'danger'; // Just started or no progress
+        }
+    }
+}
+
+// Get a descriptive title for a date based on the task status
+if (!function_exists('getDateTitle')) {
+    function getDateTitle($statusKey){
+        switch ($statusKey) {
+            case 'completed':
+                return 'A data em que esta tarefa foi desempenhada';
+            case 'losted':
+                return 'A data em que esta tarefa deveria ter sido desempenhada';
+            default:
+                return 'A data em que esta tarefa deverá ser desempenhada';
+        }
+    }
+}
+
+// Get a descriptive label title based on the task status and roles involved
+if (!function_exists('getLabelTitle')) {
+    function getLabelTitle($surveyorStatus, $auditorStatus) {
+        if ($surveyorStatus == 'completed' && $auditorStatus == 'completed') {
+            return 'A <u>Vistoria</u> e a <u>Auditoria</u> foram efetuadas';
+        } elseif ($surveyorStatus == 'completed' && $auditorStatus != 'completed') {
+            return 'A <u>Vistoria</u> foi concluída';
+        } elseif ($surveyorStatus != 'completed' && $auditorStatus == 'completed') {
+            return 'A <u>Auditoria</u> foi concluída';
+        } else {
+            return 'Tarefa em andamento';
+        }
+    }
+}
+
 //Useful to see on the bottom left side fixed smotth fixed div
 if(!function_exists('appPrintR')){
 	function appPrintR($data){
-		if( !empty($data) ){
+		/*if( !empty($data) ){
 			print '<pre class="language-markup"><code>';
 				print_r( $data );
 			print '</code></pre>';
+		}*/
+        if( !empty($data) ){
+			print '<pre>';
+				print_r( $data );
+			print '</pre>';
 		}
 	}
 }

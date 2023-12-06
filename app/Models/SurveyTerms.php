@@ -17,7 +17,7 @@ class SurveyTerms extends Model
 
     protected $table = 'survey_terms';
 
-    protected $fillable = ['user_id', 'name', 'slug', 'status'];
+    protected $fillable = ['name', 'slug', 'status']; //'user_id',
 
     public static function preListing($termsToArray = false)
     {
@@ -48,6 +48,20 @@ class SurveyTerms extends Model
         $cleanedInput = preg_replace('/\s+/', ' ', $trimmedInput);
 
         return $cleanedInput;
+    }
+
+    public static function getTermNameById($termId){
+        if($termId){
+            $termId = intval($termId);
+
+            $termName = DB::connection('smAppTemplate')
+                ->table('survey_terms')
+                ->where('id', $termId)
+                ->value('name');
+
+            return $termName ?? null;
+        }
+        return null;
     }
 
 

@@ -14,7 +14,7 @@
         @endslot
         @slot('title')
             @if($data)
-                Edição de Modelo <small><i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i> <span class="text-theme">{{$data->id}}</span> {{-- limitChars($data->title ?? '', 20) --}}</small>
+                Edição de Modelo <small><i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i> #<span class="text-theme me-2">{{$data->id}}</span> {{ limitChars($data->title ?? '', 20) }}</small>
             @else
                 Compor Modelo de Formulário
             @endif
@@ -65,13 +65,13 @@
 
                                 <div class="mb-4">
                                     <label for="title" class="form-label">Título:</label>
-                                    <input type="text" id="title" name="title" class="form-control" value="{{ $title }}" maxlength="100" required>
-                                    <div class="form-text">Exemplo: Checklist Abertura de Loja</div>
+                                    <input type="text" id="title" name="title" class="form-control" value="{{ $title }}" maxlength="100" placeholder="Exemplo: Checklist Abertura de Loja" required>
+                                    <div class="form-text">O título servirá para identificar o modelo na listagem.</div>
                                 </div>
 
                                 <div>
                                     <label for="description" class="form-label">Descrição:</label>
-                                    <textarea name="description" class="form-control maxlength" id="description" rows="3" maxlength="500" placeholder="Descreva, por exemplo, a funcionalidade ou destino deste modelo...">{{ $description }}</textarea>
+                                    <textarea name="description" class="form-control maxlength" id="description" rows="3" maxlength="500" placeholder="Descreva, por exemplo, as diretrizes para execução dos tópicos relacionados a este modelo">{{ $description }}</textarea>
                                     <div class="form-text">Opcional</div>
                                 </div>
 
@@ -82,9 +82,11 @@
                                         @include('surveys.templates.form', ['data' => $result] )
                                     @endif</div>
 
-                                    <div class="clearfix mt-3">
+                                    <button type="button" class="btn btn-sm btn-outline-theme btn-label right mt-3" data-bs-toggle="modal" data-bs-target="#addStepModal" tabindex="-1" title="Adicionar Etapa/Setor/Departamento"><i class="ri-terminal-window-line label-icon align-middle fs-16 ms-2"></i>Adicionar Bloco</button>
+
+                                    <div class="mt-2 text-end">
                                         @if ($data)
-                                            <button type="button" class="btn btn-label right btn-theme float-end mt-5" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Atualizar Formulário</button>
+                                            <button type="button" class="btn btn-label right btn-theme mt-5" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Atualizar Formulário</button>
 
                                             {{--
                                             <button type="button" class="btn btn-sm btn-label right btn-outline-info" id="btn-surveys-clone" tabindex="-1"><i class="ri-file-copy-line label-icon align-middle fs-16 ms-2"></i>Clonar</button>
@@ -94,10 +96,9 @@
                                             <a href="{{ route('surveysTemplateShowURL', ['id' => $templateId]) }}" class="btn btn-sm btn-label right btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar em nova guia" target="_blank" tabindex="-1"><i class="ri-eye-line label-icon align-middle fs-16 ms-2"></i>Visualizar</a>
                                             --}}
                                         @else
-                                            <button type="button" class="btn btn-label right btn-theme float-end mt-5" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Salvar Formulário</button>
+                                            <button type="button" class="btn btn-label right btn-theme mt-5" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Salvar Formulário</button>
                                         @endif
 
-                                        <button type="button" class="btn btn-sm btn-outline-theme btn-label right" data-bs-toggle="modal" data-bs-target="#addStepModal" tabindex="-1" title="Adicionar Etapa/Setor/Departamento"><i class="ri-terminal-window-line label-icon align-middle fs-16 ms-2"></i>Adicionar Bloco</button>
                                     </div>
                                 </div>
 

@@ -42,7 +42,7 @@
                 --}}
 
                 <div class="col-sm-12 col-md col-lg">
-                    <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="Período" data-min-date="{{ $firstDate }}" data-max-date="{{ $lastDate }}" value="{{ request('created_at') }}">
+                    <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="Período" data-min-date="{{ $firstDate ?? '' }}" data-max-date="{{ $lastDate ?? '' }}" value="{{ request('created_at') ?? '' }}">
                 </div>
 
                 {{--

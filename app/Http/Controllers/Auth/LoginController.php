@@ -53,7 +53,7 @@ class LoginController extends Controller
         $getOtherDatabases = OnboardController::getOtherDatabases($credentials['email']);
 
         if(!$getOtherDatabases){
-            return redirect()->back()->withErrors(['email' => 'Authentication failed']);
+            return redirect()->back()->withErrors(['email' => 'Falha de autenticação']);
         }
 
         // Get from the first account
@@ -85,7 +85,7 @@ class LoginController extends Controller
         }
 
         // Handle failed authentication
-        return redirect()->back()->withErrors(['email' => 'Authentication failed']);
+        return redirect()->back()->withErrors(['email' => 'Falha de autenticação']);
     }
 
 

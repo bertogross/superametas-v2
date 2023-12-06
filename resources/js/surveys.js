@@ -228,14 +228,14 @@ document.addEventListener('DOMContentLoaded', function() {
         function getRecentActivities() {
             fetch(getRecentActivitiesURL)
                 .then(response => response.json())
-                .then(activities => {
+                .then(data => {
                     //console.log(JSON.stringify(activities, null, 2));
 
                     const container = document.getElementById('load-surveys-activities');
                     container.innerHTML = '';
 
-                    if(activities){
-                        activities.forEach(activity => {
+                    if(data.success && data.activities){
+                        data.activities.forEach(activity => {
                             const activityElement = document.createElement('div');
                             activityElement.className = 'card';
                             activityElement.innerHTML = `
@@ -245,14 +245,16 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                     <div class="flex-grow-1">
                                         <div class="fs-11 mb-0 fw-bold"><a href="${activity.designatedUserProfileURL}" class="text-body d-block">${activity.designatedUserName}</a></div>
-                                        <div class="fs-10 mb-0 text-muted">${activity.templateName}</div>
+                                        <div class="fs-11 mb-0 text-muted">${activity.templateName}</div>
                                     </div>
                                     <div class="flex-shrink-0">
                                         ${activity.label}
-                                        <div class="fs-10 mb-0 text-muted">${activity.companyName}</div>
+                                        <div class="fs-11 mb-0 text-muted">${activity.companyName}</div>
+                                        <div class="fs-10 mb-0 text-muted d-none">${activity.createddAt}</div>
+                                        <div class="fs-10 mb-0 text-muted d-none">${activity.updatedAt}</div>
                                     </div>
                                 </div>
-                                <div class="progress progress-sm mt-1" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="${activity.percentage}%" style="height: 3px;">
+                                <div class="progress progress-sm mt-1 animated-progress custom-progress" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="${activity.percentage}%">
                                     <div class="progress-bar bg-${activity.progressBarClass}" role="progressbar" style="width: ${activity.percentage}%" aria-valuenow="${activity.percentage}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             `;
@@ -261,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         bsPopoverTooltip();
                     }else{
-                        container.innerHTML = 'Ainda não há dados de hoje';
+                        container.innerHTML = '<div class="text-center text-muted">'+ data.message +'</div>';
                     }
                 })
                 .catch(error => console.error('Error:', error)

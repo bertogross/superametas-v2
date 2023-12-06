@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ZohoController;
 use App\Http\Controllers\DropboxController;
 use App\Http\Controllers\SurveysController;
 use App\Http\Controllers\GoogleDriveController;
@@ -23,6 +24,11 @@ Route::get('/process-sysmo-api/{meantime?}/{database?}', [SettingsDatabaseContro
 // IBGE IPCA API
 Route::get('/surveys/{database?}', [SurveysController::class, 'populateRecurringSurveys'])->name('populateRecurringSurveysURL');
 
+// ZOHO server-based applications
+// https://www.zoho.com/mail/help/api/overview.html
+Route::get('/zoho/auth', [ZohoController::class, 'authenticate'])->name('authenticateURL');
+Route::get('/zoho/callback', [ZohoController::class, 'callback'])->name('callbackURL');
+Route::get('/zoho/send-goals-email/{database?}', [ZohoController::class, 'sendGoalsEmail'])->name('sendGoalsEmailURL');
 
 // Google Drive API
 Route::get('/google-drive/redirect', [GoogleDriveController::class, 'redirect'])->name('GoogleDriveRedirectURL');

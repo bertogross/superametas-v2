@@ -22,7 +22,6 @@ class SurveysController extends Controller
 {
     public function index(Request $request)
     {
-
         $currentUserId = auth()->id();
 
         $created_at = $request->input('created_at');
@@ -38,19 +37,6 @@ class SurveysController extends Controller
         //$queryTemplates->where('user_id', $currentUserId);
         $queryTemplates->where('condition_of','publish');
 
-        /*
-        if ($created_at) {
-            $dates = explode(' até ', $created_at);
-            if (is_array($dates) && count($dates) === 2) {
-                $start_date = Carbon::createFromFormat('d/m/Y', $dates[0])->format('Y-m-d');
-                $end_date = Carbon::createFromFormat('d/m/Y', $dates[1])->format('Y-m-d') . ' 23:59:59';
-                $queryTemplates->whereBetween('created_at', [$start_date, $end_date]);
-            } else {
-                $start_date = Carbon::createFromFormat('d/m/Y', $created_at)->format('Y-m-d');
-                $queryTemplates->whereDate('created_at', '=', $start_date);
-            }
-        }
-        */
         $templates = $queryTemplates->orderBy('created_at')->paginate(10);
         /**
          * END TEMPLATES QUERY
@@ -90,8 +76,8 @@ class SurveysController extends Controller
         $getAuthorizedCompanies = getAuthorizedCompanies();
 
         $dateRange = Survey::getSurveysDateRange();
-        $firstDate = $dateRange['first_date'];
-        $lastDate = $dateRange['last_date'];
+        $firstDate = $dateRange['first_date'] ?? null;
+        $lastDate = $dateRange['last_date'] ?? null;
 
         // usefull if crontab is losted
         $this->populateRecurringSurveys();
@@ -115,11 +101,76 @@ class SurveysController extends Controller
 
         $data = Survey::findOrFail($id);
 
-        $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
+        $surveyId = $data->id;
+
+        $analyticCompaniesData = Survey::fetchAndTransformSurveyDataByCompanies($surveyId);
+
+        $analyticTermsData = Survey::fetchAndTransformSurveyDataByTerms($surveyId);
+
+        $users = getUsers();
+        $userAvatars = [];
+        foreach ($users as $user) {
+            $userAvatars[$user->id] = [
+                'name' => $user->name,
+                'avatar' => getUserData($user->id)['avatar'],
+            ];
+        }
+
+        $getCompanies = getActiveCompanies();
+        $companies = [];
+        foreach ($getCompanies as $company) {
+            $companies[$company->id] = [
+                'name' => $company->company_alias,
+            ];
+        }
+
+        /*$stepsQuery = DB::connection('smAppTemplate')
+            ->table('survey_steps')
+            ->where('survey_id', $surveyId)
+            ->get()
+            ->toArray();
+        $steps = $stepsQuery ?? null;*/
+
+        /**
+         * START get terms
+         */
+        $terms = [];
+        $departmentsQuery = DB::connection('smAppTemplate')
+            ->table('wlsm_departments')
+            ->get()
+            ->toArray();
+        foreach ($departmentsQuery as $department) {
+            $terms[$department->department_id] = [
+                'name' => strtoupper($department->department_alias),
+            ];
+        }
+        $termsQuery = DB::connection('smAppTemplate')
+            ->table('survey_terms')
+            ->get()
+            ->toArray();
+        foreach ($termsQuery as $term) {
+            $terms[$term->id] = [
+                'name' => strtoupper($term->name),
+            ];
+        }
+        /**
+         * END get terms
+         */
+
+        $dateRange = SurveyAssignments::getAssignmentDateRange();
+        $firstDate = $dateRange['first_date'] ?? null;
+        $lastDate = $dateRange['last_date'] ?? null;
 
         return view('surveys.show', compact(
             'data',
-            'getSurveyRecurringTranslations'
+            'companies',
+            //'steps',
+            'terms',
+            'userAvatars',
+            'analyticCompaniesData',
+            'analyticTermsData',
+            'firstDate',
+            'lastDate',
         ) );
     }
 
@@ -217,6 +268,12 @@ class SurveysController extends Controller
 
         $currentStatus = $data->status;
 
+        $templateId = $data->template_id;
+
+        if($currentStatus == 'new'){
+            SurveyStep::populateSurveySteps($templateId, $surveyId);
+        }
+
         if ($currentUserId != $data->user_id) {
             return response()->json(['success' => false, 'message' => 'Você não possui autorização para Inicializar/Interromper a rotina registrada por outra pessoa']);
         }
@@ -274,6 +331,8 @@ class SurveysController extends Controller
 
     public function storeOrUpdate(Request $request, $id = null)
     {
+        $currentUserId = auth()->id();
+
         // Cache::flush();
         $messages = [
             'template_id.required' => 'Necessário selecionar um modelo',
@@ -353,7 +412,6 @@ class SurveysController extends Controller
         $validatedData['audited_by'] = $distributed_data ?? null;
         */
 
-        $currentUserId = auth()->id();
         $validatedData['user_id'] = $currentUserId;
 
         /*
@@ -381,7 +439,7 @@ class SurveysController extends Controller
 
             // Update from model if task is not started
             if($survey->status == 'new'){
-                SurveyStep::populateSurveySteps($validatedData['template_id'], $surveyId);
+                SurveyStep::populateSurveySteps($templateId, $surveyId);
             }
 
             $countResponses = countSurveyAllResponsesFromToday($surveyId);
@@ -407,7 +465,7 @@ class SurveysController extends Controller
 
             $surveyId = $survey->id;
 
-            SurveyStep::populateSurveySteps($validatedData['template_id'], $surveyId);
+            SurveyStep::populateSurveySteps($templateId, $surveyId);
 
             return response()->json([
                 'success' => true,

@@ -2,6 +2,8 @@ import {toastAlert} from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btn-login').addEventListener('click', function(event) {
+        event.preventDefault();
+
         let database = document.getElementById('database').value;
         let email = document.getElementById('username').value;
         let password = document.getElementById('password-input').value;
@@ -17,8 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Make an AJAX call to check databases
         if(!database){
-            event.preventDefault();
-
             try {
                 fetch(checkDatabasesURL, {
                     method: 'POST',
@@ -34,74 +34,91 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if( data.databases ){
-                        if (data.databases.length > 1) {
-                            // Show Swal to let user choose database
-                            Swal.fire({
-                                title: 'Selecione uma Conexão',
-                                input: 'select',
-                                inputOptions: data.databases,
-                                inputPlaceholder: '- Selecione -',
-                                html: 'Você possui acesso a mais de uma conta',
-                                showCancelButton: true,
-                                focusConfirm: false,
-                                customClass : {
-                                    closeButton : 'btn btn-dark',
-                                    cancelButton : 'btn btn-dark btn-sm ms-1',
-                                    confirmButton : 'btn btn-theme me-1'
-                                },
-                                confirmButtonText: 'Prosseguir',
-                                cancelButtonText: 'fechar',
-                                allowOutsideClick: false,
-                                didOpen: () => {
-                                    const selectElement = document.querySelector('.swal2-select');
-                                    if (selectElement) {
-                                        selectElement.classList.add('form-select', 'w-auto', 'm-3');
-                                        //selectElement.classList.remove('swal2-select');
-                                    }
+                    //console.log(data.databases);
+                    //console.log(JSON.stringify(data.databases, null, 2));
+                    if (data.databases.length > 1) {
+                        // Create an array of database names from the 'data' object
+                        const selectElement = document.createElement('select');
+                        selectElement.id = 'database';
+                        selectElement.name = 'database';
+                        selectElement.classList.add('form-control', 'swal-login-form-control', 'form-select', 'w-auto', 'm-3', 'me-auto', 'ms-auto');
 
-                                    const confirmElement = document.querySelector('.swal2-confirm');
-                                    if (confirmElement) {
-                                        confirmElement.classList.remove('swal2-styled');
-                                    }
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = '';
+                        defaultOption.textContent = '- Selecione -';
+                        selectElement.appendChild(defaultOption);
 
-                                    const cancelElement = document.querySelector('.swal2-cancel');
-                                    if (cancelElement) {
-                                        cancelElement.classList.remove('swal2-styled');
-                                    }
-                                },
-                                preConfirm: (value) => {
-                                    if (!value) {
-                                        Swal.showValidationMessage('Necessário selecionar uma conexão');
-                                    }
+                        data.databases.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.database;
+                            option.textContent = item.customer;
+                            selectElement.appendChild(option);
+                        });
+
+                        // Show Swal to let user choose database
+                        Swal.fire({
+                            title: 'Selecione uma Conexão',
+                            html: `
+                                <p>Você possui acesso a mais de uma conta</p>
+                                ${selectElement.outerHTML}
+                            `,
+                            showCancelButton: true,
+                            focusConfirm: false,
+                            customClass : {
+                                closeButton : 'btn btn-dark',
+                                cancelButton : 'btn btn-dark btn-sm ms-1',
+                                confirmButton : 'btn btn-theme me-1'
+                            },
+                            confirmButtonText: 'Prosseguir',
+                            cancelButtonText: 'fechar',
+                            allowOutsideClick: false,
+                            preConfirm: (value) => {
+                                if (!value) {
+                                    Swal.showValidationMessage('Necessário selecionar uma Conexão');
+
+                                    return false;
                                 }
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    let databaseName = data.databases[result.value];
-                                    document.getElementById('database').value = databaseName;
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                let selectedElement = document.querySelector('.swal-login-form-control');
+                                let selectedIndex = selectedElement.selectedIndex;
+                                let selectedOption = selectedElement.options[selectedIndex];
+                                let databaseName = selectedOption.value;
+                                //console.log(databaseName);
 
-                                    setTimeout(function() {
-                                        document.getElementById('loginForm').submit();
-                                    }, 500);
+                                if( !databaseName || databaseName === '' ){
+                                    toastAlert('Necessário selecionar uma Conexão', 'danger', 5000);
+
+                                    return false;
                                 }
-                            });
-                        } else {
-                            let databaseName = data.databases[0];
-                            document.getElementById('database').value = databaseName;
 
-                            setTimeout(function() {
-                                document.getElementById('loginForm').submit();
-                            }, 500);
-                        }
-                        return;
-                    }else{
-                        console.log(data);
+                                document.getElementById('database').value = databaseName;
+
+                                setTimeout(function() {
+                                    document.getElementById('loginForm').submit();
+                                }, 100);
+                            }
+                        });
+                    } else {
+                        //let databaseName = data.databases[0];
+                        let databaseName = data.databases[0].database;
+                        document.getElementById('database').value = databaseName;
+
+                        setTimeout(function() {
+                            document.getElementById('loginForm').submit();
+                        }, 100);
                     }
+                    return;
                 });
             } catch (error) {
                 console.error('Error:', error);
-                toastAlert('Não foi possível carregar o conteúdo', 'danger', 10000);
+                toastAlert(error, 'danger', 10000);
             }
+        }else{
+            toastAlert('Não foi possível estabelecer conexão com a base de dados', 'danger', 10000);
+
+            event.stopPropagation();
         }
     });
 

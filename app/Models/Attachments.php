@@ -26,7 +26,7 @@ class Attachments extends Model
         }
     }
 
-    public static function getAttachmentDateAttachmentById($attachmentId)
+    public static function getAttachmentDateById($attachmentId)
     {
         if($attachmentId){
             $attachment = self::find($attachmentId);

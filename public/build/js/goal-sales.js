@@ -243,9 +243,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     setSessionStorage('slide-mode', false)
 
-                    setTimeout(function () {
+                    //setTimeout(function () {
                         location.reload(true);
-                    }, 300);
+                    //}, 300);
                 }
             };
             xhr.send('_token=' + encodeURIComponent(document.querySelector('meta[name="csrf-token"]').content));
@@ -271,9 +271,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     setSessionStorage('analytic-mode', false);
 
-                    setTimeout(function () {
+                    //setTimeout(function () {
                         location.reload(true);
-                    }, 300);
+                    //}, 300);
                 }
             };
             xhr.send('_token=' + encodeURIComponent(document.querySelector('meta[name="csrf-token"]').content));
@@ -301,9 +301,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     setSessionStorage('analytic-mode', false);
 
-                    setTimeout(function () {
+                    //setTimeout(function () {
                         location.reload(true);
-                    }, 300);
+                    //}, 300);
                 }
             };
             xhr.send('_token=' + encodeURIComponent(document.querySelector('meta[name="csrf-token"]').content));
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 document.querySelector('input.filter-toggle').checked = true; // Set the toggle button to checked
             }
-        }, 300);
+        }, 10);
     }
 
 

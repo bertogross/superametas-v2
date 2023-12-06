@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\SurveyTerms;
 use Illuminate\Support\Str;
 
-class SurveyTermsController extends Controller
+class SurveysTermsController extends Controller
 {
     protected $connection = 'smAppTemplate';
 
@@ -28,6 +28,23 @@ class SurveyTermsController extends Controller
         return view('surveys.terms.show', compact('term'));
     }
 
+    public function search(Request $request)
+    {
+        // Search for terms based on the query
+        $searchQuery = $request->input('query');
+        $terms = SurveyTerms::where('name', 'LIKE', "%{$searchQuery}%")->get();
+
+        return $terms ? response()->json($terms) : null;
+    }
+
+    public function form()
+    {
+        //$terms = SurveyTerms::all();
+        $terms = SurveyTerms::paginate(10);
+
+        return view('surveys.terms.form', compact('terms'));
+    }
+
     public function storeOrUpdate(Request $request)
     {
         $validatedData = $request->validate([
@@ -45,7 +62,7 @@ class SurveyTermsController extends Controller
         $currentUserId = auth()->id();
 
         $term = new SurveyTerms;
-        $term->user_id = $currentUserId;
+        //$term->user_id = $currentUserId;
         $term->name = $termName;
         $term->slug = $this->createUniqueSlug($termName);
         $term->save();
@@ -59,22 +76,6 @@ class SurveyTermsController extends Controller
         $count = SurveyTerms::whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")->count();
 
         return $count ? "{$slug}-{$count}" : $slug;
-    }
-
-    public function search(Request $request)
-    {
-        // Search for terms based on the query
-        $searchQuery = $request->input('query');
-        $terms = SurveyTerms::where('name', 'LIKE', "%{$searchQuery}%")->get();
-
-        return $terms ? response()->json($terms) : null;
-    }
-
-    public function form()
-    {
-        $terms = SurveyTerms::all();
-
-        return view('surveys.terms.form', compact('terms'));
     }
 
 }

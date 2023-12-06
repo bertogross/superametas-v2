@@ -42,8 +42,8 @@ class GoalSalesController extends Controller
         list($startDate, $endDate) = $this->calculateStartAndEndDate($getMeantime);
 
         $dateRange = GoalSales::getSaleDateRange();
-        $firstDate = $dateRange['first_date'];
-        $lastDate = $dateRange['last_date'];
+        $firstDate = $dateRange['first_date'] ?? null;
+        $lastDate = $dateRange['last_date'] ?? null;
 
         // If the user has analytic mode enabled
         if (getUserMeta($currentUserId, 'analytic-mode') == 'on') {
@@ -84,8 +84,8 @@ class GoalSalesController extends Controller
     public function settings() {
 
         $dateRange = GoalSales::getSaleDateRange();
-        $firstDate = $dateRange['first_date'];
-        $lastDate = $dateRange['last_date'];
+        $firstDate = $dateRange['first_date'] ?? null;
+        $lastDate = $dateRange['last_date'] ?? null;
 
         return view('goal-sales.settings-edit', compact('firstDate', 'lastDate'));
 
@@ -145,8 +145,8 @@ class GoalSalesController extends Controller
             ->toArray();
 
         $dateRange = GoalSales::getSaleDateRange();
-        $firstDate = $dateRange['first_date'];
-        $lastDate = $dateRange['last_date'];
+        $firstDate = $dateRange['first_date'] ?? null;
+        $lastDate = $dateRange['last_date'] ?? null;
 
         return view('goal-sales.edit', compact(
                 'goals',
@@ -422,9 +422,7 @@ class GoalSalesController extends Controller
         return [$data, $totalSalesByMonth, $totalGoalsByMonth];
     }
 
-    /**
-     * Emoji Chart Default Mode and Slide Mode
-     */
+    // Emoji Chart Default Mode and Slide Mode
     private function getGoalAndSalesData($startDate, $endDate, $selectedCompanies, $selectedDepartments)
     {
         // Query for old data
@@ -484,9 +482,7 @@ class GoalSalesController extends Controller
         return $data;
     }
 
-    /**
-     * Left widget
-     */
+    // Left widget
     public function getDepartmentData($data)
     {
         // Initialize an empty array to store processed department data.
@@ -545,9 +541,7 @@ class GoalSalesController extends Controller
         return $departments;
     }
 
-    /**
-     * Chart Area and Table listing
-     */
+    // Chart Area and Table listing
     public function analyticMode(Request $request)
     {
         // Get the current user
@@ -571,9 +565,7 @@ class GoalSalesController extends Controller
         return response()->json(['analyticMode' => $newAnalyticsMode]);
     }
 
-    /**
-     * Emoji ChartSlide Mode
-     */
+    // Emoji ChartSlide Mode
     public function slideMode(Request $request)
     {
         // Get the current user
@@ -597,9 +589,7 @@ class GoalSalesController extends Controller
         return response()->json(['slideMode' => $newSlideMode]);
     }
 
-    /**
-     * Emoji Chart Default Mode
-     */
+    // Emoji Chart Default Mode
     public function defaultMode(Request $request)
     {
         // Get the current user

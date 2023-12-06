@@ -93,41 +93,76 @@ class OnboardController extends Controller
     // Get the list of other smApp databases from smOnboard
     public static function getOtherDatabases($email)
     {
-        if($email){
-            $OnboardConnection = DB::connection('smOnboard');
+        if (!$email) {
+            return null;
+        }
 
-            $otherDatabases = [];
+        $OnboardConnection = DB::connection('smOnboard');
 
-            // Get the list of database names from app_users
-            $app_usersTable = $OnboardConnection->table('app_users')
-                ->where('user_email', $email)
-                ->value('ID');
+        // Initialize an array to store other databases
+        $otherDatabases = [];
 
-            // Add the database names to the list of other databases
-            if ($app_usersTable) {
-                $otherDatabases[] = 'smApp' . $app_usersTable;
+        // Get the list of database names from app_users
+        $appUsersTable = $OnboardConnection->table('app_users')
+            ->where('user_email', $email)
+            ->get()
+            ->toArray();
+
+        if($appUsersTable){
+            foreach ($appUsersTable as $appId) {
+                $databaseId = $appId->ID;
+                $customerName = OnboardController::getCustomerNameByDatabaseId($databaseId);
+
+                $otherDatabases[] = [
+                    'database' => 'smApp' . $databaseId,
+                    'customer' => $customerName
+                ];
             }
+        }
 
-            // Get the list of app_IDs from app_subusers where sub_user_email is the given email
-            $app_subusersTable = $OnboardConnection->table('app_subusers')
-                ->where('sub_user_email', $email)
-                ->value('app_IDs');
+        // Get the list of app_IDs from app_subusers where sub_user_email is the given email
+        $appSubusersTable = $OnboardConnection->table('app_subusers')
+            ->where('sub_user_email', $email)
+            ->get()
+            ->toArray();
 
-            // Convert the app_IDs from JSON to array
-            if ($app_subusersTable) {
-                $appIds = json_decode($app_subusersTable, true);
-                foreach ($appIds as $appId) {
-                    $otherDatabases[] = 'smApp' . $appId;
+        if($appSubusersTable){
+            foreach ($appSubusersTable as $appId) {
+                $decoded = json_decode($appId->app_IDs, true);
+                foreach($decoded as $id){
+                    $databaseId = $id;
+                    $customerName = OnboardController::getCustomerNameByDatabaseId($id);
+
+                    $otherDatabases[] = [
+                        'database' => 'smApp' . $databaseId,
+                        'customer' => $customerName
+                    ];
                 }
             }
-
-            // Remove duplicates and filter out empty values
-            $otherDatabases = array_unique($otherDatabases);
-            $otherDatabases = array_filter($otherDatabases);
-
-            return $otherDatabases;
         }
-        return null;
+
+        $allDatabaseNames = array_filter($otherDatabases);
+
+        return $allDatabaseNames;
+    }
+
+
+    public static function getCustomerNameByDatabaseId($databaseId)
+    {
+        if(!$databaseId){
+            return;
+        }
+
+        $databaseId = onlyNumber($databaseId);
+
+        $OnboardConnection = DB::connection('smOnboard');
+
+        // Get the list of database names from app_users
+        $appUsersTable = $OnboardConnection->table('app_users')
+            ->where('ID', $databaseId)
+            ->first();
+
+        return $appUsersTable->user_display_name;
     }
 
 }

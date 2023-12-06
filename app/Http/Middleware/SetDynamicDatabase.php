@@ -28,7 +28,7 @@ class SetDynamicDatabase
         $getOtherDatabases = OnboardController::getOtherDatabases($email);
 
         if(!$getOtherDatabases){
-            return redirect()->back()->withErrors(['email' => 'Authentication failed']);
+            return redirect()->back()->withErrors(['email' => 'Falha de autenticação']);
         }
 
         // Get from the first account

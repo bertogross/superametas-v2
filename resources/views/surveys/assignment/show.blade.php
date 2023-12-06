@@ -3,6 +3,7 @@
     //appPrintR(json_decode($data, true));
 
     $assignmentId = $assignmentData->id;
+    $assignmentDate = $assignmentData->created_at;
     $surveyId = $assignmentData->survey_id;
     $companyId = $assignmentData->company_id;
     $surveyorId = $assignmentData->surveyor_id;
@@ -11,6 +12,7 @@
     $auditorStatus = $assignmentData->auditor_status;
 
     $templateName = $surveyData ? getTemplateNameById($surveyData->template_id) : '';
+    $templateDescription = $surveyData ? getTemplateDescriptionById($surveyData->template_id) : '';
 
     $companyName = $companyId ? getCompanyNameById($companyId) : '';
 
@@ -21,7 +23,24 @@
         ->get()
         ->toArray();
 
-    //appPrintR($responsesData);
+    $complianceSurveyorYesCount = $complianceSurveyorNoCount = $complianceAuditorYesCount = $complianceAuditorNoCount = 0;
+
+    foreach ($responsesData as $item) {
+        if (isset($item['compliance_survey'])) {
+            if ($item['compliance_survey'] === 'yes') {
+                $complianceSurveyorYesCount++;
+            } elseif ($item['compliance_survey'] === 'no') {
+                $complianceSurveyorNoCount++;
+            }
+        }
+        if (isset($item['compliance_audit'])) {
+            if ($item['compliance_audit'] === 'yes') {
+                $complianceAuditorYesCount++;
+            } elseif ($item['compliance_audit'] === 'no') {
+                $complianceAuditorNoCount++;
+            }
+        }
+    }
 @endphp
 @extends('layouts.master')
 @section('title')
@@ -34,51 +53,99 @@
 
     <div id="content">
 
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card mt-n4 mx-n3">
-                    <div class="bg-warning-subtle">
-                        <div class="card-body pb-4">
-                            <h4 class="fw-semibold">
-                                {{ limitChars($templateName ?? '', 100) }}
-                            </h4>
-                            <div class="hstack gap-3 flex-wrap">
-                                <div class="text-muted">
-                                    {{ $companyName }}
-                                </div>
+        <div class="card mt-n4 mx-n3">
+            <div class="bg-warning-subtle">
+                <div class="card-body pb-4">
+                    <h4 class="fw-semibold">
+                        <span class="text-theme">{{ $companyName }}</span> <i class="ri-arrow-right-s-fill align-bottom"></i> {{ limitChars($templateName ?? '', 100) }}
+                    </h4>
+                    <div class="hstack gap-3 flex-wrap">
 
-                                <div class="vr"></div>
+                        <div class="text-muted">
+                            {{ $assignmentDate ? \Carbon\Carbon::parse($assignmentDate)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}
+                        </div>
 
-                                <div class="text-muted">
-                                    {{ $surveyData->created_at ? \Carbon\Carbon::parse($surveyData->created_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}
-                                </div>
+                        <div class="vr"></div>
 
-                                <div class="vr"></div>
+                        <div class="text-muted">
+                            Vistoria: {{$surveyorName}}
+                        </div>
 
-                                <div class="text-muted">
-                                    Vistoria: {{$surveyorName}}
-                                </div>
+                        <div class="vr"></div>
 
-                                <div class="vr"></div>
-
-                                <div class="text-muted">
-                                    Auditoria: {{$auditorName}}
-                                </div>
-                            </div>
-                        </div><!-- end card body -->
+                        <div class="text-muted">
+                            Auditoria: {{$auditorName}}
+                        </div>
                     </div>
-                </div><!-- end card -->
-            </div><!-- end col -->
-        </div><!-- end row -->
-
-
-        <h6 class="text-uppercase mb-3">Descrição da Tarefa</h6>
-        <p class="text-muted">It would also help to know what the errors are - it could be something simple like a message saying delivery is not available which could be a problem with your shipping templates.
-
-        @if ( $surveyorStatus == 'losted' && $auditorStatus == 'losted')
-            <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                <i class="ri-alert-line label-icon blink"></i> O prazo expirou. A Vistoria e a Auditoria foram perdidas.
+                </div><!-- end card body -->
             </div>
+        </div><!-- end card -->
+
+        @if ($templateDescription)
+            <h6 class="text-uppercase mb-3">Descrição</h6>
+            <p class="text-muted">
+                {{ nl2br($templateDescription) }}
+            </p>
+        @endif
+
+        <div class="row mb-2">
+            <div class="col-sm-6 col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="barTermsChart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="mixedTermsChart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+                <div class="row">
+                    <div class="col">
+                        <div class="card card-animate">
+                            <div class="card-body">
+                                <h6 class="text-muted text-uppercase">Vistoria</h6>
+                                <span class="text-success">Conforme</span>: {{$complianceSurveyorYesCount}}
+                                <br>
+                                <span class="text-danger">Não Conforme</span>: {{$complianceSurveyorNoCount}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card card-animate">
+                            <div class="card-body">
+                                @if( !$complianceAuditorYesCount && ! $complianceAuditorNoCount )
+                                    <span class="fs-5 ri-alert-fill text-warning float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"  title="Auditoria não foi realizada"></span>
+                                @endif
+                                <h6 class="text-muted text-uppercase">Auditoria</h6>
+                                <span class="text-success">De Acordo</span>: {{$complianceAuditorYesCount}}
+                                <br>
+                                <span class="text-danger">Indeferido</span>: {{$complianceAuditorNoCount}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div id="polarTermsAreaChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if ( $surveyorStatus == 'completed' && $auditorStatus == 'losted')
+            <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
+                <i class="ri-alert-line label-icon blink"></i> A Vistoria foi completada. Entretanto, o prazo da Auditoria expirou.
+            </div>
+        @elseif ( $surveyorStatus == 'losted' && $auditorStatus == 'losted')
+            <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
+                <i class="ri-alert-line label-icon blink"></i> A Vistoria e a Auditoria não foram realizadas no prazo.
+            </div>
+        {{--
         @elseif ($surveyorStatus == 'losted')
             <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
                 <i class="ri-alert-line label-icon blink"></i> O prazo expirou e esta Vistoria foi perdida
@@ -87,18 +154,19 @@
             <div class="alert alert-secondary alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
                 <i class="ri-alert-line label-icon blink"></i> O prazo expirou e esta Auditoria foi perdida
             </div>
+        --}}
         @endif
 
         @foreach ($stepsWithTopics as $stepIndex => $step)
             @php
                 $topicBadgeIndex = 0;
 
-                $stepId = intval($step['step_id']);
-                $termId = intval($step['term_id']);
+                $stepId = isset($step['step_id']) ? intval($step['step_id']) : '';
+                $termId = isset($step['term_id']) ? intval($step['term_id']) : '';
                 // use the term_id to get term name. If term_id is less than 9000, find the getDepartmentNameById(term_id)
                 $stepName = $termId < 9000 ? getDepartmentNameById($termId) : getTermNameById($termId);
                 //$type =
-                $originalPosition = intval($step['step_order']);
+                $originalPosition = isset($step['step_order']) ? intval($step['step_order']) : 0;
                 $newPosition = $originalPosition;
                 $topics = $step['topics'];
             @endphp
@@ -106,7 +174,7 @@
             @if( $topics )
                 <div class="card joblist-card">
                     <div class="card-header border-bottom-dashed">
-                        <h5 class="job-title text-theme">{{ $stepName }}</h5>
+                        <h5 class="job-title text-theme text-uppercase">{{ $stepName }}</h5>
                     </div>
                     @if ( $topics && is_array($topics))
                         @php
@@ -116,7 +184,7 @@
                             @php
                                 $topicBadgeIndex++;
 
-                                $topicId = intval($topic['topic_id']);
+                                $topicId = isset($topic['topic_id']) ? intval($topic['topic_id']) : '';
                                 $question = $topic['question'] ?? '';
 
                                 $originalPosition = 0;
@@ -147,26 +215,35 @@
                                 $complianceAudit = $filteredItems[0]['compliance_audit'] ?? '';
 
                                 $bgSurveyor = $complianceSurvey == 'yes' ? 'bg-opacity-10 bg-success' : 'bg-opacity-10 bg-danger';
+                                $bgSurveyor = $complianceSurvey ? $bgSurveyor : 'bg-opacity-10 bg-warning';
 
                                 $bgAuditor = $complianceAudit == 'yes' ? 'bg-opacity-10 bg-success' : 'bg-opacity-10 bg-danger';
+                                $bgAuditor = $complianceAudit ? $bgAuditor : 'bg-opacity-10 bg-warning';
 
                                 $topicBadgeColor = $complianceSurvey == 'no' || $complianceAudit == 'no' ? 'danger' : 'theme';
 
-                                $topicLabelColor = $complianceSurvey == 'no' || $complianceAudit == 'no' ? '<span class="spinner-grow spinner-grow-sm text-danger float-end" title="Não Conforme"></span>' : '<span class="fs-5 ri-check-double-fill text-theme float-end" title="Em conformidade"></span>';
+                                if($complianceSurvey && $complianceAudit){
+                                    $topicLabelColor = $complianceSurvey == 'no' || $complianceAudit == 'no' ? '<span class="spinner-grow spinner-grow-sm text-danger float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Conforme"></span>' : '<span class="fs-5 ri-check-double-fill text-theme float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Em conformidade"></span>';
+                                }else{
+                                    $topicLabelColor = '<span class="fs-5 ri-alert-fill text-warning float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Comparável"></span>';
+                                }
 
                             @endphp
                             <div class="card-body pb-0">
                                 {!! $topicLabelColor !!}
                                 <h5 class="mb-0">
                                     <span class="badge bg-light-subtle badge-border text-{{$topicBadgeColor}} align-bottom me-1">{{ $topicBadgeIndex }}</span>
-                                    {{ $question }}
+                                    {{ $question ? ucfirst($question) : 'NI' }}
                                 </h5>
                                 <div class="row mt-3">
                                     <div class="col-md-6 pb-3">
                                         <div class="card border-0 h-100">
                                             <div class="card-header border-1 border-bottom-dashed {{ $bgSurveyor }}">
                                                 <h6 class="card-title mb-0">
-                                                    Vistoria: {!! $complianceSurvey && $complianceSurvey == 'yes' ? '<span class="text-theme">Conforme</span>' : '<span class="text-danger">Não Conforme</span>' !!}
+                                                    Vistoria:
+                                                    {!! $complianceSurvey && $complianceSurvey == 'yes' ? '<span class="text-theme">Conforme</span>' : '' !!}
+                                                    {!! $complianceSurvey && $complianceSurvey == 'no' ? '<span class="text-danger">Não Conforme</span>' : '' !!}
+                                                    {!! !$complianceSurvey ? '<span class="text-warning">Não Informado</span>' : '' !!}
                                                 </h6>
                                             </div>
                                             <div class="card-body {{ $bgSurveyor }}">
@@ -181,7 +258,7 @@
                                                                     if (!empty($attachmentId)) {
                                                                         $attachmentUrl = App\Models\Attachments::getAttachmentPathById($attachmentId);
 
-                                                                        $dateAttachment = App\Models\Attachments::getAttachmentDateAttachmentById($attachmentId);
+                                                                        $dateAttachment = App\Models\Attachments::getAttachmentDateById($attachmentId);
                                                                     }
                                                                 @endphp
                                                                 @if ($attachmentUrl)
@@ -209,7 +286,10 @@
                                         <div class="card border-0 h-100">
                                             <div class="card-header border-1 border-bottom-dashed {{ $bgAuditor }}">
                                                 <h6 class="card-title mb-0">
-                                                    Auditoria: {!! $complianceAudit && $complianceAudit == 'yes' ? '<span class="text-theme">Aprovada</span>' : '<span class="text-danger">Indeferida</span>' !!}
+                                                    Auditoria:
+                                                    {!! $complianceAudit && $complianceAudit == 'yes' ? '<span class="text-theme">Aprovada</span>' : '' !!}
+                                                    {!! $complianceAudit && $complianceAudit == 'no' ? '<span class="text-danger">Indeferida</span>' : '' !!}
+                                                    {!! !$complianceAudit ? '<span class="text-warning">Não Informado</span>' : '' !!}
                                                 </h6>
                                             </div>
                                             <div class="card-body {{ $bgAuditor }}">
@@ -224,7 +304,7 @@
                                                                 if (!empty($attachmentId)) {
                                                                     $attachmentUrl = App\Models\Attachments::getAttachmentPathById($attachmentId);
 
-                                                                    $dateAttachment = App\Models\Attachments::getAttachmentDateAttachmentById($attachmentId);
+                                                                    $dateAttachment = App\Models\Attachments::getAttachmentDateById($attachmentId);
                                                                 }
                                                             @endphp
                                                             @if ($attachmentUrl)
@@ -261,5 +341,202 @@
     @endsection
 @section('script')
     <script src="{{ URL::asset('build/libs/glightbox/js/glightbox.min.js') }}"></script>
+
+    <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
+
+    <script>
+        const rawTermsData = @json($analyticTermsData);
+        const terms = @json($terms);
+    </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // #barTermsChart
+        var seriesData = [];
+        var categories = [];
+
+        for (var date in rawTermsData) {
+            for (var termId in rawTermsData[date]) {
+                var termData = rawTermsData[date][termId];
+                var totalComplianceYes = termData.filter(item => item.compliance_survey === 'yes').length;
+                var totalComplianceNo = termData.filter(item => item.compliance_survey === 'no').length;
+
+                seriesData.push({
+                    x: terms[termId]['name'],
+                    y: totalComplianceYes - totalComplianceNo
+                });
+
+                categories.push(terms[termId]['name']);
+            }
+        }
+
+        var optionsTermsChart = {
+            series: [{
+                name: 'Score',
+                data: seriesData
+            }],
+            title: {
+                //text: 'Compliance Bars'
+            },
+            chart: {
+                type: 'bar',
+                height: 400,
+                toolbar: {
+                    show: false,
+                }
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '55%',
+                    colors: {
+                        ranges: [{
+                            from: -1000,
+                            to: 0,
+                            color: '#DF5253'
+                        }, {
+                            from: 1,
+                            to: 1000,
+                            color: '#1FDC01'
+                        }],
+                    },
+                    dataLabels: {
+                        position: 'top',
+                    },
+                },
+            },
+            xaxis: {
+                categories: categories
+            },
+            fill: {
+                opacity: 1
+            },
+        };
+
+        var barTermsChart = new ApexCharts(document.querySelector("#barTermsChart"), optionsTermsChart);
+        barTermsChart.render();
+
+        // #mixedTermsChart
+        var columnSeriesData = [];
+        var lineSeriesData = [];
+        var categories = [];
+
+        for (var date in rawTermsData) {
+            for (var termId in rawTermsData[date]) {
+                var termData = rawTermsData[date][termId];
+                var totalComplianceYes = termData.filter(item => item.compliance_survey === 'yes').length;
+                var totalComplianceNo = termData.filter(item => item.compliance_survey === 'no').length;
+
+                columnSeriesData.push(totalComplianceYes);
+                lineSeriesData.push(totalComplianceNo);
+                categories.push(terms[termId]['name'] + ' (' + date + ')');
+            }
+        }
+
+        var optionsMixedTermsChart = {
+            series: [{
+                name: 'Conforme',
+                type: 'column',
+                data: columnSeriesData
+            }, {
+                name: 'Não Conforme',
+                type: 'line',
+                data: lineSeriesData
+            }],
+            chart: {
+                height: 400,
+                type: 'line',
+                toolbar: {
+                    show: false,
+                }
+            },
+            stroke: {
+                width: [0, 4]
+            },
+            title: {
+                //text: 'Compliance Trends'
+            },
+            dataLabels: {
+                enabled: true,
+                enabledOnSeries: [1]
+            },
+            labels: categories,
+            xaxis: {
+                type: 'category'
+            },
+            yaxis: [{
+                title: {
+                    text: 'Conforme'
+                }
+            }, {
+                opposite: true,
+                title: {
+                    text: 'Não Conforme'
+                }
+            }],
+            colors: ['#1FDC01', '#DF5253']  // Assign custom colors to Compliance Yes and No
+        };
+
+        var mixedTermsChart = new ApexCharts(document.querySelector("#mixedTermsChart"), optionsMixedTermsChart);
+        mixedTermsChart.render();
+
+        // #polarTermsAreaChart
+        var seriesData = [];
+        var labels = [];
+
+        var termMetrics = {};
+
+        // Aggregate data for each term
+        for (var date in rawTermsData) {
+            for (var termId in rawTermsData[date]) {
+                var termData = rawTermsData[date][termId];
+                var totalCompliance = termData.filter(item => item.compliance_survey === 'yes').length;
+
+                if (!termMetrics[termId]) {
+                    termMetrics[termId] = 0;
+                }
+                termMetrics[termId] += totalCompliance;
+            }
+        }
+
+        // Prepare data for the chart
+        for (var termId in termMetrics) {
+            seriesData.push(termMetrics[termId]);
+            labels.push(terms[termId]['name']);
+        }
+
+        var optionsTermsAreaChart = {
+            series: seriesData,
+            chart: {
+                height: 327,
+                type: 'polarArea',
+                toolbar: {
+                    show: false,
+                }
+            },
+            labels: labels,
+            stroke: {
+                colors: ['#fff']
+            },
+            fill: {
+                opacity: 0.8
+            },
+            legend: {
+                position: 'bottom'
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    }
+                }
+            }]
+        };
+
+        var polarTermsAreaChart = new ApexCharts(document.querySelector("#polarTermsAreaChart"), optionsTermsAreaChart);
+        polarTermsAreaChart.render();
+    });
+    </script>
+
 
 @endsection

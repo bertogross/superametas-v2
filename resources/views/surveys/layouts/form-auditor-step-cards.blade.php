@@ -5,12 +5,12 @@
     @endphp
     @foreach ($data as $stepIndex => $step)
         @php
-            $stepId = intval($step['step_id']);
-            $termId = intval($step['term_id']);
+            $stepId = isset($step['step_id']) ? intval($step['step_id']) : '';
+            $termId = isset($step['term_id']) ? intval($step['term_id']) : '';
             // use the term_id to get term name. If term_id is less than 9000, find the getDepartmentNameById(term_id)
             $stepName = $termId < 9000 ? getDepartmentNameById($termId) : getTermNameById($termId);
             //$type =
-            $originalPosition = intval($step['step_order']);
+            $originalPosition = isset($step['step_order']) ? intval($step['step_order']) : 0;
             $newPosition = $originalPosition;
             $topics = $step['topics'];
         @endphp
@@ -18,7 +18,7 @@
         @if( $topics )
             <div class="card joblist-card">
                 <div class="card-body">
-                    <h5 class="job-title text-theme">{{ $stepName }}</h5>
+                    <h5 class="job-title text-theme text-uppercase">{{ $stepName }}</h5>
                 </div>
                 @if ( $topics && is_array($topics))
                     @php
@@ -36,7 +36,7 @@
 
                             $topicBadgeIndex++;
 
-                            $topicId = intval($topic['topic_id']);
+                            $topicId = isset($topic['topic_id']) ? intval($topic['topic_id']) : '';
                             $question = $topic['question'] ?? '';
 
                             $originalPosition = 0;
@@ -78,18 +78,13 @@
                                     <div class="col">
                                         <h5 class="mb-0">
                                             <span class="badge bg-light-subtle text-body badge-border text-theme align-bottom me-1">{{ $topicBadgeIndex }}</span>
-                                            {{ $question }}
+                                            {{ $question ? ucfirst($question) : 'NI' }}
                                         </h5>
                                     </div>
                                     <div class="col-auto">
-                                        <i class="fs-5 ri-time-line text-warning-emphasis {{ !$complianceAudit ? '' : 'd-none'}}"
-                                        data-bs-toggle="tooltip" data-bs-trigger="hover"
-                                        data-bs-placement="top" title="Status: Pendente"></i>
+                                        <i class="fs-5 ri-time-line text-warning-emphasis {{ !$complianceAudit ? '' : 'd-none'}}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Status: Pendente"></i>
 
-                                        <i class="fs-5 ri-check-double-fill text-theme {{ $complianceAudit ? '' : 'd-none'}}"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-trigger="hover"
-                                        data-bs-placement="top" title="Status: Concluído"></i>
+                                        <i class="fs-5 ri-check-double-fill text-theme {{ $complianceAudit ? '' : 'd-none'}}" data-bs-placement="top" title="Status: Concluído"></i>
                                     </div>
                                 </div>
                                 <div class="row mt-3">
@@ -111,7 +106,7 @@
                                                                 if (!empty($attachmentId)) {
                                                                     $attachmentUrl = App\Models\Attachments::getAttachmentPathById($attachmentId);
 
-                                                                    $dateAttachment = App\Models\Attachments::getAttachmentDateAttachmentById($attachmentId);
+                                                                    $dateAttachment = App\Models\Attachments::getAttachmentDateById($attachmentId);
                                                                 }
                                                             @endphp
                                                             @if ($attachmentUrl)
@@ -144,7 +139,7 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <div class="col">
+                                                    <div class="col-sm-12 col-md">
                                                         <div class="input-group">
                                                             @if( $auditorStatus != 'completed' && $auditorStatus != 'losted' )
                                                                 <label for="input-attachment-{{$radioIndex}}" class="btn btn-outline-light waves-effect waves-light ps-1 pe-1 mb-0 d-flex align-content-center flex-wrap" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Anexar fotografia" data-step-id="{{$stepId}}" data-topic-id="{{$topicId}}">
@@ -179,7 +174,7 @@
                                                                         if (!empty($attachmentId)) {
                                                                             $attachmentUrl = App\Models\Attachments::getAttachmentPathById($attachmentId);
 
-                                                                            $dateAttachment = App\Models\Attachments::getAttachmentDateAttachmentById($attachmentId);
+                                                                            $dateAttachment = App\Models\Attachments::getAttachmentDateById($attachmentId);
                                                                         }
                                                                     @endphp
                                                                     @if ($attachmentUrl)
@@ -212,14 +207,20 @@
                                                             @endif
                                                         </div>
                                                     </div>
-                                                    <div class="col-auto">
-                                                        <div class="form-check form-switch form-switch-sm form-switch-theme mb-4" title="Em conformidade">
-                                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_audit" role="switch" id="YesSwitchCheck{{ $topicIndex.$radioIndex }}" {{$auditorStatus == 'completed' || $auditorStatus == 'losted' ? 'disabled' : ''}} value="yes" {{$complianceAudit && $complianceAudit == 'yes' ? 'checked' : ''}}>
-                                                            <label class="form-check-label" for="YesSwitchCheck{{ $topicIndex.$radioIndex }}">Aprovada</label>
-                                                        </div>
-                                                        <div class="form-check form-switch form-switch-sm form-switch-danger" title="Não conforme">
-                                                            <input tabindex="-1" class="form-check-input" type="radio" name="compliance_audit" role="switch" id="NoSwitchCheck{{ $topicIndex.$radioIndex }}" {{$auditorStatus == 'completed' || $auditorStatus == 'losted' ? 'disabled' : ''}} value="no" {{$complianceAudit && $complianceAudit == 'no' ? 'checked' : ''}}>
-                                                            <label class="form-check-label" for="NoSwitchCheck{{ $topicIndex.$radioIndex }}">Indeferida</label>
+                                                    <div class="col-sm-12 col-md-auto">
+                                                        <div class="row">
+                                                            <div class="col col-md-12">
+                                                                <div class="form-check form-switch form-switch-sm form-switch-theme mt-2" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Vistoria efetuada de forma correta">
+                                                                    <input tabindex="-1" class="form-check-input" type="radio" name="compliance_audit" role="switch" id="YesSwitchCheck{{ $topicIndex.$radioIndex }}" {{$auditorStatus == 'completed' || $auditorStatus == 'losted' ? 'disabled' : ''}} value="yes" {{$complianceAudit && $complianceAudit == 'yes' ? 'checked' : ''}}>
+                                                                    <label class="form-check-label" for="YesSwitchCheck{{ $topicIndex.$radioIndex }}">De Acordo</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col col-md-12">
+                                                                <div class="form-check form-switch form-switch-sm form-switch-danger mt-2" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Vistoria efetuada de forma incorreta">
+                                                                    <input tabindex="-1" class="form-check-input" type="radio" name="compliance_audit" role="switch" id="NoSwitchCheck{{ $topicIndex.$radioIndex }}" {{$auditorStatus == 'completed' || $auditorStatus == 'losted' ? 'disabled' : ''}} value="no" {{$complianceAudit && $complianceAudit == 'no' ? 'checked' : ''}}>
+                                                                    <label class="form-check-label" for="NoSwitchCheck{{ $topicIndex.$radioIndex }}">Não Concordo</label>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

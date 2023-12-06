@@ -34,7 +34,7 @@ if (is_object($getActiveCompanies)) {
 
                             <div class="d-flex position-absolute start-0 end-0 top-0 p-3">
                                 <div class="flex-grow-1">
-                                    <h5 class="modal-title text-white" id="modalUserTitle"></h5>
+                                    <h5 class="modal-title text-white text-shadow" id="modalUserTitle"></h5>
                                 </div>
                                 <div class="flex-shrink-0">
                                     <div class="d-flex gap-3 align-items-center">

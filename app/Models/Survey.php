@@ -197,14 +197,18 @@ class Survey extends Model
             ->get();
 
         foreach ($assignments as $assignment) {
-            if ($assignment->surveyor_status === 'auditing' && $assignment->auditor_status !== 'completed') {
+            if ( ( $assignment->surveyor_status === 'completed' || $assignment->surveyor_status === 'auditing' ) && $assignment->auditor_status !== 'completed' ) {
+                // Change auditor_status to 'bypass' and surveyor_status to 'completed'
+                $assignment->auditor_status = 'bypass';
+                $assignment->surveyor_status = 'completed';
+            } /*elseif ( $assignment->surveyor_status === 'auditing' && $assignment->auditor_status !== 'completed' ) {
                 // Change auditor_status to 'losted' and surveyor_status to 'completed'
                 $assignment->auditor_status = 'losted';
                 $assignment->surveyor_status = 'completed';
-            } elseif ($assignment->surveyor_status !== 'auditing') {
+            }*/ elseif ( $assignment->surveyor_status !== 'auditing' && $assignment->surveyor_status !== 'completed' ) {
                 // Change surveyor_status to 'losted' and auditor_status to 'losted'
+                $assignment->auditor_status = 'bypass';
                 $assignment->surveyor_status = 'losted';
-                $assignment->auditor_status = 'losted';
             }
 
             $assignment->save();
@@ -235,21 +239,88 @@ class Survey extends Model
                         SurveyAssignments::distributingAssignments($surveyId, $distributedData);
                         break;
                     case 'weekly':
+                        // TODO
                         // Check if today is the specific day of the week for weekly recurrence
                         // Example: if ($today->isMonday()) { ... }
                         break;
                     case 'biweekly':
+                        // TODO
                         // Check if today is the 1st or 15th of the month for biweekly recurrence
                         break;
                     case 'monthly':
+                        // TODO
                         // Check if today matches the specific day of the month for monthly recurrence
                         break;
                     case 'annual':
+                        // TODO
                         // Check if today matches the specific day and month for annual recurrence
                         break;
                 }
             }
         }
+    }
+
+    public static function fetchAndTransformSurveyDataByCompanies($surveyId)
+    {
+        $analyticsData = SurveyAssignments::where('survey_assignments.survey_id', $surveyId)
+        ->join('survey_responses', 'survey_assignments.id', '=', 'survey_responses.assignment_id')
+        ->select(
+            //'survey_assignments.*', // You might want to select specific fields here
+            'survey_assignments.company_id',
+            'survey_assignments.surveyor_id',
+            'survey_assignments.surveyor_status',
+            'survey_assignments.created_at',
+            'survey_responses.compliance_survey',
+            //'survey_responses.compliance_audit'
+            // Add other fields you need here
+        )
+        ->where('survey_assignments.surveyor_status', 'completed')
+        ->where('survey_responses.compliance_survey', '!=', null)
+        ->get()
+        ->toArray();
+
+        $transformedArray = [];
+
+        foreach ($analyticsData as $item) {
+            $dateKey = Carbon::parse($item['created_at'])->format('d-m-Y');
+            $companyId = $item['company_id'];
+
+            $transformedArray[$dateKey][$companyId][] = $item;
+        }
+
+        return $transformedArray;
+    }
+
+    public static function fetchAndTransformSurveyDataByTerms($surveyId, $assignmentId = false)
+    {
+        $analyticsData = SurveyAssignments::where('survey_assignments.survey_id', $surveyId)
+            ->join('survey_responses', 'survey_assignments.id', '=', 'survey_responses.assignment_id')
+            ->join('survey_steps', 'survey_responses.step_id', '=', 'survey_steps.id')
+            ->select(
+                'survey_assignments.*',
+                'survey_responses.compliance_survey',
+                //'survey_responses.compliance_audit',
+                'survey_steps.term_id'
+                // Add other fields you need here
+            )
+            ->where('survey_assignments.surveyor_status', 'completed')
+            ->when($assignmentId, function ($query) use ($assignmentId) {
+                return $query->where('survey_assignments.id', $assignmentId);
+            })
+            ->where('survey_responses.compliance_survey', '!=', null)
+            ->get()
+            ->toArray();
+
+        $transformedArray = [];
+
+        foreach ($analyticsData as $item) {
+            $dateKey = Carbon::parse($item['created_at'])->format('d-m-Y');
+            $termId = $item['term_id'];
+
+            $transformedArray[$dateKey][$termId][] = $item;
+        }
+
+        return $transformedArray;
     }
 
 

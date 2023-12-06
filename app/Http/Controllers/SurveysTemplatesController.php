@@ -23,10 +23,7 @@ class SurveysTemplatesController extends Controller
 
         $data = SurveyTemplates::findOrFail($id);
 
-        $decodedData = isset($data->template_data) && is_string($data->template_data) ? json_decode($data->template_data, true) : $data->template_data;
-
-        $reorderingData = SurveyTemplates::reorderingData($decodedData);
-
+        $reorderingData = SurveyTemplates::reorderingData($data);
         $result = $reorderingData ?? null;
 
         $preview = $request->query('preview', false);
@@ -110,10 +107,7 @@ class SurveysTemplatesController extends Controller
         }
         */
 
-        $decodedData = isset($data->template_data) ? json_decode($data->template_data, true) : $data->template_data;
-
-        $reorderingData = SurveyTemplates::reorderingData($decodedData);
-
+        $reorderingData = SurveyTemplates::reorderingData($data);
         //$result = $reorderingData ?? null;
 
         $custom = SurveyTemplates::getByType($reorderingData, 'custom');

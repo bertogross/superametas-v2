@@ -12,9 +12,10 @@
         //appPrintR($assignmentData);
         //appPrintR($auditorData);
         //appPrintR($filteredStatuses);
+        //appPrintR($assignmentData);
     @endphp
-    <div class="profile-foreground position-relative mx-n5 mt-n4">
-        <div class="profile-wid-bg mx-n5">
+    <div class="profile-foreground position-relative mx-n4 mt-n5">
+        <div class="profile-wid-bg">
             <img
             @if( empty(trim($user->cover)))
                 src="{{URL::asset('build/images/small/img-9.jpg')}}"
@@ -25,7 +26,7 @@
         </div>
     </div>
 
-    <div class="pt-4 mb-2 mb-lg-1 pb-lg-4 profile-wrapper">
+    <div class="pt-5 mb-2 mb-lg-1 pb-lg-4 profile-wrapper">
         <div class="row g-4">
             <div class="col-auto">
                 <div class="avatar-lg profile-user position-relative d-inline-block">
@@ -50,11 +51,11 @@
             </div>
             <div class="col">
                 <div class="p-2">
-                    <h3 class="text-white mb-1">{{ $user->name }}</h3>
-                    <p class="text-white text-opacity-75 mb-2">{{ $roleName }}</p>
-                    <div class="hstack text-white-50 gap-1">
-                        <div class="me-2">
-                            <i class="ri-mail-line text-white text-opacity-75 fs-16 align-middle me-2"></i>{{ $user->email }}
+                    <h3 class="text-white mb-1 text-shadow">{{ $user->name }}</h3>
+                    <p class="text-white mb-2 text-shadow">{{ $roleName }}</p>
+                    <div class="hstack text-white gap-1">
+                        <div class="me-2 text-shadow">
+                            <i class="ri-mail-line text-white fs-16 align-middle me-2"></i>{{ $user->email }}
                         </div>
                     </div>
                 </div>
@@ -84,14 +85,14 @@
         <div class="card-header align-items-center d-flex">
             <h5 class="card-title mb-0 flex-grow-1"><i class="ri-calendar-check-fill fs-16 align-bottom text-theme me-2"></i>Tarefas</h5>
         </div>
-        <div class="card-body">
-            <div class="tasks-board mb-0 position-relative" id="kanbanboard">
-                @foreach ($filteredStatuses as $key => $status)
-                    @php
-                        $filteredSurveyorData = [];
-                        $filteredAuditorData = [];
+        <div class="card-body h-100" style="min-height: 150px">
+            @if ( $assignmentData && is_array($assignmentData) )
+                <div class="tasks-board mb-0 position-relative" id="kanbanboard">
+                    @foreach ($filteredStatuses as $key => $status)
+                        @php
+                            $filteredSurveyorData = [];
+                            $filteredAuditorData = [];
 
-                        if($assignmentData){
                             array_walk($assignmentData, function ($item) use (&$filteredSurveyorData, $key, $profileUserId) {
                                 if ($item['surveyor_status'] == $key && $item['surveyor_id'] == $profileUserId) {
                                     $filteredSurveyorData[] = $item;
@@ -103,78 +104,76 @@
                                     $filteredAuditorData[] = $item;
                                 }
                             });
-                        }
 
-                        $countFilteredSurveyorData = is_array($filteredSurveyorData) ? count($filteredSurveyorData) : 0;
+                            $countFilteredSurveyorData = is_array($filteredSurveyorData) ? count($filteredSurveyorData) : 0;
 
-                        $countFilteredAuditorData = is_array($filteredAuditorData) ? count($filteredAuditorData) : 0;
+                            $countFilteredAuditorData = is_array($filteredAuditorData) ? count($filteredAuditorData) : 0;
 
-                        $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
-                    @endphp
+                            $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
+                        @endphp
 
-                    <div class="tasks-list p-2 {{ in_array($key, ['waiting', 'auditing', 'pending', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
-                        <div class="d-flex mb-3">
-                            <div class="flex-grow-1">
-                                <h6 class="fs-14 text-uppercase fw-semibold mb-0">
-                                    <span data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="{{$status['label']}}" data-bs-content="{{$status['description']}}">
-                                        {{$status['label']}}
-                                    </span>
-                                    <small class="badge bg-{{$status['color']}} align-bottom ms-1 totaltask-badge">
-                                        {{ $countTotal }}
-                                    </small>
-                                </h6>
-                            </div>
-                            <div class="flex-shrink-0">
-                                {{--
-                                <div class="dropdown card-header-dropdown">
-                                    <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown"
-                                        aria-haspopup="true" aria-expanded="false">
-                                        <span class="fw-medium text-muted fs-12">Priority<i
-                                                class="mdi mdi-chevron-down ms-1"></i></span>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a class="dropdown-item" href="#">Priority</a>
-                                        <a class="dropdown-item" href="#">Date Added</a>
-                                    </div>
+                        <div class="tasks-list p-2 {{ in_array($key, ['waiting', 'auditing', 'pending', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
+                            <div class="d-flex mb-3">
+                                <div class="flex-grow-1">
+                                    <h6 class="fs-14 text-uppercase fw-semibold mb-0">
+                                        <span data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="{{$status['label']}}" data-bs-content="{{$status['description']}}">
+                                            {{$status['label']}}
+                                        </span>
+                                        <small class="badge bg-{{$status['color']}} align-bottom ms-1 totaltask-badge">
+                                            {{ $countTotal }}
+                                        </small>
+                                    </h6>
                                 </div>
-                                --}}
+                                <div class="flex-shrink-0">
+                                    {{--
+                                    <div class="dropdown card-header-dropdown">
+                                        <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                            <span class="fw-medium text-muted fs-12">Priority<i
+                                                    class="mdi mdi-chevron-down ms-1"></i></span>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a class="dropdown-item" href="#">Priority</a>
+                                            <a class="dropdown-item" href="#">Date Added</a>
+                                        </div>
+                                    </div>
+                                    --}}
+                                </div>
                             </div>
-                        </div>
-                        <div data-simplebar class="tasks-wrapper" style="max-height: 100vh;">
-                            <div id="{{$key}}-task" class="tasks mb-2">
-                                @if ( $assignmentData && is_array($assignmentData) )
+                            <div data-simplebar class="tasks-wrapper">
+                                <div id="{{$key}}-task" class="tasks mb-2">
                                     @include('surveys.layouts.profile-task-card', [
                                         'status' => $status,
                                         'statusKey' => $key,
                                         'designated' => 'auditor',
                                         'data' => $filteredAuditorData
                                     ])
-                                @endif
 
-                                @if ( $assignmentData && is_array($assignmentData) )
                                     @include('surveys.layouts.profile-task-card', [
                                         'status' => $status,
                                         'statusKey' => $key,
                                         'designated' => 'surveyor',
                                         'data' => $filteredSurveyorData
                                     ])
-                                @endif
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <!--end tasks-list-->
-                @endforeach
+                        <!--end tasks-list-->
+                    @endforeach
 
-                {{--
-                @if ($countTasks === 0)
-                    <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show ms-auto me-auto" role="alert">
-                        <i class="ri-alert-line label-icon"></i> Tarefas ainda não lhe foram atribuídas
-                    </div>
-                @endif
-                --}}
-
-            </div>
-            <!--end task-board-->
+                    {{--
+                    @if ($countTasks === 0)
+                        <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show ms-auto me-auto" role="alert">
+                            <i class="ri-alert-line label-icon"></i> Tarefas ainda não lhe foram atribuídas
+                        </div>
+                    @endif
+                    --}}
+                </div>
+            @else
+                <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+                    <i class="ri-alert-line label-icon"></i> Tarefas ainda não lhe foram delegadas
+                </div>
+            @endif
         </div>
     </div>
 
@@ -217,5 +216,12 @@
     var uploadAvatarURL = "{{ route('uploadAvatarURL') }}";
 
     attachImage("#member-image-input", "#avatar-img", uploadAvatarURL, false);
+</script>
+
+<script>
+    // Auto refresh page
+    setInterval(function() {
+        window.location.reload();// true to cleaning cache
+    }, 600000); // 600000 milliseconds = 10 minutes
 </script>
 @endsection

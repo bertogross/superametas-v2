@@ -1,59 +1,93 @@
 
 // Toast Notifications
 // Display a toast notification using Bootstrap's Toast API with a backdrop
-export function toastAlert(message, type = 'success', duration = 10000) {
-    // Remove existing toast containers
-    document.querySelectorAll('.toast-container').forEach(element => element.remove());
+export function toastAlert(message, type = 'success', duration = 3000) {
+    setTimeout(() => {
+        // Define the HTML template for the toast
+        const icon = type === 'success' ? 'ri-checkbox-circle-fill text-success' : 'ri-alert-fill text-' + type;
+        type = type === 'error' ? 'danger' : type;
 
-    // Define the HTML template for the toast
-    const icon = type === 'success' ? 'ri-checkbox-circle-fill text-success' : 'ri-alert-fill text-' + type;
-    type = type === 'error' ? 'danger' : type;
+        let toastContainerElement = document.querySelectorAll('.toast-container');
+        const toastBackdrop = `<div class="toast-backdrop"></div>`;
 
-    const ToastHtml = `
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div class="toast fade show toast-border-${type} overflow-hidden mt-3" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0 me-2">
-                            <i class="${icon} align-middle"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto float-end fs-10" data-bs-dismiss="toast" aria-label="Close"></button>
-                            <h6 class="mb-0">${message}</h6>
+        // Remove existing toast containers
+        if(toastContainerElement){
+            toastContainerElement.forEach(element => element.remove())
+        }
+
+        let toastBackdropElement = document.querySelectorAll('.toast-backdrop');
+        if(toastBackdropElement){
+            toastBackdropElement.forEach(element => element.remove());
+        }
+
+        const ToastHtml = `
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div class="toast fade show toast-border-${type} overflow-hidden mt-3" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-2">
+                                <i class="${icon} align-middle"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <button type="button" class="btn-close btn-close-white me-2 m-auto float-end fs-10" data-bs-dismiss="toast" aria-label="Close"></button>
+                                <h6 class="mb-0">${message}</h6>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
 
-    // Add the toast and backdrop to the end of the document body
-    document.body.insertAdjacentHTML('beforeend', ToastHtml);
+        // Add the toast and backdrop to the end of the document body
+        if(type != 'success'){
+            document.body.insertAdjacentHTML('beforeend', toastBackdrop);
+        }
+        document.body.insertAdjacentHTML('beforeend', ToastHtml);
 
-    // Initialize and show the toast using Bootstrap's API
-    const toastElement = document.querySelector('.toast-container .toast');
-    const toast = new bootstrap.Toast(toastElement, { autohide: false });
-    toast.show();
+        // Initialize and show the toast using Bootstrap's API
+        const toastElement = document.querySelector('.toast-container .toast');
+        const toast = new bootstrap.Toast(toastElement, { autohide: false });
+        toast.show();
 
-    // Add event listener to the close button
-    const closeButton = document.querySelector('.btn-close');
-    closeButton.addEventListener('click', () => {
-        toast.hide();
-    });
 
-    // If a duration is provided, hide the toast after the duration
-    if (duration > 0) {
+        // Add event listener to the close button
+        const closeButton = document.querySelector('.btn-close');
+        closeButton.addEventListener('click', () => {
+            toast.hide();
+
+            toastContainerElement = document.querySelectorAll('.toast-container');
+            if(toastContainerElement){
+                toastContainerElement.forEach(element => element.remove());
+            }
+
+            toastBackdropElement = document.querySelectorAll('.toast-backdrop');
+            if(toastBackdropElement){
+                toastBackdropElement.forEach(element => element.remove());
+            }
+        });
+
+        // If a duration is provided, hide the toast after the duration
         setTimeout(() => {
             toast.hide();
         }, duration);
-    }
 
-    // Remove the toast container once the toast is completely hidden
-    toastElement.addEventListener('hidden.bs.toast', () => {
-        document.querySelectorAll('.toast-container').forEach(element => element.remove());
-    });
+        setTimeout(() => {
+            // Remove the toast container once the toast is completely hidden
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastContainerElement = document.querySelectorAll('.toast-container');
+                if(toastContainerElement){
+                    toastContainerElement.forEach(element => element.remove());
+                }
+
+                toastBackdropElement = document.querySelectorAll('.toast-backdrop');
+                if(toastBackdropElement){
+                    toastBackdropElement.forEach(element => element.remove());
+                }
+            });
+        }, duration-10);
+
+    }, 100);
 }
-
 
 export function sweetWizardAlert(message, urlToRedirect = false, icon = 'success', Trigger = false){
     Swal.fire({

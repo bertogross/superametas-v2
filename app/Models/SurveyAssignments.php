@@ -74,10 +74,10 @@ class SurveyAssignments extends Model
                 ->update([
                     'status' => 'started',
                 ]);
+        }elseif($status == 'completed'){
+            $column['auditor_status'] = 'new';
+            $data->update($column);
         }elseif($status == 'auditing'){
-            // When Surveyor finish the task, transfer to Auditor make revision
-
-            // new status
             $column['auditor_status'] = 'new';
             $data->update($column);
         }
@@ -95,9 +95,13 @@ class SurveyAssignments extends Model
         $surveyId = $data->survey_id;
         $companyId = $data->company_id;
 
-        // If newStatus was 'completed', change the surveyor_status
         if($status == 'completed'){
+            // If newStatus was 'completed', change the surveyor_status
             $column['surveyor_status'] = $status;
+            $data->update($column);
+        } elseif($status == 'in_progress'){
+            // If newStatus was 'completed', change the surveyor_status
+            $column['surveyor_status'] = 'auditing';
             $data->update($column);
         }
 
@@ -105,6 +109,23 @@ class SurveyAssignments extends Model
         $column['auditor_status'] = $status;
         $data->update($column);
 
+    }
+
+
+    public static function getAssignmentDateRange()
+    {
+        $firstDate = DB::connection('smAppTemplate')->table('survey_assignments')
+            ->select(DB::raw('DATE_FORMAT(MIN(created_at), "%Y-%m-%d") as first_date'))
+            ->first();
+
+        $lastDate = DB::connection('smAppTemplate')->table('survey_assignments')
+            ->select(DB::raw('DATE_FORMAT(MAX(created_at), "%Y-%m-%d") as last_date'))
+            ->first();
+
+        return [
+            'first_date' => $firstDate->first_date ?? date('Y-m-d'),
+            'last_date' => $lastDate->last_date ?? date('Y-m-d'),
+        ];
     }
 
 }

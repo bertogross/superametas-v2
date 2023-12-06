@@ -21,16 +21,15 @@ class SurveyTopic extends Model
         'topic_order'
     ];
 
-    public function step()
+    /*public function step()
     {
         return $this->belongsTo(SurveyStep::class);
-    }
+    }*/
 
     public static function populateSurveyTopics($topics, $stepId, $surveyId){
         $currentUserId = auth()->id();
 
         if( $topics && $stepId && $surveyId){
-
             foreach($topics as $topicIndex => $topic){
                 $question = $topic['question'] ?? '';
                 $originalPosition = $topic['original_position'] ?? $topicIndex;
@@ -45,7 +44,11 @@ class SurveyTopic extends Model
 
                     $SurveyTopic = new SurveyTopic;
                     $SurveyTopic->fill($fill);
-                    $SurveyTopic->save();
+                    if (!$SurveyTopic->save()) {
+                        // Check for errors
+                        $errors = $SurveyTopic->getErrors();
+                        \Log::error('populateSurveyTopics: ' . $errors);
+                    }
                 }
             }
         }

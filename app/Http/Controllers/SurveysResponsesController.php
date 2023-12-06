@@ -76,10 +76,18 @@ class SurveysResponsesController extends Controller
 
         $attachmentIds = $request->input('attachment_ids');
 
-        if( $complianceSurvey == 'no' && !$attachmentIds ){
+        /*if( $complianceSurvey == 'no' && !$attachmentIds ){
             return response()->json([
                 'success' => false,
-                'message' => 'Necessário enviar ao menos uma foto apontando o motivo da Não Conformidade'
+                'message' => 'Necessário enviar ao menos uma foto apontando o motivo da Não Conformidade',
+                'action' => 'changeToPending'
+            ]);
+        }*/
+        if( !$attachmentIds ){
+            return response()->json([
+                'success' => false,
+                'message' => 'Necessário enviar ao menos uma foto',
+                'action' => 'changeToPending'
             ]);
         }
         $attachmentIdsInt = $attachmentIds ? array_map('intval', $attachmentIds) : [];
@@ -105,6 +113,17 @@ class SurveysResponsesController extends Controller
         // Check if attachmentIdsInt is empty and handle accordingly
         $data['attachments_survey'] = !empty($attachmentIdsInt) ? json_encode($attachmentIdsInt) : json_encode([]);
 
+        // Prevent error from JavaScript if input[name="response_id"] was cracked.
+        // Check if exists the response. If exist get the Id and update.
+        $existingResponse = SurveyResponse::where('survey_id', $data['survey_id'])
+            ->where('assignment_id', $data['assignment_id'])
+            ->where('step_id', $data['step_id'])
+            ->where('topic_id', $data['topic_id'])
+            ->where('company_id', $data['company_id'])
+            ->first();
+        if($existingResponse){
+            $id = $existingResponse->id;
+        }
 
         if ($id) {
             // Update existing survey response
@@ -226,6 +245,18 @@ class SurveysResponsesController extends Controller
 
         // Check if attachmentIdsInt is empty and handle accordingly
         $data['attachments_audit'] = !empty($attachmentIdsInt) ? json_encode($attachmentIdsInt) : json_encode([]);
+
+        // Prevent error from JavaScript if input[name="response_id"] was cracked.
+        // Check if exists the response. If exist get the Id and update.
+        $existingResponse = SurveyResponse::where('survey_id', $data['survey_id'])
+            ->where('assignment_id', $data['assignment_id'])
+            ->where('step_id', $data['step_id'])
+            ->where('topic_id', $data['topic_id'])
+            ->where('company_id', $data['company_id'])
+            ->first();
+        if($existingResponse){
+            $id = $existingResponse->id;
+        }
 
         if ($id) {
             // Update existing survey response

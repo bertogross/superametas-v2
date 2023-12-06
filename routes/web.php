@@ -13,7 +13,7 @@ use App\Http\Controllers\{
     GoalSalesController,
     SurveysController,
     SurveysTemplatesController,
-    SurveyTermsController,
+    SurveysTermsController,
     SurveysResponsesController,
     SurveysAssignmentsController,
     SettingsApiKeysController,
@@ -88,12 +88,12 @@ Route::middleware(['auth'])->group(function () {
 
 
             // Terms Routes
-            Route::get('/terms/listing', [SurveyTermsController::class, 'index'])->name('surveysTermsIndexURL');
-            Route::get('/terms/create', [SurveyTermsController::class, 'create'])->name('surveysTermsCreateURL');
-            Route::get('/terms/form', [SurveyTermsController::class, 'form'])->name('surveysTermsFormURL');
-            Route::get('/terms/edit/{id?}', [SurveyTermsController::class, 'edit'])->name('surveysTermsEditURL');
-            Route::post('/terms/store/{id?}', [SurveyTermsController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
-            Route::get('/terms/search', [SurveyTermsController::class, 'search'])->name('surveysTermsSearchURL');
+            Route::get('/terms/listing', [SurveysTermsController::class, 'index'])->name('surveysTermsIndexURL');
+            Route::get('/terms/create', [SurveysTermsController::class, 'create'])->name('surveysTermsCreateURL');
+            Route::get('/terms/form', [SurveysTermsController::class, 'form'])->name('surveysTermsFormURL');
+            Route::get('/terms/edit/{id?}', [SurveysTermsController::class, 'edit'])->name('surveysTermsEditURL');
+            Route::post('/terms/store/{id?}', [SurveysTermsController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
+            Route::get('/terms/search', [SurveysTermsController::class, 'search'])->name('surveysTermsSearchURL');
 
     });
 

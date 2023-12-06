@@ -36,6 +36,7 @@ class ProfileController extends Controller
             $query->where('surveyor_id', $userId)
                 ->orWhere('auditor_id', $userId);
             })
+            ->orderBy('updated_at', 'desc')
             ->limit(50)
             ->get()
             ->toArray();

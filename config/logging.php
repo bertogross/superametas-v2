@@ -111,7 +111,7 @@ return [
         ],
 
         'emergency' => [
-            'path' => storage_path('logs/laravel-' . env('APP_ENV') . '.log'),
+            'path' => storage_path('logs/laravel-emergency-' . env('APP_ENV') . '.log'),
         ],
     ],
 

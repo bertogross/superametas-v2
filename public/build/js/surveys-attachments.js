@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                console.log('File uploaded successfully');
+                                //console.log('File uploaded successfully');
 
                                 toastAlert(data.message, 'success', 5000);
 

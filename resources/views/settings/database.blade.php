@@ -180,7 +180,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="progress bg-warning-subtle rounded-0">
+                                <div class="progress bg-warning-subtle rounded-0 animated-progress custom-progress">
                                     <div class="progress-bar bg-warning synchronization-percent" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             </div>

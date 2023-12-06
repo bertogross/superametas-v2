@@ -802,41 +802,41 @@ class SettingsStripeController extends Controller
             case 'trialing':
             case 'incomplete':
             case 'incomplete_expired':
-            $label = 'versão demonstrativa';
-            $description = 'Esta versão permite a inserção de alguns registros com a finalidade de que você habitue-se com a aplicação.<br><br>Para mais recursos será necessário assinar o '.APP_NAME.'.';
-            $color = 'warning';
-            $class = '';
-            break;
+                $label = 'versão demonstrativa';
+                $description = 'Esta versão permite a inserção de alguns registros com a finalidade de que você habitue-se com a aplicação. <br><br> Para mais recursos será necessário assinar o '.env('APP_NAME').'.';
+                $color = 'warning';
+                $class = '';
+                break;
             case 'active':
-            $label = 'Assinatura Ativa';
-            $description = 'Este é um indicador de que a assinatura está financeiramente em dia.';
-            $color = 'theme';
-            $class = '';
+                $label = 'Assinatura Ativa';
+                $description = 'Este é um indicador de que a assinatura está financeiramente em dia.';
+                $color = 'theme';
+                $class = '';
             break;
             case 'past_due':
             case 'unpaid':
-            $label = 'Assinatura requer atenção';
-            $description = 'Este indicador sugere que você verifique e atualize o método de pagamento.';
-            $color = 'danger';
-            $class = 'blink';
-            break;
+                $label = 'Assinatura requer atenção';
+                $description = 'Este indicador sugere que você verifique e atualize o método de pagamento.';
+                $color = 'danger';
+                $class = 'blink';
+                break;
             case 'canceled':
-            $label = 'Assinatura Cancelada';
-            $description = 'Este é um indicador de que a assinatura foi cancelada.';
-            $color = 'danger';
-            $class = '';
-            break;
+                $label = 'Assinatura Cancelada';
+                $description = 'Este é um indicador de que a assinatura foi cancelada.';
+                $color = 'danger';
+                $class = '';
+                break;
             case 'uncollectible'://this ia s custom value, not stripe
-            $label = 'Assinatura Suspensa';
-            $description = 'Este é um indicador de que você solicitou a suspensão da assinatura.';
-            $color = 'warning';
-            $class = '';
-            break;
+                $label = 'Assinatura Suspensa';
+                $description = 'Este é um indicador de que você solicitou a suspensão da assinatura.';
+                $color = 'warning';
+                $class = '';
+                break;
             default:
-            $label = '';
-            $description = '';
-            $color = '';
-            $class = '';
+                $label = '';
+                $description = '';
+                $color = '';
+                $class = '';
         }
 
         $description .= "<br><br><small>*Etiqueta exibida somente ao Administrativo</small>";

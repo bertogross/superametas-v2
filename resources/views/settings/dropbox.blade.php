@@ -35,7 +35,7 @@
                                             <i class="ri-database-2-line fs-17"></i>
                                         </div>
                                         <div class="flex-grow-1 ms-3 overflow-hidden">
-                                            <div class="progress mb-2 progress-sm">
+                                            <div class="progress mb-2 progress-sm animated-progress custom-progress">
                                                 <div class="progress-bar {{ $storageInfo['percentageUsed'] <= 80 ? 'bg-info' : 'bg-danger' }}" role="progressbar" style="width: {{ $storageInfo['percentageUsed'] ?? '' }}%" aria-valuenow="{{ $storageInfo['percentageUsed'] ?? '' }}" aria-valuemin="0" aria-valuemax="100"></div>
                                             </div>
                                             <span class="text-muted fs-12 d-block text-truncate"><b>{{ formatSize($storageInfo['used']) ?? '' }}</b> utilizados de <b>{{ $storageInfo['total'] ?? '' }}</b>GB alocados</span>

@@ -5,6 +5,8 @@
     use App\Models\User;
 
     $templateData = SurveyTemplates::findOrFail($surveyData->template_id);
+    //appPrintR(json_decode($templateData->template_data, true));
+    //appPrintR($stepsWithTopics);
 
     $authorId = $templateData->user_id;
     $getAuthorData = getUserData($authorId);
@@ -17,6 +19,8 @@
     $templateName = $surveyData ? getTemplateNameById($surveyData->template_id) : '';
 
     $assignmentId = $assignmentData->id ?? null;
+    $assignmentCreatedAt = $assignmentData->created_at ?? null;
+
     $surveyorStatus = $assignmentData->surveyor_status ?? null;
 
     $companyId = $assignmentData->company_id ?? '';
@@ -27,9 +31,10 @@
 
     $today = Carbon::today();
     $responsesData = SurveyResponse::where('survey_id', $surveyId)
-        ->where('surveyor_id', $currentUserId)
-        ->where('company_id', $companyId)
-        ->whereDate('created_at', '=', $today)
+        ->where('assignment_id', $assignmentId)
+        //->where('surveyor_id', $currentUserId)
+        //->where('company_id', $companyId)
+        //->whereDate('created_at', '=', $today)
         ->get()
         ->toArray();
 @endphp
@@ -60,11 +65,11 @@
                 @endif
                 <h2>Vistoria</h2>
                 <p>Auditoria será realizada por <u>{{$auditorName}}</u></p>
-                <h3>{{ $templateName }}</h3>
+                <h3>{{ $templateName ? ucfirst($templateName) : 'NI' }}</h3>
                 <div class="mb-0 text-muted">
                     Executar em:
                     {{-- $surveyData->updated_at ? \Carbon\Carbon::parse($surveyData->updated_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY - HH:mm:ss') . 'hs' : '-' --}}
-                    {{ $surveyData->created_at ? \Carbon\Carbon::parse($surveyData->created_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}
+                    {{ $assignmentCreatedAt ? \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}
                 </div>
             </div>
             <div class="shape">
@@ -114,7 +119,7 @@
                     @endcomponent
                 @else
                     <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show" role="alert">
-                        <i class="ri-alert-line label-icon"></i> Não há dados para gerar os campos deste formulário de Vistoria
+                        <i class="ri-alert-line label-icon"></i> Não há dados para gerar os campos deste formulário
                     </div>
                 @endif
             </div>

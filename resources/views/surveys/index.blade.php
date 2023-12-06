@@ -75,11 +75,11 @@
             </div>
             @if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_CONTROLLERSHIP) )
                 <div class="row">
-                    <div class="col-sm-12 col-md-12 col-lg-4 col-xxl-3">
+                    <div class="col-sm-12 col-md-12 col-lg-4 col-xxl-3 mb-3">
                         @include('surveys.templates.listing')
                     </div>
 
-                    <div class="col-sm-12 col-md-12 col-lg-8 col-xxl-9">
+                    <div class="col-sm-12 col-md-12 col-lg-8 col-xxl-9 mb-3">
                         @include('surveys.listing')
                     </div>
                 </div>

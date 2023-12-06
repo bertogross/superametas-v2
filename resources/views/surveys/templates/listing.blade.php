@@ -24,7 +24,7 @@
                     <div class="col-sm-12 col-xl-12 col-sm-6">
                         <div class="card card-animate bg-info-subtle shadow-none bg-opacity-10">
                             <div class="position-absolute start-0" style="z-index: 0;">
-                                <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="100%" height="90">
+                                <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="100%" height="93">
                                     <style>
                                         .s0 {
                                             opacity: .05;

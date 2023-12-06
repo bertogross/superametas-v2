@@ -161,6 +161,10 @@ button.text-dark:hover{
   color: var(--vz-body-color) !important;
 }
 
+.text-shadow{
+    text-shadow: 2px 2px #424141;
+}
+
 #preloader{
   opacity: 0.5 !important;
   z-index: 10000 !important;
@@ -226,7 +230,7 @@ p:empty,
   background-color: var(--vz-theme);
 }
 
-pre code{
+pre{
     word-break: break-all !important;
     word-wrap: break-word !important;
     white-space: pre-wrap !important;
@@ -248,7 +252,7 @@ pre code{
     opacity: 0.3;
     padding: 20px;
 }
-pre code:hover{
+pre:hover{
     height: 80%;
     width: auto;
     max-width: 90%;
@@ -259,43 +263,43 @@ pre code:hover{
     padding-bottom: 100px;
 }
 
-pre code:nth-of-type(1){
+pre:nth-of-type(1){
   left: 102px;
 }
-pre code:nth-of-type(2){
+pre:nth-of-type(2){
   left: 204px;
 }
-pre code:nth-of-type(3){
+pre:nth-of-type(3){
   left: 306px;
 }
-pre code:nth-of-type(4){
+pre:nth-of-type(4){
   left: 406px;
 }
-pre code:nth-of-type(5){
+pre:nth-of-type(5){
   left: 506px;
 }
-pre code:nth-of-type(6){
+pre:nth-of-type(6){
   left: 606px;
 }
-pre code:nth-of-type(7){
+pre:nth-of-type(7){
   left: 706px;
 }
-pre code:nth-of-type(8){
+pre:nth-of-type(8){
   left: 806px;
 }
-pre code:nth-of-type(9){
+pre:nth-of-type(9){
   left: 906px;
 }
-pre code:nth-of-type(10){
+pre:nth-of-type(10){
   left: 1006px;
 }
-pre code:nth-of-type(11){
+pre:nth-of-type(11){
   left: 1106px;
 }
-pre code:nth-of-type(12){
+pre:nth-of-type(12){
   left: 1206px;
 }
-pre code:empty{
+pre:empty{
   display: none !important;
 }
 
@@ -475,6 +479,9 @@ pre code:empty{
     background-color: var(--vz-gray-800) !important;
     background: var(--vz-gray-800) !important;
 }
+
+
+
 
 [data-bs-theme="dark"] #btn-light-dark-mode .bx-moon::before {
     content: "\ec34";
@@ -911,3 +918,8 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
     }
 }
 
+@media (max-width: 575.98px) {
+    [data-layout="horizontal"] .profile-foreground {
+        margin-top: -3rem !important;
+    }
+}

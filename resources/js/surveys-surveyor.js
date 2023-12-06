@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 location.reload(true);
                             }, 1000);
                             */
-                            toastAlert('Redirecionando ao formulário...', 'primary');
+                            toastAlert('Redirecionando ao formulário...', 'success');
 
                             setTimeout(function () {
                                 window.location.href = formSurveyorAssignmentURL + '/' +assignmentId;
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     .catch(error => console.error('Error:', error));
                  }else{
-                    toastAlert('Redirecionando ao formulário...', 'warning');
+                    toastAlert('Redirecionando ao formulário...', 'success');
 
                     setTimeout(function () {
                         window.location.href = formSurveyorAssignmentURL + '/' +assignmentId;
@@ -105,6 +105,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const attachmentInputs = responsesData.querySelectorAll('input[name="attachment_id[]"]');
                 const attachmentIds = Array.from(attachmentInputs).map(input => input.value);
 
+                var pendingIcon = responsesData.querySelector('.ri-time-line');
+                var completedIcon = responsesData.querySelector('.ri-check-double-fill');
+
                 const formData = {
                     assignment_id: assignmentId,
                     company_id: companyId,
@@ -144,42 +147,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         responsesData.querySelector('input[name="response_id"]').value = responseId;
 
-                        var pendingIcon = responsesData.querySelector('.ri-time-line');
-                        var completedIcon = responsesData.querySelector('.ri-check-double-fill');
-
                         if (responseId) {
                             // If responseId is set, show the completed icon and hide the pending icon
                             if (pendingIcon) pendingIcon.classList.add('d-none');
                             if (completedIcon) completedIcon.classList.remove('d-none');
+
+                            button.querySelector('i').classList.add('ri-refresh-line');
+                            button.querySelector('i').classList.remove('ri-save-3-line');
+                            button.setAttribute('title', 'Atualizar');
+                            button.setAttribute('data-bs-original-title', 'Atualizar');
                         } else {
                             // If responseId is not set, show the pending icon and hide the completed icon
                             if (pendingIcon) pendingIcon.classList.remove('d-none');
                             if (completedIcon) completedIcon.classList.add('d-none');
                         }
 
-                        if (responseId) {
-                            button.querySelector('i').classList.add('ri-refresh-line');
-                            button.querySelector('i').classList.remove('ri-save-3-line');
-                            button.setAttribute('title', 'Atualizar');
-                            button.setAttribute('data-bs-original-title', 'Atualizar');
-                        }
-
-                        if( countTopics === countFinishedTopics ){
+                        if( countFinishedTopics >= countTopics ){
                             // enable button to finish
                             document.querySelector('#btn-response-finalize').classList.remove('d-none');
                         }
                     } else {
-                        // Handle error
-                        console.error('Erro:', data.message);
-
+                        //console.log('Erro:', data.message);
+                        
                         button.querySelector('i').classList.remove('ri-refresh-line');
                         button.querySelector('i').classList.add('ri-save-3-line');
 
-                        toastAlert(data.message, 'danger', 10000);
+                        if(data.action == 'changeToPending'){
+                            if (pendingIcon) pendingIcon.classList.remove('d-none');
+                            if (completedIcon) completedIcon.classList.add('d-none');
+
+                            document.querySelector('#btn-response-finalize').classList.add('d-none');
+                        }
+
+                        toastAlert(data.message, 'danger', 5000);
                     }
                 })
                 .catch(error => console.error('Error:', error));
-
             });
         });
     }
@@ -235,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon: 'success',
                 showDenyButton: false,
                 showCancelButton: true,
-                confirmButtonText: 'Enviar para Auditoria',
+                confirmButtonText: 'Finalizar',
                 confirmButtonClass: 'btn btn-outline-success w-xs me-2',
                 cancelButtonClass: 'btn btn-sm btn-outline-info w-xs',
                 denyButtonClass: 'btn btn-danger w-xs me-2',

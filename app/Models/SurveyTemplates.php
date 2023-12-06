@@ -23,39 +23,41 @@ class SurveyTemplates extends Model
     ];
 
     // Define relationships here
-    public function steps()
+    /*public function steps()
     {
         return $this->hasMany(SurveyStep::class);
-    }
+    }*/
 
 
     public static function reorderingData($data)
     {
+        $decodedData = isset($data->template_data) && is_string($data->template_data) ? json_decode($data->template_data, true) : $data->template_data;
+
         $transformedData = [];
 
-        if($data){
+        if($decodedData){
             // First, sort the steps according to their new_position
-            foreach ($data as $step) {
-                $newPosition = $step['stepData']['new_position'] ?? 0;
-                $transformedData[intval($newPosition)] = $step;
+            foreach ($decodedData as $key => $value) {
+                $newPosition = $value['stepData']['new_position'] ?? 0;
+                $transformedData[intval($newPosition)] = $value;
             }
             ksort($transformedData); // Sort by key to maintain the order of steps
 
             // Now, sort the topics for each step
-            foreach ($transformedData as $stepPosition => &$step) {
+            foreach ($transformedData as $stepPosition => &$value) {
                 $sortedTopicData = [];
 
-                if( isset($step['stepData']['topics']) ){
-                    foreach ($step['stepData']['topics'] as $topic) {
+                if( isset($value['stepData']['topics']) ){
+                    foreach ($value['stepData']['topics'] as $topic) {
                         $newTopicPosition = $topic['new_position'] ?? 0;
                         $sortedTopicData[intval($newTopicPosition)] = $topic;
                     }
                     ksort($sortedTopicData); // Sort by key to maintain the order of topics
 
-                    $step['stepData']['topics'] = array_values($sortedTopicData); // Re-index the array
+                    $value['stepData']['topics'] = array_values($sortedTopicData); // Re-index the array
                 }
             }
-            unset($step); // Break the reference to the last element
+            unset($value); // Break the reference to the last element
         }
         return $transformedData;
     }

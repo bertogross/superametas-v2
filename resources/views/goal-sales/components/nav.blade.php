@@ -1,4 +1,6 @@
 @php
+    use App\Models\User;
+
     $currentUserId = auth()->id();
 
     $explodeMeantime = $getCustomMeantime ? explode(' até ', $getCustomMeantime) : '';
@@ -71,10 +73,12 @@
                                 <label class="form-check-label" for="slide-mode">Modo Slide</label>
                             </div>
 
-                            <div class="form-check form-switch form-switch-theme mb-2" data-bs-toggle="tooltip" data-bs-placement="left" title="Ativar/Desativar Modo Analítico">
-                                <input class="form-check-input analytic-mode" type="radio" role="switch" name="mode" @if (getUserMeta($currentUserId, 'analytic-mode') == 'on') checked @endif id="analytic-mode">
-                                <label class="form-check-label" for="analytic-mode">Modo Analítico</label>
-                            </div>
+                            @if (auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR))
+                                <div class="form-check form-switch form-switch-theme mb-2" data-bs-toggle="tooltip" data-bs-placement="left" title="Ativar/Desativar Modo Analítico">
+                                    <input class="form-check-input analytic-mode" type="radio" role="switch" name="mode" @if (getUserMeta($currentUserId, 'analytic-mode') == 'on') checked @endif id="analytic-mode">
+                                    <label class="form-check-label" for="analytic-mode">Modo Analítico</label>
+                                </div>
+                            @endif
                         </li>
 
                         <div class="dropdown-divider mt-3"></div>
