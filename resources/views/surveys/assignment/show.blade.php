@@ -11,7 +11,9 @@
     $surveyorStatus = $assignmentData->surveyor_status;
     $auditorStatus = $assignmentData->auditor_status;
 
-    $templateName = $surveyData ? getTemplateNameById($surveyData->template_id) : '';
+    $title = $surveyData->title;
+
+    $templateName = $surveyData ? getSurveyTemplateNameById($surveyData->template_id) : '';
     $templateDescription = $surveyData ? getTemplateDescriptionById($surveyData->template_id) : '';
 
     $companyName = $companyId ? getCompanyNameById($companyId) : '';
@@ -57,7 +59,7 @@
             <div class="bg-warning-subtle">
                 <div class="card-body pb-4">
                     <h4 class="fw-semibold">
-                        <span class="text-theme">{{ $companyName }}</span> <i class="ri-arrow-right-s-fill align-bottom"></i> {{ limitChars($templateName ?? '', 100) }}
+                        <span class="text-theme">{{ $companyName }}</span> <i class="ri-arrow-right-s-fill align-bottom"></i> {{ limitChars($title ?? '', 100) }}
                     </h4>
                     <div class="hstack gap-3 flex-wrap">
 

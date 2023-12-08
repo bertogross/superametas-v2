@@ -1,5 +1,6 @@
 @php
     use App\Models\Survey;
+    use App\Models\SurveyAssignments;
 
     $currentUserId = auth()->id();
 @endphp
@@ -10,7 +11,10 @@
             $surveyId = intval($assignment['survey_id']);
 
             $survey = Survey::findOrFail($surveyId);
-            $templateName = getTemplateNameById($survey->template_id);
+
+            $title = $survey->title;
+
+            $templateName = getSurveyTemplateNameById($survey->template_id);
 
             $companyId = intval($assignment['company_id']);
             $companyName = getCompanyNameById($companyId);
@@ -25,9 +29,9 @@
             $auditorName = getUserData($auditorId)['name'];
             $auditorAvatar = getUserData($auditorId)['avatar'];
 
-            $dateTitle = getDateTitle($assignment['created_at'], $statusKey); // Assume this function exists
+            $dateTitle = getSurveyDateTitleByKey($assignment['created_at'], $statusKey);
 
-            $labelTitle = getLabelTitle($surveyorStatus, $auditorStatus, $statusKey); // Assume this function exists
+            $labelTitle = getSurveyLabelTitle($surveyorStatus, $auditorStatus, $statusKey);
 
             if($designated == 'auditor'){
                 $designatedUserId = $auditorId;
@@ -35,8 +39,8 @@
                 $designatedUserId = $surveyorId;
             }
 
-            $percentage = calculatePercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated); // Assume this function exists
-            $progressBarClass = getProgressBarClass($percentage); // Assume this function exists
+            $percentage = SurveyAssignments::calculateSurveyPercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated);
+            $progressBarClass = getProgressBarClass($percentage);
         @endphp
         {{--
         @php
@@ -44,7 +48,7 @@
             $surveyId = intval($assignment['survey_id']);
 
             $survey = Survey::findOrFail($surveyId);
-            $templateName = getTemplateNameById($survey->template_id);
+            $templateName = getSurveyTemplateNameById($survey->template_id);
 
             $companyId = intval($assignment['company_id']);
 
@@ -150,7 +154,7 @@
                     {{ $assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-' }}
                 </span>
                 <h5 class="fs-13 text-truncate task-title mb-0 mt-2">
-                    {{ $templateName }}
+                    {{ $title }}
                 </h5>
                 @if (in_array($statusKey, ['losted']))
                     @if ( $surveyorStatus == 'losted' && $auditorStatus == 'losted' )

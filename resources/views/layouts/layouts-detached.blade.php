@@ -17,7 +17,7 @@
         <link rel="shortcut icon" href="{{ URL::asset('build/images/favicons/favicon.ico')}}">
         @include('layouts.head-css')
     </head>
-    <body>
+    <body class="{{ str_contains($_SERVER['SERVER_NAME'], 'app.') ? 'production' : 'development' }}">
         <script>0</script>
         <!-- Begin page -->
         <div id="layout-wrapper">

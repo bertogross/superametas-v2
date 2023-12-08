@@ -17,11 +17,14 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('parent_id')->default(0);
             $table->bigInteger('user_id')->nullable();
+            $table->text('title')->default('Necessário Inserir um Título');
             $table->bigInteger('template_id')->default(0);
-            $table->enum('status', $status)->default('new')->comment("The status of the survey task. Status 'completed' are to be used only when recurring is 'once'.");
+            $table->enum('status', $status)->default('new')->comment("The status of the survey task.");
             $table->enum('old_status', $status)->default('new')->comment('The previous status of the survey task');
             $table->enum('priority', ['high', 'medium', 'low'])->default('high')->comment('The priority of the survey task');
-            $table->enum('recurring', ['once', 'daily', 'weekly', 'biweekly', 'monthly', 'annual'])->default('once');
+            $table->enum('recurring', ['daily', 'weekly', 'biweekly', 'monthly', 'annual'])->default('daily');
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('ended_at')->nullable();
             $table->enum('model', ['default', 'custom', 'both'])->default('both');
             $table->json('template_data')->nullable()->comment('The json data from survey_templates table');
             $table->json('distributed_data')->nullable()->comment('The json data to to use to populate the _assigments');

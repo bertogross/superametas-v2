@@ -82,7 +82,7 @@
                                         @include('surveys.templates.form', ['data' => $result] )
                                     @endif</div>
 
-                                    <button type="button" class="btn btn-sm btn-outline-theme btn-label right mt-3" data-bs-toggle="modal" data-bs-target="#addStepModal" tabindex="-1" title="Adicionar Etapa/Setor/Departamento"><i class="ri-terminal-window-line label-icon align-middle fs-16 ms-2"></i>Adicionar Bloco</button>
+                                    <button type="button" class="btn btn-sm btn-outline-theme btn-label right mt-3" data-bs-toggle="modal" data-bs-target="#addStepModal" tabindex="-1" title="Adicionar Etapa/Setor"><i class="ri-terminal-window-line label-icon align-middle fs-16 ms-2"></i>Adicionar Setor</button>
 
                                     <div class="mt-2 text-end">
                                         @if ($data)
@@ -117,7 +117,7 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalgridLabel">Termos</h5>
+                            <h5 class="modal-title" id="exampleModalgridLabel">Setores</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body" id="load-terms-form">

@@ -8,11 +8,14 @@
     @php
         use App\Models\User;
         //appPrintR($data);
+        //appPrintR($analyticCompaniesData);
         //appPrintR($analyticTermsData);
 
         $filterCompanies = request('companies', []);
 
-        $templateName = getTemplateNameById($data->template_id);
+        $title = $data->title;
+
+        $templateName = getSurveyTemplateNameById($data->template_id);
     @endphp
     @component('components.breadcrumb')
         @slot('url')
@@ -25,14 +28,14 @@
             Análise das Vistorias
             <small>
                 <i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i>
-                #<span class="text-theme me-2">{{$data->id}}</span> {{limitChars($templateName ?? '', 30) }}
+                {{limitChars($title ?? '', 30) }} #<span class="text-theme me-2">{{$data->id}}</span>
             </small>
         @endslot
     @endcomponent
 
     @if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_CONTROLLERSHIP) )
 
-        @if ($analyticCompaniesData)
+        @if ( $analyticCompaniesData || isset($_REQUEST['filter']) )
             <div id="filter" class="p-3 bg-light-subtle rounded position-relative mb-4" style="z-index: 3; display: block;">
                 <form action="{{ route('surveysShowURL', $data->id) }}" method="get" autocomplete="off">
                     <div class="row g-2">
@@ -73,9 +76,6 @@
                     @include('surveys.layouts.chart-companies')
                 @else
                     @component('components.nothing')
-                        {{--
-                        @slot('url', route('surveysCreateURL'))
-                        --}}
                     @endcomponent
                 @endif
             </div>
@@ -94,9 +94,6 @@
                     @include('surveys.layouts.chart-terms')
                 @else
                     @component('components.nothing')
-                        {{--
-                        @slot('url', route('surveysCreateURL'))
-                        --}}
                     @endcomponent
                 @endif
             </div>

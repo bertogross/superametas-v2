@@ -1,7 +1,8 @@
 import {
     toastAlert,
     lightbox,
-    debounce
+    debounce,
+    updateProgressBar
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -88,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                const countTopics = document.querySelectorAll('.btn-response-update').length;
+                //const countTopics = document.querySelectorAll('.btn-response-update').length;
                 //console.log('countTopics', countTopics);
 
                 const surveyId = parseInt(container.querySelector('input[name="survey_id"]')?.value || 0);
@@ -134,11 +135,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        toastAlert(data.message, 'success', 5000);
+                        //toastAlert(data.message, 'success', 5000);
 
                         const responseId = data.id;
-                        const countFinishedTopics = parseInt(data.count || 0);
+                        //const countFinishedTopics = parseInt(data.count || 0);
                         //console.log('countFinishedTopics', countFinishedTopics);
+
+                        const countResponses = parseInt(data.countResponses || 0);
+                        const countTopics = parseInt(data.countTopics || 0);
+                        updateProgressBar(countResponses, countTopics, 'survey-progress-bar');
 
                         if (responseId) {
                             // If responseId is set, show the completed icon and hide the pending icon
@@ -155,10 +160,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (completedIcon) completedIcon.classList.add('d-none');
                         }
 
-                        if( countFinishedTopics >= countTopics ){
+                        /*if( countFinishedTopics >= countTopics ){
                             // enable button to finish
                             document.querySelector('#btn-response-finalize').classList.remove('d-none');
-                        }
+                        }*/
                     } else {
                         //console.log('Erro:', data.message);
 
@@ -173,6 +178,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
 
                         toastAlert(data.message, 'danger', 5000);
+                    }
+
+                    if(data.showFinalizeButton){
+                        setTimeout(() => {
+                            document.querySelector('#btn-response-finalize').classList.remove('d-none');
+
+                            document.querySelector('#survey-progress-bar').remove();
+                        }, 1000);
                     }
                 })
                 .catch(error => console.error('Error:', error));

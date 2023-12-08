@@ -2,6 +2,8 @@
     $authorId = $data && $data->user_id ? $data->user_id : '';
     $surveyId = $data && $data->id ? $data->id : '';
     $templateId = $data && $data->template_id ? $data->template_id : '';
+    $title = $data->title ?? '';
+
     $startDate = $data ? $data->start_date : null;
         $startDate = $startDate ? date("d/m/Y", strtotime($startDate)) : date('d/m/Y');
 
@@ -9,6 +11,9 @@
         $distributedData = $distributedData ? json_decode($distributedData, true) : '';
 
     $recurring = $data->recurring ?? '';
+
+    $startedAt = $data->started_at ?? '';
+    $endedAt = $data->ended_at ?? '';
 
     $surveyStatus = $data->status ?? '';
 
@@ -21,7 +26,7 @@
             Se a intenção for a de modificar a recorrência de processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho adequado será o de encerrar/arquivar esta atividade e gerar um novo registro.
         </div>' : '';
 
-    $alertMessage2 = $data && $recurring != 'once' && $countResponses > 0 ? '<div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+    $alertMessage2 = $data && $countResponses > 0 ? '<div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">
             <i class="ri-alert-line label-icon"></i> Esta tarefa já está recebendo dados. Portanto, alterações em Atribuições poderão ser efetuadas mas só terão efeito a partir do próxima interação. No caso de tarefas recorrentes, a próxima interação ocorrerá, por exemplo quando Diária, amanhã.
         </div>' : '';
 
@@ -32,7 +37,7 @@
             <div class="modal-header p-3 bg-soft-info">
                 <h5 class="modal-title">
                     @if($surveyId)
-                        Edição de: <span class="text-theme">{{ limitChars(getTemplateNameById($templateId), 30) }}</span>
+                        Edição de: <span class="text-theme">{{ limitChars(getSurveyTemplateNameById($templateId), 30) }}</span>
                     @else
                         Registrando Nova Vistoria
                     @endif
@@ -40,7 +45,7 @@
                 <button type="button" class="btn-close btn-destroy" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @if( $data && $authorId && $authorId != auth()->id())
+                @if( $data && $authorId && $authorId != auth()->id() )
                     <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
                         <i class="ri-alert-line label-icon blink"></i> Você não possui autorização para editar um registro gerado por outra pessoa
                     </div>
@@ -95,16 +100,23 @@
                                     @slot('warning', 'Será necessário primeiramente <u>Compor</u> um Formulário <u>Modelo</u>')
                                 @endcomponent
                             @else
+
+                                <div class="mb-3">
+                                    <label for="title-field" class="form-label">Título deste Registro:</label>
+                                    <input type="text" class="form-control" maxlength="100" required id="title-field" name="title" name="template_id" value="{{$title}}">
+                                    <div class="form-text">O título servirá para identificar este registro na listagem e também será exibido no formulário da tarefa.</div>
+                                </div>
+
                                 <div class="mb-3">
                                     <label for="template-field" class="form-label">Selecione o Modelo:</label>
-                                    @if ($data && $countResponses > 0 && $surveyStatus != 'new')
+                                    @if ( $data && $countResponses > 0 && $surveyStatus != 'new' )
                                         {!! $alertMessage0 !!}
                                         <input type="hidden" name="template_id" value="{{$templateId}}">
                                     @else
                                         <select name="template_id" id="template-field" class="form-control form-select" required {{ $countResponses > 0 ? 'readonly' : '' }}>
                                             <option value="" {{ !$templateId ? 'selected' : 'disabled'  }}>- Selecione -</option>
                                             @foreach ($templates as $template)
-                                                <option value="{{$template->id}}" {{ isset($template->id) && $template->id == $templateId ? 'selected' : ''}}>{{ $template->title ? e($template->title) : '' }} {{ $template->recurring ? ' [ Recorrência: '.$getSurveyRecurringTranslations[$template->recurring]['label'].' ]' : '' }}</option>
+                                                <option value="{{$template->id}}" {{ isset($template->id) && $template->id == $templateId ? 'selected' : ''}}>{{ $template->title ? e($template->title) : '' }}</option>
                                             @endforeach
                                         </select>
                                     @endif
@@ -119,7 +131,7 @@
                         <div class="tab-pane fade" role="tabpanel" id="steparrow-recurring-info" aria-labelledby="steparrow-recurring-info-tab">
                             <div class="mb-3">
                                 <label for="date-recurring-field" class="form-label">Tipo de Recorrência: {{ $getSurveyRecurringTranslations['$recurring'] ?? '' }}</label>
-                                @if ($data && $countResponses > 0 && $surveyStatus != 'new')
+                                @if ( $data && $countResponses > 0 && $surveyStatus != 'new' )
                                     {!! $alertMessage1 !!}
                                     <input type="hidden" name="recurring" value="{{$recurring}}">
                                 @else
@@ -130,6 +142,24 @@
                                         @endforeach
                                     </select>
                                 @endif
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="date-recurring-start" class="form-label">Data Inicial:</label>
+                                        <input id="date-recurring-start" type="text" class="form-control flatpickr-input flatpickr-default" {{ $surveyStatus != 'new' && $startedAt ? 'disabled' : '' }} readonly name="started_at" data-date-format="d/m/Y" value="{{ $startedAt }}">
+                                        <div class="form-text">Se vazio, esta demanda será salva mas você terá de em algum dia/momento inicializar manualmente. Um botão "Inicializar" será exibido na listagem.</div>
+                                        <div class="form-text">Se a data for informada, a rotina será automáticamente inicializada e você poderá interromper quando quiser. Um botão "Interromper" será exibido na listagem.</div>
+                                    </div>
+
+                                    <div class="col">
+                                        <label for="date-recurring-end" class="form-label">Data Final:</label>
+                                        <input id="date-recurring-end" type="text" class="form-control flatpickr-input flatpickr-default" name="ended_at" data-date-format="d/m/Y" readonly value="{{ $endedAt }}">
+                                        <div class="form-text">Se vazio, as rotinas serão executadas até que você interrompa.</div>
+                                        <div class="form-text">Se uma data for informada, em tal tempo ocorrerá a distribuição final das tarefas para que no dia sequinte este registro automáticamente se encerre e tenha seu status modificado para Arquivado.</div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="d-flex align-items-start gap-3 mt-4">

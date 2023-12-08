@@ -112,10 +112,10 @@
                             $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
                         @endphp
 
-                        <div class="tasks-list p-2 {{ in_array($key, ['waiting', 'auditing', 'pending', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
+                        <div class="tasks-list p-2 {{ in_array($key, ['waiting', 'auditing', 'pending', 'in_progress', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
                             <div class="d-flex mb-3">
                                 <div class="flex-grow-1">
-                                    <h6 class="fs-14 text-uppercase fw-semibold mb-0">
+                                    <h6 class="fs-14 text-uppercase fw-semibold mb-1">
                                         <span data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="{{$status['label']}}" data-bs-content="{{$status['description']}}">
                                             {{$status['label']}}
                                         </span>
@@ -123,6 +123,7 @@
                                             {{ $countTotal }}
                                         </small>
                                     </h6>
+                                    <p class="text-muted mb-2">{{$status['description']}}</p>
                                 </div>
                                 <div class="flex-shrink-0">
                                     {{--
@@ -206,7 +207,7 @@
 <script>
     var profileShowURL = "{{ route('profileShowURL') }}";
     var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
-    var responsesAuditorStoreOrUpdateURL = "{{ route('responsesAusitorStoreOrUpdateURL') }}";
+    var responsesAuditorStoreOrUpdateURL = "{{ route('responsesAuditorStoreOrUpdateURL') }}";
 </script>
 <script src="{{ URL::asset('build/js/surveys-auditor.js') }}" type="module"></script>
 

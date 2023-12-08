@@ -84,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/assignment/activities', [SurveysAssignmentsController::class, 'getRecentActivities'])->name('getRecentActivitiesURL');
 
             Route::post('/responses/surveyor/store/{id?}', [SurveysResponsesController::class, 'responsesSurveyorStoreOrUpdate'])->name('responsesSurveyorStoreOrUpdateURL');
-            Route::post('/responses/auditor/store/{id?}', [SurveysResponsesController::class, 'responsesAuditorStoreOrUpdate'])->name('responsesAusitorStoreOrUpdateURL');
+            Route::post('/responses/auditor/store/{id?}', [SurveysResponsesController::class, 'responsesAuditorStoreOrUpdate'])->name('responsesAuditorStoreOrUpdateURL');
 
 
             // Terms Routes

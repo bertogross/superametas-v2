@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 if (checkedItems) {
-                    toastAlert('Termos adicionados', 'success', 5000);
+                    toastAlert('Setores adicionados', 'success', 5000);
                     document.querySelector('[data-bs-dismiss="modal"]').click();
                 }
             }
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <span class="btn btn-ghost-danger btn-icon rounded-pill btn-remove-topic" data-target="${stepIndex}${newTopicIndex}" title="Remover Bloco"><i class="ri-delete-bin-3-line"></i></span>
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia?" data-placeholder="Tópico..." name="steps[${stepIndex}]['topics']['question']" placeholder="Exemplo: Organização do Departamento" maxlength="150" required></input>
+                        <input type="text" class="form-control" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia?" data-placeholder="Tópico..." name="steps[${stepIndex}]['topics']['question']" placeholder="Exemplo: Organização do Setor" maxlength="150" required></input>
                     </div>
                     <div class="col-auto">
                         <span class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-block" title="Reordenar"><i class="ri-arrow-up-down-line"></i></span>

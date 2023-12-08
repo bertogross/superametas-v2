@@ -55,5 +55,11 @@ class SurveyTopic extends Model
 
     }
 
+    // Count the number of topics that have been finished
+    public static function countSurveyTopics($surveyId)
+    {
+        return $surveyId ? SurveyTopic::where('survey_id', $surveyId)->count() : 0;
+    }
+
 
 }

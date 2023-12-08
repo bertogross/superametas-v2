@@ -16,7 +16,10 @@
     $currentUserId = auth()->id();
 
     $surveyId = $surveyData->id ?? '';
-    $templateName = $surveyData ? getTemplateNameById($surveyData->template_id) : '';
+
+    $title = $surveyData->title ?? '';
+
+    $templateName = $surveyData ? getSurveyTemplateNameById($surveyData->template_id) : '';
 
     $assignmentId = $assignmentData->id ?? null;
     $assignmentCreatedAt = $assignmentData->created_at ?? null;
@@ -65,7 +68,7 @@
                 @endif
                 <h2>Vistoria</h2>
                 <p>Auditoria será realizada por <u>{{$auditorName}}</u></p>
-                <h3>{{ $templateName ? ucfirst($templateName) : 'NI' }}</h3>
+                <h3>{{ $title ? ucfirst($title) : 'NI' }}</h3>
                 <div class="mb-0 text-muted">
                     Executar em:
                     {{-- $surveyData->updated_at ? \Carbon\Carbon::parse($surveyData->updated_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY - HH:mm:ss') . 'hs' : '-' --}}
@@ -124,6 +127,14 @@
                 @endif
             </div>
         @endif
+    </div>
+
+    <div id="survey-progress-bar" class="fixed-bottom mb-0 ms-auto me-auto w-100">
+        <div class="flex-grow-1">
+            <div class="progress animated-progress custom-progress progress-label">
+                <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="" aria-valuemin="0" aria-valuemax="100"><div class="label"></div></div>
+            </div>
+        </div>
     </div>
 @endsection
 @section('script')

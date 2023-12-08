@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SurveyResponse extends Model
 {
@@ -29,5 +30,32 @@ class SurveyResponse extends Model
         'attachments_audit'
     ];
 
+    // Count the number of responses from surveyor
+    public static function countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId) {
+        //$today = Carbon::today();
+
+        return SurveyResponse::where('survey_id', $surveyId)
+            ->where('surveyor_id', $surveyorId)
+            //->where('company_id', $companyId)
+            ->where('assignment_id', $assignmentId)
+            ->whereNotNull('compliance_survey')
+            ->whereNotNull('attachments_survey')
+            //->whereDate('created_at', '=', $today)
+            ->count();
+
+    }
+
+    // Count the number of responses from auditor
+    public static function countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId) {
+        $today = Carbon::today();
+
+        return SurveyResponse::where('survey_id', $surveyId)
+            ->where('auditor_id', $auditorId)
+            //->where('company_id', $companyId)
+            ->where('assignment_id', $assignmentId)
+            ->whereNotNull('compliance_audit')
+            //->whereDate('created_at', '=', $today)
+            ->count();
+    }
 
 }

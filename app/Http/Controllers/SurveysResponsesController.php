@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SurveyTopic;
 use Illuminate\Http\Request;
 use App\Models\SurveyResponse;
 use App\Models\SurveyAssignments;
@@ -17,8 +18,8 @@ class SurveysResponsesController extends Controller
             'survey_id.required' => 'O campo survey_id é obrigatório',
             'step_id.required' => 'O campo step_id é obrigatório',
             'topic_id.required' => 'O campo topic_id é obrigatório',
-            'compliance_survey.required' => 'Marque: Conforme ou Não Conforme',
-            'compliance_survey.in' => 'Marque Apenas se Conforme ou Não Conforme',//'O campo compliance_survey deve ser yes, no ou na.',
+            //'compliance_survey.required' => 'Marque: Conforme ou Não Conforme',
+            //'compliance_survey.in' => 'Marque Apenas se Conforme ou Não Conforme',//'O campo compliance_survey deve ser yes, no ou na.',
         ];
 
         try {
@@ -27,7 +28,7 @@ class SurveysResponsesController extends Controller
                 'survey_id' => 'required',
                 'step_id' => 'required',
                 'topic_id' => 'required',
-                'compliance_survey' => 'required|in:yes,no,na',
+                //'compliance_survey' => 'required|in:yes,no,na',
                 //'comment_survey' => 'sometimes|string',
             ], $messages)->validate();
         } catch (ValidationException $e) {
@@ -73,6 +74,9 @@ class SurveysResponsesController extends Controller
         }
 
         $complianceSurvey = $request->input('compliance_survey');
+        if(!$complianceSurvey){
+            exit;
+        }
 
         $attachmentIds = $request->input('attachment_ids');
 
@@ -137,15 +141,19 @@ class SurveysResponsesController extends Controller
         // Change SurveyorAssignment status
         SurveyAssignments::changeSurveyorAssignmentStatus($assignmentId, 'in_progress');
 
+        $countTopics = SurveyTopic::countSurveyTopics($data['survey_id']);
+
         // Count the number of steps that have been finished
-        $countResponses = countSurveySurveyorResponses($currentUserId, $data['survey_id'], $data['company_id'], $assignmentId);
+        $countResponses = SurveyResponse::countSurveySurveyorResponses($currentUserId, $data['survey_id'], $data['company_id'], $assignmentId);
 
         // Return success response
         return response()->json([
             'success' => true,
             'message' => $id ? 'Os dados deste tópico foram atualizados' : 'Os dados deste tópico foram salvos',
             'id' => $SurveyResponse->id,
-            'count' => $countResponses,
+            'countResponses' => $countResponses,
+            'countTopics' => $countTopics,
+            'showFinalizeButton' => $countResponses < $countTopics ? false : true
         ]);
     }
 
@@ -156,8 +164,8 @@ class SurveysResponsesController extends Controller
             'survey_id.required' => 'O campo survey_id é obrigatório',
             'step_id.required' => 'O campo step_id é obrigatório',
             'topic_id.required' => 'O campo topic_id é obrigatório',
-            'compliance_audit.required' => 'Marque: Conforme ou Não Conforme',
-            'compliance_audit.in' => 'Marque Apenas se Conforme ou Não Conforme',//'O campo compliance_audit deve ser yes, no ou na.',
+            //'compliance_audit.required' => 'Marque: Conforme ou Não Conforme',
+            //'compliance_audit.in' => 'Marque Apenas se Conforme ou Não Conforme',//'O campo compliance_audit deve ser yes, no ou na.',
         ];
 
         try {
@@ -166,7 +174,7 @@ class SurveysResponsesController extends Controller
                 'survey_id' => 'required',
                 'step_id' => 'required',
                 'topic_id' => 'required',
-                'compliance_audit' => 'required|in:yes,no,na',
+                //'compliance_audit' => 'required|in:yes,no,na',
                 //'comment_audit' => 'sometimes|string',
             ], $messages)->validate();
         } catch (ValidationException $e) {
@@ -212,6 +220,9 @@ class SurveysResponsesController extends Controller
         }
 
         $complianceAudit = $request->input('compliance_audit');
+        if(!$complianceAudit){
+            exit;
+        }
 
         $attachmentIds = $request->input('attachment_ids');
 
@@ -270,15 +281,19 @@ class SurveysResponsesController extends Controller
         // Change SurveyorAssignment status
         SurveyAssignments::changeAuditorAssignmentStatus($assignmentId, 'in_progress');
 
+        $countTopics = SurveyTopic::countSurveyTopics($data['survey_id']);
+
         // Count the number of steps that have been finished
-        $countResponses = countSurveyAuditorResponses($currentUserId, $data['survey_id'], $data['company_id'], $assignmentId);
+        $countResponses = SurveyResponse::countSurveyAuditorResponses($currentUserId, $data['survey_id'], $data['company_id'], $assignmentId);
 
         // Return success response
         return response()->json([
             'success' => true,
             'message' => $id ? 'Os dados deste tópico foram atualizados' : 'Os dados deste tópico foram salvos',
             'id' => $SurveyResponse->id,
-            'count' => $countResponses,
+            'countResponses' => $countResponses,
+            'countTopics' => $countTopics,
+            'showFinalizeButton' => $countResponses < $countTopics ? false : true
         ]);
     }
 

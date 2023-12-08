@@ -1,7 +1,7 @@
 
 // Toast Notifications
 // Display a toast notification using Bootstrap's Toast API with a backdrop
-export function toastAlert(message, type = 'success', duration = 3000) {
+export function toastAlert(message, type = 'success', duration = 3000, backdrop = false) {
     setTimeout(() => {
         // Define the HTML template for the toast
         const icon = type === 'success' ? 'ri-checkbox-circle-fill text-success' : 'ri-alert-fill text-' + type;
@@ -39,7 +39,7 @@ export function toastAlert(message, type = 'success', duration = 3000) {
         `;
 
         // Add the toast and backdrop to the end of the document body
-        if(type != 'success'){
+        if(type != 'success' && backdrop){
             document.body.insertAdjacentHTML('beforeend', toastBackdrop);
         }
         document.body.insertAdjacentHTML('beforeend', ToastHtml);
@@ -491,7 +491,37 @@ export function percentageResult(price, percentage, decimal = 0){
     return result;
 }
 
+// Function to update the progress bar
+export function updateProgressBar(number1, number2, progressBarId) {
+    // Calculate the percentage
+    const percentage = (number1 / number2) * 100;
 
+    // Update the progress bar width and label
+    const progressBarContainer = document.getElementById(progressBarId);
+    if(progressBarContainer){
+        const progressBar = progressBarContainer.querySelector('.progress-bar');
+        const progressLabel = progressBarContainer.querySelector('.label');
+
+        progressBar.style.width = percentage + '%';
+        progressLabel.innerText = Math.round(percentage) + '%';
+
+        // Remove all background color classes
+        progressBar.classList.remove('bg-success', 'bg-info', 'bg-primary', 'bg-warning', 'bg-danger');
+
+        // Change background color based on the percentage
+        if (percentage >= 100) {
+            progressBar.classList.add('bg-success'); // Completed
+        } else if (percentage >= 75) {
+            progressBar.classList.add('bg-info'); // High progress
+        } else if (percentage >= 50) {
+            progressBar.classList.add('bg-primary'); // Moderate progress
+        } else if (percentage >= 25) {
+            progressBar.classList.add('bg-warning'); // Low progress
+        } else {
+            progressBar.classList.add('bg-danger'); // Just started or no progress
+        }
+    }
+}
 
 export function bsPopoverTooltip() {
     setTimeout(() => {
@@ -531,8 +561,6 @@ export function bsPopoverTooltip() {
     }, 100);
 }
 
-
-
 export function initFlatpickr() {
     const elements = document.querySelectorAll('.flatpickr-default');
     elements.forEach(element => {
@@ -545,7 +573,7 @@ export function initFlatpickr() {
             clear: true,
             minDate: "today",
             defaultDate: defaultValue,
-            maxDate: new Date().fp_incr(360)// Set the maximum date to 360 days from today
+            maxDate: new Date().fp_incr(1100)// Set the maximum date to 360 days from today
         });
     });
 }
@@ -600,50 +628,6 @@ export function initFlatpickrRangeMonths(){
         });
     }
 
-}
-
-function destroyModal() {
-    document.querySelectorAll('.modal .btn-destroy').forEach(function (btnClose) {
-        btnClose.addEventListener('click', function () {
-            var modalElement = this.closest('.modal');
-            if (modalElement) {
-                modalElement.remove();
-            }
-        });
-    });
-}
-
-
-
-// Check the internet connection status and display a toast notification if offline
-function checkInternetConnection() {
-    function updateConnectionStatus() {
-        if (navigator.onLine) {
-            //console.log('Online');
-        } else {
-            //console.log('Offline');
-            toastAlert('A conexão foi perdida. Por favor, verifique sua rede de internet.', 'error');
-        }
-    }
-
-    // Initial check
-    updateConnectionStatus();
-
-    // Set up event listeners for online and offline events
-    window.addEventListener('online', function () {
-        //console.log('Back online');
-        toastAlert('A conexão foi reestabelecida.', 'success', 5000);
-        updateConnectionStatus();
-    });
-
-    window.addEventListener('offline', function () {
-        //console.log('Lost connection');
-        toastAlert('A conexão foi perdida. Por favor, verifique sua rede de internet.', 'error');
-        updateConnectionStatus();
-    });
-
-    // Set up an interval to check the connection status periodically
-    setInterval(updateConnectionStatus, 10000); // Check every 10 seconds
 }
 
 export function maxLengthTextarea() {
@@ -806,7 +790,6 @@ export function wizardFormSteps(totalCompanies = 1){
         });
     }
 }
-
 function checkAllFormCheckInputs() {
     // Select all elements with the .form-check-input class
     var checkboxes = document.querySelectorAll('.form-check-input');
@@ -963,9 +946,6 @@ export function layouRightSide(){
     });
 }
 
-
-
-
 // Make the preview URL request
 export function makeFormPreviewRequest(idValue, url, target = 'load-preview', param = 'preview=true') {
     if (idValue) {
@@ -1004,15 +984,15 @@ export function makeFormPreviewRequest(idValue, url, target = 'load-preview', pa
     }
 }
 
-    // Debounce function to limit the rate of invoking the save action
-    export function debounce(func, wait) {
-        let timeout;
-        return function() {
-            const context = this, args = arguments;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(context, args), wait);
-        };
-    }
+// Debounce function to limit the rate of invoking the save action
+export function debounce(func, wait) {
+    let timeout;
+    return function() {
+        const context = this, args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+}
 
 // GLightbox Popup
 // https://github.com/biati-digital/glightbox
@@ -1026,12 +1006,8 @@ export function lightbox(){
 }
 
 
-
 export const monthsInPortuguese = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
 ];
 
-// Call the functions when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', checkInternetConnection);
-document.addEventListener('DOMContentLoaded', showButtonWhenInputChange);

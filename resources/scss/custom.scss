@@ -47,36 +47,28 @@ a:focus {
   }
 }
 
-
-@media(min-width:810px) {
-  html * {
-    scroll-behavior: smooth;
-    scrollbar-color: var(--vz-theme) #d0ecde;
-  }
-  html *::-webkit-scrollbar {
-    background: var(--vz-theme);
-    height: 4px;
-    width: 4px;
-  }
-  html *::-webkit-scrollbar-thumb {
-    background: #d0ecde;
-    -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
-  }
-  html *::-webkit-scrollbar-corner {
-    background: var(--vz-theme);
-  }
+.simplebar-content-wrapper{
+    overflow: visible scroll !important;
+    scrollbar-width: thin !important;
 }
 
-
-@media (max-width: 767.98px) {
-  html[data-layout="horizontal"] body.is_not_admin_editor .navbar-brand-box{
-    display: block !important;
-  }
+html * {
+    scroll-behavior: smooth !important;;
+    scrollbar-color: var(--vz-theme) #d0ecde !important;;
 }
-/**
-* Hide/change for this beta onboard ID
-*/
+html *::-webkit-scrollbar {
+    background: var(--vz-theme) !important;;
+    height: 4px !important;;
+    width: 4px !important;;
+}
+html *::-webkit-scrollbar-thumb {
+    background: #d0ecde !important;;
+    -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75) !important;;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75) !important;;
+}
+html *::-webkit-scrollbar-corner {
+    background: var(--vz-theme) !important;;
+}
 
 
 html{
@@ -175,6 +167,7 @@ button.text-dark:hover{
 }
 
 
+.progress-bar .label:empty,
 .nested-sortable-account-plans-featured .wrap-form-switch,
 .nested-sortable-account-plans-featured i.ri-drag-move-fill,
 .nested-sortable-account-plans-tree i.ri-delete-bin-line,
@@ -633,6 +626,13 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
 */
 .progress-vertical{
   transform: rotate(-90deg);
+}
+
+.progress-label .progress-bar .label::after {
+    border-top-color: rgba(var(--vz-dark-rgb),var(--vz-bg-opacity)) !important;
+}
+.progress-label .progress-bar .label {
+    background-color: rgba(var(--vz-dark-rgb),var(--vz-bg-opacity)) !important;
 }
 
 .border-theme{

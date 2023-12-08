@@ -134,6 +134,18 @@ if (!function_exists('getERPdata')) {
     }
 }
 
+if (!function_exists('getERP')) {
+    function getERP(){
+        $databaseName = config('database.connections.smAppTemplate.database');
+        $databaseId = !empty($databaseConnection) ? intval($databaseConnection) : extractDatabaseId($databaseName);
+
+        // Set the database connection to smOnboard
+        $OnboardConnection = DB::connection('smOnboard');
+
+        return $OnboardConnection->table('app_users')->where('ID', $databaseId)->value('user_erp') ?? null;
+    }
+}
+
 // Get ERP data
 if (!function_exists('getStripeData')) {
     function getStripeData() {
@@ -172,28 +184,6 @@ if (!function_exists('getStripeData')) {
     }
 }
 
-
-if (!function_exists('getERP')) {
-    function getERP(){
-        $databaseName = config('database.connections.smAppTemplate.database');
-        $databaseId = !empty($databaseConnection) ? intval($databaseConnection) : extractDatabaseId($databaseName);
-
-        // Set the database connection to smOnboard
-        $OnboardConnection = DB::connection('smOnboard');
-
-        return $OnboardConnection->table('app_users')->where('ID', $databaseId)->value('user_erp') ?? null;
-    }
-}
-
-// Logic to get the ID of the current database connection
-if (!function_exists('extractDatabaseId')) {
-    function extractDatabaseId($databaseConnection) {
-        // This depends on how you have structured your database names and IDs
-        // If your database names are smApp1, smApp2, etc., and IDs are 1, 2, etc.
-        return onlyNumber($databaseConnection);
-    }
-}
-
 if (!function_exists('subscriptionLabel')) {
     function subscriptionLabel(){
         $stripeData = getStripeData();
@@ -208,6 +198,15 @@ if (!function_exists('subscriptionLabel')) {
         $class = $status_translated['class'];
 
         print Auth::user()->hasRole(User::ROLE_ADMIN) ? '<span class="badge bg-transparent border border-'.$color.' text-'.$color.' float-end text-decoration-none fw-normal small '.$class.'" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="'.$label.'" data-bs-content="'.$description.'">'.$label.'</span>' : '';
+    }
+}
+
+// Logic to get the ID of the current database connection
+if (!function_exists('extractDatabaseId')) {
+    function extractDatabaseId($databaseConnection) {
+        // This depends on how you have structured your database names and IDs
+        // If your database names are smApp1, smApp2, etc., and IDs are 1, 2, etc.
+        return onlyNumber($databaseConnection);
     }
 }
 
@@ -502,13 +501,14 @@ if (!function_exists('getTermNameById')) {
     }
 }
 
-if (!function_exists('getTemplateNameById')) {
-    function getTemplateNameById($templateId) {
+if (!function_exists('getSurveyTemplateNameById')) {
+    function getSurveyTemplateNameById($templateId) {
         $template = $templateId ? SurveyTemplates::find($templateId) : null;
 
         return $template ? $template->title : null;
     }
 }
+
 
 if (!function_exists('getTemplateDescriptionById')) {
     function getTemplateDescriptionById($templateId) {
@@ -526,57 +526,6 @@ if (!function_exists('getTemplateRecurringById')) {
     }
 }
 
-// Count the number of topics that have been finished
-if (!function_exists('countSurveyTopics')) {
-    function countSurveyTopics($surveyId) {
-        return SurveyTopic::where([
-            'survey_id' => $surveyId
-        ])->count();
-    }
-}
-
-// Count the number of steps that have been finished
-if (!function_exists('countSurveySurveyorResponses')) {
-    function countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId) {
-        //$today = Carbon::today();
-
-        return SurveyResponse::where('survey_id', $surveyId)
-            ->where('surveyor_id', $surveyorId)
-            //->where('company_id', $companyId)
-            ->where('assignment_id', $assignmentId)
-            ->whereNotNull('compliance_survey')
-            ->whereNotNull('attachments_survey')
-            //->whereDate('created_at', '=', $today)
-            ->count();
-
-    }
-}
-
-
-// Count the number of steps that have been finished
-if (!function_exists('countSurveyAuditorResponses')) {
-    function countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId) {
-        $today = Carbon::today();
-
-        return SurveyResponse::where('survey_id', $surveyId)
-            ->where('auditor_id', $auditorId)
-            //->where('company_id', $companyId)
-            ->where('assignment_id', $assignmentId)
-            ->whereNotNull('compliance_audit')
-            //->whereDate('created_at', '=', $today)
-            ->count();
-    }
-}
-
-if (!function_exists('countSurveyAllResponsesFromToday')){
-    function countSurveyAllResponsesFromToday($surveyId){
-        $today = Carbon::today();
-
-        return SurveyResponse::where('survey_id', $surveyId)
-            ->whereDate('created_at', '=', $today)
-            ->count();
-    }
-}
 
 
 
@@ -626,35 +575,6 @@ if (!function_exists('limitChars')) {
     }
 }
 
-// Calculate the progress percentage
-if (!function_exists('calculatePercentage')) {
-    function calculatePercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated){
-        // Assuming you have a method to count the total number of topics/questions in a survey
-        $totalTopics = countSurveyTopics($surveyId);
-
-        $countSurveyAuditor = countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId);
-        $countSurveySurveyor = countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId);
-
-        if($auditorId === $surveyId){
-            $countResponses = ($countSurveySurveyor + $countSurveyAuditor) / 2;
-        }elseif($designated == 'auditor'){
-            $countResponses = $countSurveyAuditor;
-        }elseif($designated == 'surveyor'){
-            $countResponses = $countSurveySurveyor;
-        }else{
-            $countResponses = ($countSurveySurveyor + $countSurveyAuditor) / 2;
-        }
-
-        // Calculate the percentage
-        $percentage = 0;
-        if ($totalTopics > 0) {
-            $percentage = ($countResponses / $totalTopics) * 100;
-        }
-
-        return $percentage ? number_format($percentage, 2) : 0;
-    }
-}
-
 // Get the progress bar class based on the completion percentage
 if (!function_exists('getProgressBarClass')) {
     function getProgressBarClass($percentage){
@@ -673,8 +593,8 @@ if (!function_exists('getProgressBarClass')) {
 }
 
 // Get a descriptive title for a date based on the task status
-if (!function_exists('getDateTitle')) {
-    function getDateTitle($statusKey){
+if (!function_exists('getSurveyDateTitleByKey')) {
+    function getSurveyDateTitleByKey($statusKey){
         switch ($statusKey) {
             case 'completed':
                 return 'A data em que esta tarefa foi desempenhada';
@@ -687,8 +607,8 @@ if (!function_exists('getDateTitle')) {
 }
 
 // Get a descriptive label title based on the task status and roles involved
-if (!function_exists('getLabelTitle')) {
-    function getLabelTitle($surveyorStatus, $auditorStatus) {
+if (!function_exists('getSurveyLabelTitle')) {
+    function getSurveyLabelTitle($surveyorStatus, $auditorStatus) {
         if ($surveyorStatus == 'completed' && $auditorStatus == 'completed') {
             return 'A <u>Vistoria</u> e a <u>Auditoria</u> foram efetuadas';
         } elseif ($surveyorStatus == 'completed' && $auditorStatus != 'completed') {

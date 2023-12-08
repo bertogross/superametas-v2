@@ -241,10 +241,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             activityElement.innerHTML = `
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-xs flex-shrink-0 me-1">
-                                        <img src="${activity.designatedUserAvatar}" alt="" class="img-fluid rounded-circle">
+                                        <a href="${activity.designatedUserProfileURL}" class="text-body d-block" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar todas as Tarefas delegadas a ${activity.designatedUserName}">
+                                            <img src="${activity.designatedUserAvatar}" alt="avatar" class="img-fluid rounded-circle">
+                                        </a>
                                     </div>
                                     <div class="flex-grow-1">
-                                        <div class="fs-11 mb-0 fw-bold"><a href="${activity.designatedUserProfileURL}" class="text-body d-block">${activity.designatedUserName}</a></div>
+                                        <div class="fs-11 mb-0 fw-bold">
+                                            ${activity.designatedUserName}
+                                        </div>
                                         <div class="fs-11 mb-0 text-muted">${activity.templateName}</div>
                                     </div>
                                     <div class="flex-shrink-0">
@@ -254,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <div class="fs-10 mb-0 text-muted d-none">${activity.updatedAt}</div>
                                     </div>
                                 </div>
-                                <div class="progress progress-sm mt-1 animated-progress custom-progress" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="${activity.percentage}%">
+                                <div class="progress progress-sm mt-1 custom-progress" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="${activity.percentage}%">
                                     <div class="progress-bar bg-${activity.progressBarClass}" role="progressbar" style="width: ${activity.percentage}%" aria-valuenow="${activity.percentage}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             `;

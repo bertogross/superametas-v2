@@ -17,7 +17,7 @@ $app = new Illuminate\Foundation\Application(
 
 // Set the environment file based on the server's hostname
 if (isset($_SERVER['SERVER_NAME'])) {
-    if ( str_contains($_SERVER['SERVER_NAME'], 'superametas.com')) {
+    if ( str_contains($_SERVER['SERVER_NAME'], 'superametas.com' ) ) {
         $app->loadEnvironmentFrom('.env');
     } else {
         $app->loadEnvironmentFrom('.env.dev');

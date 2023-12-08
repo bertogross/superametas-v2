@@ -7,12 +7,13 @@ https://devdojo.com/bobbyiliev/how-to-quickly-change-the-password-for-a-user-in-
 https://laravel-news.com/openai-for-laravel
 
 
-Version 2.0.34
+Version 2.0.34 - [2023-12-07]
+- [Started] Code Factorization
 
 
 
 Version 2.0.33 - [2023-12-02 - 2023-12-06]
-- [Added] Mail with ZOHO Api
+- [Started] Mail with ZOHO Api
 - [Added] Testing environment
 - [Updated] SurveyAssigments
 

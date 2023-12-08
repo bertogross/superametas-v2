@@ -128,4 +128,30 @@ class SurveyAssignments extends Model
         ];
     }
 
+    public static function calculateSurveyPercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated){
+        // Assuming you have a method to count the total number of topics/questions in a survey
+        $totalTopics = SurveyTopic::countSurveyTopics($surveyId);
+
+        $countSurveyAuditor = SurveyResponse::countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId);
+        $countSurveySurveyor = SurveyResponse::countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId);
+
+        if($auditorId === $surveyId){
+            $countResponses = ($countSurveySurveyor + $countSurveyAuditor) / 2;
+        }elseif($designated == 'auditor'){
+            $countResponses = $countSurveyAuditor;
+        }elseif($designated == 'surveyor'){
+            $countResponses = $countSurveySurveyor;
+        }else{
+            $countResponses = ($countSurveySurveyor + $countSurveyAuditor) / 2;
+        }
+
+        // Calculate the percentage
+        $percentage = 0;
+        if ($totalTopics > 0) {
+            $percentage = ($countResponses / $totalTopics) * 100;
+        }
+
+        return $percentage ? number_format($percentage, 0) : 0;
+    }
+
 }

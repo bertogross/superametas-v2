@@ -200,13 +200,13 @@ class SurveysAssignmentsController extends Controller
         if($currentStatus == 'auditing'){
             return response()->json([
                 'success' => false,
-                'message' => 'Esta Vistoria já foi enviada para Auditoria e não poderá ser editada.',
+                'message' => 'Esta Tarefa já foi finalizada e não poderá ser editada.',
             ]);
         }
         if($currentStatus == 'losted' ){
             return response()->json([
                 'success' => false,
-                'message' => 'O prazo expirou e esta Vistoria foi perdida. Por isso não poderá mais ser editada.',
+                'message' => 'O prazo expirou e esta Tarefa foi perdida. Por isso não poderá mais ser editada.',
             ]);
         }
 
@@ -220,7 +220,7 @@ class SurveysAssignmentsController extends Controller
             //$newStatus = 'auditing';
             $newStatus = 'completed';
 
-            $message = 'Dados enviados para Auditoria';
+            $message = 'Dados gravados';
         }else{
             $message = 'Status inalterado';
 
@@ -250,13 +250,13 @@ class SurveysAssignmentsController extends Controller
         if($currentStatus == 'completed'){
             return response()->json([
                 'success' => false,
-                'message' => 'Esta Auditoria já foi finalizada não poderá mais ser editada.',
+                'message' => 'Esta Tarefa já foi finalizada não poderá mais ser editada.',
             ]);
         }
         if($currentStatus == 'losted' ){
             return response()->json([
                 'success' => false,
-                'message' => 'O prazo expirou e esta Auditoria foi perdida. Por isso não poderá mais ser editada.',
+                'message' => 'O prazo expirou, esta Tarefa foi perdida e por isso não poderá mais ser editada.',
             ]);
         }
 
@@ -270,7 +270,7 @@ class SurveysAssignmentsController extends Controller
             // [if currentStatus is in_progress] Change to completed.
             $newStatus = 'completed';
 
-            $message = 'Auditoria finalizada';
+            $message = 'Tarefa finalizada';
         }else{
             $message = 'Status inalterado';
 
@@ -341,7 +341,7 @@ class SurveysAssignmentsController extends Controller
 
         $surveyId = $assignment->survey_id;
         $survey = Survey::findOrFail($surveyId);
-        $templateName = getTemplateNameById($survey->template_id);
+        $templateName = getSurveyTemplateNameById($survey->template_id);
 
         $companyId = $assignment->company_id;
         $companyName = getCompanyNameById($companyId);
@@ -351,7 +351,7 @@ class SurveysAssignmentsController extends Controller
 
         $assignmentStatus = $assignment->{$designated . '_status'} ?? null;
 
-        $percentage = calculatePercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated);
+        $percentage = SurveyAssignments::calculateSurveyPercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated);
         $progressBarClass = getProgressBarClass($percentage);
 
         $label = $designated == 'surveyor' ? '<span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>'

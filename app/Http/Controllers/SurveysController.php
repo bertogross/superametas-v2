@@ -24,7 +24,7 @@ class SurveysController extends Controller
     {
         $currentUserId = auth()->id();
 
-        $created_at = $request->input('created_at');
+        $createdAt = $request->input('created_at');
         $status = $request->input('status');
         //$delegated_to = $request->input('delegated_to');
         //$audited_by = $request->input('audited_by');
@@ -52,15 +52,17 @@ class SurveysController extends Controller
         //$query = $query->where('user_id', $currentUserId);
         $query = $query->where('condition_of', 'publish');
 
-        if ($created_at) {
-            $dates = explode(' até ', $created_at);
-            if (is_array($dates) && count($dates) === 2) {
-                $start_date = Carbon::createFromFormat('d/m/Y', $dates[0])->format('Y-m-d');
-                $end_date = Carbon::createFromFormat('d/m/Y', $dates[1])->format('Y-m-d') . ' 23:59:59';
-                $query->whereBetween('created_at', [$start_date, $end_date]);
+        if ($createdAt) {
+            $dateRange = explode(' até ', $createdAt);
+            if (is_array($dateRange) && count($dateRange) === 2) {
+                $startDate = Carbon::createFromFormat('d/m/Y', trim($dateRange[0]))->startOfDay()->format('Y-m-d H:i:s');
+                $endDate = Carbon::createFromFormat('d/m/Y', trim($dateRange[1]))->endOfDay()->format('Y-m-d H:i:s');
+
+                $query->whereBetween('created_at', [$startDate, $endDate]);
             } else {
-                $start_date = Carbon::createFromFormat('d/m/Y', $created_at)->format('Y-m-d');
-                $query->whereDate('created_at', '=', $start_date);
+                $date = Carbon::createFromFormat('d/m/Y', $createdAt)->format('Y-m-d');
+
+                $query->whereDate('created_at', '=', $date);
             }
         }
 
@@ -163,12 +165,12 @@ class SurveysController extends Controller
 
         return view('surveys.show', compact(
             'data',
+            'analyticCompaniesData',
+            'analyticTermsData',
             'companies',
             //'steps',
             'terms',
             'userAvatars',
-            'analyticCompaniesData',
-            'analyticTermsData',
             'firstDate',
             'lastDate',
         ) );
@@ -243,7 +245,7 @@ class SurveysController extends Controller
         //$queryTemplates->where('user_id', $currentUserId);
         $templates = $queryTemplates->orderBy('title')->paginate(50);
 
-        $countResponses = countSurveyAllResponsesFromToday($id);
+        $countResponses = Survey::countSurveyAllResponsesFromToday($id);
 
         return view('surveys.edit', compact(
                 'data',
@@ -278,7 +280,7 @@ class SurveysController extends Controller
             return response()->json(['success' => false, 'message' => 'Você não possui autorização para Inicializar/Interromper a rotina registrada por outra pessoa']);
         }
 
-        $countResponses = countSurveyAllResponsesFromToday($surveyId);
+        $countResponses = Survey::countSurveyAllResponsesFromToday($surveyId);
 
         if($countResponses > 0){
             return response()->json(['success' => false, 'message' => 'Não será possível interromper esta tarefa pois dados já estão sendo coletados.']);
@@ -335,21 +337,26 @@ class SurveysController extends Controller
 
         // Cache::flush();
         $messages = [
+            'title.required' => 'Necessário Inserir um Título',
             'template_id.required' => 'Necessário selecionar um modelo',
             'distributed_data.required' => 'Necessário delegar usuários para Vistoria e Auditoria',
             'recurring.in' => 'Escolha a recorrência',
+            //'started_at' => 'Defina a data de início',
+            //'ended_at' => 'Defina a data final'
         ];
 
         try {
             $validatedData = Validator::make($request->all(), [
-                //'title' => 'required|string|max:191',
+                'title' => 'required|string|max:191',
                 //'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
                 //'description' => 'nullable|string|max:1000',
                 'template_id' => 'required',
                 //'delegated_to' => 'required',
                 //'audited_by' => 'required',
                 'distributed_data' => 'required',
-                'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
+                'recurring' => 'required|in:daily,weekly,biweekly,monthly,annual',//once,
+                //'started_at' => 'nullable',
+                //'ended_at' => 'nullable',
                 //'current_user_editor' => 'nullable',
                 //'assigned_to' => 'nullable',
                 //'status' => 'required|in:new,stopped,trash,pending,in_progress,completed,auditing',
@@ -382,14 +389,23 @@ class SurveysController extends Controller
             return is_array($value) ? json_encode($value) : $value;
         }, $validatedData);
 
+        /*
         $jsonString = $request->input('distributed_data');
-        $distributed_data = $jsonString ? json_decode($jsonString, true) : null;
+        $distributedData = $jsonString ? json_decode($jsonString, true) : null;
         if (json_last_error() !== JSON_ERROR_NONE) {
             return response()->json(['success' => false, 'message' => 'Invalid JSON format']);
         }
-        //$validatedData['distributed_data'] = $distributed_data ?? null;
+        //$validatedData['distributed_data'] = $distributedData ?? null;
+        */
 
-        $distributed_data = $validatedData['distributed_data'];
+        $jsonString = $request->input('distributed_data');
+        $distributedData = json_decode($jsonString);
+
+        if (json_last_error() !== JSON_ERROR_NONE || !is_object($distributedData)) {
+            return response()->json(['success' => false, 'message' => 'Invalid JSON format']);
+        }
+
+        $distributedData = $validatedData['distributed_data'];
 
         $templateId = $validatedData['template_id'];
         $templateQuery = SurveyTemplates::findOrFail($templateId);
@@ -397,34 +413,44 @@ class SurveysController extends Controller
 
         /*
         $jsonString = $request->input('delegated_to');
-        $distributed_data = $jsonString ? json_decode($jsonString, true) : null;
+        $distributedData = $jsonString ? json_decode($jsonString, true) : null;
         if (json_last_error() !== JSON_ERROR_NONE) {
             return response()->json(['success' => false, 'message' => 'Invalid JSON format']);
         }
-        $validatedData['delegated_to'] = $distributed_data ?? null;
+        $validatedData['delegated_to'] = $distributedData ?? null;
 
 
         $jsonString = $request->input('audited_by');
-        $distributed_data = $jsonString ? json_decode($jsonString, true) : null;
+        $distributedData = $jsonString ? json_decode($jsonString, true) : null;
         if (json_last_error() !== JSON_ERROR_NONE) {
             return response()->json(['success' => false, 'message' => 'Invalid JSON format']);
         }
-        $validatedData['audited_by'] = $distributed_data ?? null;
+        $validatedData['audited_by'] = $distributedData ?? null;
         */
 
         $validatedData['user_id'] = $currentUserId;
-
-        /*
-        $recurring = $request->input('recurring');
-        $validatedData['recurring'] = !empty($recurring) && in_array($recurring, ['once','daily','weekly','biweekly','monthly','annual']) ? $recurring : 'once';
-        */
 
         if ($id) {
 
             // Update operation
             $survey = Survey::findOrFail($id);
 
-            if($survey->status == 'new'){
+            $surveyId = $survey->id;
+
+            $surveyStatus = $survey->status;
+
+            $startedAt = $survey->started_at;
+            $endedAt = $survey->ended_at;
+
+            $countResponses = Survey::countSurveyAllResponses($surveyId);
+
+            if( $startedAt && $countResponses > 0 ){
+                $validatedData['started_at'] = Carbon::createFromFormat('d/m/Y', trim($startedAt))->startOfDay()->format('Y-m-d H:i:s');
+            }
+
+            $validatedData['ended_at'] = !$endedAt ? Carbon::createFromFormat('d/m/Y', trim($endedAt))->endOfDay()->format('Y-m-d H:i:s') : '';
+
+            if($surveyStatus == 'new'){
                 $validatedData['template_data'] = $templateData;
             }
 
@@ -435,14 +461,12 @@ class SurveysController extends Controller
 
             $survey->update($validatedData);
 
-            $surveyId = $survey->id;
-
             // Update from model if task is not started
-            if($survey->status == 'new'){
+            if($surveyStatus == 'new'){
                 SurveyStep::populateSurveySteps($templateId, $surveyId);
             }
 
-            $countResponses = countSurveyAllResponsesFromToday($surveyId);
+            $countResponses = Survey::countSurveyAllResponsesFromToday($surveyId);
 
             $distributedData = $survey->distributed_data ?? null;
 
@@ -453,7 +477,7 @@ class SurveysController extends Controller
                 'success' => true,
                 'message' => 'Dados atualizados!',
                 'id' => $surveyId,
-                'json' => $distributed_data
+                'json' => $distributedData
             ]);
         } else {
             // Store operation
@@ -471,7 +495,7 @@ class SurveysController extends Controller
                 'success' => true,
                 'message' => 'Dados adicionados com sucesso!',
                 'id' => $surveyId,
-                'json' => $distributed_data
+                'json' => $distributedData
             ]);
         }
     }
@@ -488,7 +512,6 @@ class SurveysController extends Controller
         try {
             $surveys = Survey::where('status', 'started')
                             ->where('condition_of', 'publish')
-                            ->where('recurring', '!=', 'once')
                             ->orderBy('created_at')
                             ->paginate(50);
 
@@ -503,6 +526,7 @@ class SurveysController extends Controller
             Log::error('Error in loadRecurringSurveys: ' . $e->getMessage());
         }
     }
+
 
 
 }

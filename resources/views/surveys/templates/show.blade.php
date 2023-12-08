@@ -43,7 +43,9 @@
 
             <div class="card-body p-5 text-center">
                 <h2 class="text-theme text-uppercase">Modelo</h2>
+                {{--
                 <h3>{{ $data ? ucfirst($data->title) : '' }}</h3>
+                --}}
                 <div class="mb-0 text-muted">
                     Registrado em:
                     {{-- $data->created_at ? \Carbon\Carbon::parse($data->created_at)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY - HH:mm:ss') . 'hs' : '-' --}}
