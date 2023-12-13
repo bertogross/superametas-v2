@@ -49,8 +49,12 @@ class SurveyTemplates extends Model
 
                 if( isset($value['stepData']['topics']) ){
                     foreach ($value['stepData']['topics'] as $topic) {
-                        $newTopicPosition = $topic['new_position'] ?? 0;
-                        $sortedTopicData[intval($newTopicPosition)] = $topic;
+                        $question = $topic['question'] ? trim($topic['question']) : '';
+
+                        if( !empty($question) ){
+                            $newTopicPosition = $topic['new_position'] ?? 0;
+                            $sortedTopicData[intval($newTopicPosition)] = $topic;
+                        }
                     }
                     ksort($sortedTopicData); // Sort by key to maintain the order of topics
 
@@ -84,11 +88,11 @@ class SurveyTemplates extends Model
         $data = SurveyTemplates::findOrFail($templateId);
 
         return $data->template_data ? json_decode($data->template_data, true) : null;
-
     }
     */
 
-    // usefull when new default sector/department is included
+    // usefull when new default warehouse term is included
+    // DEPRECATED ?
     public static function mergeTemplateDataArrays($data1, $data2) {
         $mergedData = [];
 

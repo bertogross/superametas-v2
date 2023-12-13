@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    Meu {{ env('APP_NAME') }}
+    Meu {{ appName() }}
 @endsection
 @section('css')
     <link href="{{ URL::asset('build/libs/dropzone/dropzone.css') }}" rel="stylesheet">
@@ -16,7 +16,7 @@
             @lang('translation.settings')
         @endslot
         @slot('title')
-            Meu {{ env('APP_NAME') }}
+            Meu {{ appName() }}
         @endslot
     @endcomponent
 

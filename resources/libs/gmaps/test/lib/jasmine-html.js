@@ -224,7 +224,7 @@ jasmine.HtmlReporter.sectionLink = function(sectionName) {
 };
 jasmine.HtmlReporterHelpers.addHelpers(jasmine.HtmlReporter);
 jasmine.HtmlReporter.ReporterView = function(dom) {
-  this.startedAt = new Date();
+  this.startAt = new Date();
   this.runningSpecCount = 0;
   this.completeSpecCount = 0;
   this.passedCount = 0;
@@ -355,7 +355,7 @@ jasmine.HtmlReporter.ReporterView = function(dom) {
       showDetails();
     }
 
-    dom.banner.appendChild(this.createDom('span', {className: 'duration'}, "finished in " + ((new Date().getTime() - this.startedAt.getTime()) / 1000) + "s"));
+    dom.banner.appendChild(this.createDom('span', {className: 'duration'}, "finished in " + ((new Date().getTime() - this.startAt.getTime()) / 1000) + "s"));
   };
 
   return this;
@@ -558,7 +558,7 @@ jasmine.TrivialReporter.prototype.reportRunnerStarting = function(runner) {
     parentDiv.appendChild(suiteDiv);
   }
 
-  this.startedAt = new Date();
+  this.startAt = new Date();
 
   var self = this;
   showPassed.onclick = function(evt) {
@@ -592,7 +592,7 @@ jasmine.TrivialReporter.prototype.reportRunnerResults = function(runner) {
     }
   }
   var message = "" + specCount + " spec" + (specCount == 1 ? "" : "s" ) + ", " + results.failedCount + " failure" + ((results.failedCount == 1) ? "" : "s");
-  message += " in " + ((new Date().getTime() - this.startedAt.getTime()) / 1000) + "s";
+  message += " in " + ((new Date().getTime() - this.startAt.getTime()) / 1000) + "s";
   this.runnerMessageSpan.replaceChild(this.createDom('a', { className: 'description', href: '?'}, message), this.runnerMessageSpan.firstChild);
 
   this.finishedAtSpan.appendChild(document.createTextNode("Finished at " + new Date().toString()));

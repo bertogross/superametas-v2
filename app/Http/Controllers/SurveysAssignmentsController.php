@@ -6,10 +6,12 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Survey;
 use App\Models\SurveyStep;
+use App\Models\SurveyTopic;
 use Illuminate\Http\Request;
+use App\Models\SurveyResponse;
 use App\Models\SurveyTemplates;
-use Illuminate\Support\Facades\DB;
 use App\Models\SurveyAssignments;
+use Illuminate\Support\Facades\DB;
 
 class SurveysAssignmentsController extends Controller
 {
@@ -58,7 +60,7 @@ class SurveysAssignmentsController extends Controller
          * START get terms
          */
         $terms = [];
-        $departmentsQuery = DB::connection('smAppTemplate')
+        /*$departmentsQuery = DB::connection('smAppTemplate')
             ->table('wlsm_departments')
             ->get()
             ->toArray();
@@ -66,7 +68,17 @@ class SurveysAssignmentsController extends Controller
             $terms[$department->department_id] = [
                 'name' => strtoupper($department->department_alias),
             ];
+        }*/
+        $wharehouseTermsQuery = DB::connection('smWarehouse')
+            ->table('survey_terms')
+            ->get()
+            ->toArray();
+        foreach ($wharehouseTermsQuery as $term) {
+            $terms[$term->id] = [
+                'name' => strtoupper($term->name),
+            ];
         }
+        
         $termsQuery = DB::connection('smAppTemplate')
             ->table('survey_terms')
             ->get()
@@ -96,9 +108,13 @@ class SurveysAssignmentsController extends Controller
             abort(404);
         }
 
+        $currentUserId = auth()->id();
+
         $assignmentData = SurveyAssignments::findOrFail($assignmentId) ?? null;
 
         $surveyId = $assignmentData->survey_id;
+
+        $companyId = $assignmentData->company_id;
 
         $surveyData = Survey::findOrFail($surveyId);
 
@@ -128,11 +144,19 @@ class SurveysAssignmentsController extends Controller
             });
         $stepsWithTopics = $stepsWithTopics ? json_decode($stepsWithTopics, true) : null;
 
+        $countTopics = SurveyTopic::countSurveyTopics($surveyId);
+
+        $countResponses = SurveyResponse::countSurveySurveyorResponses($currentUserId, $surveyId, $companyId, $assignmentId);
+
+        $percentage = $countResponses > 0 ? ($countResponses / $countTopics) * 100 : 0;
+        $percentage = number_format($percentage, 0);
+
         return view('surveys.assignment.form-surveyor', compact(
             'surveyData',
             'templateData',
             'assignmentData',
-            'stepsWithTopics'
+            'stepsWithTopics',
+            'percentage'
         ));
     }
 
@@ -142,9 +166,13 @@ class SurveysAssignmentsController extends Controller
             abort(404);
         }
 
+        $currentUserId = auth()->id();
+
         $assignmentData = SurveyAssignments::findOrFail($assignmentId) ?? null;
 
         $surveyId = $assignmentData->survey_id;
+
+        $companyId = $assignmentData->company_id;
 
         $surveyData = Survey::findOrFail($surveyId);
 
@@ -174,11 +202,19 @@ class SurveysAssignmentsController extends Controller
             });
         $stepsWithTopics = $stepsWithTopics ? json_decode($stepsWithTopics, true) : null;
 
+        $countTopics = SurveyTopic::countSurveyTopics($surveyId);
+
+        $countResponses = SurveyResponse::countSurveySurveyorResponses($currentUserId, $surveyId, $companyId, $assignmentId);
+
+        $percentage = $countResponses > 0 ? ($countResponses / $countTopics) * 100 : 0;
+        $percentage = number_format($percentage, 0);
+
         return view('surveys.assignment.form-auditor', compact(
             'surveyData',
             'templateData',
             'assignmentData',
-            'stepsWithTopics'
+            'stepsWithTopics',
+            'percentage'
         ));
     }
 
@@ -354,7 +390,7 @@ class SurveysAssignmentsController extends Controller
         $percentage = SurveyAssignments::calculateSurveyPercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated);
         $progressBarClass = getProgressBarClass($percentage);
 
-        $label = $designated == 'surveyor' ? '<span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>'
+        $label = $designated == 'surveyor' ? '<span class="badge bg-dark-subtle text-body badge-border">Checklist</span>'
                                         : '<span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>';
 
         if($designated == 'auditor'){

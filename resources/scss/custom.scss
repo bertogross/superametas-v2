@@ -167,6 +167,7 @@ button.text-dark:hover{
 }
 
 
+.gallery-wrapper:empty,
 .progress-bar .label:empty,
 .nested-sortable-account-plans-featured .wrap-form-switch,
 .nested-sortable-account-plans-featured i.ri-drag-move-fill,
@@ -688,6 +689,9 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
 }
 .nav-pills.nav-pills-theme .nav-link.active::before {
   border-left-color: var(--vz-theme);
+}
+.step-arrow-nav .nav .nav-link.done{
+    color: var(--vz-theme) !important;
 }
 
 

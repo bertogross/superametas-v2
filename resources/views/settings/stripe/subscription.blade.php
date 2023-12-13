@@ -4,6 +4,17 @@
     @if ($subscriptionId)
         @php
             try {
+                $retrieveSubscription = $stripe->subscriptions->retrieve(
+                    $subscriptionId,
+                    []
+                );
+
+                $currentPriceId = !empty($retrieve_subscription->plan->id) ? $retrieve_subscription->plan->id : '';
+            } catch (Exception $e) {
+                $error = $e->getMessage();
+            }
+
+            try {
                 $subscriptionItems = $stripe->subscriptionItems->all([
                     'subscription' => $subscriptionId,
                 ]);
@@ -104,15 +115,9 @@
 
                                     <div class="mt-4 mb-4">
                                         <ul class="list-unstyled text-muted vstack gap-2 text-center">
-                                            <li>
-                                                Integração Inclusa
-                                            </li>
-                                            <li>
-                                                Módulo de Metas
-                                            </li>
-                                            <li>
-                                                Notificações
-                                            </li>
+                                            <li>Integração Inclusa</li>
+                                            <li>Módulo de Metas</li>
+                                            {{--<li>Notificações</li>--}}
                                         </ul>
                                     </div>
 
@@ -123,7 +128,19 @@
                                     </div>
 
                                     <div class="mt-4">
-                                        <button data-product_id="{{ $productId }}" data-price_id="{{ $PriceId }}" data-recurring="{{ $recurring }}" data-interval_count="{{  $intervalCount }}" data-current-quantity="{{ isset($currentQuantity) ? $currentQuantity : 0 }}" data-quantity="{{ isset($currentPriceId) && $currentPriceId == $PriceId && isset($currentQuantity) ? $currentQuantity : 0 }}" class="btn btn-outline-theme w-100 waves-effect waves-light text-uppercase {{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'btn-subscription-update' : 'btn-subscription' }}" data-current-price_id="{{ isset($currentPriceId) ? $currentPriceId : '' }}" data-subscription_item_id="{{ $subscriptionItemId }}" disabled>{{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'Atualizar' : 'Contratar' }}</button>
+                                        <button
+                                            class="btn btn-outline-theme w-100 waves-effect waves-light text-uppercase {{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'btn-subscription-update' : 'btn-subscription' }}"
+                                            data-product_id="{{ $productId }}"
+                                            data-price_id="{{ $PriceId }}"
+                                            data-recurring="{{ $recurring }}"
+                                            data-interval_count="{{  $intervalCount }}"
+                                            data-current-quantity="{{ isset($currentQuantity) ? $currentQuantity : 0 }}"
+                                            data-quantity="{{ isset($currentPriceId) && $currentPriceId == $PriceId && isset($currentQuantity) ? $currentQuantity : 0 }}"
+                                            data-current-price_id="{{ isset($currentPriceId) ? $currentPriceId : '' }}"
+                                            data-subscription_item_id="{{ $subscriptionItemId }}"
+                                            disabled>
+                                                {{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'Atualizar' : 'Contratar' }}
+                                        </button>
 
                                         <div class="form-text small text-center fs-11 text-white text-center mt-2">
                                             {{ !empty($productDescription) ? $productDescription : '' }}
@@ -165,15 +182,9 @@
 
                                 <div class="mt-4 mb-4">
                                     <ul class="list-unstyled text-muted vstack gap-2 text-center">
-                                        <li>
-                                            Integração Inclusa
-                                        </li>
-                                        <li>
-                                            Módulo de Metas
-                                        </li>
-                                        <li>
-                                            Notificações
-                                        </li>
+                                        <li>Integração Inclusa</li>
+                                        <li>Módulo de Metas</li>
+                                        {{--<li>Notificações</li>--}}
                                     </ul>
                                 </div>
 
@@ -184,7 +195,20 @@
                                 </div>
 
                                 <div class="mt-4">
-                                    <button data-product_id="{{ $productId }}" data-price_id="{{ $PriceId }}" data-recurring="{{ $recurring }}" data-interval_count="{{  $intervalCount }}" data-current-quantity="{{ isset($currentQuantity) ? $currentQuantity : 0 }}" data-quantity="{{ isset($currentPriceId) && $currentPriceId == $PriceId && isset($currentQuantity) ? $currentQuantity : 0 }}" class="btn btn-outline-theme w-100 waves-effect waves-light text-uppercase {{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'btn-subscription-update' : 'btn-subscription' }}" data-current-price_id="{{ isset($currentPriceId) ? $currentPriceId : '' }}" data-subscription_item_id="{{ $subscriptionItemId }}" disabled>{{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'Atualizar' : 'Contratar' }}</button>
+                                    <button
+                                        class="btn btn-outline-theme w-100 waves-effect waves-light text-uppercase {{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'btn-subscription-update' : 'btn-subscription' }}"
+                                        data-product_id="{{ $productId }}"
+                                        data-price_id="{{ $PriceId }}"
+                                        data-recurring="{{ $recurring }}"
+                                        data-interval_count="{{  $intervalCount }}"
+                                        data-current-quantity="{{ isset($currentQuantity) ? $currentQuantity : 0 }}"
+                                        data-quantity="{{ isset($currentPriceId) && $currentPriceId == $PriceId && isset($currentQuantity) ? $currentQuantity : 0 }}"
+                                        data-current-price_id="{{ isset($currentPriceId) ? $currentPriceId : '' }}"
+                                        data-subscription_item_id="{{ $subscriptionItemId }}"
+                                        disabled>
+                                            {{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'Atualizar' : 'Contratar' }}
+                                    </button>
+
                                     <div class="form-text small text-center fs-11 text-white text-center mt-2">
                                         {{ !empty($productDescription) ? $productDescription : '&nbsp;' }}
                                         {{ !empty($planTypeText) ? '<div class="small"><span class="text-danger fs-13">*</span>'.$planTypeText.'</div>' : '<div>&nbsp;</div>' }}
@@ -224,7 +248,19 @@
                                             </div>
 
                                             <div class="text-center plan-btn mt-3">
-                                                <button data-product_id="{{ $productId }}" data-price_id="{{ $PriceId }}" data-recurring="{{ $recurring }}" data-interval_count="{{  $intervalCount }}" data-current-quantity="{{ isset($currentQuantity) ? $currentQuantity : 0 }}" data-quantity="{{ isset($currentPriceId) && $currentPriceId == $PriceId && isset($currentQuantity) ? $currentQuantity : 0 }}" class="btn btn-outline-theme w-sm waves-effect waves-light text-uppercase {{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'btn-subscription-update' : 'btn-subscription' }}" data-current-price_id="{{ isset($currentPriceId) ? $currentPriceId : '' }}" data-subscription_item_id="{{ $subscriptionItemId }}" disabled>{{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'Atualizar' : 'Contratar' }}</button>
+                                                <button
+                                                    class="btn btn-outline-theme w-sm waves-effect waves-light text-uppercase {{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'btn-subscription-update' : 'btn-subscription' }}"
+                                                    data-product_id="{{ $productId }}"
+                                                    data-price_id="{{ $PriceId }}"
+                                                    data-recurring="{{ $recurring }}"
+                                                    data-interval_count="{{  $intervalCount }}"
+                                                    data-current-quantity="{{ isset($currentQuantity) ? $currentQuantity : 0 }}"
+                                                    data-quantity="{{ isset($currentPriceId) && $currentPriceId == $PriceId && isset($currentQuantity) ? $currentQuantity : 0 }}"
+                                                    data-current-price_id="{{ isset($currentPriceId) ? $currentPriceId : '' }}"
+                                                    data-subscription_item_id="{{ $subscriptionItemId }}"
+                                                    disabled>
+                                                        {{ isset($currentPriceId) && $currentPriceId == $PriceId ? 'Atualizar' : 'Contratar' }}
+                                                </button>
                                             </div>
                                         </div>
                                     </div>

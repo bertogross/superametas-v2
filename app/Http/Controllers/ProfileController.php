@@ -42,9 +42,9 @@ class ProfileController extends Controller
             ->toArray();
 
 
-        $getSurveyStatusTranslations = Survey::getSurveyStatusTranslations();
-        $requiredKeys = ['waiting', 'new', 'pending', 'in_progress', 'auditing', 'completed', 'losted'];
-        $filteredStatuses = array_intersect_key($getSurveyStatusTranslations, array_flip($requiredKeys));
+        $filteredStatuses = SurveyAssignments::getSurveyAssignmentStatusTranslations();
+        //$requiredKeys = ['waiting', 'new', 'pending', 'in_progress', 'auditing', 'completed', 'losted'];
+        //$filteredStatuses = array_intersect_key($getSurveyAssignmentStatusTranslations, array_flip($requiredKeys));
 
         //$getAuthorizedCompanies = getAuthorizedCompanies();
 

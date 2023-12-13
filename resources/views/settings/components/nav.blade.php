@@ -27,7 +27,7 @@
 
             <li class="nav-item">
                 <a class="nav-link menu-link {{ request()->is('settings/account') ? 'active' : '' }}" href="{{ route('settingsAccountShowURL') }}">
-                    <i class="ri-arrow-right-up-line"></i> <span>Meu {{ env('APP_NAME') }}</span>
+                    <i class="ri-arrow-right-up-line"></i> <span>Meu {{ appName() }}</span>
                 </a>
             </li>
 
@@ -77,11 +77,13 @@
                 </li>
             @endif
 
+            <!--
             <li class="nav-item">
                 <a class="nav-link menu-link {{ request()->is('settings/security') ? 'active' : '' }}" href="{{-- route('settingsSecurityIndexURL') --}}#">
                     <i class="ri-shield-keyhole-line"></i> <span>@lang('translation.security')</span>
                 </a>
             </li>
+            -->
         </ul>
     </div>
 </div>

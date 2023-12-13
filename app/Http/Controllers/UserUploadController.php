@@ -123,7 +123,7 @@ class UserUploadController extends Controller
                 $file = $request->file('file');
 
                 // Check if there's an old logo and delete it
-                $oldLogo = DB::connection($this->connection)->table('settings')->where('key', 'logo')->value('value');
+                $oldLogo = DB::connection('smAppTemplate')->table('settings')->where('key', 'logo')->value('value');
                 if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
                     Storage::disk('public')->delete($oldLogo);
                 }
@@ -147,7 +147,7 @@ class UserUploadController extends Controller
                 $filePath = $file->store($path, 'public');
 
                 // Save the file path in the settings table
-                $settings = DB::connection($this->connection)->table('settings')->updateOrInsert(
+                $settings = DB::connection('smAppTemplate')->table('settings')->updateOrInsert(
                     ['key' => 'logo'],
                     ['value' => $filePath]
                 );
@@ -165,14 +165,14 @@ class UserUploadController extends Controller
     {
         try {
             // Retrieve the logo path from the settings table
-            $logoPath = DB::connection($this->connection)->table('settings')->where('key', 'logo')->value('value');
+            $logoPath = DB::connection('smAppTemplate')->table('settings')->where('key', 'logo')->value('value');
 
             // Check if the logo exists and delete it
             if ($logoPath && Storage::disk('public')->exists($logoPath)) {
                 Storage::disk('public')->delete($logoPath);
 
                 // Optionally, you can also remove the logo path from the settings table
-                DB::connection($this->connection)->table('settings')->where('key', 'logo')->delete();
+                DB::connection('smAppTemplate')->table('settings')->where('key', 'logo')->delete();
 
                 return response()->json(['success' => true, 'message' => 'Logo deleted successfully!'], 200);
             }

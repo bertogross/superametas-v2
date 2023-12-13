@@ -19,33 +19,13 @@ return [
         'secret' => env('MAILGUN_SECRET'),
         'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
     ],
-
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
-
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-    ],
-
-    'dropbox' => [
-        'app_key' => env('DROPBOX_APP_KEY'),
-        'app_secret' => env('DROPBOX_APP_SECRET'),
-    ],
-
-    'stripe' => [
-        'model' => App\Models\User::class,
-        'key' => env('STRIPE_PUBLIC_KEY'),
-        'secret' => env('STRIPE_SECRET_KEY'),
-        'webhook' => env('STRIPE_WEBHOOK_SECRET_KEY'),
-    ],
-
-    'zoho' => [
-        'client_id' => env('ZOHO_CLIENT_ID'),
-        'client_secret' => env('ZOHO_CLIENT_SECRET'),
-        'redirect' => env('ZOHO_REDIRECT_URI'),
     ],
 
 ];

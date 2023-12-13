@@ -15,14 +15,30 @@ $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );
 
-// Set the environment file based on the server's hostname
-if (isset($_SERVER['SERVER_NAME'])) {
-    if ( str_contains($_SERVER['SERVER_NAME'], 'superametas.com' ) ) {
-        $app->loadEnvironmentFrom('.env');
-    } else {
-        $app->loadEnvironmentFrom('.env.dev');
-    }
+/*
+|--------------------------------------------------------------------------
+| Set Environment File Based on Server Host
+|--------------------------------------------------------------------------
+|
+| Here we will check the server's host and set the environment file
+| accordingly. If the host is 'localhost', we will use the .env.dev
+| file. Otherwise, we will use the default .env file.
+|
+*/
+$host = $_SERVER['HTTP_HOST'] ?? 'default';
+if ( str_contains($host, '127.0.0.1' ) || str_contains($host, 'localhost' ) ) {
+    $app->loadEnvironmentFrom('.env.dev');
 }
+/*
+if (isset($_SERVER['HTTP_HOST'])) {
+    if ( str_contains($_SERVER['HTTP_HOST'], '127.0.0.1' ) || str_contains($_SERVER['HTTP_HOST'], 'localhost' ) ) {
+        $app->loadEnvironmentFrom('.env.dev');
+    } else {
+        $app->loadEnvironmentFrom('.env');
+    }
+}*/
+
+
 
 
 /*

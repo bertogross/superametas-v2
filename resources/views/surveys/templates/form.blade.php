@@ -1,7 +1,7 @@
 @foreach ($data as $stepIndex => $step)
     @php
         $stepData = $step['stepData'] ?? null;
-        $stepName = $stepData['step_name'] ?? 'NI';
+        $termName = $stepData['term_name'] ?? 'NI';
         $termId = $stepData['term_id'] ?? 0;
         $type = $stepData['type'] ?? 'custom';
         $originalPosition = $stepData['original_position'] ?? $stepIndex;
@@ -12,7 +12,7 @@
     @endphp
     <div id="{{ $termId }}" class="accordion-item block-item mt-3 mb-0 border-light border-1 rounded rounded-2 p-0">
         <div class="input-group">
-            <input type="text" class="form-control text-theme" name="steps[{{$stepIndex}}]['stepData']['step_name']" value="{{ $stepName }}" placeholder="Setor/Etapa" maxlength="100" readonly required tabindex="-1">
+            <input type="text" class="form-control text-theme text-uppercase" name="steps[{{$stepIndex}}]['stepData']['term_name']" value="{{ $termName }}" placeholder="Setor/Etapa" maxlength="100" readonly required tabindex="-1">
 
             <div class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-block ri-arrow-up-down-line text-body" title="Reordenar"></div>
 
@@ -54,8 +54,8 @@
                 <button type="button" class="btn btn-ghost-dark btn-icon btn-add-topic rounded-pill float-end cursor-copy text-theme ri-menu-add-line" data-block-step-id="{{ $termId }}" data-block-index="{{ $stepIndex }}" title="Adicionar Tópico"></button>
 
                 @if ( $type == 'custom' )
-                    <button type="button" class="btn btn-ghost-danger btn-icon rounded-pill btn-remove-block float-end ri-delete-bin-7-fill" data-target="{{ $termId }}" title="Remover Bloco" tabindex="-1"></button>
                 @endif
+                <button type="button" class="btn btn-ghost-danger btn-icon rounded-pill btn-remove-block float-end ri-delete-bin-7-fill" data-target="{{ $termId }}" title="Remover Bloco" tabindex="-1"></button>
             </div>
 
         </div>

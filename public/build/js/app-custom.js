@@ -50,6 +50,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Prevent data-choices sort companies by name
+    const isChoiceCompanies = document.querySelectorAll(".filter-companies");
+    if (isChoiceCompanies.length > 0) {
+        Array.from(isChoiceCompanies).forEach(function (isChoice) {
+            new Choices(isChoice, {
+                shouldSort: false,
+                removeItems: true,
+                removeItemButton: true
+            });
+        });
+    }
+
+
 });
 
 // Check the internet connection status and display a toast notification if offline
@@ -114,12 +127,12 @@ function sanitizeInputValue(inputElement) {
 function sanitizeInputOnInput(event) {
     const target = event.target;
 
-        // Check if the event target is an input element (e.g., INPUT, TEXTAREA etc)
-        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.tagName === 'option') {
-            setTimeout(() => {
-                sanitizeInputValue(target);
-            }, 100);
-        }
+    // Check if the event target is a textarea or an input of type text
+    if ((target.tagName === 'TEXTAREA') || (target.tagName === 'INPUT' && target.type === 'text')) {
+        setTimeout(() => {
+            sanitizeInputValue(target);
+        }, 100);
+    }
 }
 document.addEventListener('input', sanitizeInputOnInput);
 document.addEventListener('blur', sanitizeInputOnInput);
@@ -138,18 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-function destroyModal() {
-    if(document.querySelectorAll('.modal .btn-destroy').length){
-        document.querySelectorAll('.modal .btn-destroy').forEach(function (btnClose) {
-            btnClose.addEventListener('click', function () {
-                var modalElement = this.closest('.modal');
-                if (modalElement) {
-                    modalElement.remove();
-                }
-            });
-        });
-    }
-}
+
 
 // Alert users when they try to type in an input or textarea element that is marked as readonly
 /*
@@ -172,6 +174,5 @@ document.addEventListener('DOMContentLoaded', handleReadonlyInputs);
 
 // Call the functions when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', lightbox);
-document.addEventListener('DOMContentLoaded', destroyModal);
 document.addEventListener('DOMContentLoaded', checkInternetConnection);
 document.addEventListener('DOMContentLoaded', showButtonWhenInputChange);

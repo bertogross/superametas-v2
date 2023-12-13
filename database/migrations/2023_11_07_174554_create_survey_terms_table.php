@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('survey_terms', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id')->nullable();
+            //$table->bigInteger('user_id')->nullable();
             $table->string('name', 191);
             $table->string('slug', 191);
             $table->Integer('status')->default(1);

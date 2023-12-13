@@ -15,7 +15,7 @@ class SurveysTemplatesController extends Controller
 {
     protected $connection = 'smAppTemplate';
 
-    public function show(Request $request, $id = null)
+    public function preview(Request $request, $id = null)
     {
         if (!$id) {
             abort(404);
@@ -30,7 +30,7 @@ class SurveysTemplatesController extends Controller
 
         $edition = $request->query('edition', false);
 
-        return view('surveys.templates.show', compact(
+        return view('surveys.templates.preview', compact(
             'data',
             'result',
             'preview',
@@ -45,28 +45,13 @@ class SurveysTemplatesController extends Controller
 
         session()->forget('success');
 
+
         $terms = SurveyTerms::all();
 
-        $getAuthorizedCompanies = getAuthorizedCompanies();
+        $data = [];
 
-        $getActiveDepartments = getActiveDepartments();
+        $defaultOriginal = getWarehouseTerms();
 
-        $data = $defaultOriginal = [];
-
-        $index = 0;
-        foreach($getActiveDepartments as $department){
-            $defaultOriginal[] = [
-                'stepData' => [
-                    'step_name' => $department->department_alias,
-                    'term_id' => $department->department_id,
-                    'type' => 'default',
-                    'original_position' => $department->department_id,
-                    'new_position' => $index,
-                ],
-                //'topics' => $preListing
-            ];
-            $index++;
-        }
         $result = array_filter($defaultOriginal);
 
         return view('surveys.templates.create', compact(
@@ -93,19 +78,10 @@ class SurveysTemplatesController extends Controller
 
         $surveys = Survey::where('template_id', $id)
             //->where('user_id', $currentUserId)
-            ->where('condition_of', '==', 'publish')
             ->get();
 
-        $getActiveDepartments = getActiveDepartments();
 
         $terms = SurveyTerms::all();
-
-        // Check if the current user is the creator
-        /*
-        if ($currentUserId == $data->user_id) {
-            return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro gerado por outra pessoa']);
-        }
-        */
 
         $reorderingData = SurveyTemplates::reorderingData($data);
         //$result = $reorderingData ?? null;
@@ -116,24 +92,12 @@ class SurveysTemplatesController extends Controller
         $default = SurveyTemplates::getByType($reorderingData, 'default');
         $default = $default ?? [];
 
-        $defaultOriginal = [];
-        $index = 0;
-        foreach($getActiveDepartments as  $department){
-            $defaultOriginal[] = [
-                'stepData' => [
-                    'step_name' => $department->department_alias,
-                    'term_id' => $department->department_id,
-                    'type' => 'default',
-                    'original_position' => $department->department_id,
-                    'new_position' =>$index,
-                ],
-                //'topics' => $preListing
-            ];
-            $index++;
-        }
-        $defaultOriginal = array_filter($defaultOriginal);
-
+        /*
+        // DEPRECATED ?
+        // TODO think about if is realy necessary add new original data to registered template. Are a conflict here related with the stepData new_position field.
+        $defaultOriginal = getWarehouseTerms();
         $default = SurveyTemplates::mergeTemplateDataArrays($defaultOriginal, $default);
+        */
 
         $result = array_merge($default, $custom);
 
@@ -151,11 +115,18 @@ class SurveysTemplatesController extends Controller
         // Cache::flush();
         $currentUserId = auth()->id();
 
+        $messages = [
+            'title.required' => 'Informe o título',
+            'title.max' => 'Título deve possuir no máximo 190 caracteres.',
+            'description.required' => 'Descreva',
+            'description.max' => 'A descrição deve conter do máximo 500 caracteres.',
+        ];
+
         $validatedData = $request->validate([
             'title' => 'required|string|max:191',
-            'description' => 'nullable|string|max:1000',
+            'description' => 'nullable|string|max:500',
             'template_data' => 'required',
-        ]);
+        ], $messages);
 
         // Convert array inputs to JSON strings for storage
         $validatedData = array_map(function ($value) {

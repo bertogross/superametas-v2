@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             newBlock.innerHTML = `
                 <div class="input-group">
-                    <input type="text" class="form-control text-theme" name="steps[${newBlockIndex}]['stepData']['step_name']" placeholder="Informe o Setor/Etapa" autocomplete="off" maxlength="100" value="${value}" readonly required>
+                    <input type="text" class="form-control text-theme text-uppercase" name="steps[${newBlockIndex}]['stepData']['term_name']" placeholder="Informe o Setor/Etapa" autocomplete="off" maxlength="100" value="${value}" readonly required>
 
                     <input type="hidden" name="steps[${newBlockIndex}]['stepData']['term_id']" value="${id}" tabindex="-1" value="custom">
                     <input type="hidden" name="steps[${newBlockIndex}]['stepData']['type']" tabindex="-1" value="custom">

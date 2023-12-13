@@ -14,7 +14,7 @@ class SurveyTopic extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'user_id',
+        //'user_id',
         'survey_id',
         'step_id',
         'question',
@@ -36,7 +36,7 @@ class SurveyTopic extends Model
                 $newPosition = $topic['new_position'] ?? $originalPosition;
 
                 if($question){
-                    $fill['user_id'] = $currentUserId;
+                    //$fill['user_id'] = $currentUserId;
                     $fill['survey_id'] = $surveyId;
                     $fill['step_id'] = $stepId;
                     $fill['question'] = $question;

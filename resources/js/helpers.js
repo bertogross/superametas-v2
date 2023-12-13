@@ -1,8 +1,10 @@
 
 // Toast Notifications
 // Display a toast notification using Bootstrap's Toast API with a backdrop
+/*
 export function toastAlert(message, type = 'success', duration = 3000, backdrop = false) {
     setTimeout(() => {
+
         // Define the HTML template for the toast
         const icon = type === 'success' ? 'ri-checkbox-circle-fill text-success' : 'ri-alert-fill text-' + type;
         type = type === 'error' ? 'danger' : type;
@@ -88,6 +90,94 @@ export function toastAlert(message, type = 'success', duration = 3000, backdrop 
 
     }, 100);
 }
+*/
+export function toastAlert(message, type = 'success', duration = 3000, backdrop = false) {
+    setTimeout(() => {
+        // Define the HTML template for the toast
+        const icon = type === 'success' ? 'ri-checkbox-circle-fill text-success' : 'ri-alert-fill text-' + type;
+        type = type === 'error' ? 'danger' : type;
+
+        let toastContainerElement = document.querySelectorAll('.toast-container');
+        const toastBackdrop = `<div class="toast-backdrop"></div>`;
+
+        // Remove existing toast containers
+        if (toastContainerElement) {
+            toastContainerElement.forEach(element => element.remove());
+        }
+
+        // Remove existing toast backdrops
+        let toastBackdropElement = document.querySelectorAll('.toast-backdrop');
+        if (toastBackdropElement) {
+            toastBackdropElement.forEach(element => element.remove());
+        }
+
+        const ToastHtml = `
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div class="toast fade show toast-border-${type} overflow-hidden mt-3" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-2">
+                                <i class="${icon} align-middle"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <button type="button" class="btn-close btn-close-white me-2 m-auto float-end fs-10" data-bs-dismiss="toast" aria-label="Close"></button>
+                                <h6 class="mb-0">${message}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add the toast and backdrop to the end of the document body
+        if (type != 'success' && backdrop) {
+            document.body.insertAdjacentHTML('beforeend', toastBackdrop);
+        }
+        document.body.insertAdjacentHTML('beforeend', ToastHtml);
+
+        // Initialize and show the toast using Bootstrap's API
+        const toastElement = document.querySelector('.toast-container .toast');
+        const toast = new bootstrap.Toast(toastElement, { autohide: false });
+        toast.show();
+
+        // Add event listener to the close button
+        const closeButton = document.querySelector('.btn-close');
+        closeButton.addEventListener('click', () => {
+            toast.hide();
+
+            toastContainerElement = document.querySelectorAll('.toast-container');
+            if (toastContainerElement) {
+                toastContainerElement.forEach(element => element.remove());
+            }
+
+            toastBackdropElement = document.querySelectorAll('.toast-backdrop');
+            if (toastBackdropElement) {
+                toastBackdropElement.forEach(element => element.remove());
+            }
+        });
+
+        // If a duration is provided, hide the toast after the duration
+        setTimeout(() => {
+            toast.hide();
+
+            // Remove the toast container and backdrop once the toast is completely hidden
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastContainerElement = document.querySelectorAll('.toast-container');
+                if(toastContainerElement){
+                    toastContainerElement.forEach(element => element.remove());
+                }
+
+                toastBackdropElement = document.querySelectorAll('.toast-backdrop');
+                if(toastBackdropElement){
+                    toastBackdropElement.forEach(element => element.remove());
+                }
+            });
+        }, duration);
+
+    }, 100);
+}
+
+
 
 export function sweetWizardAlert(message, urlToRedirect = false, icon = 'success', Trigger = false){
     Swal.fire({
@@ -153,6 +243,18 @@ export function sweetWizardAlert(message, urlToRedirect = false, icon = 'success
 // Multiple Modals
 // Maintain modal-open when close another modal
 export function multipleModal() {
+    function destroyModal() {
+        if(document.querySelectorAll('.modal .btn-destroy').length){
+            document.querySelectorAll('.modal .btn-destroy').forEach(function (btnClose) {
+                btnClose.addEventListener('click', function () {
+                    var modalElement = this.closest('.modal');
+                    if (modalElement) {
+                        modalElement.remove();
+                    }
+                });
+            });
+        }
+    }
     setTimeout(function () {
         document.querySelectorAll('.modal').forEach(function (modal) {
             modal.addEventListener('show', function () {
@@ -182,6 +284,7 @@ export function multipleModal() {
 
         destroyModal();
     }, 500);
+
 }
 
 /*
@@ -563,45 +666,83 @@ export function bsPopoverTooltip() {
 
 export function initFlatpickr() {
     const elements = document.querySelectorAll('.flatpickr-default');
-    elements.forEach(element => {
-        const defaultValue = element.value ? element.value : null;
+    if(elements){
+        elements.forEach(element => {
+            var currentValue = element.value ? element.value : null;
 
-        flatpickr(element, {
-            dateFormat: "d/m/Y",
-            locale: "pt",
-            allowInput: true,
-            clear: true,
-            minDate: "today",
-            defaultDate: defaultValue,
-            maxDate: new Date().fp_incr(1100)// Set the maximum date to 360 days from today
+            flatpickr(element, {
+                dateFormat: "d/m/Y",
+                locale: "pt",
+                allowInput: true,
+                clear: true,
+                minDate: "today",
+                defaultDate: currentValue,
+                maxDate: new Date().fp_incr(1100)// Set the maximum date to 360 days from today
+            });
         });
-    });
-}
+    }
 
-export function initFlatpickrRange() {
-    const elements = document.querySelectorAll('.flatpickr-range');
-    elements.forEach(element => {
-        var getMinDate = element.getAttribute("data-min-date");
-        getMinDate = !getMinDate ? 'today' : getMinDate;
+    const elementsBetween = document.querySelectorAll('.flatpickr-between');
+    if(elementsBetween){
+        var elementStart = document.getElementById('date-recurring-start');
+        var elementEnd = document.getElementById('date-recurring-end');
 
-        var getMaxDate = element.getAttribute("data-max-date");
-        getMaxDate = !getMaxDate ? 'today' : getMaxDate;
+        if(elementStart && elementEnd){
+            var startValue = elementStart.value ? elementStart.value : null;
+            var endValue = elementEnd.value ? elementEnd.value : null;
 
-        flatpickr(element, {
-            dateFormat: "d/m/Y",
-            locale: "pt",
-            clear: true,
-            mode: "range",
-            minDate: getMinDate,
-            maxDate: getMaxDate
+            // Initialize Flatpickr for the end date
+            const endDatePicker = flatpickr("#date-recurring-end", {
+                dateFormat: "d/m/Y",
+                locale: "pt",
+                allowInput: true,
+                clear: true,
+                minDate: "today",
+                defaultDate: endValue,
+                maxDate: new Date().fp_incr(3300)// Set the maximum date to 3300 days from today
+            });
+
+            // Initialize Flatpickr for the start date
+            flatpickr("#date-recurring-start", {
+                dateFormat: "d/m/Y",
+                locale: "pt",
+                allowInput: true,
+                clear: true,
+                minDate: "today",
+                defaultDate: startValue,
+                maxDate: new Date().fp_incr(1100),// Set the maximum date to 1100 days from today
+                onChange: function(selectedDates) {
+                    // Update the minDate for endDatePicker
+                    const startDate = selectedDates[0];
+                    endDatePicker.set('minDate', startDate);
+                }
+            });
+        }
+    }
+
+    const elementsRange = document.querySelectorAll('.flatpickr-range');
+    if(elementsRange){
+        elementsRange.forEach(element => {
+            var getMinDate = element.getAttribute("data-min-date");
+            getMinDate = !getMinDate ? 'today' : getMinDate;
+
+            var getMaxDate = element.getAttribute("data-max-date");
+            getMaxDate = !getMaxDate ? 'today' : getMaxDate;
+
+            flatpickr(element, {
+                dateFormat: "d/m/Y",
+                locale: "pt",
+                clear: true,
+                mode: "range",
+                minDate: getMinDate,
+                maxDate: getMaxDate
+            });
         });
-    });
-}
+    }
 
-export function initFlatpickrRangeMonths(){
-    const elements = document.querySelectorAll('.flatpickr-range-month');
-    if (elements) {
-        elements.forEach(function (element) {
+    const elementsRangeMonth = document.querySelectorAll('.flatpickr-range-month');
+    if (elementsRangeMonth) {
+        elementsRangeMonth.forEach(function (element) {
             var getMinDate = element.getAttribute("data-min-date");
             getMinDate = !getMinDate ? 'today' : getMinDate;
 
@@ -627,8 +768,8 @@ export function initFlatpickrRangeMonths(){
             });
         });
     }
-
 }
+
 
 export function maxLengthTextarea() {
     const textareas = document.querySelectorAll('.maxlength'); // Select all textareas with a maxlength attribute
@@ -675,141 +816,6 @@ export function revalidationOnInput(formSelector = '.needs-validation') {
     }
 }
 
-export function wizardFormSteps(totalCompanies = 1){
-    var formSteps = document.querySelectorAll(".form-steps");
-    if (formSteps){
-        Array.from(formSteps).forEach(function (form) {
-            checkAllFormCheckInputs();
-
-            // next tab
-            if (form.querySelectorAll(".nexttab")){
-
-                Array.from(form.querySelectorAll(".nexttab")).forEach(function (nextButton) {
-                    var tabEl = form.querySelectorAll('button[data-bs-toggle="pill"]');
-
-                    Array.from(tabEl).forEach(function (item) {
-                        item.addEventListener('show.bs.tab', function (event) {
-                            event.target.classList.add('done');
-                        });
-                    });
-
-                    nextButton.addEventListener("click", function () {
-
-                        form.classList.add('was-validated');
-
-                        var nextTab = nextButton.getAttribute('data-nexttab');
-
-                        document.getElementById(nextTab).removeAttribute('disabled');
-
-                        var inputControl = form.querySelectorAll(".tab-pane.show .form-control");
-                        if(inputControl){
-                            inputControl.forEach(function(elem){
-
-                                //console.log('nextTab ID: ', nextTab);
-
-                                /*var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-                                if(elem.value.length > 0 && elem.value.match(validRegex)){*/
-                                if(elem.value.length > 0){
-                                    form.classList.remove('was-validated');
-
-                                    document.getElementById(nextTab).click();
-                                }
-                            });
-                        }
-
-                        var checkedControl = form.querySelectorAll(".tab-pane.show .form-check-input:checked");
-                        if(checkedControl){
-                            var checkedControllemght = checkedControl.length
-                            //console.log('checked count', checkedControllemght);
-
-                            checkedControl.forEach(function(elem){
-                                //console.log('totalCompanies:', totalCompanies);
-                                //console.log('nextTab ID: ', nextTab);
-
-                                if(checkedControllemght == (parseInt(totalCompanies) * 2)){
-                                    form.classList.remove('was-validated');
-
-                                    document.getElementById(nextTab).click();
-
-                                }
-                            });
-                        }
-
-                        document.getElementById(nextTab).setAttribute('disabled', 'disabled');
-                    });
-                });
-
-            }
-
-            //Pervies tab
-            if (form.querySelectorAll(".previestab")){
-                Array.from(form.querySelectorAll(".previestab")).forEach(function (prevButton) {
-
-                    prevButton.addEventListener("click", function () {
-                        var prevTab = prevButton.getAttribute('data-previous');
-
-                        document.getElementById(prevTab).removeAttribute('disabled');
-
-                        var totalDone = prevButton.closest("form").querySelectorAll(".custom-nav .done").length;
-                        for (var i = totalDone - 1; i < totalDone; i++) {
-                            (prevButton.closest("form").querySelectorAll(".custom-nav .done")[i]) ? prevButton.closest("form").querySelectorAll(".custom-nav .done")[i].classList.remove('done'): '';
-                        }
-                        document.getElementById(prevTab).click();
-
-                        document.getElementById(prevTab).setAttribute('disabled', 'disabled');
-
-                    });
-                });
-            }
-
-            // Step number click
-            var tabButtons = form.querySelectorAll('button[data-bs-toggle="pill"]');
-            if (tabButtons){
-                Array.from(tabButtons).forEach(function (button, i) {
-                    button.setAttribute("data-position", i);
-                    button.addEventListener("click", function () {
-                        form.classList.remove('was-validated');
-
-                        var getProgressBar = button.getAttribute("data-progressbar");
-                        if (getProgressBar) {
-                            var totalLength = document.getElementById("custom-progress-bar").querySelectorAll("li").length - 1;
-                            var current = i;
-                            var percent = (current / totalLength) * 100;
-                            document.getElementById("custom-progress-bar").querySelector('.progress-bar').style.width = percent + "%";
-                        }
-                        (form.querySelectorAll(".custom-nav .done").length > 0) ?
-                        Array.from(form.querySelectorAll(".custom-nav .done")).forEach(function (doneTab) {
-                            doneTab.classList.remove('done');
-                        }): '';
-                        for (var j = 0; j <= i; j++) {
-                            tabButtons[j].classList.contains('active') ? tabButtons[j].classList.remove('done') : tabButtons[j].classList.add('done');
-                        }
-                    });
-                });
-            }
-        });
-    }
-}
-function checkAllFormCheckInputs() {
-    // Select all elements with the .form-check-input class
-    var checkboxes = document.querySelectorAll('.form-check-input');
-
-    // Iterate over them and add a change event listener to each one
-    checkboxes.forEach(function(checkbox) {
-        // Add a change listener to the current checkbox
-        checkbox.addEventListener('change', function() {
-            // This function is called whenever a checkbox is checked or unchecked
-            // You can add your logic here for what happens when the state changes
-            if (this.checked) {
-                this.setAttribute('checked', '');
-                //console.log(this.id + ' is checked');
-            } else {
-                this.removeAttribute('checked');
-                //console.log(this.id + ' is unchecked');
-            }
-        });
-    });
-}
 
 export function toggleTableRows() {
     // Get all the expand/collapse buttons
@@ -992,6 +998,60 @@ export function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(context, args), wait);
     };
+}
+
+export function toggleElement() {
+    var toggle = document.querySelectorAll('.btn-toggle-element');
+
+    if(toggle.length){
+        toggle.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var target = this.getAttribute('data-toggle-target');
+
+                var element = document.getElementById(target);
+                if (element) {
+                    if (element.style.display === "none") {
+                        // If the div is hidden, show it
+                        element.style.display = "block";
+
+                        element.focus();
+                    } else {
+                        // If the div is shown, hide it
+                        element.style.display = "none";
+                    }
+                }
+            });
+        });
+    }
+}
+
+// Used on survey-surveyor.js and survey-auditor.js compliance radio labels
+export function updateLabelClasses(radios) {
+    radios.forEach(radio => {
+        const label = document.querySelector(`label[for="${radio.id}"]`);
+
+        // Reset classes
+        label.classList.remove('btn-success', 'btn-danger', 'btn-outline-success', 'btn-outline-danger');
+
+        if (radio.checked) {
+            if (radio.value === 'yes') {
+                // Add and remove classes as needed when 'yes' radio is checked
+                label.classList.add('btn-success');
+                label.classList.remove('btn-outline-success');
+            } else if (radio.value === 'no') {
+                // Add and remove classes as needed when 'no' radio is checked
+                label.classList.add('btn-danger');
+                label.classList.remove('btn-outline-danger');
+            }
+        } else {
+            // Add outline classes when radio is not checked
+            if (radio.value === 'yes') {
+                label.classList.add('btn-outline-success');
+            } else if (radio.value === 'no') {
+                label.classList.add('btn-outline-danger');
+            }
+        }
+    });
 }
 
 // GLightbox Popup

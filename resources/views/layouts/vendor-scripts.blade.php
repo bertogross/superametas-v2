@@ -25,7 +25,19 @@ window.App = {!! json_encode([
     $SUBDOMAIN = $HTTP_HOST ? strtok($HTTP_HOST, '.') : '';
 @endphp
 @if ( $SUBDOMAIN && $SUBDOMAIN != 'app' )
+    @php
+        $replacements = [
+            'localhost:8000' => 'local',
+            'localhost' => 'local',
+            'development' => 'dev',
+            'testing' => 'test'
+        ];
+
+        foreach ($replacements as $search => $replace) {
+            $SUBDOMAIN = str_replace($search, $replace, $SUBDOMAIN);
+        }
+    @endphp
     <div class="ribbon-box border-0 ribbon-fill position-fixed top-0 start-0 d-none d-lg-block d-xl-block" data-bs-toggle="tooltip" data-bs-placement="right" title="{{$SUBDOMAIN}} Environment" style="z-index:5000; width: 60px; height:60px;">
-        <div class="ribbon ribbon-{{$SUBDOMAIN == 'development' ? 'danger' : 'warning'}} text-uppercase fs-10">{{ str_replace(['localhost:8000', 'localhost'], 'local', $SUBDOMAIN)}}</div>
+        <div class="ribbon ribbon-{{$SUBDOMAIN == 'development' ? 'danger' : 'warning'}} text-uppercase">{{ $SUBDOMAIN }}</div>
     </div>
 @endif

@@ -1,1 +1,0 @@
-@include('surveys.compose.create')

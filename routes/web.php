@@ -17,9 +17,7 @@ use App\Http\Controllers\{
     SurveysResponsesController,
     SurveysAssignmentsController,
     SettingsApiKeysController,
-    SettingsStripeController,
     AttachmentsController,
-    StripeWebhookController,
     DropboxController,
     ClarifaiImageController,
     ScenexImageController
@@ -36,7 +34,8 @@ Route::get('index/{locale}', [HomeController::class, 'lang']);
 Route::middleware(['auth'])->group(function () {
     // Root
     //Route::get('/', [HomeController::class, 'root'])->name('root');
-    Route::get('/', [GoalSalesController::class, 'index'])->name('root');
+    //Route::get('/', [GoalSalesController::class, 'index'])->name('root');
+    Route::get('/', [SurveysController::class, 'index'])->name('root');
 
     // User Profile & Password Update
     Route::prefix('user')->group(function () {
@@ -70,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
             //Route::get('/listing', [SurveysTemplatesController::class, 'index'])->name('surveyTemplateIndexURL');
             Route::get('/template/create', [SurveysTemplatesController::class, 'create'])->name('surveysTemplateCreateURL');
             Route::get('/template/edit/{id?}', [SurveysTemplatesController::class, 'edit'])->name('surveysTemplateEditURL')->where('id', '[0-9]+');
-            Route::get('/template/show/{id?}', [SurveysTemplatesController::class, 'show'])->name('surveysTemplateShowURL')->where('id', '[0-9]+');
+            Route::get('/template/preview/{id?}', [SurveysTemplatesController::class, 'preview'])->name('surveysTemplatePreviewURL')->where('id', '[0-9]+');
             Route::post('/template/store/{id?}', [SurveysTemplatesController::class, 'storeOrUpdate'])->name('surveysTemplateStoreOrUpdateURL');
 
             Route::get('/assignment/{id}', [SurveysAssignmentsController::class, 'show'])->name('assignmentShowURL')->where('id', '[0-9]+');
@@ -85,7 +84,6 @@ Route::middleware(['auth'])->group(function () {
 
             Route::post('/responses/surveyor/store/{id?}', [SurveysResponsesController::class, 'responsesSurveyorStoreOrUpdate'])->name('responsesSurveyorStoreOrUpdateURL');
             Route::post('/responses/auditor/store/{id?}', [SurveysResponsesController::class, 'responsesAuditorStoreOrUpdate'])->name('responsesAuditorStoreOrUpdateURL');
-
 
             // Terms Routes
             Route::get('/terms/listing', [SurveysTermsController::class, 'index'])->name('surveysTermsIndexURL');
@@ -114,11 +112,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/users/store', [SettingsUserController::class, 'store'])->name('settingsUsersStoreURL');
                 Route::post('/users/update/{id?}', [SettingsUserController::class, 'update'])->name('settingsUsersUpdateURL');
                 Route::get('/users/modal-form/{id?}', [SettingsUserController::class, 'getUserModalContent'])->name('getUserModalContentURL');
-
-            Route::post('/stripe/subscription', [SettingsStripeController::class, 'createStripeSession'])->name('stripeSubscriptionURL');
-            Route::post('/stripe/subscription/details', [SettingsStripeController::class, 'updateSubscriptionItem'])->name('stripeSubscriptionDetailsURL');
-            Route::post('/stripe/cart/addon', [SettingsStripeController::class, 'addonCart'])->name('stripeCartAddonURL');
-            Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);
 
             Route::get('/dropbox', [DropboxController::class, 'index'])->name('DropboxIndexURL');
             Route::get('/dropbox/browse/{path}', [DropboxController::class, 'browseFolder'])->name('DropboxBrowseFolderURL');

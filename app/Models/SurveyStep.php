@@ -17,7 +17,7 @@ class SurveyStep extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'user_id',
+        //'user_id',
         'survey_id',
         'term_id',
         'step_order'
@@ -63,7 +63,7 @@ class SurveyStep extends Model
 
             foreach($result as $stepIndex => $step){
                 $stepData = $step['stepData'] ?? null;
-                //$stepName = $stepData['step_name'] ?? '';
+                //$termName = $stepData['term_name'] ?? '';
                 $termId = $stepData['term_id'] ?? '';
                 //$type = $stepData['type'] ?? 'custom';
                 $originalPosition = $stepData['original_position'] ?? $stepIndex;
@@ -72,7 +72,7 @@ class SurveyStep extends Model
                 $topics = $step['topics'] ?? null;
 
                 $fill = [
-                    'user_id' => $currentUserId,
+                    //'user_id' => $currentUserId,
                     'survey_id' => intval($surveyId),
                     'term_id' => intval($termId),
                     'step_order' => intval($newPosition),

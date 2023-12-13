@@ -83,7 +83,7 @@
 
             @if (!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) && count($getAuthorizedCompanies) > 1)
                 <div class="col-sm-12 col-md col-lg" title="Exibir somente Lojas selecionadas">
-                    <select class="form-control" data-choices data-choices-removeItem name="companies[]" id="filter-companies" multiple data-placeholder="Loja">
+                    <select class="form-control filter-companies" name="companies[]" data-placeholder="-Loja-" multiple>
                         @foreach ($getAuthorizedCompanies as $company)
                             <option {{ in_array($company, $filterCompanies) ? 'selected' : '' }} value="{{ $company }}">{{ getCompanyNameById($company) }}</option>
                         @endforeach
@@ -93,7 +93,7 @@
 
             @if (!empty($getActiveDepartments) && is_object($getActiveDepartments) && count($getActiveDepartments) > 1)
                 <div class="col-sm-12 col-md col-lg" title="Exibir somente Departamentos selecionados">
-                    <select class="form-control" data-choices data-choices-removeItem name="departments[]" multiple data-placeholder="Departamento">
+                    <select class="form-control" data-choices data-choices-removeItem name="departments[]" data-placeholder="-Departamento-" multiple>
                         @foreach ($getActiveDepartments as $department)
                             <option {{ in_array($department->department_id, $filterDepartments) ? 'selected' : '' }} value="{{ $department->department_id }}">{{ $department->department_alias }}</option>
                         @endforeach

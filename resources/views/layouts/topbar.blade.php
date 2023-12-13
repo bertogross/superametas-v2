@@ -4,6 +4,9 @@
     $getUserData = getUserData();
     $getCompanyLogo = getCompanyLogo();
     $getCompanyName = getCompanyName();
+
+    $host = $_SERVER['HTTP_HOST'] ?? 'default';
+    $logo2 = str_contains($host, 'testing') ? '-2' : '';
 @endphp
 <header id="page-topbar">
     <div class="layout-width">
@@ -11,33 +14,33 @@
             <div class="d-flex">
                 <!-- LOGO -->
                 <div class="navbar-brand-box horizontal-logo">
-                    <a href="{{ url('/') }}" class="logo logo-dark" title="Ir para inicial do {{env('APP_NAME')}}">
+                    <a href="{{ url('/') }}" class="logo logo-dark" title="Ir para inicial do {{appName()}}">
                         <span class="logo-sm">
-                            <img src="{{ URL::asset('build/images/logo-sm.png') }}" alt="{{env('APP_NAME')}}" height="22" class="logo-image">
+                            <img src="{{ URL::asset('build/images/logo-sm' . $logo2 . '.png') }}" alt="{{appName()}}" height="22" class="logo-image">
                         </span>
                         <span class="logo-lg">
                             <img
                             @if ($getCompanyLogo)
                                 src="{{$getCompanyLogo}}"
                             @else
-                                src="{{URL::asset('build/images/logo-dark.png')}}"
+                                src="{{URL::asset('build/images/logo-dark' . $logo2 . '.png')}}"
                             @endif
-                            alt="{{env('APP_NAME')}}" height="39">
+                            alt="{{appName()}}" height="39">
                         </span>
                     </a>
 
-                    <a href="{{ url('/') }}" class="logo logo-light" title="Ir para inicial do {{env('APP_NAME')}}">
+                    <a href="{{ url('/') }}" class="logo logo-light" title="Ir para inicial do {{appName()}}">
                         <span class="logo-sm">
-                            <img src="{{ URL::asset('build/images/logo-sm.png') }}" alt="{{env('APP_NAME')}}" height="22">
+                            <img src="{{ URL::asset('build/images/logo-sm' . $logo2 . '.png') }}" alt="{{appName()}}" height="22">
                         </span>
                         <span class="logo-lg">
                             <img
                             @if ($getCompanyLogo)
                                 src="{{$getCompanyLogo}}"
                             @else
-                                src="{{URL::asset('build/images/logo-light.png')}}"
+                                src="{{URL::asset('build/images/logo-light' . $logo2 . '.png')}}"
                             @endif
-                            alt="{{env('APP_NAME')}}" height="39">
+                            alt="{{appName()}}" height="39">
                         </span>
                     </a>
                 </div>
@@ -94,15 +97,17 @@
 
                         <div class="p-2">
                             <div class="row g-0">
-                                <div class="col">
-                                    <a class="dropdown-icon-item" href="{{ route('goalSalesIndexURL') }}" title="Meta de Vendas">
-                                        <i class="ri-user-smile-line text-theme fs-1"></i>
-                                        {{--
-                                        <img src="{{ URL::asset('build/images/svg/happy.png') }}" alt="Meta de Vendas">
-                                        --}}
-                                        <span>Vendas</span>
-                                    </a>
-                                </div>
+                                @if (getERP())
+                                    <div class="col">
+                                        <a class="dropdown-icon-item" href="{{ route('goalSalesIndexURL') }}" title="Meta de Vendas">
+                                            <i class="ri-shopping-cart-2-fill text-theme fs-1"></i>
+                                            {{--
+                                            <img src="{{ URL::asset('build/images/svg/happy.png') }}" alt="Meta de Vendas">
+                                            --}}
+                                            <span>Vendas</span>
+                                        </a>
+                                    </div>
+                                @endif
 
                                 <!--
                                 <div class="col">
@@ -115,19 +120,19 @@
 
                                 @if(auth()->user()->hasRole(User::ROLE_ADMIN) || auth()->user()->hasRole(User::ROLE_CONTROLLERSHIP))
                                     <div class="col">
-                                        <a class="dropdown-icon-item" href="{{ route('surveysIndexURL') }}" title="Vistorias">
-                                            <i class="ri-survey-line text-theme fs-1"></i>
+                                        <a class="dropdown-icon-item" href="{{ route('surveysIndexURL') }}" title="Checklists">
+                                            <i class="ri-survey-fill text-theme fs-1"></i>
                                             {{--
-                                            <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Vistorias">
+                                            <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Checklists">
                                             --}}
-                                            <span>Vistorias</span>
+                                            <span>Checklists</span>
                                         </a>
                                     </div>
                                 @endif
 
                                 <div class="col">
                                     <a class="dropdown-icon-item" href="{{ route('profileShowURL') }}" title="Tarefas">
-                                        <i class="ri-calendar-check-fill text-theme fs-1"></i>
+                                        <i class="ri-todo-fill text-theme fs-1"></i>
                                         <span>Tarefas</span>
                                     </a>
                                 </div>

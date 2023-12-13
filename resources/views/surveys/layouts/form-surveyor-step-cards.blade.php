@@ -9,8 +9,7 @@
             if( isset($purpose) && $purpose == 'validForm' ){
                 $stepId = isset($step['step_id']) ? intval($step['step_id']) : '';
                 $termId = isset($step['term_id']) ? intval($step['term_id']) : '';
-                // use the term_id to get term name. If term_id is less than 9000, find the getDepartmentNameById(term_id)
-                $stepName = $termId < 9000 ? getDepartmentNameById($termId) : getTermNameById($termId);
+                $termName = $termId >= 100000 ? getWarehouseTermNameById($termId) : getTermNameById($termId);
                 //$type =
                 $originalPosition = isset($step['step_order']) ? intval($step['step_order']) : 0;
                 $newPosition = $originalPosition;
@@ -18,7 +17,7 @@
             }else{
                 $stepId = '';
                 $stepData = $step['stepData'] ?? null;
-                $stepName = $stepData['step_name'] ?? '';
+                $termName = $stepData['term_name'] ?? '';
                 $termId = $stepData['term_id'] ?? '';
                 //$type = $stepData['type'] ?? 'custom';
                 $originalPosition = $stepData['original_position'] ?? $stepIndex;
@@ -30,7 +29,7 @@
         @if( $topics )
             <div class="card joblist-card">
                 <div class="card-body">
-                    <h5 class="job-title text-theme text-uppercase">{{ $stepName }}</h5>
+                    <h5 class="job-title text-theme text-uppercase">{{ $termName }}</h5>
                 </div>
                 @if ( $topics && is_array($topics))
                     @php
@@ -88,6 +87,7 @@
                         @endphp
                         <div class="card-footer border-top-dashed {{ $bg }}">
                             <form class="responses-data-container" autocomplete="off">
+                                <input type="hidden" name="topic_id" value="{{$topicId ?? ''}}">
                                 <input type="hidden" name="response_id" value="{{$responseId ?? ''}}">
 
                                 <div class="row">
@@ -112,13 +112,13 @@
                                     <div class="col-sm-12 col-md">
                                         <div class="input-group">
                                             @if( $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' )
-                                                <label for="input-attachment-{{$radioIndex}}" class="btn btn-outline-light waves-effect waves-light ps-1 pe-1 mb-0 d-flex align-content-center flex-wrap" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Anexar fotografia" data-step-id="{{$stepId}}" data-topic-id="{{$topicId}}">
+                                                <label for="input-attachment-{{$radioIndex}}" class="btn btn-outline-light waves-effect waves-light ps-1 pe-1 mb-0 d-flex align-content-center flex-wrap" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Anexar Fotografia" data-step-id="{{$stepId}}" data-topic-id="{{$topicId}}">
                                                     <i class="ri-image-add-fill text-body fs-5 m-2"></i>
                                                 </label>
                                                 <input type="file" id="input-attachment-{{$radioIndex}}" class="input-upload-photo d-none" accept="image/jpeg" {{ isset($purpose) && $purpose == 'validForm' ? '' : 'disabled' }}>
                                             @endif
 
-                                            <textarea tabindex="-1" class="form-control border-light" maxlength="1000" rows="3" name="comment_survey" placeholder="Observações..." {{$surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled readonly' : ''}} style="max-height: 70px;">{{$commentSurvey ?? ''}}</textarea>
+                                            <textarea tabindex="-1" class="form-control border-light" maxlength="1000" {{ $purpose == 'validForm' ? 'rows="3"' : 'readonly' }} name="comment_survey" placeholder="Observações..." {{$surveyorStatus == 'auditing' || $surveyorStatus == 'losted' ? 'disabled readonly' : ''}} style="max-height: 70px;">{{$commentSurvey ?? ''}}</textarea>
                                         </div>
 
                                         @if( $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' )
@@ -151,7 +151,7 @@
                                                     @endphp
                                                     @if ($attachmentUrl)
                                                         <div id="element-attachment-{{$attachmentId}}" class="element-item col-auto">
-                                                            <div class="gallery-box card p-0">
+                                                            <div class="gallery-box card p-0 mb-0 mt-1">
                                                                 <div class="gallery-container">
                                                                     <a href="{{ $attachmentUrl }}" class="image-popup" title="Imagem capturada em {{$dateAttachment}}hs" data-gallery="gallery-{{$radioIndex}}">
                                                                         <img class="rounded gallery-img" alt="image" height="70" src="{{ $attachmentUrl }}">
@@ -164,7 +164,7 @@
                                                             </div>
 
                                                             @if( $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' )
-                                                                <div class="position-absolute translate-middle mt-n3">
+                                                                <div class="position-absolute translate-middle mt-n4 ms-2">
                                                                     <div class="avatar-xs">
                                                                         <button type="button" class="avatar-title bg-light border-0 rounded-circle text-danger cursor-pointer btn-delete-photo" data-attachment-id="{{$attachmentId}}" title="Deletar Arquivo">
                                                                             <i class="ri-delete-bin-2-line"></i>

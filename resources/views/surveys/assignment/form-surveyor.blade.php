@@ -30,7 +30,7 @@
     $companyName = $companyId ? getCompanyNameById($companyId) : '';
 
     $auditorId = $assignmentData->auditor_id ?? null;
-    $auditorName = getUserData($auditorId)['name'];
+    $auditorName = $auditorId ? getUserData($auditorId)['name'] : '';
 
     $today = Carbon::today();
     $responsesData = SurveyResponse::where('survey_id', $surveyId)
@@ -43,7 +43,7 @@
 @endphp
 @extends('layouts.master')
 @section('title')
-    Formulário de Vistoria
+    Formulário de Checklist
 @endsection
 @section('css')
     <link rel="stylesheet" href="{{ URL::asset('build/libs/glightbox/css/glightbox.min.css') }}">
@@ -54,20 +54,24 @@
             {{ route('surveysIndexURL') }}
         @endslot
         @slot('li_1')
-            Vistorias
+            Checklists
         @endslot
         @slot('title')
             Tarefa <small><i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i> #<span class="text-theme">{{$surveyId}}</span> {{ limitChars($templateName ?? '', 20) }}</small>
         @endslot
     @endcomponent
-    <div id="content" class="rounded rounded-2 mb-4">
+    <div id="content" class="rounded rounded-2 mb-4" style="max-width: 700px; margin: 0 auto;">
         <div class="bg-info-subtle position-relative">
             <div class="card-body p-5 text-center">
                 @if ($companyName )
                     <h2 class="text-theme text-uppercase">{{ $companyName }}</h2>
                 @endif
-                <h2>Vistoria</h2>
-                <p>Auditoria será realizada por <u>{{$auditorName}}</u></p>
+                <h2>Checklist</h2>
+
+                @if($auditorName)
+                    <p>Auditoria será realizada por <u>{{$auditorName}}</u></p>
+                @endif
+
                 <h3>{{ $title ? ucfirst($title) : 'NI' }}</h3>
                 <div class="mb-0 text-muted">
                     Executar em:
@@ -96,12 +100,12 @@
         @else
             @if ($surveyorStatus == 'auditing')
                 <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                    <i class="ri-alert-line label-icon blink"></i> Esta Vistoria já foi enviada para Auditoria e não poderá ser editada
+                    <i class="ri-alert-line label-icon blink"></i> Este Checklist já foi enviada para Auditoria e não poderá ser editada
                 </div>
             @endif
             @if ($surveyorStatus == 'losted')
                 <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                    <i class="ri-alert-line label-icon blink"></i> O prazo expirou e esta Vistoria foi perdida. Por isso não poderá mais ser editada
+                    <i class="ri-alert-line label-icon blink"></i> O prazo expirou e este Checklist foi perdida. Por isso não poderá mais ser editada
                 </div>
             @endif
 
@@ -113,7 +117,7 @@
                 <input type="hidden" name="company_id" value="{{$companyId}}">
 
                 @if ($surveyData)
-                    @component('surveys.layouts.form-surveyor-step-cards')
+                    @component('surveys.layouts.form-surveyor-step-cards-v2')
                         @slot('data', $stepsWithTopics)
                         @slot('responsesData', $responsesData)
                         @slot('purpose', 'validForm')
@@ -131,8 +135,8 @@
 
     <div id="survey-progress-bar" class="fixed-bottom mb-0 ms-auto me-auto w-100">
         <div class="flex-grow-1">
-            <div class="progress animated-progress custom-progress progress-label">
-                <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="" aria-valuemin="0" aria-valuemax="100"><div class="label"></div></div>
+            <div class="progress animated-progress progress-label">
+                <div class="progress-bar rounded-0 bg-{{getProgressBarClass($percentage)}}" role="progressbar" style="width: {{$percentage}}%" aria-valuenow="" aria-valuemin="0" aria-valuemax="100"><div class="label">{{ $percentage > 0 ? $percentage.'%' : ''}}</div></div>
             </div>
         </div>
     </div>
@@ -164,4 +168,12 @@
         var assetUrl = "{{ URL::asset('/') }}";
     </script>
     <script src="{{ URL::asset('build/js/surveys-attachments.js') }}" type="module"></script>
+
+    <script type="module">
+        import {
+            toggleElement,
+        } from '{{ URL::asset('build/js/helpers.js') }}';
+
+        toggleElement();
+    </script>
 @endsection

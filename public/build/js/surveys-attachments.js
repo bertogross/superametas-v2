@@ -195,14 +195,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (galleryWrapper) {
                             const galleryItemHtml = `
                                 <div id="element-attachment-${data.id}" class="element-item col-auto">
-                                    <div class="gallery-box card p-0">
+                                    <div class="gallery-box card p-0 mb-0 mt-1">
                                         <div class="gallery-container">
                                             <a href="/storage/${data.path}" class="image-popup">
                                                 <img class="rounded gallery-img" alt="image" height="70" src="${assetUrl}storage/${data.path}">
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="position-absolute translate-middle mt-n3">
+                                    <div class="position-absolute translate-middle mt-n4 ms-2">
                                         <div class="avatar-xs">
                                             <button type="button" class="avatar-title bg-light border-0 rounded-circle text-danger cursor-pointer btn-delete-photo" data-attachment-id="${data.id}" title="Deletar Arquivo">
                                                 <i class="ri-delete-bin-2-line"></i>

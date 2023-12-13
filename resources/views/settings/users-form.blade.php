@@ -1,18 +1,13 @@
 @php
-use App\Models\User;
+    use App\Models\User;
 
-$getActiveCompanies = getActiveCompanies();
-//appPrintR($getActiveCompanies);
+    $getActiveCompanies = getActiveCompanies();
 
-$getAuthorizedCompanies = $user ? getAuthorizedCompanies($user->id) : $getActiveCompanies;
-//appPrintR($getAuthorizedCompanies);
+    $getAuthorizedCompanies = $user ? getAuthorizedCompanies($user->id) : $getActiveCompanies;
 
-if (is_object($getActiveCompanies)) {
-    $extractCompanyIds = $getActiveCompanies->pluck('company_id')->map(function ($value) {
-        return (int) $value;
-    })->all();
-    //appPrintR($extractCompanyIds);
-}
+    if (is_array($getActiveCompanies)) {
+        $extractCompanyIds = array_column($getActiveCompanies, 'company_id');
+    }
 @endphp
 <!-- Modal -->
 <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
@@ -149,10 +144,10 @@ if (is_object($getActiveCompanies)) {
                                         checked
                                     @endif
                                     value="1">
-                                    <label class="form-check-label" for="user_status_1" data-bs-html="true" data-bs-toggle="tooltip" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Ativo = Verde">Status <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Desativado este usuário não terá sucesso ao tentar efetuar login em seu {{env('APP_NAME')}}"></i></label>
+                                    <label class="form-check-label" for="user_status_1" data-bs-html="true" data-bs-toggle="tooltip" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Ativo = Verde">Status <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Desativado este usuário não terá sucesso ao tentar efetuar login em seu {{appName()}}"></i></label>
                                 </div>
                                 {{--
-                                <label class="form-label">Status <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Desativado, o usuário não poderá mais efetuar login em seu {{env('APP_NAME')}}"></i></label>
+                                <label class="form-label">Status <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Desativado, o usuário não poderá mais efetuar login em seu {{appName()}}"></i></label>
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-check form-switch form-switch-theme form-switch-md">

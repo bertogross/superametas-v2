@@ -25,6 +25,7 @@
 
     @php
         //appPrintR($data);
+        //appPrintR($result);
         $templateId = $data->id ?? '';
         $authorId = $data->user_id ?? '';
         $title = $data->title ?? '';
@@ -51,13 +52,13 @@
                 <div class="float-end">
 
                 </div>
-                <h4 class="card-title mb-0"><i class="ri-survey-line fs-16 align-middle text-theme me-2"></i>{{ $data->title ?? 'Formulário' }}</h4>
+                <h4 class="card-title mb-0"><i class="ri-survey-fill fs-16 align-middle text-theme me-2"></i>{{ $data->title ?? 'Formulário' }}</h4>
             </div>
             <div class="card-body">
                 <form id="surveyTemplateForm" method="POST" class="needs-validation" novalidate autocomplete="off">
                     @csrf
                     <div class="row">
-                        <div class="col-sm-12 col-md-6 col-lg-6 col-xxl-6">
+                        <div class="col-sm-12 col-md-6 col-lg-6 col-xxl-7">
                             <div class="p-3">
                                 <p class="text-body fw-bold mb-4">Composição do Modelo</p>
 
@@ -66,12 +67,12 @@
                                 <div class="mb-4">
                                     <label for="title" class="form-label">Título:</label>
                                     <input type="text" id="title" name="title" class="form-control" value="{{ $title }}" maxlength="100" placeholder="Exemplo: Checklist Abertura de Loja" required>
-                                    <div class="form-text">O título servirá para identificar o modelo na listagem.</div>
+                                    <div class="form-text">O título servirá para identificar o modelo na listagem</div>
                                 </div>
 
                                 <div>
                                     <label for="description" class="form-label">Descrição:</label>
-                                    <textarea name="description" class="form-control maxlength" id="description" rows="3" maxlength="500" placeholder="Descreva, por exemplo, as diretrizes para execução dos tópicos relacionados a este modelo">{{ $description }}</textarea>
+                                    <textarea name="description" class="form-control maxlength" id="description" rows="5" maxlength="500" placeholder="Descreva, por exemplo, as diretrizes para execução dos tópicos relacionados a este modelo">{{ $description }}</textarea>
                                     <div class="form-text">Opcional</div>
                                 </div>
 
@@ -85,26 +86,17 @@
                                     <button type="button" class="btn btn-sm btn-outline-theme btn-label right mt-3" data-bs-toggle="modal" data-bs-target="#addStepModal" tabindex="-1" title="Adicionar Etapa/Setor"><i class="ri-terminal-window-line label-icon align-middle fs-16 ms-2"></i>Adicionar Setor</button>
 
                                     <div class="mt-2 text-end">
-                                        @if ($data)
-                                            <button type="button" class="btn btn-label right btn-theme mt-5" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Atualizar Formulário</button>
+                                        {{--
+                                            <button type="button" class="d-none" id="btn-survey-template-autosave" data-autosave="yes" tabindex="-1"></button>
+                                        --}}
 
-                                            {{--
-                                            <button type="button" class="btn btn-sm btn-label right btn-outline-info" id="btn-surveys-clone" tabindex="-1"><i class="ri-file-copy-line label-icon align-middle fs-16 ms-2"></i>Clonar</button>
-                                            --}}
-
-                                            {{--
-                                            <a href="{{ route('surveysTemplateShowURL', ['id' => $templateId]) }}" class="btn btn-sm btn-label right btn-outline-dark" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar em nova guia" target="_blank" tabindex="-1"><i class="ri-eye-line label-icon align-middle fs-16 ms-2"></i>Visualizar</a>
-                                            --}}
-                                        @else
-                                            <button type="button" class="btn btn-label right btn-theme mt-5" id="btn-survey-template-store-or-update" tabindex="-1"><i class="ri-save-3-line label-icon align-middle fs-16 ms-2"></i>Salvar Formulário</button>
-                                        @endif
-
+                                        <button type="button" class="btn btn-label right btn-theme mt-5" id="btn-survey-template-store-or-update" tabindex="-1" data-autosave="no"><i class="ri-save-3-line label-icon align-middle fs-16 ms-1"></i>{{ $data ? 'Atualizar' : 'Salvar' }} Formulário</button>
                                     </div>
                                 </div>
 
                             </div>
                         </div>
-                        <div class="col-sm-12 col-md-6 col-lg-6 col-xxl-6">
+                        <div class="col-sm-12 col-md-6 col-lg-6 col-xxl-5">
                             <div id="load-preview" class="p-3 border border-1 border-light rounded"></div>
                         </div>
                     </div>
@@ -142,7 +134,7 @@
     <script>
         var surveysIndexURL = "{{ route('surveysIndexURL') }}";
         var surveysTemplateEditURL = "{{ route('surveysTemplateEditURL') }}";
-        var surveysTemplateShowURL = "{{ route('surveysTemplateShowURL') }}";
+        var surveysTemplatePreviewURL = "{{ route('surveysTemplatePreviewURL') }}";
         var surveysTemplateStoreOrUpdateURL = "{{ route('surveysTemplateStoreOrUpdateURL') }}";
 
         var surveysTermsStoreOrUpdateURL = "{{ route('surveysTermsStoreOrUpdateURL') }}";

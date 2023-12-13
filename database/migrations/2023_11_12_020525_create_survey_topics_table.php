@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('survey_topics', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id')->nullable();
+            //$table->bigInteger('user_id')->nullable();
             $table->bigInteger('survey_id')->nullable();
             $table->bigInteger('step_id')->nullable();
             $table->string('question', 191)->nullable();

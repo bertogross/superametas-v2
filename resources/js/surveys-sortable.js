@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         reloadTermsForm();
 
+                        attachTemplateAutosave();
+
                         event.stopPropagation();
 
                         return;
@@ -49,7 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (topicElement) {
                         topicElement.remove();
 
-                        attachNestedListeners()
+                        attachNestedListeners();
+
+                        attachTemplateAutosave();
 
                         event.stopPropagation();
 
@@ -132,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             newBlock.innerHTML = `
                 <div class="input-group">
-                    <input type="text" class="form-control text-theme" name="steps[${blockIndex}]['stepData']['step_name']" placeholder="Informe o Setor/Etapa" maxlength="100" value="${value}" readonly required tabindex="-1">
+                    <input type="text" class="form-control text-theme text-uppercase" name="steps[${blockIndex}]['stepData']['term_name']" placeholder="Informe o Setor/Etapa" maxlength="100" value="${value}" readonly required tabindex="-1">
                     <div class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-block ri-arrow-up-down-line text-body" title="Reordenar"></div>
 
                     <button type="button" class="btn btn-ghost-dark btn-icon rounded-pill btn-accordion-toggle ri-arrow-up-s-line" tabindex="-1"></button>
@@ -160,6 +164,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector(selector).click();
 
                 attachNestedListeners();
+
+                attachTemplateAutosave();
 
                 //attachRemoveButtonListeners();
                 //choicesListeners(surveysTermsSearchURL, surveysTermsStoreOrUpdateURL, choicesSelectorClass);
@@ -196,6 +202,8 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
                 attachNestedListeners();
 
+                attachTemplateAutosave();
+
                 //var inputName = `steps[${stepIndex}]['topics']['question']`;
                 //document.querySelector('input[name="' + inputName + '"]').focus();
                 document.querySelector('input.focus-' + termId + topicIndex + '').focus();
@@ -223,6 +231,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     group: selector === '.nested-sortable-topic' ? 'shared' : null,
                     onUpdate: function () {
                         updateNestedPositions(selector);
+
+                        attachTemplateAutosave();
+
                     }
                 });
             });
@@ -253,6 +264,16 @@ document.addEventListener('DOMContentLoaded', function() {
     updateNestedPositions('.nested-sortable-block');
     updateNestedPositions('.nested-sortable-topic');
 
+    function attachTemplateAutosave(){
+        const btnAutoSave = document.getElementById('btn-survey-template-autosave');
+
+        if(btnAutoSave){
+            setTimeout(() => {
+                btnAutoSave.click();
+            }, 100);
+        }
+    }
+
 
     // Function to observe DOM changes
     function observeDOMChanges() {
@@ -262,7 +283,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     removeInputIfTheSameExistOnTheListing();
                 }
                 //attachNestedListeners();
-
             });
         });
 

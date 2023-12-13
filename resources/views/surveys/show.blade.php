@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    Análise das Vistorias
+    Análise do Checklist
 @endsection
 @section('css')
 @endsection
@@ -25,7 +25,7 @@
             @lang('translation.surveys')
         @endslot
         @slot('title')
-            Análise das Vistorias
+            Análise do Checklist
             <small>
                 <i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i>
                 {{limitChars($title ?? '', 30) }} #<span class="text-theme me-2">{{$data->id}}</span>
@@ -35,18 +35,18 @@
 
     @if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_CONTROLLERSHIP) )
 
-        @if ( $analyticCompaniesData || isset($_REQUEST['filter']) )
+        @if ( $analyticTermsData || isset($_REQUEST['filter']) )
             <div id="filter" class="p-3 bg-light-subtle rounded position-relative mb-4" style="z-index: 3; display: block;">
                 <form action="{{ route('surveysShowURL', $data->id) }}" method="get" autocomplete="off">
                     <div class="row g-2">
 
                         <div class="col-sm-12 col-md col-lg">
-                            <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="Período" data-min-date="{{ $firstDate ?? '' }}" data-max-date="{{ $lastDate ?? '' }}" value="{{ request('created_at') ?? '' }}">
+                            <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="- Período -" data-min-date="{{ $firstDate ?? '' }}" data-max-date="{{ $lastDate ?? '' }}" value="{{ request('created_at') ?? '' }}">
                         </div>
 
                         @if (!empty($companies) && is_array($companies) && count($companies) > 1)
                             <div class="col-sm-12 col-md col-lg" title="Exibir somente Lojas selecionadas">
-                                <select class="form-control" data-choices data-choices-removeItem name="companies[]" id="filter-companies" multiple data-placeholder="Loja">
+                                <select class="form-control filter-companies" name="companies[]" multiple data-placeholder="- Loja -">
                                     @foreach ($companies as $companyId => $company)
                                         <option {{ in_array($companyId, $filterCompanies) ? 'selected' : '' }} value="{{ $companyId }}">{{ $company['name'] }}</option>
                                     @endforeach
@@ -63,6 +63,7 @@
             </div>
         @endif
 
+        {{--
         <div class="card" style="z-index: 2;">
             <div class="card-header">
                 <div class="d-flex align-items-center">
@@ -90,14 +91,17 @@
                 </div>
             </div>
             <div class="card-body pb-0">
-                @if ($analyticTermsData)
-                    @include('surveys.layouts.chart-terms')
-                @else
-                    @component('components.nothing')
-                    @endcomponent
-                @endif
             </div>
         </div>
+        --}}
+
+        @if ($analyticTermsData)
+            @include('surveys.layouts.chart-terms')
+        @else
+            @component('components.nothing')
+            @endcomponent
+        @endif
+
     @else
         <div class="alert alert-danger">Acesso não autorizado</div>
     @endif
@@ -119,10 +123,8 @@
     <script type="module">
         import {
             initFlatpickr,
-            initFlatpickrRange
         } from '{{ URL::asset('build/js/helpers.js') }}';
 
-        initFlatpickrRange();
         initFlatpickr();
     </script>
 @endsection

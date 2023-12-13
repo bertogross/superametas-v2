@@ -21,13 +21,13 @@ class SettingsAccountController extends Controller
 
     public function show()
     {
-        $settings = DB::connection($this->connection)->table('settings')->pluck('value', 'key')->toArray();
+        $settings = DB::connection('smAppTemplate')->table('settings')->pluck('value', 'key')->toArray();
 
-        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
 
         $getStripeData = getStripeData();
-        $customerId = $getStripeData['customer_id'];
-        $subscriptionId = $getStripeData['subscription_id'];
+        $customerId = $getStripeData['customer_id'] ?? '';
+        $subscriptionId = $getStripeData['subscription_id'] ?? '';
 
         $subscriptionItemId = '';
 
@@ -47,26 +47,30 @@ class SettingsAccountController extends Controller
 
         // Custom error messages
         $messages = [
-            'name.required' => 'The company name is required.',
-            'name.max' => 'The company name may not be greater than 191 characters.',
-            'phone.required' => 'The phone number is required.',
-            'phone.max' => 'The phone number may not be greater than 20 characters.',
+            'name.required' => 'O nome da empresa é obrigatório.',
+            'name.max' => 'O nome da empresa não pode ter mais de 191 caracteres.',
+            'user_name.required' => 'Seu nome é obrigatório.',
+            'user_name.max' => 'Seu nome não pode ter mais de 191 caracteres.',
+            'phone.required' => 'O número de telefone é obrigatório.',
+            'phone.max' => 'O número de telefone não pode ter mais de 16 caracteres.',
         ];
 
         // Validate the request data
         $request->validate([
             'name' => 'required|string|max:191',
-            'phone' => 'required|string|max:20',
+            'user_name' => 'required|string|max:191',
+            'phone' => 'required|string|max:16',
         ], $messages);
 
-        // Update or insert other settings
         $this->updateOrInsertSetting('name', $request->name);
+
+        $this->updateOrInsertSetting('user_name', $request->user_name);
 
         // Remove non-numeric characters from phone number
         $cleanedPhone = onlyNumber($request->phone);
         $this->updateOrInsertSetting('phone', $cleanedPhone);
 
-        return redirect()->back()->with('success', 'Settings updated successfully!');
+        return redirect()->back()->with('success', 'Configurações atualizadas com êxito!');
     }
 
     /**
@@ -78,7 +82,7 @@ class SettingsAccountController extends Controller
      */
     public function updateOrInsertSetting(string $key, $value)
     {
-        DB::connection($this->connection)->table('settings')->updateOrInsert(
+        DB::connection('smAppTemplate')->table('settings')->updateOrInsert(
             ['key' => $key],
             ['value' => $value]
         );

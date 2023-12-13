@@ -10,13 +10,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if(clickedElement){
             // Create Session for Subscription
-            if (clickedElement.classList.contains('.btn-subscription')) {
+            if (clickedElement.classList.contains('btn-subscription')) {
                 event.preventDefault();
-                this.blur();
+                clickedElement.blur();
 
-                var priceId = this.getAttribute('data-price_id');
-                var currentPriceId = this.getAttribute('data-current-price_id');
-                var quantity = this.getAttribute('data-quantity');
+                var priceId = clickedElement.getAttribute('data-price_id');
+                var currentPriceId = clickedElement.getAttribute('data-current-price_id');
+                var quantity = clickedElement.getAttribute('data-quantity');
+                quantity = parseInt(quantity);
+
+                if( !quantity ){
+                    toastAlert('Informe a quantidade', 'danger', 10000);
+                    return;
+                }
 
                 var params = {
                     'current_price_id': currentPriceId,
@@ -35,18 +41,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (!data.success) {
-                        toastAlert(data.message, 'danger');
+                        toastAlert(data.message, 'danger', 10000);
                         return;
                     }
 
                     var checkoutURL = data.stripe.url;
-                    Swal.fire({
+                    /*Swal.fire({
                         confirmButtonClass: 'btn btn-outline-theme text-uppercase d-none',
                         buttonsStyling: false,
                         icon: '',
                         title: '',
                         html: '<img src="' + assetUrl + 'build/images/stripe/white-small.png" title="Stripe" width="100" class="mb-3"><br>Redirecionado para a página de pagamento...'
-                    });
+                    });*/
+
+                    toastAlert('Redirecionado para a página de pagamento...', 'success', 10000);
+
+                    clickedElement.aetAttribute('disabled');
 
                     setTimeout(function() {
                         window.location.href = checkoutURL;
@@ -54,7 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => {
                     var message = error.message || 'Não foi possível proceder com a solicitação.<br>Tente novamente mais tarde.';
-                    toastAlert(message, 'danger');
+
+                    toastAlert(message, 'danger', 10000);
                 })
                 .finally(() => {
                     //APP_loading();
@@ -62,14 +73,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Update subscription (change subscription plan)
-            if (clickedElement.classList.contains('#btn-subscription-details')) {
+            if (clickedElement.id === 'btn-subscription-details') {
                 event.preventDefault();
-                var btn = this;
-                this.blur();
+                clickedElement.blur();
 
-                var subscriptionId = this.getAttribute('data-subscription_id');
-                var priceId = this.getAttribute('data-price_id');
-                var quantity = this.getAttribute('data-quantity');
+                var subscriptionId = clickedElement.getAttribute('data-subscription_id');
+                var priceId = clickedElement.getAttribute('data-price_id');
+                var quantity = clickedElement.getAttribute('data-quantity');
+                quantity = parseInt(quantity);
+
+                if( !quantity ){
+                    toastAlert('Informe a quantidade', 'danger', 10000);
+                    return;
+                }
 
                 var params = {
                     'subscription_id': subscriptionId,
@@ -88,18 +104,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (!data.success) {
-                        toastAlert(data.message, 'danger');
+                        toastAlert(data.message, 'danger', 10000);
                         return;
                     }
 
                     var checkoutURL = data.stripe.url;
+                    /*
                     Swal.fire({
                         confirmButtonClass: 'btn btn-outline-theme text-uppercase d-none',
                         buttonsStyling: false,
                         icon: '',
                         title: '',
                         html: '<img src="' + assetUrl + 'build/images/stripe/white-small.png" title="Stripe" width="100" class="mb-3"><br>Redirecionado para a página de pagamento...'
-                    });
+                    });*/
+
+                    clickedElement.aetAttribute('disabled');
+
+                    toastAlert('Redirecionado para a página de pagamento...', 'success', 10000);
 
                     setTimeout(function() {
                         window.location.href = checkoutURL;
@@ -107,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => {
                     var message = error.message || 'Não foi possível proceder com a solicitação.<br>Tente novamente mais tarde.';
-                    toastAlert(message, 'danger');
+                    toastAlert(message, 'danger', 10000);
                 })
                 .finally(() => {
                     //APP_loading();
@@ -115,38 +136,37 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Remove from cart
-            if (clickedElement.classList.contains('.btn-addon-cart-remove')) {
+            if (clickedElement.classList.contains('btn-addon-cart-remove')) {
                 event.preventDefault();
-                var addon = this.getAttribute('data-addon');
+                var addon = clickedElement.getAttribute('data-addon');
                 document.querySelector('.btn-addon-cart[data-addon="' + addon + '"]').click();
             }
 
-
             // START Addons Cart
-            if (clickedElement.classList.contains('.btn-addon-cart')) {
+            if (clickedElement.classList.contains('btn-addon-cart')) {
                 event.preventDefault();
                 var cart = [];
-                this.blur();
+                clickedElement.blur();
 
-                if (this.classList.contains('selected')) {
-                    if (this.classList.contains('option-label')) {
-                        this.classList.remove('selected');
-                        this.closest('.option').querySelector('input').checked = false;
+                if (clickedElement.classList.contains('selected')) {
+                    if (clickedElement.classList.contains('option-label')) {
+                        clickedElement.classList.remove('selected');
+                        clickedElement.closest('.option').querySelector('input').checked = false;
                     } else {
-                        this.classList.remove('selected');
-                        this.innerHTML = 'Adicionar ao Carrinho';
+                        clickedElement.classList.remove('selected');
+                        clickedElement.innerHTML = 'Adicionar ao Carrinho';
                     }
                 } else {
-                    if (this.classList.contains('option-label')) {
+                    if (clickedElement.classList.contains('option-label')) {
                         document.querySelectorAll('input[name="storage"]').forEach(function(input) {
                             input.closest('.option').querySelector('.option-label').classList.remove('selected');
                         });
 
-                        this.classList.add('selected');
-                        this.closest('.option').querySelector('input').checked = true;
+                        clickedElement.classList.add('selected');
+                        clickedElement.closest('.option').querySelector('input').checked = true;
                     } else {
-                        this.classList.add('selected');
-                        this.innerHTML = '<i class="ri-check-line"></i> Adicionado';
+                        clickedElement.classList.add('selected');
+                        clickedElement.innerHTML = '<i class="ri-check-line"></i> Adicionado';
                     }
                 }
 
@@ -190,9 +210,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             // END Addons Cart
-
-
-
         }
     });
 

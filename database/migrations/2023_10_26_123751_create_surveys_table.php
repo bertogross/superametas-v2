@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('surveys', function (Blueprint $table) {
-            $status = ['new', 'started', 'stopped', 'completed', 'filed'];
+            $status = ['new', 'scheduled', 'started', 'stopped', 'completed', 'filed'];
 
             $table->id();
             $table->bigInteger('parent_id')->default(0);
@@ -22,15 +22,15 @@ return new class extends Migration
             $table->enum('status', $status)->default('new')->comment("The status of the survey task.");
             $table->enum('old_status', $status)->default('new')->comment('The previous status of the survey task');
             $table->enum('priority', ['high', 'medium', 'low'])->default('high')->comment('The priority of the survey task');
-            $table->enum('recurring', ['daily', 'weekly', 'biweekly', 'monthly', 'annual'])->default('daily');
-            $table->timestamp('started_at')->nullable();
-            $table->timestamp('ended_at')->nullable();
+            $table->enum('recurring', ['once', 'daily', 'weekly', 'biweekly', 'monthly', 'annual'])->default('daily');
+            $table->timestamp('start_at')->nullable();
+            $table->timestamp('end_in')->nullable();
             $table->enum('model', ['default', 'custom', 'both'])->default('both');
             $table->json('template_data')->nullable()->comment('The json data from survey_templates table');
             $table->json('distributed_data')->nullable()->comment('The json data to to use to populate the _assigments');
             $table->timestamp('completed_at')->nullable()->comment('The timestamp when the survey task was completed');
             $table->timestamp('audited_at')->nullable()->comment('The timestamp when the survey task was audited');
-            $table->enum('condition_of', ['publish', 'filed', 'deleted'])->default('publish');
+            //$table->enum('condition_of', ['publish', 'filed', 'deleted'])->default('publish');
             $table->timestamps();
         });
     }

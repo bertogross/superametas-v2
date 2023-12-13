@@ -12,6 +12,11 @@ use App\Models\SurveyAssignments;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\SettingsStripeController;
 
+function appName(){
+    $host = $_SERVER['HTTP_HOST'] ?? 'default';
+    return str_contains($host, 'testing') ? 'Checklist' : env('APP_NAME');
+}
+
 // Get all users with status = 1, ordered by name
 if (!function_exists('getUsers')) {
     function getUsers() {
@@ -123,14 +128,6 @@ if (!function_exists('getERPdata')) {
             return null;
         }
 
-        /*
-        return view('settings/database', [
-            'onboard_id' => $customer,
-            'target' => 'sales',
-            'key' => 'ffs64DSA2ds4',
-            'meantime' => date('Y-m'),
-        ]);
-        */
     }
 }
 
@@ -267,7 +264,7 @@ if (!function_exists('getAuthorizedCompanies')) {
 
         $AuthorizedCompanies = !empty($AuthorizedCompanies) ? json_decode($AuthorizedCompanies, true) : array();
 
-        return empty($AuthorizedCompanies) ? getActiveCompanies() : $AuthorizedCompanies;
+        return empty($AuthorizedCompanies) ? [1] : $AuthorizedCompanies;
     }
 }
 
@@ -278,10 +275,10 @@ if (!function_exists('getActiveCompanies')) {
             ->table('wlsm_companies')
             ->where('status', 1)
             ->orderBy('company_id')
-            ->get();
+            ->get()
+            ->toArray();
 
-        $activeCompanies = $activeCompanies ?? null;
-        return is_string($activeCompanies) ? json_decode($activeCompanies, true) : $activeCompanies;
+        return $activeCompanies ?? null;
     }
 }
 
@@ -316,6 +313,61 @@ if (!function_exists('getActiveDepartments')) {
     }
 }
 
+// Get active wharehouse terms.
+if (!function_exists('getWarehouseTerms')) {
+    function getWarehouseTerms() {
+        $data = [];
+
+        // Set the database connection to smWarehouse
+        $warehouseConnection = DB::connection('smWarehouse');
+
+        // Fetch terms with their topics
+        $terms = $warehouseConnection->table('survey_terms')
+            ->where('survey_terms.status', 1)
+            ->join('survey_topics', 'survey_terms.id', '=', 'survey_topics.term_id')
+            ->orderBy('survey_terms.term_order')
+            ->orderBy('survey_topics.topic_order')
+            ->select(
+                'survey_terms.id AS term_id',
+                'survey_terms.name AS term_name',
+                'survey_terms.term_order AS term_order',
+                'survey_topics.id AS topic_id',
+                'survey_topics.question AS topic_question',
+                'survey_topics.topic_order AS topic_order',
+            )
+            ->get();
+
+        // Group topics by term
+        foreach ($terms as $term) {
+            if (!isset($data[$term->term_id])) {
+                $data[$term->term_id] = [
+                    'stepData' => [
+                        'term_id' => $term->term_id,
+                        'term_name' => $term->term_name,
+                        'type' => 'default',
+                        'original_position' => $term->term_order,
+                        'new_position' => $term->term_order,
+                    ],
+                    'topics' => []
+                ];
+            }
+
+            $data[$term->term_id]['topics'][] = [
+                'topic_id' => $term->topic_id,
+                'question' => $term->topic_question,
+                'original_position' => $term->topic_order,
+                'new_position' => $term->topic_order,
+            ];
+        }
+
+        // Optional: Re-index array to remove term_id keys
+        $data = array_values($data);
+
+        return $data;
+    }
+
+}
+
 // Get the department alias based on the department ID
 if (!function_exists('getDepartmentNameById')) {
     function getDepartmentNameById($departmentId){
@@ -324,9 +376,23 @@ if (!function_exists('getDepartmentNameById')) {
         $departmentAlias = DB::connection('smAppTemplate')
             ->table('wlsm_departments') // replace with your departments table name
             ->where('department_id', $departmentId)
-            ->value('department_alias'); // replace with the column name that stores the department alias
+            ->value('department_alias');
 
         return $departmentAlias ?: null;
+    }
+}
+
+// Get the term name based on the ID
+if (!function_exists('getWarehouseTermNameById')) {
+    function getWarehouseTermNameById($termId){
+        $termId = intval($termId);
+
+        $termName = DB::connection('smWarehouse')
+            ->table('survey_terms')
+            ->where('id', $termId)
+            ->value('name');
+
+        return $termName ?: null;
     }
 }
 
@@ -592,34 +658,6 @@ if (!function_exists('getProgressBarClass')) {
     }
 }
 
-// Get a descriptive title for a date based on the task status
-if (!function_exists('getSurveyDateTitleByKey')) {
-    function getSurveyDateTitleByKey($statusKey){
-        switch ($statusKey) {
-            case 'completed':
-                return 'A data em que esta tarefa foi desempenhada';
-            case 'losted':
-                return 'A data em que esta tarefa deveria ter sido desempenhada';
-            default:
-                return 'A data em que esta tarefa deverá ser desempenhada';
-        }
-    }
-}
-
-// Get a descriptive label title based on the task status and roles involved
-if (!function_exists('getSurveyLabelTitle')) {
-    function getSurveyLabelTitle($surveyorStatus, $auditorStatus) {
-        if ($surveyorStatus == 'completed' && $auditorStatus == 'completed') {
-            return 'A <u>Vistoria</u> e a <u>Auditoria</u> foram efetuadas';
-        } elseif ($surveyorStatus == 'completed' && $auditorStatus != 'completed') {
-            return 'A <u>Vistoria</u> foi concluída';
-        } elseif ($surveyorStatus != 'completed' && $auditorStatus == 'completed') {
-            return 'A <u>Auditoria</u> foi concluída';
-        } else {
-            return 'Tarefa em andamento';
-        }
-    }
-}
 
 //Useful to see on the bottom left side fixed smotth fixed div
 if(!function_exists('appPrintR')){

@@ -57,20 +57,20 @@
             {{ route('surveysIndexURL') }}
         @endslot
         @slot('li_1')
-            Vistorias
+            Checklists
         @endslot
         @slot('title')
             Auditoria <small><i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i> #<span class="text-theme">{{$surveyId}}</span> {{ limitChars($templateName ?? '', 20) }}</small>
         @endslot
     @endcomponent
-    <div id="content" class="rounded rounded-2 mb-4">
+    <div id="content" class="rounded rounded-2 mb-4" style="max-width: 700px; margin: 0 auto;">
         <div class="bg-secondary-subtle position-relative">
             <div class="card-body p-5 text-center">
                 @if ($companyName )
                     <h2 class="text-theme text-uppercase">{{ $companyName }}</h2>
                 @endif
                 <h2 class="text-secondary">Auditoria</h2>
-                <p>A Vistoria foi realizada por <u>{{$surveyorName}}</u></p>
+                <p>A Checklist foi realizada por <u>{{$surveyorName}}</u></p>
                 <h3>{{ $title ? ucfirst($title) : 'NI' }}</h3>
                 <div class="mb-0 text-muted">
                     Executar em:
@@ -114,7 +114,7 @@
                 <input type="hidden" name="survey_id" value="{{$surveyId}}">
                 <input type="hidden" name="company_id" value="{{$companyId}}">
                 @if ($surveyData && $responsesData)
-                    @component('surveys.layouts.form-auditor-step-cards')
+                    @component('surveys.layouts.form-auditor-step-cards-v2')
                         @slot('data', $stepsWithTopics)
                         @slot('responsesData', $responsesData)
                         @slot('auditorStatus', $auditorStatus)
@@ -131,8 +131,8 @@
 
     <div id="survey-progress-bar" class="fixed-bottom mb-0 ms-auto me-auto w-100">
         <div class="flex-grow-1">
-            <div class="progress animated-progress custom-progress progress-label">
-                <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="" aria-valuemin="0" aria-valuemax="100"><div class="label"></div></div>
+            <div class="progress animated-progress progress-label">
+                <div class="progress-bar rounded-0 bg-{{getProgressBarClass($percentage)}}" role="progressbar" style="width: {{$percentage}}%" aria-valuenow="" aria-valuemin="0" aria-valuemax="100"><div class="label">{{ $percentage > 0 ? $percentage.'%' : ''}}</div></div>
             </div>
         </div>
     </div>
@@ -163,4 +163,11 @@
         var assetUrl = "{{ URL::asset('/') }}";
     </script>
     <script src="{{ URL::asset('build/js/surveys-attachments.js') }}" type="module"></script>
+
+    <script type="module">
+        import {
+            toggleElementId,
+        } from '{{ URL::asset('build/js/helpers.js') }}';
+
+    </script>
 @endsection

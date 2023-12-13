@@ -231,8 +231,8 @@ class DropboxController extends Controller
      */
     private function getNewAccessToken($refreshToken)
     {
-        $appKey = config('services.dropbox.app_key');
-        $appSecret = config('services.dropbox.app_secret');
+        $appKey = env('DROPBOX_APP_KEY');
+        $appSecret = env('DROPBOX_APP_SECRET');
 
         $client = new Client(['verify' => false]);
         $response = $client->post('https://api.dropboxapi.com/oauth2/token', [
@@ -394,8 +394,8 @@ class DropboxController extends Controller
      */
     public function callback(Request $request)
     {
-        $appKey = config('services.dropbox.app_key');
-        $appSecret = config('services.dropbox.app_secret');
+        $appKey = env('DROPBOX_APP_KEY');
+        $appSecret = env('DROPBOX_APP_SECRET');
         $redirectUri = route('DropboxCallbackURL');
 
         if (!$request->has('code')) {
@@ -429,7 +429,7 @@ class DropboxController extends Controller
      */
     public function authorizeDropbox()
     {
-        $appKey = config('services.dropbox.app_key');
+        $appKey = env('DROPBOX_APP_KEY');
         $redirectUri = route('DropboxCallbackURL');
 
         $authUrl = "https://www.dropbox.com/oauth2/authorize?client_id={$appKey}&response_type=code&redirect_uri={$redirectUri}";

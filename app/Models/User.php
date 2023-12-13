@@ -60,7 +60,7 @@ class User extends Authenticatable
     const CAPABILITY_TRANSLATIONS = [
         'manage' => 'Configurações Gerais',
         'edit' => 'Editar Metas',
-        'controllership' => 'Editar Vistorias',
+        'controllership' => 'Editar Checklists',
         'view' => 'Visualização Íntegral',
         'partial_view' => 'Visualização Limitada',
     ];

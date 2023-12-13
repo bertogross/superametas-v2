@@ -4,11 +4,8 @@ use App\Models\User;
 $type = 'sales';
 
 $getAuthorizedCompanies = getAuthorizedCompanies();
-//appPrintR($getAuthorizedCompanies);
 $getActiveCompanies = getActiveCompanies();
-//appPrintR($getActiveCompanies);
 $getActiveDepartments = getActiveDepartments();
-//appPrintR($getActiveDepartments);
 
 $currentMonth = now()->format('Y-m');
 $previousMonth = now()->subMonth()->format('Y-m');
@@ -25,7 +22,7 @@ $endYear = intval($currentMonth) >= (intval(date('Y'))+11) ? date('Y', strtotime
                 <button type="button" class="btn-close btn-destroy" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @unless( !auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) )
+                @if( !auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_EDITOR) )
                     <div class="alert alert-danger">Acesso não autorizado</div>
                     @php exit; @endphp
                 @endunless

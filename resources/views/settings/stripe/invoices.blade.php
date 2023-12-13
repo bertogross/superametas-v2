@@ -188,5 +188,5 @@
         Não há dados Stripe
     @endif
 @else
-    Não há dados de Cliente ID na Stripe
+    Não foi possível carregar os dados de faturamento na Stripe.<br>Certifique-se se já é assinante do {{appName()}}.
 @endif

@@ -83,7 +83,7 @@
 
     <div class="card">
         <div class="card-header align-items-center d-flex">
-            <h5 class="card-title mb-0 flex-grow-1"><i class="ri-calendar-check-fill fs-16 align-bottom text-theme me-2"></i>Tarefas</h5>
+            <h5 class="card-title mb-0 flex-grow-1"><i class="ri-todo-fill fs-16 align-bottom text-theme me-2"></i>Tarefas</h5>
         </div>
         <div class="card-body h-100" style="min-height: 150px">
             @if ( $assignmentData && is_array($assignmentData) )
@@ -112,7 +112,7 @@
                             $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
                         @endphp
 
-                        <div class="tasks-list p-2 {{ in_array($key, ['waiting', 'auditing', 'pending', 'in_progress', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
+                        <div class="tasks-list p-2 {{-- in_array($key, ['waiting', 'auditing', 'pending', 'completed', 'in_progress', 'losted']) && $countTotal < 1 ? 'd-none' : '' --}} {{ in_array($key, ['waiting', 'auditing', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
                             <div class="d-flex mb-3">
                                 <div class="flex-grow-1">
                                     <h6 class="fs-14 text-uppercase fw-semibold mb-1">

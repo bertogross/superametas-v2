@@ -2,11 +2,9 @@ import {
     toastAlert,
     sweetWizardAlert,
     initFlatpickr,
-    initFlatpickrRange,
     maxLengthTextarea,
     makeFormPreviewRequest,
     revalidationOnInput,
-    wizardFormSteps,
     multipleModal,
     bsPopoverTooltip,
     layouRightSide,
@@ -86,6 +84,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function recurringOnce(){
+        const recurringSelect = document.getElementById('date-recurring-field');
+        const startDateInput = document.getElementById('date-recurring-start');
+        const endDateInput = document.getElementById('date-recurring-end');
+
+        if(recurringSelect){
+            // Event listener for the recurring select dropdown
+            recurringSelect.addEventListener('change', function() {
+                if (this.value === 'once') {
+                    // If 'once' is selected, disable the end date and set its value to the start date
+                    endDateInput.value = startDateInput.value;
+                    endDateInput.disabled = true;
+                } else {
+                    // For other options, enable the end date input
+                    endDateInput.disabled = false;
+                }
+            });
+
+            // Optional: Event listener for the start date to update the end date if 'once' is selected
+            startDateInput.addEventListener('input', function() {
+                if (recurringSelect.value === 'once') {
+                    endDateInput.value = startDateInput.value;
+                }
+            });
+        }
+    }
+
     function loadFormModal(Id = null) {
         var xhr = new XMLHttpRequest();
 
@@ -109,7 +134,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     revalidationOnInput();
 
-                    wizardFormSteps(totalCompanies);
+                    recurringOnce();
+
+                    wizardFormSteps();
 
                     initFlatpickr();
 
@@ -126,6 +153,187 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
         xhr.send();
+    }
+
+    function wizardFormSteps(){
+        var formSteps = document.querySelectorAll(".form-steps");
+        if (formSteps){
+            Array.from(formSteps).forEach(function (form) {
+
+                function checkAllFormCheckInputs() {
+                    // Select all elements with the .form-check-input class
+                    var checkboxes = document.querySelectorAll('.form-check-input');
+
+                    // Iterate over them and add a change event listener to each one
+                    checkboxes.forEach(function(checkbox) {
+                        // Add a change listener to the current checkbox
+                        checkbox.addEventListener('change', function() {
+                            // This function is called whenever a checkbox is checked or unchecked
+                            // You can add your logic here for what happens when the state changes
+                            if (this.checked) {
+                                this.setAttribute('checked', '');
+                                //console.log(this.id + ' is checked');
+                            } else {
+                                this.removeAttribute('checked');
+                                //console.log(this.id + ' is unchecked');
+                            }
+
+                            if (this.classList.contains('form-check-input-companies')) {
+                                var checkbox = this;
+                                let companyId = checkbox.value;
+                                let column = document.getElementById(`distributed-tab-company-${companyId}`);
+
+                                column.style.display = 'none';
+                                column.querySelectorAll('input').forEach(input => input.required = false);
+
+                                if (checkbox.checked) {
+                                    column.style.display = '';
+                                    column.querySelectorAll('input').forEach(input => input.required = true);
+                                }
+                            }
+                        });
+                    });
+                }
+                checkAllFormCheckInputs();
+
+                /*function checkRequiredFields(inputControlRequired) {
+                    let filledRequiredFields = Array.from(inputControlRequired).reduce((count, elem) => {
+                        return count + (elem.value.trim() !== '' ? 1 : 0);
+                    }, 0);
+
+                    return filledRequiredFields === inputControlRequired.length;
+                }*/
+
+                function navigateToTab(nextTabId) {
+                    form.classList.remove('was-validated');
+
+                    const nextTab = document.getElementById(nextTabId);
+
+                    nextTab.removeAttribute('disabled');
+                    nextTab.click();
+                    nextTab.setAttribute('disabled', 'disabled');
+
+                    //form.classList.add('was-validated');
+                }
+
+                function checkRequiredFields(inputControls, switchControls) {
+                    let emptyInputCount = Array.from(inputControls).filter(input => !input.value.trim()).length;
+                    let isSwitchChecked = Array.from(switchControls).filter(input => input.checked).length;
+
+                    let switchRequirementCount = 0;
+
+                    // If no switch is checked, count it as one requirement not met
+                    if(isSwitchChecked){
+                        switchRequirementCount = isSwitchChecked > 0 ? 0 : 1;
+                    }
+
+                    return emptyInputCount + switchRequirementCount;
+                }
+
+                // next tab
+                if (form.querySelector(".nexttab")) {
+                    const tabButtons = form.querySelectorAll('button[data-bs-toggle="pill"]');
+                    Array.from(tabButtons).forEach(item => {
+                        item.addEventListener('show.bs.tab', event => event.target.classList.add('done'));
+                    });
+
+                    Array.from(form.querySelectorAll(".nexttab")).forEach(nextButton => {
+                        nextButton.addEventListener("click", () => {
+                            form.classList.add('was-validated');
+
+                            const activeTab = form.querySelector(".tab-pane.show");
+
+                            const nextTab = nextButton.getAttribute('data-nexttab');
+
+                            const inputControlRequired = activeTab.querySelectorAll(".wizard-input-control[required]");
+                            //console.log('inputControlRequired', inputControlRequired.length);
+
+                            const switchControlRequired = activeTab.querySelectorAll(".wizard-switch-control[required]");
+                            //console.log('switchControlRequired', switchControlRequired.length);
+
+                            const totalUnfilledRequired = checkRequiredFields(inputControlRequired, switchControlRequired);
+                            //console.log('totalUnfilledRequired', totalUnfilledRequired);
+
+                            if (totalUnfilledRequired > 0) {
+                                toastAlert('Necessário preencher os campos obrigatórios', 'danger', 10000);
+                                return;
+                            }
+
+                            // Additional logic for specific tabs
+                            if (nextTab === 'steparrow-recurring-info-tab') {
+                                const checkedControlCompanies = form.querySelectorAll(".tab-pane.show .form-check-input-companies:checked");
+                                if(form.querySelectorAll(".tab-pane.show .form-check-input-companies").length){
+                                    if (checkedControlCompanies.length === 0) {
+                                        toastAlert('Necessário selecionar ao menos uma unidade', 'danger', 10000);
+                                        return;
+                                    }
+                                }
+                                navigateToTab(nextTab);
+                            } else if (nextTab === 'steparrow-success-tab') {
+                                const checkedControlUsers = form.querySelectorAll(".tab-pane.show .form-check-input-users:checked");
+
+                                const selectedCompanies = form.querySelectorAll(".tab-pane .form-check-input-companies:checked");
+
+                                if (checkedControlUsers.length < selectedCompanies.length) {
+                                    toastAlert('Necessário delegar para cada Unidade as respectivas Atribuições', 'danger', 10000);
+                                    return;
+                                }
+
+                                navigateToTab(nextTab);
+                            } else {
+                                navigateToTab(nextTab);
+                            }
+                        });
+                    });
+                }
+
+                //Pervies tab
+                if (form.querySelectorAll(".previestab")){
+                    Array.from(form.querySelectorAll(".previestab")).forEach(function (prevButton) {
+
+                        prevButton.addEventListener("click", function () {
+                            var prevTab = prevButton.getAttribute('data-previous');
+
+                            document.getElementById(prevTab).removeAttribute('disabled');
+
+                            var totalDone = prevButton.closest("form").querySelectorAll(".custom-nav .done").length;
+                            for (var i = totalDone - 1; i < totalDone; i++) {
+                                (prevButton.closest("form").querySelectorAll(".custom-nav .done")[i]) ? prevButton.closest("form").querySelectorAll(".custom-nav .done")[i].classList.remove('done'): '';
+                            }
+                            document.getElementById(prevTab).click();
+
+                            document.getElementById(prevTab).setAttribute('disabled', 'disabled');
+                        });
+                    });
+                }
+
+                // Step number click
+                var tabButtons = form.querySelectorAll('button[data-bs-toggle="pill"]');
+                if (tabButtons){
+                    Array.from(tabButtons).forEach(function (button, i) {
+                        button.setAttribute("data-position", i);
+                        button.addEventListener("click", function () {
+                            form.classList.remove('was-validated');
+
+                            var getProgressBar = button.getAttribute("data-progressbar");
+                            if (getProgressBar) {
+                                var totalLength = document.getElementById("custom-progress-bar").querySelectorAll("li").length - 1;
+                                var current = i;
+                                var percent = (current / totalLength) * 100;
+                                document.getElementById("custom-progress-bar").querySelector('.progress-bar').style.width = percent + "%";
+                            }
+                            (form.querySelectorAll(".custom-nav .done").length > 0) ?
+                            Array.from(form.querySelectorAll(".custom-nav .done")).forEach(function (doneTab) {
+                                doneTab.classList.remove('done');
+                            }): '';
+                            for (var j = 0; j <= i; j++) {
+                                tabButtons[j].classList.contains('active') ? tabButtons[j].classList.remove('done') : tabButtons[j].classList.add('done');
+                            }
+                        });
+                    });
+                }
+            });
+        }
     }
 
     // Attach event listeners for the modal form
@@ -232,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     //console.log(JSON.stringify(activities, null, 2));
 
                     const container = document.getElementById('load-surveys-activities');
-                    container.innerHTML = '';
+                    container.innerHTML = '<h6 class="text-muted m-0 text-uppercase fw-semibold mb-4">Atividades Recentes</h6>';
 
                     if(data.success && data.activities){
                         data.activities.forEach(activity => {
@@ -253,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                     <div class="flex-shrink-0">
                                         ${activity.label}
-                                        <div class="fs-11 mb-0 text-muted">${activity.companyName}</div>
+                                        <div class="fs-11 mb-0 text-muted text-end">${activity.companyName}</div>
                                         <div class="fs-10 mb-0 text-muted d-none">${activity.createddAt}</div>
                                         <div class="fs-10 mb-0 text-muted d-none">${activity.updatedAt}</div>
                                     </div>
@@ -267,7 +475,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         bsPopoverTooltip();
                     }else{
-                        container.innerHTML = '<div class="text-center text-muted">'+ data.message +'</div>';
+                        container.innerHTML = '<h6 class="text-muted m-0 text-uppercase fw-semibold mb-4">Atividades Recentes</h6><div class="text-center text-muted">'+ data.message +'</div>';
                     }
                 })
                 .catch(error => console.error('Error:', error)
@@ -288,7 +496,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Call the function when the DOM is fully loaded
-    initFlatpickrRange();
     initFlatpickr();
     maxLengthTextarea();
     layouRightSide();

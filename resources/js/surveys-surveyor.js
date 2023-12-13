@@ -2,7 +2,8 @@ import {
     toastAlert,
     lightbox,
     debounce,
-    updateProgressBar
+    updateProgressBar,
+    updateLabelClasses
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -102,9 +103,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 responseId = responseId ? parseInt(responseId) : null;
 
                 const compliance = responsesData.querySelector('input[name="compliance_survey"]:checked')?.value || '';
+
+                // Select the radio buttons
+                const radios = responsesData.querySelectorAll('input[type="radio"][name="compliance_survey"]');
+                radios.forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        // When a radio button changes, update the label classes
+                        updateLabelClasses(radios);
+                    });
+                });
+
                 const comment = responsesData.querySelector('textarea[name="comment_survey"]')?.value || '';
                 const attachmentInputs = responsesData.querySelectorAll('input[name="attachment_id[]"]');
                 const attachmentIds = Array.from(attachmentInputs).map(input => input.value);
+
+                const textArea = responsesData.querySelector('textarea');
+                const btnPhoto = responsesData.querySelector('.btn-add-photo');
 
                 var pendingIcon = responsesData.querySelector('.ri-time-line');
                 var completedIcon = responsesData.querySelector('.ri-check-double-fill');
@@ -184,12 +198,30 @@ document.addEventListener('DOMContentLoaded', function() {
                             document.querySelector('#btn-response-finalize').classList.add('d-none');
                         }
 
-                        toastAlert(data.message, 'danger', 5000);
+                        if(data.action2 == 'showTextarea'){
+                            textArea.style.display = "block";
+
+                            textArea.focus();
+
+                            textArea.classList.add('blink', 'bg-warning-subtle');
+                            setTimeout(() => {
+                                textArea.classList.remove('blink', 'bg-warning-subtle');
+                            }, 3000);
+                        }else if(data.action2 == 'blickPhotoButton'){
+                            btnPhoto.classList.add('blink', 'bg-warning-subtle');
+                            setTimeout(() => {
+                                btnPhoto.classList.remove('blink', 'bg-warning-subtle');
+                            }, 3000);
+                        }
+
+                        toastAlert(data.message, 'danger', 7000);
                     }
 
                     if(data.showFinalizeButton){
                         setTimeout(() => {
                             document.querySelector('#btn-response-finalize').classList.remove('d-none');
+
+                            //document.querySelector('#btn-response-finalize').click();
 
                             document.querySelector('#survey-progress-bar').remove();
                         }, 1000);
@@ -201,13 +233,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-
     // Attach event listeners to compliance survey radio buttons
     const complianceSurveyRadios = document.querySelectorAll('input[name="compliance_survey"]');
     if(complianceSurveyRadios){
         complianceSurveyRadios.forEach(radio => {
             radio.addEventListener('change', function() {
                 const container = this.closest('.responses-data-container');
+
                 const updateButton = container.querySelector('.btn-response-update');
                 if (updateButton) {
                     updateButton.click();

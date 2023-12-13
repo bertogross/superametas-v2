@@ -24,20 +24,20 @@ class SurveysController extends Controller
     {
         $currentUserId = auth()->id();
 
+        // usefull if crontab or Kernel schedule is losted
+        Survey::populateSurveys();
+
         $createdAt = $request->input('created_at');
         $status = $request->input('status');
-        //$delegated_to = $request->input('delegated_to');
-        //$audited_by = $request->input('audited_by');
 
         /**
          * START TEMPLATES QUERY
          */
-
         $queryTemplates = SurveyTemplates::query();
         //$queryTemplates->where('user_id', $currentUserId);
-        $queryTemplates->where('condition_of','publish');
+        //$queryTemplates->where('condition_of','publish');
 
-        $templates = $queryTemplates->orderBy('created_at')->paginate(10);
+        $templates = $queryTemplates->orderBy('created_at', 'desc')->paginate(50);
         /**
          * END TEMPLATES QUERY
          */
@@ -46,11 +46,12 @@ class SurveysController extends Controller
          * START SURVEYS QUERY
          */
         $query = Survey::query();
+
         if ($status) {
             $query->where('status', $status);
         }
         //$query = $query->where('user_id', $currentUserId);
-        $query = $query->where('condition_of', 'publish');
+        //$query = $query->where('condition_of', 'publish');
 
         if ($createdAt) {
             $dateRange = explode(' até ', $createdAt);
@@ -67,6 +68,15 @@ class SurveysController extends Controller
         }
 
         $data = $query->orderBy('created_at')->paginate(10);
+
+        /*
+        $data = $query->whereIn('status', ['new', 'scheduled', 'started', 'stopped'])->orderBy('created_at')->paginate(10);
+
+        $dataCompleted = $query->where('status', 'completed')->orderBy('created_at')->paginate(10);
+
+        $dataFiled = $query->where('status', 'filed')->orderBy('created_at')->paginate(10);
+        */
+
         /**
          * END SURVEYS QUERY
          */
@@ -80,9 +90,6 @@ class SurveysController extends Controller
         $dateRange = Survey::getSurveysDateRange();
         $firstDate = $dateRange['first_date'] ?? null;
         $lastDate = $dateRange['last_date'] ?? null;
-
-        // usefull if crontab is losted
-        $this->populateRecurringSurveys();
 
         return view('surveys.index', compact(
             'data',
@@ -105,7 +112,7 @@ class SurveysController extends Controller
 
         $surveyId = $data->id;
 
-        $analyticCompaniesData = Survey::fetchAndTransformSurveyDataByCompanies($surveyId);
+        //$analyticCompaniesData = Survey::fetchAndTransformSurveyDataByCompanies($surveyId);
 
         $analyticTermsData = Survey::fetchAndTransformSurveyDataByTerms($surveyId);
 
@@ -137,7 +144,7 @@ class SurveysController extends Controller
          * START get terms
          */
         $terms = [];
-        $departmentsQuery = DB::connection('smAppTemplate')
+        /*$departmentsQuery = DB::connection('smAppTemplate')
             ->table('wlsm_departments')
             ->get()
             ->toArray();
@@ -145,12 +152,22 @@ class SurveysController extends Controller
             $terms[$department->department_id] = [
                 'name' => strtoupper($department->department_alias),
             ];
-        }
-        $termsQuery = DB::connection('smAppTemplate')
+        }*/
+        $wharehouseTermsQuery = DB::connection('smWarehouse')
             ->table('survey_terms')
             ->get()
             ->toArray();
-        foreach ($termsQuery as $term) {
+        foreach ($wharehouseTermsQuery as $term) {
+            $terms[$term->id] = [
+                'name' => strtoupper($term->name),
+            ];
+        }
+
+        $customTermsQuery = DB::connection('smAppTemplate')
+            ->table('survey_terms')
+            ->get()
+            ->toArray();
+        foreach ($customTermsQuery as $term) {
             $terms[$term->id] = [
                 'name' => strtoupper($term->name),
             ];
@@ -165,7 +182,7 @@ class SurveysController extends Controller
 
         return view('surveys.show', compact(
             'data',
-            'analyticCompaniesData',
+            //'analyticCompaniesData',
             'analyticTermsData',
             'companies',
             //'steps',
@@ -180,7 +197,6 @@ class SurveysController extends Controller
     public function create()
     {
         // Cache::flush();
-
         session()->forget('success');
 
         $currentUserId = auth()->id();
@@ -188,25 +204,26 @@ class SurveysController extends Controller
         $data = null;
 
         $users = getUsers();
-
+        $getActiveCompanies = getActiveCompanies();
         $getAuthorizedCompanies = getAuthorizedCompanies();
-
         $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
 
         $queryTemplates = SurveyTemplates::query();
         //$queryTemplates->where('user_id', $currentUserId);
 
-        $templates = $queryTemplates->orderBy('title')->paginate(50);
+        $templates = $queryTemplates->orderBy('title')->get();// ->paginate(50)
 
-        $countResponses = 0;
+        $countAllResponses = $countTodayResponses = 0;
 
         return view('surveys.create', compact(
                 'data',
                 'templates',
                 'users',
+                'getActiveCompanies',
                 'getAuthorizedCompanies',
                 'getSurveyRecurringTranslations',
-                'countResponses'
+                'countAllResponses',
+                'countTodayResponses'
             )
         );
     }
@@ -214,7 +231,6 @@ class SurveysController extends Controller
     public function edit(Request $request, $id = null)
     {
         // Cache::flush();
-
         session()->forget('success');
 
         $currentUserId = auth()->id();
@@ -236,24 +252,26 @@ class SurveysController extends Controller
         }
 
         $users = getUsers();
-
+        $getActiveCompanies = getActiveCompanies();
         $getAuthorizedCompanies = getAuthorizedCompanies();
-
         $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
 
         $queryTemplates = SurveyTemplates::query();
         //$queryTemplates->where('user_id', $currentUserId);
-        $templates = $queryTemplates->orderBy('title')->paginate(50);
+        $templates = $queryTemplates->orderBy('title')->get();// ->paginate(50)
 
-        $countResponses = Survey::countSurveyAllResponsesFromToday($id);
+        $countAllResponses = Survey::countSurveyAllResponses($id);
+        $countTodayResponses = Survey::countSurveyAllResponsesFromToday($id);
 
         return view('surveys.edit', compact(
                 'data',
                 'templates',
                 'users',
+                'getActiveCompanies',
                 'getAuthorizedCompanies',
                 'getSurveyRecurringTranslations',
-                'countResponses'
+                'countAllResponses',
+                'countTodayResponses'
             )
         );
     }
@@ -263,20 +281,24 @@ class SurveysController extends Controller
     {
         $currentUserId = auth()->id();
 
+        $now = now()->format('Y-m-d H:i:s');
+
         $surveyId = $request->input('id');
         $surveyId = intval($surveyId);
 
-        $data = Survey::findOrFail($surveyId);
+        $survey = Survey::findOrFail($surveyId);
 
-        $currentStatus = $data->status;
+        $currentStatus = $survey->status;
 
-        $templateId = $data->template_id;
+        $startAt = $survey->start_at;
+
+        $templateId = $survey->template_id;
 
         if($currentStatus == 'new'){
             SurveyStep::populateSurveySteps($templateId, $surveyId);
         }
 
-        if ($currentUserId != $data->user_id) {
+        if ($currentUserId != $survey->user_id) {
             return response()->json(['success' => false, 'message' => 'Você não possui autorização para Inicializar/Interromper a rotina registrada por outra pessoa']);
         }
 
@@ -286,9 +308,9 @@ class SurveysController extends Controller
             return response()->json(['success' => false, 'message' => 'Não será possível interromper esta tarefa pois dados já estão sendo coletados.']);
         }
 
-        $distributedData = $data->distributed_data ?? null;
+        $distributedData = $survey->distributed_data ?? null;
 
-        //$oldStatus = $data->old_status ?? $currentStatus;
+        //$oldStatus = $survey->old_status ?? $currentStatus;
 
         //$message = 'Status da tarefa foi atualizado com sucesso';
         //$newStatus = $oldStatus;
@@ -297,7 +319,11 @@ class SurveysController extends Controller
             case 'new':
                 $newStatus = 'started';
 
-                $message = 'Vistoria inicializada com sucesso';
+                if(!$startAt){
+                    $columns['start_at'] = $now ;
+                }
+
+                $message = 'Rotina inicializada com sucesso';
 
                 // Start the task by distributing to each party
                 SurveyAssignments::distributingAssignments($surveyId, $distributedData);
@@ -305,7 +331,11 @@ class SurveysController extends Controller
             case 'stopped':
                 $newStatus = 'started';
 
-                $message = 'Vistoria reinicializada com sucesso';
+                if(!$startAt){
+                    $columns['start_at'] = $now;
+                }
+
+                $message = 'Rotina reinicializada com sucesso';
 
                 // Restart the task by distributing to each party
                 SurveyAssignments::distributingAssignments($surveyId, $distributedData);
@@ -313,19 +343,17 @@ class SurveysController extends Controller
             case 'started':
                 $newStatus = 'stopped';
 
-                $message = 'Vistoria interrompida';
+                $message = 'Rotina interrompida';
                 break;
-            default:
-               echo "i is not equal to 0, 1 or 2";
         }
 
         $columns['status'] = $newStatus;
         //$columns['old_status'] = $currentStatus;
 
         // Save the changes
-        $data->update($columns);
+        $survey->update($columns);
 
-        $message = $newStatus == 'stopped' ? 'Vistoria foi interrompida' : $message;
+        $message = $newStatus == 'stopped' ? 'Checklist foi interrompida' : $message;
 
         // Return a success response
         return response()->json(['success' => true, 'message' => $message]);
@@ -333,16 +361,39 @@ class SurveysController extends Controller
 
     public function storeOrUpdate(Request $request, $id = null)
     {
+        // Cache::flush();
         $currentUserId = auth()->id();
 
-        // Cache::flush();
+        //$users = getUsers()->where('status', 1);
+        //$userIds = $users->pluck('id')->all();
+
+        // Get today's date in 'Ymd' format
+        $today = Carbon::now()->startOfDay();
+
+        $getActiveCompanies = getActiveCompanies();
+
+        /*$companyIds = $getActiveCompanies ? $getActiveCompanies : null;
+        $companyIds = $companyIds ? array_column($companyIds, 'company_id') : [1];
+        $companyIds = $companyIds && count($companyIds) > 1 ? array_unique($companyIds) : $companyIds;*/
+
+        $getActiveCompanies = getActiveCompanies();
+        $companyIds = $getActiveCompanies ? array_column($getActiveCompanies, 'company_id') : [1];
+        $companyIds = array_unique($companyIds);
+        $companyIds = array_map('strval', $companyIds);
+
+        // \Log::info('Company IDs: ', $companyIds);
+        // \Log::info('Request Data: ', $request->all());
+
         $messages = [
             'title.required' => 'Necessário Inserir um Título',
             'template_id.required' => 'Necessário selecionar um modelo',
-            'distributed_data.required' => 'Necessário delegar usuários para Vistoria e Auditoria',
-            'recurring.in' => 'Escolha a recorrência',
-            //'started_at' => 'Defina a data de início',
-            //'ended_at' => 'Defina a data final'
+            'distributed_data.required' => 'Necessário delegar usuários para Checklist e Auditoria',
+            'recurring.required' => 'Escolha a recorrência',
+            'companies.required' => 'Selecione uma ou mais unidades',
+            //'delegated_to.required' => 'Defina as atribuições',
+            //'audited_by.required' => 'Defina as atribuições de auditoria',
+            //'start_at' => 'Defina a data de início',
+            //'end_in' => 'Defina a data final'
         ];
 
         try {
@@ -351,21 +402,19 @@ class SurveysController extends Controller
                 //'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
                 //'description' => 'nullable|string|max:1000',
                 'template_id' => 'required',
-                //'delegated_to' => 'required',
                 //'audited_by' => 'required',
                 'distributed_data' => 'required',
-                'recurring' => 'required|in:daily,weekly,biweekly,monthly,annual',//once,
-                //'started_at' => 'nullable',
-                //'ended_at' => 'nullable',
+                'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
+                //'companies' => 'required|in:'.implode(',', $companyIds).'',
+                'companies' => 'required|array',
+                'companies.*' => 'in:'.implode(',', $companyIds),
+
+                //'delegated_to' => 'required|in:'.implode(',', $userIds).'',
+                //'audited_by' => 'required|in:'.implode(',', $userIds).'',
+                //'start_at' => 'required',
+                //'end_in' => 'nullable',
                 //'current_user_editor' => 'nullable',
-                //'assigned_to' => 'nullable',
                 //'status' => 'required|in:new,stopped,trash,pending,in_progress,completed,auditing',
-                //'survey_compose_custom_id' => 'nullable',
-                //'survey_compose_default_id' => 'nullable',
-                //'custom_fields' => 'nullable|array',
-                //'custom_fields.*.type' => 'required_with:custom_fields|string|max:20',
-                //'custom_fields.*.name' => 'required_with:custom_fields|string|max:30',
-                //'custom_fields.*.label' => 'required_with:custom_fields|string|max:50',
             ], $messages)->validate();
         } catch (ValidationException $e) {
             $errors = $e->errors();
@@ -389,15 +438,6 @@ class SurveysController extends Controller
             return is_array($value) ? json_encode($value) : $value;
         }, $validatedData);
 
-        /*
-        $jsonString = $request->input('distributed_data');
-        $distributedData = $jsonString ? json_decode($jsonString, true) : null;
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return response()->json(['success' => false, 'message' => 'Invalid JSON format']);
-        }
-        //$validatedData['distributed_data'] = $distributedData ?? null;
-        */
-
         $jsonString = $request->input('distributed_data');
         $distributedData = json_decode($jsonString);
 
@@ -411,26 +451,44 @@ class SurveysController extends Controller
         $templateQuery = SurveyTemplates::findOrFail($templateId);
         $templateData = $templateQuery->template_data ?? '';
 
-        /*
-        $jsonString = $request->input('delegated_to');
-        $distributedData = $jsonString ? json_decode($jsonString, true) : null;
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return response()->json(['success' => false, 'message' => 'Invalid JSON format']);
-        }
-        $validatedData['delegated_to'] = $distributedData ?? null;
-
-
-        $jsonString = $request->input('audited_by');
-        $distributedData = $jsonString ? json_decode($jsonString, true) : null;
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return response()->json(['success' => false, 'message' => 'Invalid JSON format']);
-        }
-        $validatedData['audited_by'] = $distributedData ?? null;
-        */
-
         $validatedData['user_id'] = $currentUserId;
 
+        $recurring = $request->input('recurring');
+
+        $companies = $request->input('companies', []);
+        $companies = array_map('intval', $companies);
+        $companies = json_encode($companies);
+
+        $startAt = $request->input('start_at');
+        $startAt = !empty($startAt) ? Carbon::createFromFormat('d/m/Y', trim($startAt))->startOfDay()->format('Y-m-d H:i:s') : '';
+
+        // Parse the provided start date and set it to the start of the day
+        if($startAt && $startAt > $today){
+            $validatedData['status'] = 'scheduled';
+        }
+
+        $endIn = $request->input('end_in');
+        $endIn = !empty($endIn) ? Carbon::createFromFormat('d/m/Y', trim($endIn))->endOfDay()->format('Y-m-d H:i:s') : '';
+
+        if($endIn && $startAt && $endIn <= $startAt){
+            $validatedData['end_in'] = Carbon::createFromFormat('Y-m-d H:i:s', trim($startAt))->endOfDay()->format('Y-m-d H:i:s');
+        }else{
+            $validatedData['end_in'] = $endIn && $endIn < $today ? $today : $endIn;
+        }
+
+        if($recurring == 'once'){
+            $validatedData['end_in'] = Carbon::createFromFormat('Y-m-d H:i:s', trim($startAt))->endOfDay()->format('Y-m-d H:i:s');
+        }
+
         if ($id) {
+            // Prevent from cracker to change if Responses is populated
+            $countResponses = Survey::countSurveyAllResponses($id);
+            if($countResponses > 0){
+                $validatedData['companies'] = $survey->companies;
+                $validatedData['recurring'] = $survey->recurring;
+            }else{
+                $validatedData['companies'] = $companies;
+            }
 
             // Update operation
             $survey = Survey::findOrFail($id);
@@ -439,19 +497,16 @@ class SurveysController extends Controller
 
             $surveyStatus = $survey->status;
 
-            $startedAt = $survey->started_at;
-            $endedAt = $survey->ended_at;
-
-            $countResponses = Survey::countSurveyAllResponses($surveyId);
-
-            if( $startedAt && $countResponses > 0 ){
-                $validatedData['started_at'] = Carbon::createFromFormat('d/m/Y', trim($startedAt))->startOfDay()->format('Y-m-d H:i:s');
+            if( in_array($surveyStatus, ['new', 'scheduled']) ){
+                // Authorize template overwrite the existent
+                $validatedData['template_data'] = $templateData;
             }
 
-            $validatedData['ended_at'] = !$endedAt ? Carbon::createFromFormat('d/m/Y', trim($endedAt))->endOfDay()->format('Y-m-d H:i:s') : '';
-
-            if($surveyStatus == 'new'){
-                $validatedData['template_data'] = $templateData;
+            if ( in_array($surveyStatus, ['started', 'stopped', 'completed', 'filed']) ){
+                // Prevent user change existent start_at date from form
+                $validatedData['start_at'] = $survey->start_at;
+            }else{
+                $validatedData['start_at'] = $startAt;
             }
 
             // Check if the current user is the creator
@@ -465,8 +520,6 @@ class SurveysController extends Controller
             if($surveyStatus == 'new'){
                 SurveyStep::populateSurveySteps($templateId, $surveyId);
             }
-
-            $countResponses = Survey::countSurveyAllResponsesFromToday($surveyId);
 
             $distributedData = $survey->distributed_data ?? null;
 
@@ -482,6 +535,10 @@ class SurveysController extends Controller
         } else {
             // Store operation
             $validatedData['template_data'] = $templateData;
+
+            $validatedData['companies'] = $companies;
+
+            $validatedData['start_at'] = $startAt;
 
             $survey = new Survey;
             $survey->fill($validatedData);
@@ -500,32 +557,6 @@ class SurveysController extends Controller
         }
     }
 
-    // A crontab to start recurring tasks
-    public function populateRecurringSurveys($database = null)
-    {
-        // Set the database connection name dynamically
-        if ($database) {
-            $databaseName = 'smApp' . $database;
-            config(['database.connections.smAppTemplate.database' => $databaseName]);
-        }
-
-        try {
-            $surveys = Survey::where('status', 'started')
-                            ->where('condition_of', 'publish')
-                            ->orderBy('created_at')
-                            ->paginate(50);
-
-            if ($surveys->count() > 0) {
-                foreach ($surveys as $survey) {
-                    Survey::checkSurveyAssignmentUntilYesterday($survey->id);
-                    Survey::startNewAssignmentIfSurveyIsRecurring($survey->id);
-                }
-            }
-        } catch (\Exception $e) {
-            // Handle the exception or log it
-            Log::error('Error in loadRecurringSurveys: ' . $e->getMessage());
-        }
-    }
 
 
 

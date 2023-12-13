@@ -6,8 +6,10 @@
     $assignmentDate = $assignmentData->created_at;
     $surveyId = $assignmentData->survey_id;
     $companyId = $assignmentData->company_id;
+
     $surveyorId = $assignmentData->surveyor_id;
     $auditorId = $assignmentData->auditor_id;
+
     $surveyorStatus = $assignmentData->surveyor_status;
     $auditorStatus = $assignmentData->auditor_status;
 
@@ -46,7 +48,7 @@
 @endphp
 @extends('layouts.master')
 @section('title')
-    Resultado da Vistoria
+    Resultado da Checklist
 @endsection
 @section('css')
     <link rel="stylesheet" href="{{ URL::asset('build/libs/glightbox/css/glightbox.min.css') }}">
@@ -70,7 +72,7 @@
                         <div class="vr"></div>
 
                         <div class="text-muted">
-                            Vistoria: {{$surveyorName}}
+                            Checklist: {{$surveyorName}}
                         </div>
 
                         <div class="vr"></div>
@@ -110,7 +112,7 @@
                     <div class="col">
                         <div class="card card-animate">
                             <div class="card-body">
-                                <h6 class="text-muted text-uppercase">Vistoria</h6>
+                                <h6 class="text-muted text-uppercase">Checklist</h6>
                                 <span class="text-success">Conforme</span>: {{$complianceSurveyorYesCount}}
                                 <br>
                                 <span class="text-danger">Não Conforme</span>: {{$complianceSurveyorNoCount}}
@@ -141,16 +143,16 @@
 
         @if ( $surveyorStatus == 'completed' && $auditorStatus == 'losted')
             <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                <i class="ri-alert-line label-icon blink"></i> A Vistoria foi completada. Entretanto, o prazo da Auditoria expirou.
+                <i class="ri-alert-line label-icon blink"></i> A Checklist foi completada. Entretanto, o prazo da Auditoria expirou.
             </div>
         @elseif ( $surveyorStatus == 'losted' && $auditorStatus == 'losted')
             <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                <i class="ri-alert-line label-icon blink"></i> A Vistoria e a Auditoria não foram realizadas no prazo.
+                <i class="ri-alert-line label-icon blink"></i> A Checklist e a Auditoria não foram realizadas no prazo.
             </div>
         {{--
         @elseif ($surveyorStatus == 'losted')
             <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                <i class="ri-alert-line label-icon blink"></i> O prazo expirou e esta Vistoria foi perdida
+                <i class="ri-alert-line label-icon blink"></i> O prazo expirou e este Checklist foi perdida
             </div>
         @elseif ($auditorStatus == 'losted')
             <div class="alert alert-secondary alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
@@ -166,7 +168,7 @@
                 $stepId = isset($step['step_id']) ? intval($step['step_id']) : '';
                 $termId = isset($step['term_id']) ? intval($step['term_id']) : '';
                 // use the term_id to get term name. If term_id is less than 9000, find the getDepartmentNameById(term_id)
-                $stepName = $termId < 9000 ? getDepartmentNameById($termId) : getTermNameById($termId);
+                $termName = $termId >= 100000 ? getWarehouseTermNameById($termId) : getTermNameById($termId);
                 //$type =
                 $originalPosition = isset($step['step_order']) ? intval($step['step_order']) : 0;
                 $newPosition = $originalPosition;
@@ -176,7 +178,7 @@
             @if( $topics )
                 <div class="card joblist-card">
                     <div class="card-header border-bottom-dashed">
-                        <h5 class="job-title text-theme text-uppercase">{{ $stepName }}</h5>
+                        <h5 class="job-title text-theme text-uppercase">{{ $termName }}</h5>
                     </div>
                     @if ( $topics && is_array($topics))
                         @php
@@ -227,7 +229,7 @@
                                 if($complianceSurvey && $complianceAudit){
                                     $topicLabelColor = $complianceSurvey == 'no' || $complianceAudit == 'no' ? '<span class="spinner-grow spinner-grow-sm text-danger float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Conforme"></span>' : '<span class="fs-5 ri-check-double-fill text-theme float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Em conformidade"></span>';
                                 }else{
-                                    $topicLabelColor = '<span class="fs-5 ri-alert-fill text-warning float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Comparável"></span>';
+                                    $topicLabelColor = $auditorId ? '<span class="fs-5 ri-alert-fill text-warning float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Comparável"></span>' : '';
                                 }
 
                             @endphp
@@ -238,19 +240,25 @@
                                     {{ $question ? ucfirst($question) : 'NI' }}
                                 </h5>
                                 <div class="row mt-3">
-                                    <div class="col-md-6 pb-3">
+                                    <div class="{{ $auditorId ? 'col-md-6' : 'col-md-12' }} pb-3">
                                         <div class="card border-0 h-100">
                                             <div class="card-header border-1 border-bottom-dashed {{ $bgSurveyor }}">
                                                 <h6 class="card-title mb-0">
-                                                    Vistoria:
+                                                    @if ($auditorId)
+                                                        Checklist:
+                                                    @endif
                                                     {!! $complianceSurvey && $complianceSurvey == 'yes' ? '<span class="text-theme">Conforme</span>' : '' !!}
                                                     {!! $complianceSurvey && $complianceSurvey == 'no' ? '<span class="text-danger">Não Conforme</span>' : '' !!}
                                                     {!! !$complianceSurvey ? '<span class="text-warning">Não Informado</span>' : '' !!}
                                                 </h6>
                                             </div>
-                                            <div class="card-body {{ $bgSurveyor }}">
-                                                {!! $commentSurvey ? nl2br($commentSurvey) : '' !!}
-                                            </div>
+
+                                            @if ($commentSurvey)
+                                                <div class="card-body {{ $bgSurveyor }}">
+                                                    {!! $commentSurvey ? nl2br($commentSurvey) : '' !!}
+                                                </div>
+                                            @endif
+
                                             @if ( !empty($surveyAttachmentIds) && is_array($surveyAttachmentIds) )
                                                 <div class="card-footer border-0 {{ $bgSurveyor }}">
                                                     <div class="row">
@@ -284,7 +292,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="col-md-6 pb-3">
+                                    <div class="{{ $auditorId ? 'col-md-6' : 'd-none' }} pb-3">
                                         <div class="card border-0 h-100">
                                             <div class="card-header border-1 border-bottom-dashed {{ $bgAuditor }}">
                                                 <h6 class="card-title mb-0">

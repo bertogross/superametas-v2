@@ -13,7 +13,7 @@ import {
     formatNumber,
     percentageResult,
     getChartColorsArray,
-    initFlatpickrRangeMonths
+    initFlatpickr
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -844,24 +844,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Prevent data-choices sort comapnies by name
-    var isChoiceEl = document.getElementById("filter-companies");
-    if(isChoiceEl){
-        var choiceInstance = new Choices(isChoiceEl, {
-            shouldSort: false,
-            removeItems: true,
-            removeItemButton: true
-        });
-    }
 
 
     // Call the functions when the DOM is fully loaded
     bsPopoverTooltip();
-    initFlatpickrRangeMonths();
+    initFlatpickr();
     toggleCustomMeantimeInput();
     toggleZoomInOut();
     showButtonWhenInputChange();
-
 });
 
 

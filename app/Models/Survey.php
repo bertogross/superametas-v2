@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Survey extends Model
 {
@@ -17,17 +18,23 @@ class Survey extends Model
 
     public $timestamps = true;
 
+    protected $casts = [
+        'start_at' => 'datetime',
+        'end_in' => 'datetime',
+    ];
+
     protected $fillable = [
         'title',
         'template_id',
+        'companies',
         'user_id',
         'status',
         'old_status',
         'distributed_data',
         'template_data',
         'recurring',
-        'started_at',
-        'ended_at',
+        'start_at',
+        'end_in',
         'priority',
         'completed_at',
         'audited_at'
@@ -93,68 +100,47 @@ class Survey extends Model
     public static function getSurveyStatusTranslations()
     {
         return [
-            'waiting' => [
-                'label' => 'Aguardando',
-                'reverse' => '',
-                'description' => 'Aguardando a finalização da primeira etapa, Vistoria',
-                'icon' => 'ri-pause-mini-line',
-                'color' => 'primary'
-            ],
-            'started' => [
-                'label' => 'Ativa',
-                'reverse' => 'Interromper',
-                'description' => 'Tarefa Inicializada',
-                'icon' => 'ri-pause-mini-line',
-                'color' => 'success'
-            ],
-            'new' => [
-                'label' => 'Nova',
+             'new' => [
+                'label' => 'Novo',
                 'reverse' => 'Iniciar',
-                'description' => 'Tarefas registradas mas não inicializadas',
+                'description' => 'Rotina registrada mas não inicializada',
                 'icon' => 'ri-play-fill',
                 'color' => 'primary'
             ],
+            'scheduled' => [
+                'label' => 'Agendado',
+                'reverse' => '',
+                'description' => 'Rotina agendada',
+                'icon' => 'ri-calendar-2-line',
+                'color' => 'info'
+            ],
+            'started' => [
+                'label' => 'Ativo',
+                'reverse' => 'Interromper',
+                'description' => 'Rotina inicializada',
+                'icon' => 'ri-pause-mini-line',
+                'color' => 'success'
+            ],
             'stopped' => [
-                'label' => 'Parado',
+                'label' => 'Interrompido',
                 'reverse' => 'Reiniciar',
-                'description' => 'Tarefas interrompidas',
+                'description' => 'Rotina interrompida',
                 'icon' => 'ri-stop-mini-fill',
                 'color' => 'danger'
             ],
-            'pending' => [
-                'label' => 'Pendente',
-                'reverse' => 'Abrir Formulário',
-                'description' => 'Tarefa que foram inicializadas mas ainda não possuem dados de progresso',
-                'icon' => 'ri-survey-line',
-                'color' => 'warning'
-            ],
-            'in_progress' => [
-                'label' => 'Em Progresso',
-                'reverse' => 'Abrir Formulário',
-                'description' => 'Tarefas em andamento',
-                'icon' => 'ri-time-line',
-                'color' => 'info'
-            ],
-            'auditing' => [
-                'label' => 'Em Auditoria',
-                'reverse' => 'Abrir Formulário',
-                'description' => 'Tarefas que estão sendo revisadas/auditadas',
-                'icon' => 'ri-todo-line',
-                'color' => 'secondary'
-            ],
             'completed' => [
-                'label' => 'Concluída',
+                'label' => 'Concluído',
                 'reverse' => '',
-                'description' => 'Tarefas que foram concluídas',
+                'description' => 'Rotina concluída',
                 'icon' => 'ri-check-double-fill',
                 'color' => 'success'
             ],
-            'losted' => [
-                'label' => 'Perdida',
+           'filed' => [
+                'label' => 'Arquivado',
                 'reverse' => '',
-                'description' => 'Tarefas não concluídas no prazo',
+                'description' => 'Rotina arquivada',
                 'icon' => 'ri-skull-line',
-                'color' => 'danger'
+                'color' => 'warning'
             ]
         ];
     }
@@ -178,10 +164,13 @@ class Survey extends Model
     public static function getSurveyRecurringTranslations()
     {
         return [
+            'once' => [
+                'label' => 'Uma vez',
+                'description' => 'Tarefa ou processo que será executado uma vez',
+            ],
             'daily' => [
                 'label' => 'Diária',
                 'description' => 'Tarefa ou processo que será repetido diáriamente',
-                'color' => 'secondary'
             ],
             'weekly' => [
                 'label' => 'Semanal',
@@ -198,6 +187,7 @@ class Survey extends Model
             'annual' => [
                 'label' => 'Anual',
                 'description' => 'Tarefa ou processo que será repetido uma vez ao ano',
+                'bg-color' => 'dark'
             ]
         ];
     }
@@ -231,15 +221,19 @@ class Survey extends Model
         }
     }
 
-    public static function startNewAssignmentIfSurveyIsRecurring($surveyId)
+    public static function startSurveyAssignments($surveyId)
     {
         $today = Carbon::today();
         $survey = Survey::findOrFail($surveyId);
 
-        $status = $survey->status;
+        $startAt = $survey->start_at; // Date when the survey started
+        $endIn = $survey->end_in; // The final date
 
-        if($status == 'started'){
-            $recurring = $survey->recurring;
+        $status = $survey->status;
+        $recurring = $survey->recurring;
+
+        if ($status == 'started') {
+
             $distributedData = $survey->distributed_data ?? null;
 
             // Check if there are survey assignments for today
@@ -250,29 +244,63 @@ class Survey extends Model
             // If there are no assignments for today, check the recurrence pattern
             if ($assignmentsCount == 0) {
                 switch ($recurring) {
+                    case 'once':
                     case 'daily':
-                        SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                            SurveyAssignments::distributingAssignments($surveyId, $distributedData);
                         break;
                     case 'weekly':
-                        // TODO
-                        // Check if today is the specific day of the week for weekly recurrence
-                        // Example: if ($today->isMonday()) { ... }
+                        // Calculate the day of the week for both $startAt and $today
+                        $specificDayOfWeek = $startAt->dayOfWeek;
+                        $currentDayOfWeek = $today->dayOfWeek;
+
+                        if ($specificDayOfWeek === $currentDayOfWeek) {
+                            SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                        }
                         break;
                     case 'biweekly':
-                        // TODO
-                        // Check if today is the 1st or 15th of the month for biweekly recurrence
+                        // Calculate 15 days after $startAt for biweekly recurrence
+                        $biweeklyDate = $startAt->addDays(15);
+
+                        // Check if today matches the calculated biweekly date
+                        if ($today->equalTo($biweeklyDate)) {
+                            SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                        }
                         break;
                     case 'monthly':
-                        // TODO
-                        // Check if today matches the specific day of the month for monthly recurrence
+                        // Check if $startAt matches the specific day of the month for monthly recurrence
+                        $specificDayOfMonth = $startAt->day;
+
+                        // Adjust the specificDay to a date that is safe within this month
+                        if ($specificDayOfMonth > $today->daysInMonth) {
+                            $specificDayOfMonth = $today->daysInMonth;
+                        }
+
+                        if ($today->day == $specificDayOfMonth) {
+                            SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                        }
                         break;
                     case 'annual':
-                        // TODO
-                        // Check if today matches the specific day and month for annual recurrence
+                        // Check if $startAt matches the specific day and month for annual recurrence
+                        $specificDay = $startAt->day;
+                        $specificMonth = $startAt->month;
+
+                        // Check if the $startAt date conflicts with the current month and year
+                        if ($today->year == $startAt->year && $today->month == $specificMonth) {
+                            // Adjust the specificDay to a date that is safe within this month
+                            if ($specificDay > $today->daysInMonth) {
+                                $specificDay = $today->daysInMonth; // Set it to the last day of the month
+                            }
+                        }
+
+                        if ($today->day == $specificDay && $today->month == $specificMonth) {
+                            SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                        }
                         break;
                 }
             }
         }
+
+
     }
 
     /*
@@ -464,7 +492,6 @@ class Survey extends Model
         return $transformedArray;
     }
 
-
     public static function fetchAndTransformSurveyDataByTerms($surveyId, $assignmentId = null)
     {
         $filterCreatedAt = request('created_at', '');
@@ -528,6 +555,62 @@ class Survey extends Model
 
         return $transformedArray;
     }
+
+    // START Used with crontab to start recurring tasks
+    public static function populateSurveys($database = null)
+    {
+        self::setDatabaseConnection($database);
+
+        self::processSurveysWithStatus('scheduled', function ($survey) {
+            $today = Carbon::now()->startOfDay();
+            if ($survey->start_at && $survey->start_at->equalTo($today)) {
+                $survey->update(['status' => 'started']);
+                Survey::checkSurveyAssignmentUntilYesterday($survey->id);
+                Survey::startSurveyAssignments($survey->id);
+            }
+        });
+
+        self::processSurveysWithStatus('new', function ($survey) {
+            $today = Carbon::now()->startOfDay();
+            if ($survey->start_at && $survey->start_at->equalTo($today)) {
+                $survey->update(['status' => 'started']);
+                Survey::checkSurveyAssignmentUntilYesterday($survey->id);
+                Survey::startSurveyAssignments($survey->id);
+            }
+        });
+
+        self::processSurveysWithStatus('started', function ($survey) {
+            if ($survey->end_in && $survey->start_at->greaterThan($survey->end_in)) {
+                $survey->update(['status' => 'completed']);
+            } else {
+                Survey::checkSurveyAssignmentUntilYesterday($survey->id);
+                //Survey::startSurveyAssignments($survey->id);
+            }
+        });
+    }
+    private static function setDatabaseConnection($database)
+    {
+        if ($database) {
+            $databaseName = 'smApp' . $database;
+            if (!DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$databaseName])) {
+                return;
+            }
+            config(['database.connections.smAppTemplate.database' => $databaseName]);
+        }
+    }
+    private static function processSurveysWithStatus($status, $callback)
+    {
+        try {
+            $surveys = Survey::where('status', $status)->orderBy('created_at')->get();
+            foreach ($surveys as $survey) {
+                $callback($survey);
+            }
+        } catch (\Exception $e) {
+            Log::error("Error in populateSurveys with status {$status}: " . $e->getMessage());
+        }
+    }
+    // END Used with crontab to start recurring tasks
+
 
 
 }

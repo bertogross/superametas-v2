@@ -17,7 +17,8 @@
         "socialiteproviders/dropbox": "^4.2",
         "spatie/dropbox-api": "^1.22",
         "spatie/flysystem-dropbox": "^3.0",
-        "stripe/stripe-php": "^13.3"
+        "stripe/stripe-php": "^13.3",
+        "symfony/finder": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

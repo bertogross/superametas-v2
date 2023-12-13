@@ -29,9 +29,9 @@
             $auditorName = getUserData($auditorId)['name'];
             $auditorAvatar = getUserData($auditorId)['avatar'];
 
-            $dateTitle = getSurveyDateTitleByKey($assignment['created_at'], $statusKey);
+            $dateTitle = SurveyAssignments::getSurveyAssignmentDateTitleByKey($assignment['created_at'], $statusKey);
 
-            $labelTitle = getSurveyLabelTitle($surveyorStatus, $auditorStatus, $statusKey);
+            $labelTitle = SurveyAssignments::getSurveyAssignmentLabelTitle($surveyorStatus, $auditorStatus, $statusKey);
 
             if($designated == 'auditor'){
                 $designatedUserId = $auditorId;
@@ -117,9 +117,9 @@
 
             if ( in_array($statusKey, ['completed']) || $surveyorStatus == 'completed' && $auditorStatus == 'completed' ){
                 if ($surveyorStatus == 'completed' && $auditorStatus == 'completed'){
-                    $labelTitle = 'A <u>Vistoria</u> e a <u>Auditoria</u> foram efetuadas';
+                    $labelTitle = 'A <u>Checklist</u> e a <u>Auditoria</u> foram efetuadas';
                 }else if ($surveyorStatus == 'completed' && $auditorStatus != 'completed'){
-                    $labelTitle = 'A <u>Vistoria</u> foi concluída';
+                    $labelTitle = 'A <u>Checklist</u> foi concluída';
                 }else{
                     $labelTitle = 'Tarefa Concluída';
                 }
@@ -142,7 +142,7 @@
                             </span>
                         @elseif($designated == 'surveyor')
                             <span class="badge bg-dark-subtle text-body badge-border" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="{{ $labelTitle }}">
-                                Vistoria
+                                Checklist
                                 @if ( in_array($statusKey, ['completed']) && $surveyorStatus == 'completed' && $auditorStatus == 'completed' )
                                     <i class="ri-check-double-fill ms-2 text-success"></i>
                                 @endif
@@ -159,11 +159,11 @@
                 @if (in_array($statusKey, ['losted']))
                     @if ( $surveyorStatus == 'losted' && $auditorStatus == 'losted' )
                         <div class="text-danger small mt-2">
-                            Esta <u>Auditoria</u> foi perdida pois a <u>Vistoria</u> não foi efetuada na data prevista.
+                            Esta <u>Auditoria</u> foi perdida pois a <u>Checklist</u> não foi efetuada na data prevista.
                         </div>
                     @elseif ( $surveyorStatus == 'completed' && $auditorStatus == 'losted' )
                         <div class="text-warning small mt-2">
-                            A <u>Vistoria</u> foi completada. Entretanto, a <u>Auditoria</u> não foi efetuada na data prevista.
+                            A <u>Checklist</u> foi completada. Entretanto, a <u>Auditoria</u> não foi efetuada na data prevista.
                         </div>
                     @elseif ( $surveyorStatus != 'completed' && $surveyorStatus != 'losted' && $auditorStatus == 'losted' )
                         <div class="text-warning small mt-2">
@@ -178,7 +178,7 @@
                     <div class="col small">
                         <div class="avatar-group ps-0">
                             @if ($surveyorId === $auditorId)
-                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas de Vistoria e Auditoria delegadas a <u>{{ $surveyorName }}</u>">
+                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas de Checklist e Auditoria delegadas a <u>{{ $surveyorName }}</u>">
                                     <img
                                     @if( empty(trim($surveyorAvatar)) )
                                         src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
@@ -188,7 +188,7 @@
                                     alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
                                 </a>
                             @else
-                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Vistoria delegada a <u>{{ $surveyorName }}</u>">
+                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Checklist delegada a <u>{{ $surveyorName }}</u>">
                                     <img
                                     @if( empty(trim($surveyorAvatar)) )
                                         src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
@@ -198,15 +198,18 @@
                                     alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
                                 </a>
 
-                                <a href="{{ route('profileShowURL', $auditorId) }}" class="d-inline-block ms-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Auditoria delegada a <u>{{ $auditorName }}</u>">
-                                    <img
-                                    @if( empty(trim($auditorAvatar)) )
-                                        src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                    @else
-                                        src="{{ $auditorAvatar }}"
-                                    @endif
-                                    alt="{{ $auditorName }}" class="rounded-circle avatar-xxs">
-                                </a>
+                                @if($auditorId)
+                                    <a href="{{ route('profileShowURL', $auditorId) }}" class="d-inline-block ms-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Auditoria delegada a <u>{{ $auditorName }}</u>">
+                                        <img
+                                        @if( empty(trim($auditorAvatar)) )
+                                            src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
+                                        @else
+                                            src="{{ $auditorAvatar }}"
+                                        @endif
+                                        alt="{{ $auditorName }}" class="rounded-circle avatar-xxs">
+                                    </a>
+                                @endif
+                                
                             @endif
                         </div>
                     </div>
@@ -237,7 +240,7 @@
                         @endif
 
                         @if ( $currentUserId === $designatedUserId && $designated === 'surveyor' && $surveyorId === $auditorId && in_array($statusKey, ['auditing']) )
-                            <i class="text-theme ri-questionnaire-fill" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Neste contexto a você foram delegadas tarefas de Vistoria e Auditoria.<br>Procure na coluna <b>Nova</b> o card correspondente a <b>{{ $companyName }}</b> de <b>{{ $assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-' }}</b> e inicialize a tarefa "></i>
+                            <i class="text-theme ri-questionnaire-fill" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Neste contexto a você foram delegadas tarefas de Checklist e Auditoria.<br>Procure na coluna <b>Nova</b> o card correspondente a <b>{{ $companyName }}</b> de <b>{{ $assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-' }}</b> e inicialize a tarefa "></i>
                         @endif
                     </div>
                 </div>

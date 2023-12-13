@@ -13,11 +13,11 @@ class SettingsStripeController extends Controller
 
     protected $stripe;
 
-    public function __construct(StripeClient $stripe)
+    public function __construct()
     {
-        $this->stripe = $stripe;
-        $this->stripe->setApiKey(config('services.stripe.secret'));
+        $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
     }
+
 
     /*
     public function charge(Request $request)
@@ -122,7 +122,8 @@ class SettingsStripeController extends Controller
 
         // Assuming getStripeData() is a method that retrieves Stripe data
         $stripeData = getStripeData();
-        $subscriptionId = $stripeData['subscription_id'];
+        $subscriptionId = $stripeData['subscription_id'] ?? '';
+
         $actualSubscriptionStatus = $request->input('subscription_status');
         $subscriptionItems = $request->input('subscription_items', []);
 
@@ -133,17 +134,19 @@ class SettingsStripeController extends Controller
                 $this->handleInactiveSubscription($subscriptionId);
             }
         } catch (\Exception $e) {
+            \Log::error('subscriptionStatusChange: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Error updating subscription: ' . $e->getMessage()
+                'message' => 'Erro ao atualizar a assinatura'
             ]);
         }
     }
 
     public function getOrCreateStripeCustomer()
     {
-        $user = Auth::user(); // Assuming you have user authentication set up
+        $user = auth()->user();
 
         if (!$user) {
             return response()->json([
@@ -170,11 +173,15 @@ class SettingsStripeController extends Controller
 
             // If customer doesn't exist, create
             if (empty($customerId)) {
+
+                $databaseConnection = config('database.connections.smAppTemplate.database');
+                $databaseId = extractDatabaseId($databaseConnection);
+
                 $customer = $this->stripe->customers->create([
                     'name' => $displayName,
                     'email' => $userEmail,
                     'preferred_locales' => ['pt-BR'],
-                    'metadata' => ['onboard_id' => $user->id] // Assuming onboard_id is the user's ID
+                    'metadata' => ['onboard_id' => $databaseId]
                 ]);
 
                 $customerId = $customer->id;
@@ -189,10 +196,12 @@ class SettingsStripeController extends Controller
                 'customer_id' => $customerId
             ]);
         } catch (\Exception $e) {
+            \Log::error('getOrCreateStripeCustomer: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Erro ao criar ou recuperar cliente Stripe: ' . $e->getMessage()
+                'message' => 'Erro ao criar ou recuperar dados de cliente Stripe'
             ]);
         }
     }
@@ -200,12 +209,14 @@ class SettingsStripeController extends Controller
     public function createStripeSession(Request $request)
     {
         try {
-            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
         } catch (Exception $e) {
+            \Log::error('createStripeSession: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Falha na conexão com a Stripe: ' . $e->getMessage()
+                'message' => 'Falha na conexão com a Stripe'
             ]);
         }
 
@@ -213,7 +224,7 @@ class SettingsStripeController extends Controller
         $customerId = $this->getOrCreateStripeCustomer();
 
         $stripeData = getStripeData();
-        $subscriptionId = $stripeData['subscription_id'];
+        $subscriptionId = $stripeData['subscription_id'] ?? '';
 
         if (!empty($subscriptionId)) {
             return response()->json([
@@ -244,10 +255,12 @@ class SettingsStripeController extends Controller
 
             return response()->json(['success' => true, 'stripe' => $checkoutSession]);
         } catch (\Exception $e) {
+            \Log::error('createStripeSession: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Erro ao criar sessão Stripe: ' . $e->getMessage()
+                'message' => 'Erro ao criar sessão Stripe'
             ]);
         }
     }
@@ -255,12 +268,14 @@ class SettingsStripeController extends Controller
     public function cancelStripeSubscription(Request $request)
     {
         try {
-            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
         } catch (Exception $e) {
+            \Log::error('cancelStripeSubscription: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Falha na conexão com a Stripe: ' . $e->getMessage()
+                'message' => 'Falha na conexão com a Stripe'
             ]);
         }
 
@@ -293,10 +308,12 @@ class SettingsStripeController extends Controller
                 'message' => 'A assinatura foi cancelada'
             ]);
         } catch (Exception $e) {
+            \Log::error('cancelStripeSubscription: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Erro ao cancelar assinatura: ' . $e->getMessage()
+                'message' => 'Erro ao cancelar assinatura'
             ]);
         }
     }
@@ -304,12 +321,14 @@ class SettingsStripeController extends Controller
     public function cancelOtherStripeSubscriptions(Request $request)
     {
         try {
-            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
         } catch (Exception $e) {
+            \Log::error('cancelOtherStripeSubscriptions: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Falha na conexão com a Stripe: ' . $e->getMessage()
+                'message' => 'Falha na conexão com a Stripe'
             ]);
         }
 
@@ -346,17 +365,19 @@ class SettingsStripeController extends Controller
                 'message' => 'Outras assinaturas canceladas'
             ]);
         } catch (Exception $e) {
+            \Log::error('cancelOtherStripeSubscriptions: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Erro ao cancelar outras assinaturas: ' . $e->getMessage()
+                'message' => 'Erro ao cancelar outras assinaturas'
             ]);
         }
     }
 
     public function deleteSubscriptionItem(Request $request)
     {
-        $stripe = new StripeClient(config('services.stripe.secret'));
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
         $itemId = $request->input('item_ID', '');
         $addonName = $request->input('addon_name', '');
@@ -383,7 +404,8 @@ class SettingsStripeController extends Controller
                 'message' => 'O Addon foi desativado'
             ]);
         } catch (Exception $e) {
-            // Log the error or handle it as needed
+            \Log::error('deleteSubscriptionItem: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'type' => 'error',
@@ -395,13 +417,13 @@ class SettingsStripeController extends Controller
 
     public function updateSubscriptionItem(Request $request)
     {
-        $stripe = new StripeClient(config('services.stripe.secret'));
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
         // Assuming you have a middleware to check for user login
         // and a method to get onboard data
         $stripeData = getStripeData();
-        $subscriptionId = $stripeData['subscription_id'];
-        $subscriptionStatus = $stripeData['subscription_status'];
+        $subscriptionId = $stripeData['subscription_id'] ?? '';
+        $subscriptionStatus = $stripeData['subscription_status'] ?? '';
 
         $priceId = $request->input('price_id', '');
         $subscriptionItemId = $request->input('subscription_item_id', '');
@@ -428,11 +450,12 @@ class SettingsStripeController extends Controller
 
                 return response()->json(['success' => true, 'title' => 'Assinatura Atualizada']);
             } catch (Exception $e) {
-                // Log the error or handle it as needed
+                \Log::error('updateSubscriptionItem: ' . $e->getMessage());
+
                 return response()->json([
                     'success' => false,
                     'title' => 'Erro',
-                    'message' => 'Algo errado ocorreu. Por favor, atualize a página e tente novamente. ' . $e->getMessage()
+                    'message' => 'Algo errado ocorreu. Por favor, atualize a página e tente novamente. '
                 ]);
             }
         }
@@ -449,7 +472,7 @@ class SettingsStripeController extends Controller
             ]);
         }
 
-        $user = Auth::user(); // Get the authenticated user
+        $user = auth()->user(); // Get the authenticated user
 
         // Assuming the user model has a stripe_customer_id field
         $customerId = $user->stripe_customer_id;
@@ -478,17 +501,19 @@ class SettingsStripeController extends Controller
                 'customer' => $updatedCustomer
             ]);
         } catch (\Exception $e) {
+            \Log::error('updateStripeCustomer: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Erro ao atualizar cliente Stripe: ' . $e->getMessage()
+                'message' => 'Erro ao atualizar cliente Stripe'
             ]);
         }
     }
 
     public function getRelatedItemIdFromPriceId(Request $request)
     {
-        $stripe = new StripeClient(config('services.stripe.secret'));
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
         // Assuming you have a middleware to check for user login
         $itemIds = $request->input('item_IDs', []);
@@ -506,8 +531,8 @@ class SettingsStripeController extends Controller
                     return response()->json(['success' => true, 'item_id' => $id]);
                 }
             } catch (Exception $e) {
-                // Log the error or handle it as needed
-                // Continue to the next item in case of an exception
+                \Log::error('getRelatedItemIdFromPriceId: ' . $e->getMessage());
+
                 continue;
             }
         }
@@ -517,7 +542,7 @@ class SettingsStripeController extends Controller
 
     public function retrieveProductFromPriceId(Request $request)
     {
-        $stripe = new StripeClient(config('services.stripe.secret'));
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
         $priceId = $request->input('price_id', '');
 
@@ -529,14 +554,15 @@ class SettingsStripeController extends Controller
             $price = $stripe->prices->retrieve($priceId, ['expand' => ['product']]);
             return response()->json(['success' => true, 'product' => $price]);
         } catch (Exception $e) {
-            // Log the error or handle it as needed
-            return response()->json(['success' => false, 'title' => 'Erro', 'message' => 'Failed to retrieve product']);
+            \Log::error('retrieveProductFromPriceId: ' . $e->getMessage());
+
+            return response()->json(['success' => false, 'title' => 'Erro', 'message' => 'Falha ao recuperar o produto']);
         }
     }
 
     public function retrieveProduct(Request $request)
     {
-        $stripe = new StripeClient(config('services.stripe.secret'));
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
         $productId = $request->input('product_ID', '');
 
@@ -548,7 +574,8 @@ class SettingsStripeController extends Controller
             $product = $stripe->products->retrieve($productId);
             return response()->json(['success' => true, 'product' => $product]);
         } catch (Exception $e) {
-            // Log the error or handle it as needed
+            \Log::error('retrieveProduct: ' . $e->getMessage());
+
             return response()->json(['success' => false, 'title' => 'Erro', 'message' => 'Failed to retrieve product']);
         }
     }
@@ -556,7 +583,7 @@ class SettingsStripeController extends Controller
     public function retrieveStripeCustomer($customerId = null)
     {
         if (!$customerId) {
-            $user = Auth::user(); // Assuming you have user authentication set up
+            $user = auth()->user();
             $customerId = $user->stripe_customer_id; // Replace with your user model's appropriate field
 
             if (!$customerId) {
@@ -576,10 +603,12 @@ class SettingsStripeController extends Controller
                 'customer' => $customer
             ]);
         } catch (\Exception $e) {
+            \Log::error('retrieveStripeCustomer: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Error retrieving customer: ' . $e->getMessage()
+                'message' => 'Erro ao recuperar o cliente'
             ]);
         }
     }
@@ -587,12 +616,14 @@ class SettingsStripeController extends Controller
     public function handleActiveSubscription($subscriptionItems, $subscriptionId)
     {
         try {
-            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
         } catch (Exception $e) {
+            \Log::error('handleActiveSubscription: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Falha na conexão com a Stripe: ' . $e->getMessage()
+                'message' => 'Falha na conexão com a Stripe'
             ]);
         }
 
@@ -618,6 +649,8 @@ class SettingsStripeController extends Controller
                 'message' => 'A assinatura foi suspensa'
             ]);
           }catch (Exception $e){
+            \Log::error('handleActiveSubscription: ' . $e->getMessage());
+
             //https://www.php.net/manual/pt_BR/language.exceptions.php
             //https://stripe.com/docs/api/errors/handling
             if($e){
@@ -633,12 +666,12 @@ class SettingsStripeController extends Controller
     public function handleInactiveSubscription($subscriptionId)
     {
         try {
-            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'title' => 'Erro',
-                'message' => 'Falha na conexão com a Stripe: ' . $e->getMessage()
+                'message' => 'Falha na conexão com a Stripe'
             ]);
         }
 
@@ -653,13 +686,15 @@ class SettingsStripeController extends Controller
             ]);
 
           }catch (Exception $e){
+            \Log::error('handleInactiveSubscription: ' . $e->getMessage());
+
             //https://www.php.net/manual/pt_BR/language.exceptions.php
             //https://stripe.com/docs/api/errors/handling
             if($e){
                 return response()->json([
                     'success' => false,
                     'title' => 'Erro',
-                    'message' => 'Error updating subscription: ' . $e->getMessage()
+                    'message' => 'Erro ao atualizar a assinatura'
                 ]);
             }
         }
@@ -676,13 +711,13 @@ class SettingsStripeController extends Controller
         if( !empty($customerId) && !empty($subscriptionId) ){
 
             $result = DB::connection('smOnboard')->table('app_users')
-            ->where('user_stripe_customer_id', $customerId)
-            ->update([
-                'user_stripe_subscription_id' => $subscriptionId,
-                'user_stripe_subscription_status' => $subscriptionStatus,
-                'user_stripe_subscription_quantity' => $quantity,
-                'user_stripe_products' => ''
-            ]);
+                ->where('user_stripe_customer_id', $customerId)
+                ->update([
+                    'user_stripe_subscription_id' => $subscriptionId,
+                    'user_stripe_subscription_status' => $subscriptionStatus,
+                    'user_stripe_subscription_quantity' => $quantity,
+                    'user_stripe_products' => ''
+                ]);
 
             if(!$result){
                 http_response_code(302);
@@ -768,7 +803,13 @@ class SettingsStripeController extends Controller
                     // other details you need
                 ];
             } catch (\Exception $e) {
-                // Handle exceptions
+                \Log::error('getCartDetails: ' . $e->getMessage());
+
+                return response()->json([
+                    'success' => false,
+                    'title' => 'Erro',
+                    'message' => 'Erro ao obter detalhes do carrinho'
+                ]);
             }
         }
         return $details;
@@ -780,17 +821,27 @@ class SettingsStripeController extends Controller
             return response()->json(['error' => 'Authentication required'], 401);
         }
 
-        $onboardData = $this->getOnboardData(); // Assuming this is a method to fetch onboard data
-        $subscriptionStatus = $onboardData['user']['subscription_status'];
+        try {
+            $stripeData = getStripeData();
+            $subscriptionStatus = $stripeData['subscription_status'] ?? '';
 
-        if ($subscriptionStatus != 'active') {
-            return response()->json(['error' => 'Subscription not active'], 403);
+            if ($subscriptionStatus != 'active') {
+                return response()->json(['error' => 'Subscription not active'], 403);
+            }
+
+            $cart = $request->input('cart', []);
+            $cartDetails = $this->getCartDetails($cart);
+
+            return response()->json(['cartDetails' => $cartDetails]);
+        } catch (\Exception $e) {
+            \Log::error('addonCart: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'title' => 'Erro',
+                'message' => 'Erro ao obter detalhes dos Addons'
+            ]);
         }
-
-        $cart = $request->input('cart', []);
-        $cartDetails = $this->getCartDetails($cart);
-
-        return response()->json(['cartDetails' => $cartDetails]);
     }
 
     public static function subscriptionStatusTranslation($status)
@@ -803,7 +854,7 @@ class SettingsStripeController extends Controller
             case 'incomplete':
             case 'incomplete_expired':
                 $label = 'versão demonstrativa';
-                $description = 'Esta versão permite a inserção de alguns registros com a finalidade de que você habitue-se com a aplicação. <br><br> Para mais recursos será necessário assinar o '.env('APP_NAME').'.';
+                $description = 'Esta versão permite a inserção de alguns registros com a finalidade de que você habitue-se com a aplicação. <br><br> Para mais recursos será necessário assinar o '.appName().'.';
                 $color = 'warning';
                 $class = '';
                 break;

@@ -36,8 +36,8 @@
                             </div>
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
-                                    <div class="flex-grow-1">
-                                        <p class="text-uppercase fw-medium text-body text-truncate mb-0">{{ limitChars($template->title, 30) }}</p>
+                                    <div class="flex-grow-1" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ limitChars(ucfirst($template->title), 200) }}">
+                                        <p class="text-uppercase fw-medium text-body text-truncate mb-0">{{ limitChars(ucfirst($template->title), 30) }}</p>
                                     </div>
                                     <div class="flex-shrink-0">
                                         <div class="dropdown dropstart me-n2">
@@ -56,7 +56,7 @@
                                                     class="dropdown-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Editar">Editar</a>
                                                 </li>
                                                 <li>
-                                                    <a href="{{ route('surveysTemplateShowURL', $template->id) }}" class="dropdown-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualizar Modelo">Visualizar</a>
+                                                    <a href="{{ route('surveysTemplatePreviewURL', $template->id) }}" class="dropdown-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualizar Modelo">Visualizar</a>
                                                 </li>
                                             </div>
                                         </div>

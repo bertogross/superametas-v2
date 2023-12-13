@@ -1,17 +1,17 @@
 <div id="surveysList" class="card h-100">
     <div class="card-header">
         <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1"><i class="ri-survey-line fs-16 align-bottom text-theme me-2"></i>Vistorias</h5>
+            <h5 class="card-title mb-0 flex-grow-1"><i
+                    class="ri-survey-fill fs-16 align-bottom text-theme me-2"></i>Listagem</h5>
             <div class="flex-shrink-0">
                 <div class="d-flex flex-wrap gap-2">
                     <button class="btn btn-sm btn-label right btn-outline-theme float-end waves-effect"
-                    @if( is_object($templates) && count($templates) > 0 )
-                        id="btn-surveys-create"
+                        @if (is_object($templates) && count($templates) > 0) id="btn-surveys-create"
                     @else
-                        onclick="alert('Você deverá primeiramente registrar um Modelo');"
-                    @endif
-                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Adicionar Tarefa de Vistoria">
-                        <i class="ri-add-line label-icon align-middle fs-16 ms-2"></i>Vistoria
+                        onclick="alert('Você deverá primeiramente registrar um Modelo');" @endif
+                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left"
+                        title="Adicionar Tarefa de Checklist">
+                        <i class="ri-add-line label-icon align-middle fs-16 ms-2"></i>Checklist
                     </button>
                 </div>
             </div>
@@ -23,11 +23,24 @@
             <div class="row g-3">
 
                 <div class="col-sm-12 col-md col-lg">
-                    <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="Período" data-min-date="{{ $firstDate ?? '' }}" data-max-date="{{ $lastDate ?? '' }}" value="{{ request('created_at') ?? '' }}">
+                    <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="- Período -" data-min-date="{{ $firstDate ?? '' }}" data-max-date="{{ $lastDate ?? '' }}" value="{{ request('created_at') ?? '' }}">
+                </div>
+
+                <div class="col-sm-12 col-md col-lg">
+                    <select class="form-control form-select" name="status">
+                        <option value="">- Status -</option>
+                        @foreach ($getSurveyStatusTranslations as $key => $value)
+                            <option {{ $key == request('status') ? 'selected' : '' }} value="{{ $key }}" title="{{ $value['description'] }}">
+                                {{ $value['label'] }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="col-sm-12 col-md-auto col-lg-auto wrap-form-btn">{{-- d-none --}}
-                    <button type="submit" name="filter" value="true" class="btn btn-theme waves-effect w-100 init-loader"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Filtrar</button>
+                    <button type="submit" name="filter" value="true" class="btn btn-theme waves-effect w-100 init-loader">
+                        <i class="ri-equalizer-fill me-1 align-bottom"></i> Filtrar
+                    </button>
                 </div>
 
             </div>
@@ -35,7 +48,7 @@
     </div>
 
     <div class="card-body">
-        @if ( !$data || $data->isEmpty() )
+        @if (!$data || $data->isEmpty())
             @component('components.nothing')
                 {{--
                 @slot('url', route('surveysCreateURL'))
@@ -43,13 +56,26 @@
             @endcomponent
         @else
             <div class="table-responsive table-card mb-4">
-                <table class="table align-middle table-nowrap mb-0 table-striped" id="tasksTable">
+                <table class="table table-sm align-middle table-nowrap mb-0 table-striped" id="tasksTable">
                     <thead class="table-light text-muted text-uppercase">
                         <tr>
-                            <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Usuário autor deste registro" width="50"></th>
-                            <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Título do modelo que serviu de base para gerar os tópicos desta vistoria">Título</th>
-                            <th class="text-center" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="A Data de Registro não é necessáriamente a data de início das tarefas">Registro</th>
-                            <th class="text-center" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-html="true" data-bs-placement="top" data-bs-title="Recorrências Possíveis" data-bs-content="{{ implode('<br>', array_column($getSurveyRecurringTranslations, 'label')) }}">Recorrência</th>
+                            <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                                title="Usuário autor deste registro" width="50"></th>
+                            <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                                title="Título do modelo que serviu de base para gerar os tópicos desta vistoria">Título
+                            </th>
+                            <th class="text-center" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-html="true"
+                                data-bs-placement="top" data-bs-title="Recorrências Possíveis"
+                                data-bs-content="{{ implode('<br>', array_column($getSurveyRecurringTranslations, 'label')) }}">
+                                Recorrência</th>
+                            <th class="text-center" data-bs-toggle="tooltip" data-bs-trigger="hover"
+                                data-bs-placement="top"
+                                title="A Data de Registro não é necessáriamente a data de início das tarefas">Registrado em
+                            </th>
+                            <th class="text-center" data-bs-toggle="tooltip" data-bs-trigger="hover"
+                                data-bs-placement="top" title="A Data de início da rotina">Inicial</th>
+                            <th class="text-center" data-bs-toggle="tooltip" data-bs-trigger="hover"
+                                data-bs-placement="top" title="A Data final da rotina">Final</th>
                             <th class="text-center">Status</th>
                             <th scope="col"></th>
                         </tr>
@@ -68,17 +94,21 @@
 
                                 $surveyStatus = $survey->status;
 
+                                /*
                                 $delegatedToIds = [];
-                                $delegatedTo = array_map(function($item) {
+                                $delegatedTo = array_map(function ($item) {
                                     return $item['user_id'];
                                 }, $decodedData['delegated_to']);
                                 $delegatedToIds = count($delegatedTo) > 1 ? array_unique($delegatedTo) : $delegatedTo;
+                                */
 
+                                /*
                                 $auditedByIds = [];
-                                $auditedBy = array_map(function($item) {
+                                $auditedBy = array_map(function ($item) {
                                     return $item['user_id'];
                                 }, $decodedData['audited_by']);
                                 $auditedByIds = count($auditedBy) > 1 ? array_unique($auditedBy) : $auditedBy;
+                                */
 
                                 $recurring = $survey->recurring;
                                 $recurringLabel = $getSurveyRecurringTranslations[$recurring]['label'];
@@ -93,27 +123,42 @@
                                             $name = getUserData($authorId)['name'];
                                         @endphp
                                         <div class="avatar-group-item">
-                                            <a href="{{ route('profileShowURL', $authorId) }}" class="d-inline-block" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $name }} é o autor deste registro">
-                                                <img src="{{ $avatar }}"
-                                                alt="{{ $name }}" class="rounded-circle avatar-xxs">
+                                            <a href="{{ route('profileShowURL', $authorId) }}" class="d-inline-block"
+                                                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                                                title="{{ $name }} é o autor deste registro">
+                                                <img src="{{ $avatar }}" alt="{{ $name }}"
+                                                    class="rounded-circle avatar-xxs">
                                             </a>
                                         </div>
                                     </div>
                                 </td>
-                                <td title="{{ $getSurveyTemplateNameById }}">
-                                    {{ limitChars($title, 30) }}<br>
-                                    Modelo: {{ limitChars($getSurveyTemplateNameById, 30) }}
+                                <td>
+                                    {{ limitChars(ucfirst($title), 30) }}<br>
+                                    Modelo: <span data-bs-toggle="tooltip" data-bs-trigger="hover"
+                                        data-bs-placement="top"
+                                        title="{{ limitChars(ucfirst($getSurveyTemplateNameById), 200) }}"></span>{{ limitChars(ucfirst($getSurveyTemplateNameById), 300) }}
                                 </td>
                                 <td class="text-center">
-                                    {{ $survey->created_at ? date("d/m/Y", strtotime($survey->created_at)) : '-' }}
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge bg-{{ $getSurveyRecurringTranslations[$recurring]['color'] }}-subtle text-{{ $getSurveyRecurringTranslations[$recurring]['color'] }} text-uppercase" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $getSurveyRecurringTranslations[$recurring]['description'] }}">
+                                    <span class="badge badge-border bg-dark-subtle text-body text-uppercase"
+                                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                                        title="{{ $getSurveyRecurringTranslations[$recurring]['description'] }}">
                                         {{ $recurringLabel }}
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge bg-{{ $getSurveyStatusTranslations[$surveyStatus]['color'] }}-subtle text-{{ $getSurveyStatusTranslations[$surveyStatus]['color'] }} text-uppercase" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $getSurveyStatusTranslations[$surveyStatus]['description'] }}">
+                                    {{ $survey->created_at ? date('d/m/Y H:i', strtotime($survey->created_at)) : '-' }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $survey->start_at ? date('d/m/Y', strtotime($survey->start_at)) : '-' }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $survey->end_in ? date('d/m/Y', strtotime($survey->end_in)) : '-' }}
+                                </td>
+                                <td class="text-center">
+                                    <span
+                                        class="badge bg-{{ $getSurveyStatusTranslations[$surveyStatus]['color'] }}-subtle text-{{ $getSurveyStatusTranslations[$surveyStatus]['color'] }} text-uppercase"
+                                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                                        title="{{ $getSurveyStatusTranslations[$surveyStatus]['description'] }}">
                                         {{ $getSurveyStatusTranslations[$surveyStatus]['label'] }}
                                         @if ($surveyStatus == 'started')
                                             <span class="spinner-border align-top ms-1"></span>
@@ -121,29 +166,34 @@
                                     </span>
                                 </td>
                                 <td scope="row" class="text-end">
-                                    @if ( in_array($surveyStatus, ['new', 'started', 'stopped']) )
+                                    @if (in_array($surveyStatus, ['new', 'started', 'stopped']))
                                         <button type="button" data-survey-id="{{ $survey->id }}"
                                             data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
                                             class="btn btn-sm btn-label right waves-effect btn-soft-{{ $getSurveyStatusTranslations[$surveyStatus]['color'] }} btn-surveys-change-status"
                                             data-current-status="{{ $surveyStatus }}"
                                             title="{{ $getSurveyStatusTranslations[$surveyStatus]['reverse'] }}">
-                                                <i class="{{ $getSurveyStatusTranslations[$surveyStatus]['icon'] }} label-icon align-middle fs-16 ms-2"></i> {{ $getSurveyStatusTranslations[$surveyStatus]['reverse'] }}
+                                            <i
+                                                class="{{ $getSurveyStatusTranslations[$surveyStatus]['icon'] }} label-icon align-middle fs-16"></i>{{ $getSurveyStatusTranslations[$surveyStatus]['reverse'] }}
                                         </button>
                                     @endif
 
-                                    <div class="btn-group">
+                                    @if (!in_array($surveyStatus, ['completed', 'filed']))
                                         <button type="button"
-                                        @if ($authorId != auth()->id())
-                                            class="btn btn-sm btn-soft-dark waves-effect ri-edit-line"
+                                            @if ($authorId != auth()->id()) class="btn btn-sm btn-soft-dark waves-effect ri-edit-line"
                                             onclick="alert('Você não possui autorização para editar um registro gerado por outra pessoa');"
                                         @else
                                             class="btn btn-sm btn-soft-dark waves-effect btn-surveys-edit ri-edit-line"
-                                            data-survey-id="{{$surveyId}}"
-                                        @endif
-                                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Editar"></button>
+                                            data-survey-id="{{ $surveyId }}" @endif
+                                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left"
+                                            title="Editar"></button>
+                                    @endif
 
-                                        <a href="{{ route('surveysShowURL', $surveyId) }}" class="btn btn-sm btn-soft-dark waves-effect ri-line-chart-fill" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Visualização Analítica"></a>
-                                    </div>
+                                    @if ( !in_array($surveyStatus, ['scheduled', 'new']) )
+                                        <a href="{{ route('surveysShowURL', $surveyId) }}"
+                                            class="btn btn-sm btn-soft-dark waves-effect ri-line-chart-fill"
+                                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left"
+                                            title="Visualização Analítica"></a>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -154,7 +204,5 @@
                 {!! $data->links('layouts.custom-pagination') !!}
             </div>
         @endif
-
     </div>
-    <!--end card-body-->
 </div>

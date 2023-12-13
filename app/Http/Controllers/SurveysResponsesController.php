@@ -63,13 +63,13 @@ class SurveysResponsesController extends Controller
         if( $surveyorStatus == 'auditing' ){
             return response()->json([
                 'success' => false,
-                'message' => 'Esta Vistoria já foi enviada para Auditoria e não poderá ser editada',
+                'message' => 'Esta Tarefa já foi enviada para Auditoria e não poderá ser editado',
             ]);
         }
         if($surveyorStatus == 'losted' ){
             return response()->json([
                 'success' => false,
-                'message' => 'Esta Vistoria foi perdida pois o prazo expirou e por isso não poderá mais ser editada',
+                'message' => 'Esta Tarefa foi perdida pois o prazo expirou e por isso não poderá mais ser editada',
             ]);
         }
 
@@ -85,13 +85,15 @@ class SurveysResponsesController extends Controller
                 'success' => false,
                 'message' => 'Necessário enviar ao menos uma foto apontando o motivo da Não Conformidade',
                 'action' => 'changeToPending'
+                'action2' => 'blickPhotoButton'
             ]);
         }*/
         if( !$attachmentIds ){
             return response()->json([
                 'success' => false,
                 'message' => 'Necessário enviar ao menos uma foto',
-                'action' => 'changeToPending'
+                'action' => 'changeToPending',
+                'action2' => 'blickPhotoButton'
             ]);
         }
         $attachmentIdsInt = $attachmentIds ? array_map('intval', $attachmentIds) : [];
@@ -103,7 +105,8 @@ class SurveysResponsesController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Necessário descrever o motivo da Não Conformidade',
-                'action' => 'changeToPending'
+                'action' => 'changeToPending',
+                'action2' => 'showTextarea'
             ]);
         }
 
@@ -229,8 +232,9 @@ class SurveysResponsesController extends Controller
         if( $complianceAudit == 'no' && !$attachmentIds ){
             return response()->json([
                 'success' => false,
-                'message' => 'Necessário enviar ao menos uma foto comprovando o motivo de haver Indeferido',
-                'action' => 'changeToPending'
+                'message' => 'Se Não Conforme, necessário enviar ao menos uma foto comprovando o motivo de haver Indeferido',
+                'action' => 'changeToPending',
+                'action2' => 'blickPhotoButton'
             ]);
         }
 
@@ -241,7 +245,8 @@ class SurveysResponsesController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Necessário descrever o motivo de haver Indeferido',
-                'action' => 'changeToPending'
+                'action' => 'changeToPending',
+                'action2' => 'showTextarea'
             ]);
         }
 

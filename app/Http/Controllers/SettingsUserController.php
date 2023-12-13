@@ -242,6 +242,11 @@ class SettingsUserController extends Controller
                 continue;
             }
 
+            $databaseExists = DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$databaseName]);
+            if (!$databaseExists) {
+                return null;
+            }
+
             // Set the database connection configuration for the other database
             config([
                 'database.connections.otherDatabase' => [

@@ -22,8 +22,8 @@ class GoalSalesController extends Controller
     {
         $currentUserId = auth()->id();
 
-        $selectedCompanies = $request->input('companies');
-        $selectedDepartments = $request->input('departments');
+        $selectedCompanies = $request->input('companies', []);
+        $selectedDepartments = $request->input('departments', []);
 
         // Get the filters from the request
         $getMeantime = e($request->input('meantime', date('Y-m')));
@@ -112,7 +112,7 @@ class GoalSalesController extends Controller
         $getIPCA = getIPCAdata($meantime);
 
         // Query the wlsm_goals table to get the goals for the given companyId and meantime
-        $goals = DB::connection($this->connection)
+        $goals = DB::connection('smAppTemplate')
             ->table('wlsm_goals')
             ->where('company_id', $companyId)
             ->where('meantime', $meantime)
@@ -122,7 +122,7 @@ class GoalSalesController extends Controller
             ->toArray();
 
         // Query the wlsm_sales table to get the sales for the given companyId and meantime
-        $salesYearBefore = DB::connection($this->connection)
+        $salesYearBefore = DB::connection('smAppTemplate')
             ->table('wlsm_sales')
             ->where('company_id', $companyId)
             ->where('date_sale', 'LIKE', $previousMeantimeYearBefore . '%')
@@ -134,7 +134,7 @@ class GoalSalesController extends Controller
 
 
         // Query the wlsm_sales table to get the sales for the given companyId and meantime
-        $salesMonthBefore = DB::connection($this->connection)
+        $salesMonthBefore = DB::connection('smAppTemplate')
             ->table('wlsm_sales')
             ->where('company_id', $companyId)
             ->where('date_sale', 'LIKE', $previousMeantimeMonthBefore . '%')
@@ -185,7 +185,7 @@ class GoalSalesController extends Controller
         foreach ($goals as $departmentId => $goalData) {
             $goalValue = onlyNumber($goalData);
 
-            $exists = DB::connection($this->connection)->table('wlsm_goals')
+            $exists = DB::connection('smAppTemplate')->table('wlsm_goals')
                 ->where('company_id', $companyId)
                 ->where('department_id', $departmentId)
                 ->where('meantime', $meantime)
@@ -195,7 +195,7 @@ class GoalSalesController extends Controller
             if ($goalValue <= 0) {
                 if ($exists) {
                     // Delete existing record
-                    DB::connection($this->connection)->table('wlsm_goals')
+                    DB::connection('smAppTemplate')->table('wlsm_goals')
                         ->where('company_id', $companyId)
                         ->where('department_id', $departmentId)
                         ->where('meantime', $meantime)
@@ -205,7 +205,7 @@ class GoalSalesController extends Controller
             } else {
                 if ($exists) {
                     // Update existing record
-                    DB::connection($this->connection)->table('wlsm_goals')
+                    DB::connection('smAppTemplate')->table('wlsm_goals')
                         ->where('company_id', $companyId)
                         ->where('department_id', $departmentId)
                         ->where('meantime', $meantime)
@@ -216,7 +216,7 @@ class GoalSalesController extends Controller
                         ]);
                 } else {
                     // Insert new record
-                    DB::connection($this->connection)->table('wlsm_goals')->insert([
+                    DB::connection('smAppTemplate')->table('wlsm_goals')->insert([
                         'user_id' => $currentUserId,
                         'company_id' => $companyId,
                         'department_id' => $departmentId,
@@ -229,7 +229,7 @@ class GoalSalesController extends Controller
             }
         }
 
-        return response()->json(['success' => true, 'message' => 'Goals updated successfully!']);
+        return response()->json(['success' => true, 'message' => 'Metas Atualizadas!']);
     }
 
     private function calculateStartAndEndDate($meantime)
@@ -272,7 +272,7 @@ class GoalSalesController extends Controller
     private function getSalesData($startDate, $endDate, $selectedCompanies, $selectedDepartments)
     {
         // Query for sales data
-        $query = DB::connection($this->connection)
+        $query = DB::connection('smAppTemplate')
             ->table('wlsm_sales as sales')
             ->join('wlsm_companies as companies', 'sales.company_id', '=', 'companies.company_id')
             ->join('wlsm_departments as departments', 'sales.department_id', '=', 'departments.department_id')
@@ -306,7 +306,7 @@ class GoalSalesController extends Controller
     private function getGoalsData($startDate, $endDate, $selectedCompanies, $selectedDepartments)
     {
         // Query for goals data
-        $query = DB::connection($this->connection)
+        $query = DB::connection('smAppTemplate')
             ->table('wlsm_goals as goals')
             ->join('wlsm_companies as companies', 'goals.company_id', '=', 'companies.company_id')
             ->join('wlsm_departments as departments', 'goals.department_id', '=', 'departments.department_id')
@@ -426,7 +426,7 @@ class GoalSalesController extends Controller
     private function getGoalAndSalesData($startDate, $endDate, $selectedCompanies, $selectedDepartments)
     {
         // Query for old data
-        $query = DB::connection($this->connection)
+        $query = DB::connection('smAppTemplate')
             ->table('wlsm_sales as sales')
             ->join('wlsm_companies as companies', 'sales.company_id', '=', 'companies.company_id')
             ->join('wlsm_departments as departments', 'sales.department_id', '=', 'departments.department_id')
