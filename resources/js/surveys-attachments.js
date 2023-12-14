@@ -1,19 +1,51 @@
 import {
     toastAlert,
-    lightbox
+    lightbox,
+    showPreloader
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
 
     // Attach event listeners for Photos image upload
+    function insertUploadProgress() {
+        const uploadProgressHTML = `
+            <div id="uploadProgress" class="fixed-bottom mb-5 ms-auto me-auto">
+                <div class="flex-grow-1">
+                    <div class="progress animated-progress progress-label bg-white">
+                        <div id="progressBar" class="progress-bar bg-theme" role="progressbar" style="width: 1%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressText" class="label">Inicializando...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        document.body.insertAdjacentHTML('beforeend', uploadProgressHTML);
+    }
+    function removeUploadProgress(){
+        var element = document.getElementById('uploadProgress');
+        if(element){
+            element.remove();
+        }
+    }
     function attachPhoto(inputFile, uploadUrl, onSuccess) {
         if (inputFile) {
             const file = inputFile.files[0];
+
             if (!file.type.startsWith('image/')) {
                 console.error('File is not an image.');
-                toastAlert('File is not an image.', 'danger', 5000);
+                toastAlert('O arquivo deve ser uma imagem', 'warning', 15000);
                 return;
             }
+
+            // Check if the file is a JPEG or JPG image
+            if (!file.type.match('image/jpeg')) {
+                console.error('File is not a JPEG or JPG image.');
+                toastAlert('O arquivo deve ser JPG', 'warning', 15000);
+                return;
+            }
+
+            showPreloader();
+
+            insertUploadProgress();
 
             const reader = new FileReader();
 
@@ -24,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 img.onload = function() {
                     if (!img.complete || img.naturalWidth === 0) {
                         console.error('Failed to load image.');
-                        toastAlert('Failed to load image.', 'danger', 5000);
+                        toastAlert('Falha ao carregar o arquivo', 'danger', 15000);
                         return;
                     }
 
@@ -52,64 +84,98 @@ document.addEventListener('DOMContentLoaded', function() {
                     canvas.toBlob(function(blob) {
                         if (!blob) {
                             console.error('Failed to create blob.');
-                            toastAlert('Failed to create blob.', 'danger', 5000);
+                            toastAlert('Falha ao redimensionar o arquivo', 'danger', 15000);
                             return;
                         }
 
                         const formData = new FormData();
                         formData.append('file', blob, file.name);
 
-                        fetch(uploadUrl, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        // Use XMLHttpRequest for upload
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('POST', uploadUrl, true);
+
+                        // Set up the request events
+                        xhr.upload.onprogress = function(event) {
+                            if (event.lengthComputable) {
+                                const percentComplete = Math.round((event.loaded / event.total) * 100);
+                                const progressBar = document.getElementById('progressBar');
+                                const progressText = document.getElementById('progressText');
+
+                                progressBar.style.width = percentComplete + '%';
+                                progressBar.setAttribute('aria-valuenow', percentComplete);
+                                progressText.innerText = percentComplete > 98 ? 'Armazenando...' : percentComplete + '%';
                             }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                //console.log('File uploaded successfully');
+                        };
 
-                                toastAlert(data.message, 'success', 5000);
+                        xhr.onload = function() {
+                            if (xhr.status === 200) {
+                                const data = JSON.parse(xhr.responseText);
+                                if (data.success) {
+                                    toastAlert(data.message, 'success', 5000);
+                                    onSuccess(inputFile, data);
 
-                                onSuccess(inputFile, data); // Call the callback function
-
-                                // Trigger a click event on the closest update button
-                                const container = document.querySelector(`#element-attachment-${data.id}`).closest('.responses-data-container');
-                                if (container) {
-                                    const updateButton = container.querySelector('.btn-response-update');
-                                    if (updateButton) {
-                                        setTimeout(() => {
-                                            updateButton.click();
-                                        }, 3000);
+                                    // Trigger a click event on the closest update button
+                                    const container = document.querySelector(`#element-attachment-${data.id}`).closest('.responses-data-container');
+                                    if (container) {
+                                        const updateButton = container.querySelector('.btn-response-update');
+                                        if (updateButton) {
+                                            setTimeout(() => {
+                                                updateButton.click();
+                                            }, 2000);
+                                        }
                                     }
+
+                                    removeUploadProgress();
+                                } else {
+                                    toastAlert(data.message, 'danger', 15000);
+
+                                    removeUploadProgress();
                                 }
-
-
                             } else {
-                                console.error('Upload failed:', data.message);
-
-                                toastAlert(data.message, 'danger', 5000);
+                                toastAlert('Upload failed: ' + xhr.statusText, 'danger');
                             }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            toastAlert('Upload failed: ' + error, 'danger');
-                        });
+
+                            removeUploadProgress();
+
+                            showPreloader(false);
+                        };
+
+                        xhr.onerror = function() {
+                            console.error('Upload failed: ' + xhr.statusText);
+                            toastAlert('O envio do arquivo falhou', 'danger', 15000);
+
+                            removeUploadProgress();
+
+                            showPreloader(false);;
+                        };
+
+                        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                        xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+
+                        // Send the request
+                        xhr.send(formData);
                     }, file.type === 'image/png' ? 'image/png' : 'image/jpeg', file.type === 'image/png' ? 1 : 0.6);
                 };
 
                 img.onerror = function() {
                     console.error('Error in loading image.');
-                    toastAlert('Error in loading image.', 'danger');
+                    toastAlert('Erro ao carregar arquivo', 'danger', 15000);
+
+                    removeUploadProgress();
+
+                    showPreloader(false);
                 };
             };
 
             reader.onerror = function() {
                 console.error('Error reading file.');
-                toastAlert('Error reading file.', 'danger');
+                toastAlert('Erro na leitura do arquivo', 'danger', 15000);
+
+                removeUploadProgress();
+
+                showPreloader(false);
             };
 
             reader.readAsDataURL(file);
@@ -180,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Call this function initially to attach listeners to existing delete buttons
     deletePhotoButtonsListener();
 
-    // Your existing upload logic
+    // Upload logic
     const uploadSurveyPhotoInputs = document.querySelectorAll('.input-upload-photo');
     if (uploadSurveyPhotoInputs) {
         uploadSurveyPhotoInputs.forEach(function(input) {
@@ -202,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="position-absolute translate-middle mt-n4 ms-2">
+                                    <div class="position-absolute translate-middle mt-n2 ms-2">
                                         <div class="avatar-xs">
                                             <button type="button" class="avatar-title bg-light border-0 rounded-circle text-danger cursor-pointer btn-delete-photo" data-attachment-id="${data.id}" title="Deletar Arquivo">
                                                 <i class="ri-delete-bin-2-line"></i>

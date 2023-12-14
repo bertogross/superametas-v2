@@ -22,21 +22,21 @@
 
     $surveyStatus = $data->status ?? '';
 
-    $alertMessage0 = $data && $countAllResponses > 0 ? '<div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+    $alertMessage0 = $data && $countAllResponses > 0 ? '<div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show mt-2 mb-2" role="alert">
             <i class="ri-alert-line label-icon"></i> Esta rotina já foi iniciada e a alteração do Modelo não poderá ser efetuada. Prossiga se necessitar editar as atribuições.<br>
             Se a intenção for a de modificar tópicos dos processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho adequado será o de encerrar/arquivar esta atividade e gerar um novo registro.
         </div>' : '';
-    $alertMessage1 = $data && $countAllResponses > 0 ? '<div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+    $alertMessage1 = $data && $countAllResponses > 0 ? '<div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-2 mb-2" role="alert">
             <i class="ri-alert-line label-icon"></i> Esta rotina já foi iniciada e a alteração da Recorrência não poderá ser efetuada. Prossiga se necessitar editar as atribuições.<br>
             Se a intenção for a de modificar a recorrência de processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho adequado será o de encerrar/arquivar esta atividade e gerar um novo registro.
         </div>' : '';
 
-    $alertMessage2 = $data && $countAllResponses > 0 ? '<div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+    $alertMessage2 = $data && $countAllResponses > 0 ? '<div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-2 mb-2" role="alert">
             <i class="ri-alert-line label-icon"></i> Esta rotina já foi iniciada e a alteração em Unidades não poderá ser efetuada. Prossiga se necessitar editar as atribuições.<br>
             Se a intenção for a de ativar/desativar unidades de processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho adequado será o de encerrar/arquivar esta atividade e gerar um novo registro.
         </div>' : '';
 
-    $alertMessage3 = $data && $countTodayResponses > 0 ? '<div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+    $alertMessage3 = $data && $countTodayResponses > 0 ? '<div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show mt-2 mb-2" role="alert">
         <i class="ri-alert-line label-icon"></i> Esta tarefa já está recebendo dados. Portanto, alterações em Atribuições poderão ser efetuadas mas só terão efeito a partir da próxima interação. Por exemplo, no caso de tarefas diárias, a próxima interação ocorrerá amanhã.
     </div>' : '';
 @endphp
@@ -256,14 +256,14 @@
                                     <div class="row">
                                         @foreach ($getActiveCompanies as $company)
                                             <div class="col-sm-12 col-md-6 col-lg-4" id="distributed-tab-company-{{ $company->company_id }}"
-                                                @if ($data && $countAllResponses > 0 && in_array($company->company_id, $selectedCompanies))
+                                                @if (in_array($company->company_id, $selectedCompanies))
                                                     style="display: block;"
                                                 @else
                                                     style="display: none;"
                                                 @endif
                                                 >
                                                 <div class="card bg-body">
-                                                    <div class="card-header bg-body text-uppercase fw-bold">
+                                                    <div class="card-header bg-body text-uppercase fw-bold text-theme">
                                                         {{ $company->company_alias }}
                                                     </div>
                                                     <div class="card-body">

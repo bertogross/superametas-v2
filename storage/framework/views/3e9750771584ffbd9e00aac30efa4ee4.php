@@ -7,7 +7,7 @@
             <div class="col-sm-6">
                 <?php if($getCompanyLogo): ?>
                     <a href="<?php echo e(url('/')); ?>" title="Ir para inicial do <?php echo e(appName()); ?>">
-                        <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="<?php echo e(appName()); ?>" class="me-1" height="27">
+                        <img src="<?php echo e(URL::asset('build/images/logo-sm.png')); ?>" alt="<?php echo e(appName()); ?>" class="me-1" height="27" loading="lazy">
                     </a>
                     <?php echo e(appName()); ?> - <script>document.write(new Date().getFullYear())</script> ©
                 <?php else: ?>

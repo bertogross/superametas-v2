@@ -16,7 +16,7 @@
                 <div class="navbar-brand-box horizontal-logo">
                     <a href="{{ url('/') }}" class="logo logo-dark" title="Ir para inicial do {{appName()}}">
                         <span class="logo-sm">
-                            <img src="{{ URL::asset('build/images/logo-sm' . $logo2 . '.png') }}" alt="{{appName()}}" height="22" class="logo-image">
+                            <img src="{{ URL::asset('build/images/logo-sm' . $logo2 . '.png') }}" alt="{{appName()}}" height="22" class="logo-image" loading="lazy">
                         </span>
                         <span class="logo-lg">
                             <img
@@ -25,13 +25,13 @@
                             @else
                                 src="{{URL::asset('build/images/logo-dark' . $logo2 . '.png')}}"
                             @endif
-                            alt="{{appName()}}" height="39">
+                            alt="{{appName()}}" height="31" loading="lazy">
                         </span>
                     </a>
 
                     <a href="{{ url('/') }}" class="logo logo-light" title="Ir para inicial do {{appName()}}">
                         <span class="logo-sm">
-                            <img src="{{ URL::asset('build/images/logo-sm' . $logo2 . '.png') }}" alt="{{appName()}}" height="22">
+                            <img src="{{ URL::asset('build/images/logo-sm' . $logo2 . '.png') }}" alt="{{appName()}}" height="22" loading="lazy">
                         </span>
                         <span class="logo-lg">
                             <img
@@ -40,7 +40,7 @@
                             @else
                                 src="{{URL::asset('build/images/logo-light' . $logo2 . '.png')}}"
                             @endif
-                            alt="{{appName()}}" height="39">
+                            alt="{{appName()}}" height="31" loading="lazy">
                         </span>
                     </a>
                 </div>
@@ -102,7 +102,7 @@
                                         <a class="dropdown-icon-item" href="{{ route('goalSalesIndexURL') }}" title="Meta de Vendas">
                                             <i class="ri-shopping-cart-2-fill text-theme fs-1"></i>
                                             {{--
-                                            <img src="{{ URL::asset('build/images/svg/happy.png') }}" alt="Meta de Vendas">
+                                            <img src="{{ URL::asset('build/images/svg/happy.png') }}" alt="Meta de Vendas" loading="lazy">
                                             --}}
                                             <span>Vendas</span>
                                         </a>
@@ -112,7 +112,7 @@
                                 <!--
                                 <div class="col">
                                     <a class="dropdown-icon-item" href="{{-- route('goalResultsIndexURL') --}}#" title="Meta de Resultados">
-                                        <img src="{{ URL::asset('build/images/bg-d.png') }}" alt="Meta de Resultados">
+                                        <img src="{{ URL::asset('build/images/bg-d.png') }}" alt="Meta de Resultados" loading="lazy">
                                         <span>Resultados</span>
                                     </a>
                                 </div>
@@ -121,11 +121,18 @@
                                 @if(auth()->user()->hasRole(User::ROLE_ADMIN) || auth()->user()->hasRole(User::ROLE_CONTROLLERSHIP))
                                     <div class="col">
                                         <a class="dropdown-icon-item" href="{{ route('surveysIndexURL') }}" title="Checklists">
-                                            <i class="ri-survey-fill text-theme fs-1"></i>
+                                            <i class="ri-checkbox-line text-theme fs-1"></i>
                                             {{--
-                                            <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Checklists">
+                                            <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Checklists" loading="lazy">
                                             --}}
                                             <span>Checklists</span>
+                                        </a>
+                                    </div>
+
+                                    <div class="col">
+                                        <a class="dropdown-icon-item" href="{{ route('teamIndexURL') }}" title="Equipe">
+                                            <i class="ri-team-fill text-theme fs-1"></i>
+                                            <span>Equipe</span>
                                         </a>
                                     </div>
                                 @endif
@@ -150,7 +157,7 @@
                 --}}
 
                 <div class="ms-1 header-item d-none d-sm-flex">
-                    <button type="button" id="btn-light-dark-mode" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"  data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Alternar Visual">
+                    <button type="button" id="btn-light-dark-mode" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"  data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Alternar Visual">
                         <i class="bx bx-moon fs-22"></i>
                     </button>
                 </div>
@@ -164,11 +171,11 @@
                 <div class="dropdown ms-sm-3 header-item topbar-user">
                     <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="d-flex align-items-center">
-                            <img class="rounded-circle header-profile-user" src="{{ $getUserData['avatar'] ? $getUserData['avatar'] :  URL::asset('build/images/users/user-dummy-img.jpg') }}" alt="{{$getUserData['name']}}">
+                            <img class="rounded-circle header-profile-user" src="{{ $getUserData['avatar'] ? $getUserData['avatar'] :  URL::asset('build/images/users/user-dummy-img.jpg') }}" alt="{{$getUserData['name']}}" loading="lazy">
                             <span class="text-start ms-xl-2">
                                 <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{$getUserData['name']}}</span>
                                 <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">
-                                    {{ (new User)->getRoleName($getUserData['role']) }}
+                                    {{ \App\Models\User::getRoleName($getUserData['role']) }}
                                 </span>
                             </span>
                         </span>
@@ -203,6 +210,7 @@
                             <i class="ri-user-3-fill text-muted fs-16 align-middle me-1"></i>
                             <span class="align-middle">Meu Perfil</span>
                         </a>
+
 
                         <!--
                         <a class="dropdown-item" href="auth-lockscreen-basic"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Lock screen</span></a>

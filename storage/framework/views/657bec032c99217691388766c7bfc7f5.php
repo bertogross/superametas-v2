@@ -73,8 +73,6 @@
     <script src="<?php echo e(URL::asset('build/libs/flatpickr/plugins/confirmDate/confirmDate.js')); ?>"></script>
 
     <script>
-        var totalCompanies = <?php echo e(!empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) ? count($getAuthorizedCompanies) : 1); ?>;
-
         var surveysIndexURL = "<?php echo e(route('surveysIndexURL')); ?>";
         var surveysCreateURL = "<?php echo e(route('surveysCreateURL')); ?>";
         var surveysEditURL = "<?php echo e(route('surveysEditURL')); ?>";

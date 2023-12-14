@@ -3,9 +3,11 @@
     @lang('translation.signup')
 @endsection
 @section('content')
-
+    @php
+        $host = $_SERVER['HTTP_HOST'] ?? 'default';
+        $logo2 = str_contains($host, 'testing') ? '-2' : '';
+    @endphp
     <div class="auth-page-wrapper pt-5">
-
         <!-- auth page content -->
         <div class="auth-page-content">
             <div class="container">
@@ -14,7 +16,7 @@
                         <div class="text-center mt-sm-5 mb-4 text-white-50">
                             <div>
                                 <a href="{{ url('/') }}" class="d-inline-block auth-logo">
-                                    <img src="{{ URL::asset('build/images/logo-light.png') }}" alt="{{appName()}}" height="39">
+                                    <img src="{{ URL::asset('build/images/logo-light' . $logo2 . '.png') }}" alt="{{appName()}}" height="31" loading="lazy">
                                 </a>
                             </div>
                         </div>

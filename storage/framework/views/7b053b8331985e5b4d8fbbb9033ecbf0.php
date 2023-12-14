@@ -20,7 +20,7 @@
                 <?php else: ?>
                     src="<?php echo e(URL::asset('build/images/logo-dark' . $logo2 . '.png')); ?>"
                 <?php endif; ?>
-                alt="<?php echo e(appName()); ?>" height="39">
+                alt="<?php echo e(appName()); ?>" height="31" loading="lazy">
             </span>
         </a>
         <!-- Light Logo-->
@@ -35,7 +35,7 @@
                 <?php else: ?>
                     src="<?php echo e(URL::asset('build/images/logo-light' . $logo2 . '.png')); ?>"
                 <?php endif; ?>
-                alt="<?php echo e(appName()); ?>" height="39">
+                alt="<?php echo e(appName()); ?>" height="31" loading="lazy">
             </span>
         </a>
         <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">

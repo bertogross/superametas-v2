@@ -10,6 +10,7 @@ use App\Http\Controllers\{
     SettingsUserController,
     SettingsDatabaseController,
     SettingsAccountController,
+    TeamController,
     GoalSalesController,
     SurveysController,
     SurveysTemplatesController,
@@ -78,6 +79,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/assignment/surveyor-status', [SurveysAssignmentsController::class, 'changeAssignmentSurveyorStatus'])->name('changeAssignmentSurveyorStatusURL');
 
             Route::get('/assignment/auditor-form/{id?}', [SurveysAssignmentsController::class, 'formAuditorAssignment'])->name('formAuditorAssignmentURL')->where('id', '[0-9]+');
+            Route::post('/assignment/auditor-enter', [SurveysAssignmentsController::class, 'enterAssignmentAuditor'])->name('enterAssignmentAuditorURL');
+            Route::post('/assignment/auditor-request/{id?}', [SurveysAssignmentsController::class, 'requestAssignmentAuditor'])->name('requestAssignmentAuditorURL')->where('id', '[0-9]+');
+            Route::post('/assignment/auditor-revoke/{id?}', [SurveysAssignmentsController::class, 'revokeAssignmentAuditor'])->name('revokeAssignmentAuditorURL')->where('id', '[0-9]+');
             Route::post('/assignment/auditor-status', [SurveysAssignmentsController::class, 'changeAssignmentAuditorStatus'])->name('changeAssignmentAuditorStatusURL');
 
             Route::get('/assignment/activities', [SurveysAssignmentsController::class, 'getRecentActivities'])->name('getRecentActivitiesURL');
@@ -121,6 +125,10 @@ Route::middleware(['auth'])->group(function () {
 
         });
     });
+
+    // Team Routes
+    Route::get('/team', [TeamController::class, 'index'])->name('teamIndexURL');
+
 
     // File Upload Routes
     Route::prefix('upload')->group(function () {

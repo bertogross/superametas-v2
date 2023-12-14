@@ -15,7 +15,14 @@
 
         $title = $data->title;
 
-        $templateName = getSurveyTemplateNameById($data->template_id);
+        $templateData = \App\Models\SurveyTemplates::findOrFail($data->template_id);
+
+        $authorId = $templateData->user_id;
+        $getAuthorData = getUserData($authorId);
+        $authorRoleName = \App\Models\User::getRoleName($getAuthorData['role']);
+        $templateName = trim($templateData->title) ? nl2br($templateData->title) : '';
+        $templateDescription = trim($templateData->description) ? nl2br($templateData->description) : '';
+
     @endphp
     @component('components.breadcrumb')
         @slot('url')
@@ -34,6 +41,14 @@
     @endcomponent
 
     @if( auth()->user()->hasAnyRole(User::ROLE_ADMIN, User::ROLE_CONTROLLERSHIP) )
+
+        <h6 class="text-uppercase mb-3">{{$title}}</h6>
+
+        @if ($templateDescription)
+
+            {!! !empty($templateDescription) ? '<div class="blockquote custom-blockquote blockquote-outline blockquote-dark rounded mt-2 mb-3"><h5>Modelo: '.$templateName.'</h5><p class="text-body mb-2">'.$templateDescription.'</p><footer class="blockquote-footer mt-0">'.$getAuthorData['name'].' <cite title="'.$authorRoleName.'">'.$authorRoleName.'</cite></footer></div>' : '' !!}
+
+        @endif
 
         @if ( $analyticTermsData || isset($_REQUEST['filter']) )
             <div id="filter" class="p-3 bg-light-subtle rounded position-relative mb-4" style="z-index: 3; display: block;">

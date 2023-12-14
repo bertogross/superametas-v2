@@ -22,7 +22,7 @@
             @else
                 src="{{ URL::asset('storage/' . $user->cover) }}"
             @endif
-            alt="cover" class="profile-wid-img" />
+            alt="cover" class="profile-wid-img" loading="lazy"/>
         </div>
     </div>
 
@@ -36,7 +36,7 @@
                     @else
                         src="{{ URL::asset('storage/' . $user->avatar) }}"
                     @endif
-                    alt="avatar" class="img-thumbnail rounded-circle" />
+                    alt="avatar" class="img-thumbnail rounded-circle" loading="lazy" />
                     @if($user->id == auth()->id())
                         <div class="avatar-xs p-0 rounded-circle profile-photo-edit" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="right" title="Alterar Avatar">
                             <input class="d-none" name="avatar" id="member-image-input" type="file" accept="image/jpeg">
@@ -81,107 +81,244 @@
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header align-items-center d-flex">
-            <h5 class="card-title mb-0 flex-grow-1"><i class="ri-todo-fill fs-16 align-bottom text-theme me-2"></i>Tarefas</h5>
-        </div>
-        <div class="card-body h-100" style="min-height: 150px">
-            @if ( $assignmentData && is_array($assignmentData) )
-                <div class="tasks-board mb-0 position-relative" id="kanbanboard">
-                    @foreach ($filteredStatuses as $key => $status)
-                        @php
-                            $filteredSurveyorData = [];
-                            $filteredAuditorData = [];
+    <div class="row mb-4">
+        <div class="col-sm-12 col-md-7 col-lg-9 col-xxl-10">
+            <div class="card h-100">
+                <div class="card-header align-items-center d-flex">
+                    <h5 class="card-title mb-0 flex-grow-1"><i class="ri-todo-fill fs-16 align-bottom text-theme me-2"></i>Tarefas</h5>
+                </div>
+                <div class="card-body pb-0" style="min-height: 150px">
+                    @if ( $assignmentData && is_array($assignmentData) )
+                        <div class="tasks-board mb-0 position-relative" id="kanbanboard">
+                            @foreach ($filteredStatuses as $key => $status)
+                                @php
+                                    $filteredSurveyorData = [];
+                                    $filteredAuditorData = [];
 
-                            array_walk($assignmentData, function ($item) use (&$filteredSurveyorData, $key, $profileUserId) {
-                                if ($item['surveyor_status'] == $key && $item['surveyor_id'] == $profileUserId) {
-                                    $filteredSurveyorData[] = $item;
-                                }
-                            });
+                                    array_walk($assignmentData, function ($item) use (&$filteredSurveyorData, $key, $profileUserId) {
+                                        if ($item['surveyor_status'] == $key && $item['surveyor_id'] == $profileUserId) {
+                                            $filteredSurveyorData[] = $item;
+                                        }
+                                    });
 
-                            array_walk($assignmentData, function ($item) use (&$filteredAuditorData, $key, $profileUserId) {
-                                if ($item['auditor_status'] == $key && $item['auditor_id'] == $profileUserId) {
-                                    $filteredAuditorData[] = $item;
-                                }
-                            });
+                                    array_walk($assignmentData, function ($item) use (&$filteredAuditorData, $key, $profileUserId) {
+                                        if ($item['auditor_status'] == $key && $item['auditor_id'] == $profileUserId) {
+                                            $filteredAuditorData[] = $item;
+                                        }
+                                    });
 
-                            $countFilteredSurveyorData = is_array($filteredSurveyorData) ? count($filteredSurveyorData) : 0;
+                                    $countFilteredSurveyorData = is_array($filteredSurveyorData) ? count($filteredSurveyorData) : 0;
 
-                            $countFilteredAuditorData = is_array($filteredAuditorData) ? count($filteredAuditorData) : 0;
+                                    $countFilteredAuditorData = is_array($filteredAuditorData) ? count($filteredAuditorData) : 0;
 
-                            $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
-                        @endphp
+                                    $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
+                                @endphp
 
-                        <div class="tasks-list p-2 {{-- in_array($key, ['waiting', 'auditing', 'pending', 'completed', 'in_progress', 'losted']) && $countTotal < 1 ? 'd-none' : '' --}} {{ in_array($key, ['waiting', 'auditing', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
-                            <div class="d-flex mb-3">
-                                <div class="flex-grow-1">
-                                    <h6 class="fs-14 text-uppercase fw-semibold mb-1">
-                                        <span data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="{{$status['label']}}" data-bs-content="{{$status['description']}}">
-                                            {{$status['label']}}
-                                        </span>
-                                        <small class="badge bg-{{$status['color']}} align-bottom ms-1 totaltask-badge">
-                                            {{ $countTotal }}
-                                        </small>
-                                    </h6>
-                                    <p class="text-muted mb-2">{{$status['description']}}</p>
-                                </div>
-                                <div class="flex-shrink-0">
-                                    {{--
-                                    <div class="dropdown card-header-dropdown">
-                                        <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false">
-                                            <span class="fw-medium text-muted fs-12">Priority<i
-                                                    class="mdi mdi-chevron-down ms-1"></i></span>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#">Priority</a>
-                                            <a class="dropdown-item" href="#">Date Added</a>
+                                <div class="tasks-list p-2 {{-- in_array($key, ['waiting', 'auditing', 'pending', 'completed', 'in_progress', 'losted']) && $countTotal < 1 ? 'd-none' : '' --}} {{ in_array($key, ['waiting', 'waiting', 'pending', 'auditing', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
+                                    <div class="d-flex mb-3">
+                                        <div class="flex-grow-1">
+                                            <h6 class="fs-14 text-uppercase fw-semibold mb-1">
+                                                <span data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="{{$status['label']}}" data-bs-content="{{$status['description']}}">
+                                                    {{$status['label']}}
+                                                </span>
+                                                <small class="badge bg-{{$status['color']}} align-bottom ms-1 totaltask-badge">
+                                                    {{ $countTotal }}
+                                                </small>
+                                            </h6>
+                                            <p class="text-muted mb-2">{{$status['description']}}</p>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            {{--
+                                            <div class="dropdown card-header-dropdown">
+                                                <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false">
+                                                    <span class="fw-medium text-muted fs-12">Priority<i
+                                                            class="mdi mdi-chevron-down ms-1"></i></span>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <a class="dropdown-item" href="#">Priority</a>
+                                                    <a class="dropdown-item" href="#">Date Added</a>
+                                                </div>
+                                            </div>
+                                            --}}
                                         </div>
                                     </div>
-                                    --}}
-                                </div>
-                            </div>
-                            <div data-simplebar class="tasks-wrapper">
-                                <div id="{{$key}}-task" class="tasks mb-2">
-                                    @include('surveys.layouts.profile-task-card', [
-                                        'status' => $status,
-                                        'statusKey' => $key,
-                                        'designated' => 'auditor',
-                                        'data' => $filteredAuditorData
-                                    ])
+                                    <div data-simplebar class="tasks-wrapper">
+                                        <div id="{{$key}}-task" class="tasks mb-2 pb-3">
+                                            @include('surveys.layouts.profile-task-card', [
+                                                'user' => $user,
+                                                'status' => $status,
+                                                'statusKey' => $key,
+                                                'designated' => 'auditor',
+                                                'data' => $filteredAuditorData
+                                            ])
 
-                                    @include('surveys.layouts.profile-task-card', [
-                                        'status' => $status,
-                                        'statusKey' => $key,
-                                        'designated' => 'surveyor',
-                                        'data' => $filteredSurveyorData
-                                    ])
+                                            @include('surveys.layouts.profile-task-card', [
+                                                'user' => $user,
+                                                'status' => $status,
+                                                'statusKey' => $key,
+                                                'designated' => 'surveyor',
+                                                'data' => $filteredSurveyorData
+                                            ])
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                                <!--end tasks-list-->
+                            @endforeach
+
+                            {{--
+                            @if ($countTasks === 0)
+                                <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show ms-auto me-auto" role="alert">
+                                    <i class="ri-alert-line label-icon"></i> Tarefas ainda não lhe foram atribuídas
+                                </div>
+                            @endif
+                            --}}
                         </div>
-                        <!--end tasks-list-->
-                    @endforeach
-
-                    {{--
-                    @if ($countTasks === 0)
-                        <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show ms-auto me-auto" role="alert">
-                            <i class="ri-alert-line label-icon"></i> Tarefas ainda não lhe foram atribuídas
+                    @else
+                        <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+                            <i class="ri-alert-line label-icon"></i> Tarefas ainda não lhe foram delegadas
                         </div>
                     @endif
-                    --}}
                 </div>
-            @else
-                <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">
-                    <i class="ri-alert-line label-icon"></i> Tarefas ainda não lhe foram delegadas
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-5 col-lg-3 col-xxl-2">
+            @php
+                $countAuditorTasks = \App\Models\User::countAuditorTasks($profileUserId);
+                $countSurveyorTasks = \App\Models\User::countSurveyorTasks($profileUserId);
+            @endphp
+            <div class="card h-100">
+                <div class="card-header align-items-center d-flex">
+                    <h5 class="card-title mb-0 flex-grow-1"><i class="ri-line-chart-fill fs-16 align-bottom text-theme me-2"></i>Síntese</h5>
                 </div>
-            @endif
+                <div class="card-body" style="min-height: 150px">
+                    @if($countAuditorTasks > 0)
+                        <div class="text-center">
+                            <div class="text-muted"><span class="fw-medium">{{$countAuditorTasks}}</span> {{ $countAuditorTasks > 1 ? 'Auditorias' : 'Auditoria' }} {{ $countAuditorTasks > 1 ? 'Atribuídas' : 'Atribuída' }}</div>
+                        </div>
+                        <div class="mt-3">
+                            @foreach ($filteredStatuses as $key => $status)
+                                @php
+                                    $filteredSurveyorData = [];
+                                    $filteredAuditorData = [];
+
+                                    array_walk($assignmentData, function ($item) use (&$filteredSurveyorData, $key, $profileUserId) {
+                                        if ($item['surveyor_status'] == $key && $item['surveyor_id'] == $profileUserId) {
+                                            $filteredSurveyorData[] = $item;
+                                        }
+                                    });
+
+                                    array_walk($assignmentData, function ($item) use (&$filteredAuditorData, $key, $profileUserId) {
+                                        if ($item['auditor_status'] == $key && $item['auditor_id'] == $profileUserId) {
+                                            $filteredAuditorData[] = $item;
+                                        }
+                                    });
+
+                                    $countFilteredSurveyorData = is_array($filteredSurveyorData) ? count($filteredSurveyorData) : 0;
+
+                                    $countFilteredAuditorData = is_array($filteredAuditorData) ? count($filteredAuditorData) : 0;
+
+                                    $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
+
+                                    $percentage = $countAuditorTasks > 0 && $countTotal > 0 ? ($countTotal / $countAuditorTasks) * 100 : 0;
+                                    $percentage = number_format($percentage, 0);
+                                @endphp
+                                @if($percentage > 0)
+                                    <div class="row align-items-center g-2">
+                                        <div class="col-auto">
+                                            <div class="p-1" style="min-width: 100px;">
+                                                <h6 class="mb-0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="{{$status['label']}}" data-bs-content="{{$status['description']}}">
+                                                    {{$status['label']}}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="p-1">
+                                                <div class="progress animated-progress progress-sm" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Equivalente a {{ $percentage }}% de {{$countSurveyorTasks}} tarefas">
+                                                    <div class="progress-bar bg-{{getProgressBarClass($percentage)}}" role="progressbar" style="width: {{$percentage}}%" aria-valuenow="{{$percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="p-1">
+                                                <h6 class="mb-0 text-{{$status['color']}}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Total de tarefas relacionadas ao status {{$status['label']}}">{{ $countTotal }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+
+                        </div>
+                    @endif
+
+                    @if($countSurveyorTasks > 0)
+                        <div class="text-center">
+                            <div class="text-muted"><span class="fw-medium">{{$countSurveyorTasks}}</span> {{ $countSurveyorTasks > 1 ? 'Vistorias' : 'Vistoria' }} {{ $countSurveyorTasks > 1 ? 'Atribuídas' : 'Atribuída' }}</div>
+                        </div>
+                        <div class="mt-3">
+                            @foreach ($filteredStatuses as $key => $status)
+                                @php
+                                    $filteredSurveyorData = [];
+                                    $filteredAuditorData = [];
+
+                                    array_walk($assignmentData, function ($item) use (&$filteredSurveyorData, $key, $profileUserId) {
+                                        if ($item['surveyor_status'] == $key && $item['surveyor_id'] == $profileUserId) {
+                                            $filteredSurveyorData[] = $item;
+                                        }
+                                    });
+
+                                    array_walk($assignmentData, function ($item) use (&$filteredAuditorData, $key, $profileUserId) {
+                                        if ($item['auditor_status'] == $key && $item['auditor_id'] == $profileUserId) {
+                                            $filteredAuditorData[] = $item;
+                                        }
+                                    });
+
+                                    $countFilteredSurveyorData = is_array($filteredSurveyorData) ? count($filteredSurveyorData) : 0;
+
+                                    $countFilteredAuditorData = is_array($filteredAuditorData) ? count($filteredAuditorData) : 0;
+
+                                    $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
+
+                                    $percentage = $countSurveyorTasks > 0 && $countTotal > 0 ? ($countTotal / $countSurveyorTasks) * 100 : 0;
+                                    $percentage = number_format($percentage, 0);
+                                @endphp
+                                @if($percentage > 0)
+                                    <div class="row align-items-center g-2">
+                                        <div class="col-auto">
+                                            <div class="p-1" style="min-width: 100px;">
+                                                <h6 class="mb-0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="{{$status['label']}}" data-bs-content="{{$status['description']}}">
+                                                    {{$status['label']}}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="p-1">
+                                                <div class="progress animated-progress progress-sm" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Equivalente a {{ $percentage }}% de {{$countSurveyorTasks}} tarefas">
+                                                    <div class="progress-bar bg-{{getProgressBarClass($percentage)}}" role="progressbar" style="width: {{$percentage}}%" aria-valuenow="{{$percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="p-1">
+                                                <h6 class="mb-0 text-{{$status['color']}}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Total de tarefas relacionadas ao status {{$status['label']}}">{{ $countTotal }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 
 @endsection
 @section('script')
-
 <script>
+    var profileShowURL = "{{ route('profileShowURL') }}";
+
     var surveysIndexURL = "{{ route('surveysIndexURL') }}";
     var surveysCreateURL = "{{ route('surveysCreateURL') }}";
     var surveysEditURL = "{{ route('surveysEditURL') }}";
@@ -192,7 +329,6 @@
     var formAuditorAssignmentURL = "{{ route('formAuditorAssignmentURL') }}";
     var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";
     var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
-    var profileShowURL = "{{ route('profileShowURL') }}";
 </script>
 <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
 
@@ -200,14 +336,15 @@
     var formSurveyorAssignmentURL = "{{ route('formSurveyorAssignmentURL') }}";
     var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";
     var responsesSurveyorStoreOrUpdateURL = "{{ route('responsesSurveyorStoreOrUpdateURL') }}";
-    var profileShowURL = "{{ route('profileShowURL') }}";
 </script>
 <script src="{{ URL::asset('build/js/surveys-surveyor.js') }}" type="module"></script>
 
 <script>
-    var profileShowURL = "{{ route('profileShowURL') }}";
     var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
     var responsesAuditorStoreOrUpdateURL = "{{ route('responsesAuditorStoreOrUpdateURL') }}";
+    var enterAssignmentAuditorURL = "{{ route('enterAssignmentAuditorURL') }}";
+    var requestAssignmentAuditorURL = "{{ route('requestAssignmentAuditorURL') }}";
+    var revokeAssignmentAuditorURL = "{{ route('revokeAssignmentAuditorURL') }}";
 </script>
 <script src="{{ URL::asset('build/js/surveys-auditor.js') }}" type="module"></script>
 

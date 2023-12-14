@@ -1,7 +1,7 @@
 @php
-    use App\Models\User;
-
     $getActiveCompanies = getActiveCompanies();
+
+    $capabilities = $user->capabilities ? json_decode($user->capabilities, true) : [];
 
     $getAuthorizedCompanies = $user ? getAuthorizedCompanies($user->id) : $getActiveCompanies;
 
@@ -25,7 +25,7 @@
                             @else
                                 src="{{ URL::asset('storage/' . $user->cover) }}"
                             @endif
-                            alt="cover" id="cover-img" class="img-fluid" data-user-id="{{ $user ? $user->id : '' }}">
+                            alt="cover" id="cover-img" class="img-fluid" data-user-id="{{ $user ? $user->id : '' }}" loading="lazy">
 
                             <div class="d-flex position-absolute start-0 end-0 top-0 p-3">
                                 <div class="flex-grow-1">
@@ -71,7 +71,7 @@
                                     @else
                                         src="{{ URL::asset('storage/' . $user->avatar) }}"
                                     @endif
-                                    id="avatar-img" alt="avatar" class="avatar-md rounded-circle h-auto" data-user-id="{{ $user ? $user->id : '' }}" />
+                                    id="avatar-img" alt="avatar" class="avatar-md rounded-circle h-auto" data-user-id="{{ $user ? $user->id : '' }}"  loading="lazy"/>
                                 </div>
                             </div>
                         </div>
@@ -123,14 +123,27 @@
                                     <label class="form-label">Nível <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Níveis e Permissões" data-bs-content="<ul class='list-unstyled mb-0'><li>Saiba mais visualizando ao final desta página a tabela contendo o grid de Níveis e Permissões</li></ul>"></i></label>
                                     <select class="form-control form-select" name="role">
                                         <option class="text-body" disabled selected>- Selecione -</option>
-                                        @foreach(User::CAPABILITIES as $roleId => $capabilities)
+                                        @foreach(\App\Models\User::USER_ROLES as $roleId => $capabilities)
                                             @if($roleId != 1)
-                                                <option class="text-muted" @if(isset($user) && $roleId == $user->role) selected @endif value="{{ $roleId }}">{{ (new User)->getRoleName($roleId) }}</option>
+                                                <option class="text-muted" @if(isset($user) && $roleId == $user->role) selected @endif value="{{ $roleId }}">{{ \App\Models\User::getRoleName($roleId) }}</option>
                                             @endif
                                         @endforeach
                                     </select>
                                 </div>
                             @endif
+
+                            <div class="form-group mb-5">
+                                <div class="form-check form-switch form-switch-theme form-switch-lg">
+                                    <input type="checkbox" class="form-check-input" name="capabilities[]" id="user_capability"
+                                    @if( $capabilities && in_array('audit', $capabilities) )
+                                        checked
+                                    @endif
+                                    value="audit">
+                                    <label class="form-check-label" for="user_capability">Auditoria
+                                        <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Se ativar este recurso, o usuário terá permissão para realizar Auditorias em qualquer das tarefas"></i>
+                                    </label>
+                                </div>
+                            </div>
 
                             <!-- Save data in 'users' table collumn 'status' -->
                             <div class="form-group mb-5">
@@ -144,7 +157,9 @@
                                         checked
                                     @endif
                                     value="1">
-                                    <label class="form-check-label" for="user_status_1" data-bs-html="true" data-bs-toggle="tooltip" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Ativo = Verde">Status <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Desativado este usuário não terá sucesso ao tentar efetuar login em seu {{appName()}}"></i></label>
+                                    <label class="form-check-label" for="user_status_1">Status
+                                        <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Desativado este usuário não terá sucesso ao tentar efetuar login em seu {{appName()}}"></i>
+                                    </label>
                                 </div>
                                 {{--
                                 <label class="form-label">Status <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="Quando Desativado, o usuário não poderá mais efetuar login em seu {{appName()}}"></i></label>

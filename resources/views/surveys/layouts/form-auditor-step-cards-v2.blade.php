@@ -115,7 +115,7 @@
                                                                     <div class="gallery-box card p-0 mb-0 mt-1">
                                                                         <div class="gallery-container">
                                                                             <a href="{{ $attachmentUrl }}" class="image-popup" title="Imagem capturada em {{$dateAttachment}}hs" data-gallery="gallery-{{$responseId}}">
-                                                                                <img class="rounded gallery-img" alt="image" height="70" src="{{ $attachmentUrl }}">
+                                                                                <img class="rounded gallery-img" alt="image" height="70" src="{{ $attachmentUrl }}" loading="lazy">
 
                                                                                 <div class="gallery-overlay">
                                                                                     <h5 class="overlay-caption fs-10">{{$dateAttachment}}</h5>
@@ -193,7 +193,7 @@
                                                                             </div>
 
                                                                             @if( $auditorStatus != 'completed' && $auditorStatus != 'losted' )
-                                                                                <div class="position-absolute translate-middle mt-n4 ms-2">
+                                                                                <div class="position-absolute translate-middle mt-n2 ms-2">
                                                                                     <div class="avatar-xs">
                                                                                         <button type="button" class="avatar-title bg-light border-0 rounded-circle text-danger cursor-pointer btn-delete-photo" data-attachment-id="{{$attachmentId}}" title="Deletar Arquivo">
                                                                                             <i class="ri-delete-bin-2-line"></i>

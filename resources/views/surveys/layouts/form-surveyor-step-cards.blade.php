@@ -164,7 +164,7 @@
                                                             </div>
 
                                                             @if( $surveyorStatus != 'auditing' && $surveyorStatus != 'losted' )
-                                                                <div class="position-absolute translate-middle mt-n4 ms-2">
+                                                                <div class="position-absolute translate-middle mt-n2 ms-2">
                                                                     <div class="avatar-xs">
                                                                         <button type="button" class="avatar-title bg-light border-0 rounded-circle text-danger cursor-pointer btn-delete-photo" data-attachment-id="{{$attachmentId}}" title="Deletar Arquivo">
                                                                             <i class="ri-delete-bin-2-line"></i>

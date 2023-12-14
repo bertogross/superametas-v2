@@ -125,7 +125,7 @@ class Survey extends Model
                 'label' => 'Interrompido',
                 'reverse' => 'Reiniciar',
                 'description' => 'Rotina interrompida',
-                'icon' => 'ri-stop-mini-fill',
+                'icon' => 'ri-restart-line',
                 'color' => 'danger'
             ],
             'completed' => [
@@ -133,7 +133,7 @@ class Survey extends Model
                 'reverse' => '',
                 'description' => 'Rotina concluída',
                 'icon' => 'ri-check-double-fill',
-                'color' => 'success'
+                'color' => 'theme'
             ],
            'filed' => [
                 'label' => 'Arquivado',
@@ -221,6 +221,7 @@ class Survey extends Model
         }
     }
 
+    // Populate assignments
     public static function startSurveyAssignments($surveyId)
     {
         $today = Carbon::today();
@@ -245,8 +246,10 @@ class Survey extends Model
             if ($assignmentsCount == 0) {
                 switch ($recurring) {
                     case 'once':
+                        SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                        break;
                     case 'daily':
-                            SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                        SurveyAssignments::distributingAssignments($surveyId, $distributedData);
                         break;
                     case 'weekly':
                         // Calculate the day of the week for both $startAt and $today
@@ -559,12 +562,15 @@ class Survey extends Model
     // START Used with crontab to start recurring tasks
     public static function populateSurveys($database = null)
     {
+
         self::setDatabaseConnection($database);
 
         self::processSurveysWithStatus('scheduled', function ($survey) {
             $today = Carbon::now()->startOfDay();
-            if ($survey->start_at && $survey->start_at->equalTo($today)) {
+
+            if ( $survey->start_at && $survey->start_at == $today ) {
                 $survey->update(['status' => 'started']);
+
                 Survey::checkSurveyAssignmentUntilYesterday($survey->id);
                 Survey::startSurveyAssignments($survey->id);
             }
@@ -572,19 +578,23 @@ class Survey extends Model
 
         self::processSurveysWithStatus('new', function ($survey) {
             $today = Carbon::now()->startOfDay();
-            if ($survey->start_at && $survey->start_at->equalTo($today)) {
+
+            if ( $survey->start_at && $survey->start_at <= $today ) {
                 $survey->update(['status' => 'started']);
+
                 Survey::checkSurveyAssignmentUntilYesterday($survey->id);
                 Survey::startSurveyAssignments($survey->id);
             }
         });
 
         self::processSurveysWithStatus('started', function ($survey) {
-            if ($survey->end_in && $survey->start_at->greaterThan($survey->end_in)) {
+            $today = Carbon::now()->startOfDay();
+
+            if ( $survey->end_in && $today > $survey->end_in ) {
                 $survey->update(['status' => 'completed']);
             } else {
                 Survey::checkSurveyAssignmentUntilYesterday($survey->id);
-                //Survey::startSurveyAssignments($survey->id);
+                Survey::startSurveyAssignments($survey->id);
             }
         });
     }
@@ -606,7 +616,7 @@ class Survey extends Model
                 $callback($survey);
             }
         } catch (\Exception $e) {
-            Log::error("Error in populateSurveys with status {$status}: " . $e->getMessage());
+            \Log::error("Error in populateSurveys with status {$status}: " . $e->getMessage());
         }
     }
     // END Used with crontab to start recurring tasks

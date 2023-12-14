@@ -72,7 +72,7 @@ function checkInternetConnection() {
             //console.log('Online');
         } else {
             //console.log('Offline');
-            toastAlert('A conexão foi perdida. Por favor, verifique sua rede de internet.', 'error');
+            toastAlert('A conexão foi perdida. Por favor, verifique sua rede de internet.', 'error', 100000, true);
         }
     }
 
@@ -82,13 +82,13 @@ function checkInternetConnection() {
     // Set up event listeners for online and offline events
     window.addEventListener('online', function () {
         //console.log('Back online');
-        toastAlert('A conexão foi reestabelecida.', 'success', 5000);
+        toastAlert('A conexão foi reestabelecida', 'success', 5000);
         updateConnectionStatus();
     });
 
     window.addEventListener('offline', function () {
         //console.log('Lost connection');
-        toastAlert('A conexão foi perdida. Por favor, verifique sua rede de internet.', 'error');
+        toastAlert('A conexão foi perdida. Por favor, verifique sua rede de internet.', 'error', 100000, true);
         updateConnectionStatus();
     });
 

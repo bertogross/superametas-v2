@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\SurveyAssignments;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -49,7 +50,7 @@ class User extends Authenticatable
     const ROLE_PARTNER = 5;
 
     // Capabilities for each role
-    const CAPABILITIES = [
+    const USER_ROLES = [
         self::ROLE_ADMIN => ['manage', 'edit', 'controllership', 'view'],
         self::ROLE_EDITOR => ['edit', 'view'],
         self::ROLE_CONTROLLERSHIP => ['controllership', 'view'],
@@ -61,6 +62,7 @@ class User extends Authenticatable
         'manage' => 'Configurações Gerais',
         'edit' => 'Editar Metas',
         'controllership' => 'Editar Checklists',
+        'audit' => 'Auditar Tarefas',
         'view' => 'Visualização Íntegral',
         'partial_view' => 'Visualização Limitada',
     ];
@@ -82,7 +84,7 @@ class User extends Authenticatable
      * @param int $role The role identifier.
      * @return string The human-readable name of the role.
      */
-    public function getRoleName($role)
+    public static function getRoleName($role)
     {
         $roles = [
             self::ROLE_ADMIN => 'Administração',
@@ -119,7 +121,7 @@ class User extends Authenticatable
      */
     public function hasCapability($capability)
     {
-        return in_array($capability, self::CAPABILITIES[$this->role] ?? []);
+        return in_array($capability, self::USER_ROLES[$this->role] ?? []);
     }
 
 
@@ -130,7 +132,7 @@ class User extends Authenticatable
      */
     public static function generatePermissionsTable()
     {
-        $roles = array_keys(self::CAPABILITIES);
+        $roles = array_keys(self::USER_ROLES);
         $capabilitiesList = ['manage', 'edit', 'controllership', 'view', 'partial_view'];
 
         $caption = '<div class="row">';
@@ -150,7 +152,7 @@ class User extends Authenticatable
                                 $html .= '<th class="fw-normal">'.$caption.'</th>';
 
                                 foreach ($roles as $roleId) {
-                                    $html .= '<th class="text-center">' . (new self)->getRoleName($roleId) . '</th>';
+                                    $html .= '<th class="text-center">' . self::getRoleName($roleId) . '</th>';
                                 }
 
                             $html .= '</tr>';
@@ -164,7 +166,7 @@ class User extends Authenticatable
 
                             foreach ($roles as $roleId) {
                                 $html .= '<td class="text-center">';
-                                if (in_array($capability, self::CAPABILITIES[$roleId])) {
+                                if (in_array($capability, self::USER_ROLES[$roleId])) {
                                     $html .= '<i class="ri-checkbox-circle-fill text-success" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Permitido" data-bs-original-title="Permitido"></i>';
                                 }
                                 /*
@@ -190,5 +192,14 @@ class User extends Authenticatable
         return $html;
     }
 
+    public static function countSurveyorTasks($userId){
+
+        return SurveyAssignments::where('surveyor_id', $userId)->count();
+    }
+
+    public static function countAuditorTasks($userId){
+
+        return SurveyAssignments::where('auditor_id', $userId)->count();
+    }
 
 }

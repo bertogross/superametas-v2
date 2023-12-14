@@ -66,9 +66,9 @@
                                             $avatar = getUserData($template->user_id)['avatar'];
                                             $name = getUserData($template->user_id)['name'];
                                         ?>
-                                        <a href="<?php echo e(route('profileShowURL', $template->user_id)); ?>" class="d-inline-block" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="<?php echo e($name); ?> é o autor deste registro">
+                                        <a href="<?php echo e(route('profileShowURL', $template->user_id)); ?>" class="d-inline-block" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="<?php echo e($name); ?> foi o autor deste registro">
                                             <img src="<?php echo e($avatar); ?>"
-                                            alt="<?php echo e($name); ?>" class="rounded-circle avatar-xxs">
+                                            alt="<?php echo e($name); ?>" class="rounded-circle avatar-xxs" loading="lazy">
                                         </a>
                                     </div>
                                     <div class="flex-grow-1 text-end">

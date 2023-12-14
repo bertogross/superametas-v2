@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\AttachmentsController;
 
 class SurveyAssignments extends Model
 {
@@ -30,31 +31,83 @@ class SurveyAssignments extends Model
                         //'auditor_id' => $audited['user_id'],
                         'surveyor_id' => $delegated['user_id']
                     ];
-                    break;
+                    //break;
                 //}
             }
         //}
 
-        // Delete all data where created_at is equal to today
-        $today = now()->startOfDay(); // Get the start of today
-        SurveyAssignments::whereDate('created_at', $today)->where('survey_id', $surveyId)->delete();
+        // Get the most recent date of assignment for the specific survey and remove
+        SurveyAssignments::removeDistributingAssignments($surveyId);
 
+        // Populate/repopulate = depends on are or not completed indivisual user tasks
         foreach ($distributedDataMerged as $value) {
-            $data = [
-                'surveyor_id' => intval($value['surveyor_id']),
-                //'auditor_id' => intval($value['auditor_id']),
-                'survey_id' => intval($surveyId),
-                'company_id' => intval($value['company_id']),
-            ];
+            // Check if this surveyor_id has recent completed task
+            $recentlySurveyorAssignment = DB::connection('smAppTemplate')->table('survey_assignments')
+                ->where('surveyor_id', $value['surveyor_id'])
+                ->where('survey_id', $surveyId)
+                ->where('company_id', $value['company_id'])
+                ->whereIn('surveyor_status', ['completed'])
+                    ->max(DB::raw('DATE(created_at)'));
 
-            try {
-                $assignment = new SurveyAssignments;
-                $assignment->fill($data);
-                $assignment->save();
-            } catch (\Exception $e) {
-                // TODO
-                // Handle the exception or log it
+            // If user dont have completed task, populate
+            if(!$recentlySurveyorAssignment){
+                $data = [
+                    'surveyor_id' => intval($value['surveyor_id']),
+                    //'auditor_id' => intval($value['auditor_id']),
+                    'survey_id' => intval($surveyId),
+                    'company_id' => intval($value['company_id']),
+                ];
+
+                try {
+                    $assignment = new self;
+                    $assignment->fill($data);
+                    $assignment->save();
+                } catch (\Exception $e) {
+                    // TODO
+                    // Handle the exception or log it
+                }
             }
+        }
+    }
+
+    // Get the most recent date of assignment for the specific survey
+    public static function removeDistributingAssignments($surveyId) {
+        $lastDate = DB::connection('smAppTemplate')->table('survey_assignments')
+            ->where('survey_id', $surveyId)
+            ->whereIn('surveyor_status', ['new', 'pending', 'in_progress', ''])
+            ->max(DB::raw('DATE(created_at)'));
+
+        if ($lastDate) {
+            // Fetch the assignments to be deleted
+            $assignments = SurveyAssignments::whereDate('created_at', $lastDate)
+                ->where('survey_id', $surveyId)
+                ->whereIn('surveyor_status', ['new', 'pending', 'in_progress', ''])
+                ->get();
+
+            $assignmentIds = $assignments->pluck('id');
+
+            // Find and delete attachments
+            foreach ($assignments as $assignment) {
+                // Extract attachment IDs from JSON columns
+                $attachmentIdsSurvey = json_decode($assignment->attachments_survey, true) ?? [];
+                $attachmentIdsAudit = json_decode($assignment->attachments_audit, true) ?? [];
+                $allAttachmentIds = array_merge($attachmentIdsSurvey, $attachmentIdsAudit);
+
+                $allAttachmentIds = array_filter($allAttachmentIds);
+
+                // Delete each attachment
+                if($allAttachmentIds && is_array($allAttachmentIds)){
+                    foreach ($allAttachmentIds as $attachmentId) {
+                        AttachmentsController::deletePhoto(null, $attachmentId);
+                    }
+                }
+
+                // Delete the assignment record
+                $assignment->delete();
+            }
+
+            // Delete related responses
+            SurveyResponse::whereIn('assignment_id', $assignmentIds)->delete();
         }
     }
 
@@ -66,6 +119,8 @@ class SurveyAssignments extends Model
         $surveyId = $data->survey_id;
         $companyId = $data->company_id;
 
+        $currentAuditorStatus = $data->auditor_status;
+
         if($status == 'pending'){
             // Field survey status column
             DB::connection('smAppTemplate')->table('surveys')
@@ -73,17 +128,18 @@ class SurveyAssignments extends Model
                 ->update([
                     'status' => 'started',
                 ]);
-        }elseif($status == 'completed'){
-            $column['auditor_status'] = 'new';
-            $data->update($column);
-        }elseif($status == 'auditing'){
-            $column['auditor_status'] = 'new';
-            $data->update($column);
+        }elseif($status == 'completed' && $currentAuditorStatus == 'waiting'){
+            $columns['auditor_status'] = 'new';
         }
+        /*elseif($status == 'auditing'){
+            $columns['auditor_status'] = 'new';
+            $data->update($columns);
+        }*/
 
         // new status
-        $column['surveyor_status'] = $status;
-        $data->update($column);
+        $columns['surveyor_status'] = $status;
+
+        $data->update($columns);
     }
 
     public static function changeAuditorAssignmentStatus($assignmentId, $status)
@@ -163,17 +219,10 @@ class SurveyAssignments extends Model
                 'icon' => 'ri-play-fill',
                 'color' => 'primary'
             ],
-            'completed' => [
-                'label' => 'Concluída',
-                'reverse' => '',
-                'description' => 'Tarefas que foram concluídas',
-                'icon' => 'ri-check-double-fill',
-                'color' => 'success'
-            ],
             /*'waiting' => [
                 'label' => 'Aguardando',
                 'reverse' => '',
-                'description' => 'Aguardando a finalização da primeira etapa, Checklist',
+                'description' => 'Aguardando a finalização da primeira etapa, Vistoria',
                 'icon' => 'ri-pause-mini-line',
                 'color' => 'primary'
             ],*/
@@ -186,10 +235,17 @@ class SurveyAssignments extends Model
             ],
             'in_progress' => [
                 'label' => 'Em Progresso',
-                'reverse' => 'Abrir Formulário',
-                'description' => 'Tarefas em andamento',
-                'icon' => 'ri-time-line',
+                'reverse' => 'Retomar Atividade',
+                'description' => 'Tarefas sendo executadas',
+                'icon' => 'ri-todo-fill',
                 'color' => 'info'
+            ],
+            'completed' => [
+                'label' => 'Concluída',
+                'reverse' => '',
+                'description' => 'Tarefas que foram concluídas',
+                'icon' => 'ri-check-double-fill',
+                'color' => 'success'
             ],
             'auditing' => [
                 'label' => 'Em Auditoria',
@@ -208,6 +264,7 @@ class SurveyAssignments extends Model
         ];
     }
 
+
     // Get a descriptive label title based on the task status and roles involved
     public static function getSurveyAssignmentLabelTitle($surveyorStatus, $auditorStatus)
     {
@@ -218,7 +275,7 @@ class SurveyAssignments extends Model
         } elseif ($surveyorStatus != 'completed' && $auditorStatus == 'completed') {
             return 'A <u>Auditoria</u> foi concluída';
         } else {
-            return 'Tarefa em andamento';
+            return 'Tarefa';
         }
     }
 

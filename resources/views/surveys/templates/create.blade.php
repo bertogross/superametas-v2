@@ -52,7 +52,7 @@
                 <div class="float-end">
 
                 </div>
-                <h4 class="card-title mb-0"><i class="ri-survey-fill fs-16 align-middle text-theme me-2"></i>{{ $data->title ?? 'Formulário' }}</h4>
+                <h4 class="card-title mb-0"><i class="ri-checkbox-line fs-16 align-middle text-theme me-2"></i>{{ $data->title ?? 'Formulário' }}</h4>
             </div>
             <div class="card-body">
                 <form id="surveyTemplateForm" method="POST" class="needs-validation" novalidate autocomplete="off">

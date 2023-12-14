@@ -10,24 +10,27 @@
             alt="@if(isset($name)){{ $name }}@endif" class="img-fluid" height="140" id="cover-img-@if(isset($id)){{ $id }}@endif">
         </div>
         <div class="card-body p-4">
+
             <div class="row align-items-center team-row">
-                <div class="col team-settings">
-                    <div class="row">
-                        <div class="col">
-                            <div class="flex-shrink-0 me-2">
-                                <!--
-                                <button type="button" class="btn btn-light btn-icon rounded-circle btn-sm favourite-btn "> <i class="ri-star-fill fs-14"></i> </button>
-                                -->
-                           </div>
-                        </div>
-                        <div class="col text-end dropdown">
-                            <button type="button"  data-bs-toggle="dropdown" class="btn btn-sm btn-soft-dark ri-more-fill text-theme fs-17 rounded-pill" aria-expanded="false"></button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item btn-edit-user cursor-pointer" data-user-id="{{ $id }}" data-user-name="@if(isset($name)) {{ $name }} @endif"><i class="ri-pencil-line me-2 align-bottom text-muted"></i>Editar</a></li>
-                            </ul>
+                @if (request()->is('settings/users'))
+                    <div class="col team-settings">
+                        <div class="row">
+                            <div class="col">
+                                <div class="flex-shrink-0 me-2">
+                                    <!--
+                                    <button type="button" class="btn btn-light btn-icon rounded-circle btn-sm favourite-btn "> <i class="ri-star-fill fs-14"></i> </button>
+                                    -->
+                                </div>
+                            </div>
+                            <div class="col text-end dropdown">
+                                <button type="button"  data-bs-toggle="dropdown" class="btn btn-sm btn-soft-dark ri-more-fill text-theme fs-17 rounded-pill" aria-expanded="false"></button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item btn-edit-user cursor-pointer" data-user-id="{{ $id }}" data-user-name="@if(isset($name)) {{ $name }} @endif"><i class="ri-pencil-line me-2 align-bottom text-muted"></i>Editar</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endif
                 <div class="col-lg-4 col">
                     <div class="team-profile-img">
                         <div class="avatar-lg img-thumbnail rounded-circle flex-shrink-0"><img
@@ -62,13 +65,18 @@
                 </div>
                 <div class="col-lg-4 col">
                     <div class="row text-muted text-center">
-                        <div class="col-6 border-end border-end-dashed">
-                            <h5 class="mb-1 projects-num">225</h5>
-                            <p class="text-muted mb-0">Projects</p>
-                        </div>
-                        <div class="col-6">
-                            <h5 class="mb-1 tasks-num">197</h5>
-                            <p class="text-muted mb-0">Tasks</p>
+                        @php
+                            $countAuditorTasks = \App\Models\User::countAuditorTasks($id);
+                        @endphp
+                        @if ( in_array('audit', $capabilities) || $countAuditorTasks > 0 )
+                            <div class="col-6 border-end border-end-dashed">
+                                <h5 class="mb-1 projects-num">{{ $countAuditorTasks }}</h5>
+                                <p class="text-muted mb-0">Auditorias</p>
+                            </div>
+                        @endif
+                        <div class="{{ in_array('audit', $capabilities) || $countAuditorTasks > 0 ? 'col-6' : 'col-12' }}">
+                            <h5 class="mb-1 tasks-num">{{ \App\Models\User::countSurveyorTasks($id) }}</h5>
+                            <p class="text-muted mb-0">Vistorias</p>
                         </div>
                     </div>
                 </div>

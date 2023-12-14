@@ -3,6 +3,7 @@
     use App\Models\SurveyAssignments;
 
     $currentUserId = auth()->id();
+
 @endphp
 @if ( !empty($data) && is_array($data) )
     @foreach ($data as $key => $assignment)
@@ -21,13 +22,13 @@
 
             $surveyorId = $assignment['surveyor_id'] ?? null;
             $surveyorStatus = $assignment['surveyor_status'] ?? null;
-            $surveyorName = getUserData($surveyorId)['name'];
-            $surveyorAvatar = getUserData($surveyorId)['avatar'];
+            $surveyorName = getUserData($surveyorId)['name'] ?? '';
+            $surveyorAvatar = getUserData($surveyorId)['avatar'] ?? '';
 
             $auditorId = $assignment['auditor_id'] ?? null;
             $auditorStatus = $assignment['auditor_status'] ?? null;
-            $auditorName = getUserData($auditorId)['name'];
-            $auditorAvatar = getUserData($auditorId)['avatar'];
+            $auditorName = $auditorId ? getUserData($auditorId)['name'] : '';
+            $auditorAvatar = $auditorId ? getUserData($auditorId)['avatar'] : '';
 
             $dateTitle = SurveyAssignments::getSurveyAssignmentDateTitleByKey($assignment['created_at'], $statusKey);
 
@@ -42,90 +43,7 @@
             $percentage = SurveyAssignments::calculateSurveyPercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated);
             $progressBarClass = getProgressBarClass($percentage);
         @endphp
-        {{--
-        @php
-            $assignmentId = intval($assignment['id']);
-            $surveyId = intval($assignment['survey_id']);
 
-            $survey = Survey::findOrFail($surveyId);
-            $templateName = getSurveyTemplateNameById($survey->template_id);
-
-            $companyId = intval($assignment['company_id']);
-
-            $surveyorId = isset($assignment['surveyor_id']) ? intval($assignment['surveyor_id']) : null;
-            $auditorId = isset($assignment['auditor_id']) ? intval($assignment['auditor_id']) : null;
-
-            $surveyorStatus = $assignment['surveyor_status'] ?? null;
-            $auditorStatus = $assignment['auditor_status'] ?? null;
-
-            $surveyorAvatar = getUserData($surveyorId)['avatar'];
-            $surveyorName = getUserData($surveyorId)['name'];
-
-            $auditorAvatar = getUserData($auditorId)['avatar'];
-            $auditorName = getUserData($auditorId)['name'];
-
-            if($designated == 'auditor'){
-                $designatedUserId = $auditorId;
-            }elseif($designated == 'surveyor'){
-                $designatedUserId = $surveyorId;
-            }
-
-            // Count the number of steps that have been finished
-            $countTopics = countSurveyTopics($surveyId);
-
-            $countResponses = 0;
-
-            if( in_array($statusKey, ['auditing']) && $designated == 'surveyor' ){
-                $countResponses = countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId);
-            }else{
-                if($designated == 'auditor'){
-                    $countResponses = countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId);
-                }elseif($designated == 'surveyor'){
-                    $countResponses = countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId);
-                }
-            }
-
-            // Calculate the percentage
-            $percentage = 0;
-            if ($countTopics > 0) {
-                $percentage = ($countResponses / $countTopics) * 100;
-            }
-
-            // Determine the progress bar class based on the percentage
-            $progressBarClass = 'danger'; // default class
-            if ($percentage > 25) {
-                $progressBarClass = 'warning';
-            }
-            if ($percentage > 50) {
-                $progressBarClass = 'primary';
-            }
-            if ($percentage > 75) {
-                $progressBarClass = 'info';
-            }
-            if ($percentage > 95) {
-                $progressBarClass = 'secondary';
-            }
-            if ($percentage >= 100) {
-                $progressBarClass = 'success';
-            }
-
-            $dateTitle = !in_array($statusKey, ['completed', 'losted']) ? 'A data em que esta tarefa deverá ser desempenhada' : '';
-            $dateTitle = in_array($statusKey, ['losted']) ? 'A data em que esta tarefa deveria ter sido desempenhada' : $dateTitle;
-            $dateTitle = in_array($statusKey, ['completed'])  ? 'A data em que esta tarefa foi desempenhada' : $dateTitle;
-
-            $labelTitle = '';
-
-            if ( in_array($statusKey, ['completed']) || $surveyorStatus == 'completed' && $auditorStatus == 'completed' ){
-                if ($surveyorStatus == 'completed' && $auditorStatus == 'completed'){
-                    $labelTitle = 'A <u>Checklist</u> e a <u>Auditoria</u> foram efetuadas';
-                }else if ($surveyorStatus == 'completed' && $auditorStatus != 'completed'){
-                    $labelTitle = 'A <u>Checklist</u> foi concluída';
-                }else{
-                    $labelTitle = 'Tarefa Concluída';
-                }
-            }
-        @endphp
-        --}}
         <div class="card tasks-box bg-body" data-assignment-id="{{$assignmentId}}">
             <div class="card-body">
                 <div class="row mb-0">
@@ -142,7 +60,7 @@
                             </span>
                         @elseif($designated == 'surveyor')
                             <span class="badge bg-dark-subtle text-body badge-border" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="{{ $labelTitle }}">
-                                Checklist
+                                Vistoria
                                 @if ( in_array($statusKey, ['completed']) && $surveyorStatus == 'completed' && $auditorStatus == 'completed' )
                                     <i class="ri-check-double-fill ms-2 text-success"></i>
                                 @endif
@@ -150,10 +68,10 @@
                         @endif
                     </div>
                 </div>
-                <span data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $dateTitle }}">
+                <span class="fs-12" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $dateTitle }}">
                     {{ $assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-' }}
                 </span>
-                <h5 class="fs-13 text-truncate task-title mb-0 mt-2">
+                <h5 class="fs-12 text-truncate task-title mb-0 mt-2">
                     {{ $title }}
                 </h5>
                 @if (in_array($statusKey, ['losted']))
@@ -185,7 +103,7 @@
                                     @else
                                         src="{{ $surveyorAvatar }}"
                                     @endif
-                                    alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
+                                    alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs" loading="lazy">
                                 </a>
                             @else
                                 <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Checklist delegada a <u>{{ $surveyorName }}</u>">
@@ -195,7 +113,7 @@
                                     @else
                                         src="{{ $surveyorAvatar }}"
                                     @endif
-                                    alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs">
+                                    alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs" loading="lazy">
                                 </a>
 
                                 @if($auditorId)
@@ -206,14 +124,29 @@
                                         @else
                                             src="{{ $auditorAvatar }}"
                                         @endif
-                                        alt="{{ $auditorName }}" class="rounded-circle avatar-xxs">
+                                        alt="{{ $auditorName }}" class="rounded-circle avatar-xxs" loading="lazy">
                                     </a>
                                 @endif
-                                
+
                             @endif
                         </div>
                     </div>
-                    <div class="col-auto">
+                    <div class="col-auto text-end">
+                        {{--
+                        @if ( in_array('audit', $currentUserCapabilities) && in_array($statusKey, ['new','pending','in_progress','completed']) )
+                            <button type="button"
+                            data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
+                            title="Requisitar esta tarefa para Auditoria"
+                            class="btn btn-sm btn-label right waves-effect btn-soft-secondary btn-assignment-audit-request"
+                            data-assignment-id="{{$assignmentId}}">
+                                <i class="ri-add-line label-icon align-middle fs-16"></i> Auditar
+                            </button>
+                            @if (in_array($statusKey, ['new','pending','in_progress','completed']))
+                                <br>
+                            @endif
+                        @endif
+                        --}}
+
                         @if ($currentUserId === $designatedUserId && in_array($statusKey, ['new','pending','in_progress']) )
                             <button type="button"
                                 title="{{$status['reverse']}}"
@@ -223,7 +156,7 @@
                                 data-current-status="{{$statusKey}}">
                                     <i class="{{$status['icon']}} label-icon align-middle fs-16"></i> {{$status['reverse']}}
                             </button>
-                        @elseif( ( $currentUserId === $surveyorId || $currentUserId === $auditorId ) && in_array($statusKey, ['completed']) )
+                        @elseif( ( ( $currentUserId === $surveyorId || $currentUserId === $auditorId ) && in_array($statusKey, ['completed']) ) || in_array('audit', $currentUserCapabilities) )
                             <a href="{{ route('assignmentShowURL', $assignmentId) }}"
                                 title="Visualizar"
                                 class="btn btn-sm btn-label right waves-effect btn-soft-success">
@@ -247,8 +180,8 @@
             </div>
             <!--end card-body-->
             @if ( in_array($statusKey, ['in_progress']) || ( in_array($statusKey, ['auditing']) && $designated == 'surveyor' ) )
-                <div class="progress progress-sm animated-progress custom-progress" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $percentage }}%">
-                    <div class="progress-bar bg-{{ $progressBarClass }}" role="progressbar" style="width: {{ $percentage }}%" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress progress-sm animated-progress custom-progress p-0 rounded-bottom-2" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $percentage }}%">
+                    <div class="progress-bar bg-{{ $progressBarClass }} rounded-0" role="progressbar" style="width: {{ $percentage }}%" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             @endif
         </div>

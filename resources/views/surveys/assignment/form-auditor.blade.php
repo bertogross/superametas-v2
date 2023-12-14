@@ -8,7 +8,7 @@
 
     $authorId = $templateData->user_id;
     $getAuthorData = getUserData($authorId);
-    $authorRoleName = (new User)->getRoleName($getAuthorData['role']);
+    $authorRoleName = \App\Models\User::getRoleName($getAuthorData['role']);
     $description = trim($templateData->description) ? nl2br($templateData->description) : '';
 
     $currentUserId = auth()->id();
@@ -29,7 +29,7 @@
     $companyName = $companyId ? getCompanyNameById($companyId) : '';
 
     $surveyorId = $assignmentData->surveyor_id ?? null;
-    $surveyorName = getUserData($surveyorId)['name'];
+    $surveyorName = getUserData($surveyorId)['name'] ?? '';
 
     $today = Carbon::today();
 
@@ -70,7 +70,7 @@
                     <h2 class="text-theme text-uppercase">{{ $companyName }}</h2>
                 @endif
                 <h2 class="text-secondary">Auditoria</h2>
-                <p>A Checklist foi realizada por <u>{{$surveyorName}}</u></p>
+                <p>A tarefa foi realizada por <u>{{$surveyorName}}</u></p>
                 <h3>{{ $title ? ucfirst($title) : 'NI' }}</h3>
                 <div class="mb-0 text-muted">
                     Executar em:
@@ -136,6 +136,7 @@
             </div>
         </div>
     </div>
+
 @endsection
 @section('script')
     <script src="{{ URL::asset('build/libs/glightbox/js/glightbox.min.js') }}"></script>

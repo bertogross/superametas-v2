@@ -80,7 +80,6 @@ class SurveysTemplatesController extends Controller
             //->where('user_id', $currentUserId)
             ->get();
 
-
         $terms = SurveyTerms::all();
 
         $reorderingData = SurveyTemplates::reorderingData($data);

@@ -24,11 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 var currentStatus = this.getAttribute("data-current-status"); // new  |  pending  |  in_progress  |  auditing
 
-                var url = changeAssignmentAuditorStatusURL
-
                 if(currentStatus == 'new'){
                     // Use only to change status to pending
-                    fetch(url, {
+                    fetch(changeAssignmentAuditorStatusURL, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -70,6 +68,65 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const assignmentActionAuditRequestButtons = document.querySelectorAll('.btn-assignment-audit-request');
+    if(assignmentActionAuditRequestButtons){
+        assignmentActionAuditRequestButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                this.blur();
+
+                alert('In the development stage');
+                return;
+
+                if (confirm('Deseja adicionar esta tarefa a sua lista de Auditorias?')) {
+                    var assignmentId = this.getAttribute("data-assignment-id");
+                    assignmentId = parseInt(assignmentId);
+
+                    fetch(enterAssignmentAuditorURL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                        },
+                        body: JSON.stringify({ assignment_id: assignmentId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        var sweetMessage = '';
+
+                        if (data.success) {
+                            toastAlert(data.message, 'success');
+
+                            if(data.current_surveyor_status != 'completed'){
+                                sweetMessage = 'Esta tarefa ainda não foi concluída. Assim que disponível ela será exibida na sessão de seu Perfil.';
+                            }else{
+                                sweetMessage = 'Esta tarefa está pronta para ser auditada e já está disponível na sessão de seu Perfil.';
+                            }
+
+                            sweetWizardAlert(sweetMessage, profileShowURL, 'success', 'Ficar por aqui', 'Acessar meu Perfil');
+
+                        } else {
+                            // Handle error
+                            console.error('Error:', data.message);
+
+                            sweetMessage = data.message;
+
+                            if(data.action == 'request'){
+                                //sweetWizardAlert(sweetMessage, requestAssignmentAuditorURL + '/' + assignmentId, 'info', 'Deixar como está', 'Solicitar esta Tarefa');
+                            }else if(data.action == 'revoke'){
+                                //sweetWizardAlert(sweetMessage, revokeAssignmentAuditorURL + '/' + assignmentId, 'info', 'Deixar como está', 'Revogar esta Tarefa');
+                            }else{
+                                toastAlert(data.message, 'danger', 5000);
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+        });
+    }
+
 
     // Event listeners for each 'btn-response-update' to update/store form data to the 'survey_responses' table
     const responseAuditorUpdateButtons = document.querySelectorAll('.btn-response-update');
@@ -90,6 +147,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
+                const textArea = responsesData.querySelector('textarea');
+                const btnPhoto = responsesData.querySelector('.btn-add-photo');
+
                 //const countTopics = document.querySelectorAll('.btn-response-update').length;
                 //console.log('countTopics', countTopics);
 
@@ -103,6 +163,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const compliance = responsesData.querySelector('input[name="compliance_audit"]:checked')?.value || '';
 
+                const comment = responsesData.querySelector('textarea[name="comment_audit"]')?.value || '';
+                const attachmentInputs = responsesData.querySelectorAll('input[name="attachment_id[]"]');
+                const attachmentIds = Array.from(attachmentInputs).map(input => input.value);
+
+                if (compliance && attachmentIds.length === 0) {
+                    // Select all radio buttons with the name 'compliance_survey'
+                    const complianceSurveyRadios = responsesData.querySelectorAll('input[name="compliance_survey"]');
+
+                    // Uncheck each radio button
+                    complianceSurveyRadios.forEach(radio => {
+                        radio.checked = false;
+                    });
+
+                    btnPhoto.classList.add('blink', 'bg-warning');
+                    setTimeout(() => {
+                        btnPhoto.classList.remove('blink', 'bg-warning');
+                    }, 5000);
+
+                    toastAlert('Primeiro envie uma foto', 'warning', 10000);
+
+                    return;
+                }
+
                 // Select the radio buttons
                 const radios = responsesData.querySelectorAll('input[type="radio"][name="compliance_audit"]');
                 radios.forEach(radio => {
@@ -111,13 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         updateLabelClasses(radios);
                     });
                 });
-
-                const comment = responsesData.querySelector('textarea[name="comment_audit"]')?.value || '';
-                const attachmentInputs = responsesData.querySelectorAll('input[name="attachment_id[]"]');
-                const attachmentIds = Array.from(attachmentInputs).map(input => input.value);
-
-                const textArea = responsesData.querySelector('textarea');
-                const btnPhoto = responsesData.querySelector('.btn-add-photo');
 
                 var pendingIcon = responsesData.querySelector('.ri-time-line');
                 var completedIcon = responsesData.querySelector('.ri-check-double-fill');
@@ -200,10 +276,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             setTimeout(() => {
                                 textArea.classList.remove('blink', 'bg-warning-subtle');
                             }, 3000);
-                        }else if(data.action2 == 'blickPhotoButton'){
-                            btnPhoto.classList.add('blink', 'bg-warning-subtle');
+                        }else if(data.action2 == 'blinkPhotoButton'){
+                            btnPhoto.classList.add('blink', 'bg-warning');
                             setTimeout(() => {
-                                btnPhoto.classList.remove('blink', 'bg-warning-subtle');
+                                btnPhoto.classList.remove('blink', 'bg-warning');
                             }, 3000);
                         }
 

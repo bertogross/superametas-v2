@@ -7,7 +7,7 @@
             <div class="col-sm-6">
                 @if ($getCompanyLogo)
                     <a href="{{ url('/') }}" title="Ir para inicial do {{appName()}}">
-                        <img src="{{ URL::asset('build/images/logo-sm.png') }}" alt="{{appName()}}" class="me-1" height="27">
+                        <img src="{{ URL::asset('build/images/logo-sm.png') }}" alt="{{appName()}}" class="me-1" height="27" loading="lazy">
                     </a>
                     {{ appName() }} - <script>document.write(new Date().getFullYear())</script> ©
                 @else

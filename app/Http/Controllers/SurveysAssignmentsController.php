@@ -78,12 +78,12 @@ class SurveysAssignmentsController extends Controller
                 'name' => strtoupper($term->name),
             ];
         }
-        
-        $termsQuery = DB::connection('smAppTemplate')
+
+        $customTermsQuery = DB::connection('smAppTemplate')
             ->table('survey_terms')
             ->get()
             ->toArray();
-        foreach ($termsQuery as $term) {
+        foreach ($customTermsQuery as $term) {
             $terms[$term->id] = [
                 'name' => strtoupper($term->name),
             ];
@@ -92,13 +92,17 @@ class SurveysAssignmentsController extends Controller
          * END get terms
          */
 
+        $user = auth()->user();
+        $currentUserCapabilities = $user->capabilities ? json_decode($user->capabilities, true) : [];
+
         return view('surveys.assignment.show', compact(
             'surveyData',
             'templateData',
             'assignmentData',
             'stepsWithTopics',
             'analyticTermsData',
-            'terms'
+            'terms',
+            'currentUserCapabilities'
         ) );
     }
 
@@ -223,8 +227,6 @@ class SurveysAssignmentsController extends Controller
         $currentUserId = auth()->id();
 
         $assignmentId = $request->input('assignment_id');
-        $assignmentId = intval($assignmentId);
-
         $data = SurveyAssignments::findOrFail($assignmentId);
 
         if ($currentUserId != $data->surveyor_id) {
@@ -273,8 +275,6 @@ class SurveysAssignmentsController extends Controller
         $currentUserId = auth()->id();
 
         $assignmentId = $request->input('assignment_id');
-        $assignmentId = intval($assignmentId);
-
         $data = SurveyAssignments::findOrFail($assignmentId);
 
         if ($currentUserId != $data->auditor_id) {
@@ -317,6 +317,64 @@ class SurveysAssignmentsController extends Controller
         SurveyAssignments::changeAuditorAssignmentStatus($assignmentId, $newStatus);
 
         return response()->json(['success' => true, 'message' => $message]);
+    }
+
+    public function enterAssignmentAuditor(Request $request)
+    {
+        $currentUserId = auth()->id();
+
+        $assignmentId = $request->input('assignment_id');
+        $data = SurveyAssignments::findOrFail($assignmentId);
+
+        $surveyorStatus = $data->surveyor_status;
+
+        // Check if this assignment have another user audito
+        if ($data->auditor_id && $currentUserId != $data->auditor_id) {
+            return response()->json(['success' => false, 'message' => 'A tarefa de Auditoria já foi delegada a outra pessoa. Solicite ao usuário '.getUserData($data->auditor_id)['name'].' que a revogue para então você poder proceder com esta requisição.', 'action' => 'request']);
+        }
+
+        // Check if this assignment user auditor is the current user
+        if ($data->auditor_id && $currentUserId == $data->auditor_id) {
+            return response()->json(['success' => false, 'message' => 'A tarefa de Auditoria já foi a você delegada. Deseja revogar?', 'action' => 'revoke']);
+        }
+
+        // Update auditor_id
+        $column['auditor_id'] = $currentUserId;
+        $data->update($column);
+
+        $message = 'A Auditoria desta tarefa foi requisitada.';
+
+        return response()->json(['success' => true, 'message' => $message, 'current_surveyor_status' => $surveyorStatus]);
+    }
+
+    public function requestAssignmentAuditorURL(Request $request, $assignmentId)
+    {
+        $currentUserId = auth()->id();
+
+        $data = SurveyAssignments::findOrFail($assignmentId);
+
+        $currentAuditorId = $data->auditor_id;
+
+        if($currentUserId == $currentAuditorId){
+            return response()->json(['success' => false, 'message' => 'Esta tarefa de Auditoria já é sua']);
+        }
+
+        // TODO send message for $currentAuditorId to release this Assignment and transfer to antoher user
+    }
+
+    public function revokeAssignmentAuditorURL(Request $request, $assignmentId)
+    {
+        $currentUserId = auth()->id();
+
+        $data = SurveyAssignments::findOrFail($assignmentId);
+
+        $currentAuditorId = $data->auditor_id;
+
+        if($currentUserId != $currentAuditorId){
+            return response()->json(['success' => false, 'message' => 'Você não pode revogar a tarefa de outro usuário']);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Solicitação enviada']);
     }
 
     public function getRecentActivities()
@@ -390,8 +448,7 @@ class SurveysAssignmentsController extends Controller
         $percentage = SurveyAssignments::calculateSurveyPercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated);
         $progressBarClass = getProgressBarClass($percentage);
 
-        $label = $designated == 'surveyor' ? '<span class="badge bg-dark-subtle text-body badge-border">Checklist</span>'
-                                        : '<span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>';
+        $label = $designated == 'surveyor' ? '<span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>' : '<span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>';
 
         if($designated == 'auditor'){
             $designatedUserId = $auditorId;

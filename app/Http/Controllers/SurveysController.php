@@ -24,7 +24,7 @@ class SurveysController extends Controller
     {
         $currentUserId = auth()->id();
 
-        // usefull if crontab or Kernel schedule is losted
+        // Usefull if crontab or Kernel schedule is losted
         Survey::populateSurveys();
 
         $createdAt = $request->input('created_at');
@@ -67,7 +67,7 @@ class SurveysController extends Controller
             }
         }
 
-        $data = $query->orderBy('created_at')->paginate(10);
+        $data = $query->orderBy('created_at', 'desc')->paginate(10);
 
         /*
         $data = $query->whereIn('status', ['new', 'scheduled', 'started', 'stopped'])->orderBy('created_at')->paginate(10);
@@ -185,8 +185,8 @@ class SurveysController extends Controller
             //'analyticCompaniesData',
             'analyticTermsData',
             'companies',
-            //'steps',
             'terms',
+            //'steps',
             'userAvatars',
             'firstDate',
             'lastDate',
@@ -203,7 +203,21 @@ class SurveysController extends Controller
 
         $data = null;
 
-        $users = getUsers();
+        $users = getUsers()->filter(function ($user) {
+            // Check if capabilities is not null
+            if ($user->capabilities !== null) {
+                // Decode the JSON capabilities into an array
+                $userCapabilities = json_decode($user->capabilities, true);
+
+                // Check if 'audit' is not in the capabilities array
+                return !in_array('audit', $userCapabilities);
+            }
+
+            // If capabilities is null, include the user
+            return true;
+        });
+
+
         $getActiveCompanies = getActiveCompanies();
         $getAuthorizedCompanies = getAuthorizedCompanies();
         $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
@@ -251,7 +265,21 @@ class SurveysController extends Controller
             return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro gerado por outra pessoa']);
         }
 
-        $users = getUsers();
+        $users = getUsers()->filter(function ($user) {
+            // Check if capabilities is not null
+            if ($user->capabilities !== null) {
+                // Decode the JSON capabilities into an array
+                $userCapabilities = json_decode($user->capabilities, true);
+
+                // Check if 'audit' is not in the capabilities array
+                return !in_array('audit', $userCapabilities);
+            }
+
+            // If capabilities is null, include the user
+            return true;
+        });
+
+
         $getActiveCompanies = getActiveCompanies();
         $getAuthorizedCompanies = getAuthorizedCompanies();
         $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
@@ -305,7 +333,10 @@ class SurveysController extends Controller
         $countResponses = Survey::countSurveyAllResponsesFromToday($surveyId);
 
         if($countResponses > 0){
-            return response()->json(['success' => false, 'message' => 'Não será possível interromper esta tarefa pois dados já estão sendo coletados.']);
+            // TODO
+            // TODO URGENT
+            // TODO chek if it is necessary because when task is in progress I can stop
+            //return response()->json(['success' => false, 'message' => 'Não será possível interromper esta tarefa pois dados já estão sendo coletados.']);
         }
 
         $distributedData = $survey->distributed_data ?? null;
@@ -343,6 +374,8 @@ class SurveysController extends Controller
             case 'started':
                 $newStatus = 'stopped';
 
+                SurveyAssignments::removeDistributingAssignments($surveyId);
+
                 $message = 'Rotina interrompida';
                 break;
         }
@@ -353,7 +386,7 @@ class SurveysController extends Controller
         // Save the changes
         $survey->update($columns);
 
-        $message = $newStatus == 'stopped' ? 'Checklist foi interrompida' : $message;
+        $message = $newStatus == 'stopped' ? 'Checklist interrompidO' : $message;
 
         // Return a success response
         return response()->json(['success' => true, 'message' => $message]);
@@ -460,7 +493,7 @@ class SurveysController extends Controller
         $companies = json_encode($companies);
 
         $startAt = $request->input('start_at');
-        $startAt = !empty($startAt) ? Carbon::createFromFormat('d/m/Y', trim($startAt))->startOfDay()->format('Y-m-d H:i:s') : '';
+        $startAt = !empty($startAt) ? Carbon::createFromFormat('d/m/Y', trim($startAt))->startOfDay()->format('Y-m-d H:i:s') : null;
 
         // Parse the provided start date and set it to the start of the day
         if($startAt && $startAt > $today){
@@ -468,10 +501,10 @@ class SurveysController extends Controller
         }
 
         $endIn = $request->input('end_in');
-        $endIn = !empty($endIn) ? Carbon::createFromFormat('d/m/Y', trim($endIn))->endOfDay()->format('Y-m-d H:i:s') : '';
+        $endIn = !empty($endIn) ? Carbon::createFromFormat('d/m/Y', trim($endIn))->endOfDay()->format('Y-m-d H:i:s') : null;
 
         if($endIn && $startAt && $endIn <= $startAt){
-            $validatedData['end_in'] = Carbon::createFromFormat('Y-m-d H:i:s', trim($startAt))->endOfDay()->format('Y-m-d H:i:s');
+            $validatedData['end_in'] = $startAt ? Carbon::createFromFormat('Y-m-d H:i:s', trim($startAt))->endOfDay()->format('Y-m-d H:i:s') : null;
         }else{
             $validatedData['end_in'] = $endIn && $endIn < $today ? $today : $endIn;
         }
@@ -480,7 +513,18 @@ class SurveysController extends Controller
             $validatedData['end_in'] = Carbon::createFromFormat('Y-m-d H:i:s', trim($startAt))->endOfDay()->format('Y-m-d H:i:s');
         }
 
+        if(!$startAt){
+            $validatedData['start_at'] = null;
+            $validatedData['end_in'] = null;
+            $validatedData['status'] = 'new';
+        }
+
         if ($id) {
+            // Update operation
+            $survey = Survey::findOrFail($id);
+
+            $surveyId = $survey->id;
+
             // Prevent from cracker to change if Responses is populated
             $countResponses = Survey::countSurveyAllResponses($id);
             if($countResponses > 0){
@@ -489,11 +533,6 @@ class SurveysController extends Controller
             }else{
                 $validatedData['companies'] = $companies;
             }
-
-            // Update operation
-            $survey = Survey::findOrFail($id);
-
-            $surveyId = $survey->id;
 
             $surveyStatus = $survey->status;
 
@@ -504,9 +543,9 @@ class SurveysController extends Controller
 
             if ( in_array($surveyStatus, ['started', 'stopped', 'completed', 'filed']) ){
                 // Prevent user change existent start_at date from form
-                $validatedData['start_at'] = $survey->start_at;
+                $validatedData['start_at'] = $survey->start_at ?? '';
             }else{
-                $validatedData['start_at'] = $startAt;
+                $validatedData['start_at'] = $startAt ?? '';
             }
 
             // Check if the current user is the creator
@@ -517,7 +556,7 @@ class SurveysController extends Controller
             $survey->update($validatedData);
 
             // Update from model if task is not started
-            if($surveyStatus == 'new'){
+            if(in_array($surveyStatus, ['new', 'scheduled'])){
                 SurveyStep::populateSurveySteps($templateId, $surveyId);
             }
 

@@ -76,29 +76,30 @@ class AttachmentsController extends Controller
         }
     }
 
-    public function deletePhoto(Request $request, $id)
+    public function deletePhoto(Request $request = null, $id)
     {
-        try {
+        if($id){
+            try {
+                // Retrieve the attachment from the database
+                 $attachment = Attachments::find($id);
 
-            // Retrieve the attachment from the database
-            $attachment = Attachments::find($id);
+                if (!$attachment) {
+                    return response()->json(['success' => false, 'message' => 'Anexo não encontrado'], 404);
+                }
 
-            if (!$attachment) {
-                return response()->json(['success' => false, 'message' => 'Anexo não encontrado'], 404);
+                // Delete the file from storage
+                if (Storage::disk('public')->exists($attachment->path)) {
+                    Storage::disk('public')->delete($attachment->path);
+                }
+
+                // Delete the attachment record from the database
+                $attachment->delete();
+
+                return response()->json(['success' => true, 'message' => 'Anexo excluído com êxito'], 200);
+
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
-
-            // Delete the file from storage
-            if (Storage::disk('public')->exists($attachment->path)) {
-                Storage::disk('public')->delete($attachment->path);
-            }
-
-            // Delete the attachment record from the database
-            $attachment->delete();
-
-            return response()->json(['success' => true, 'message' => 'Anexo excluído com êxito'], 200);
-
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 

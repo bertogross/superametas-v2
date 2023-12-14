@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->text('status');
             $table->Integer('status')->default(1);
             $table->Integer('role')->default(5);
-            $table->enum('capabilities', ['manage', 'edit', 'controller', 'view', 'partial_view'])->default('view');
+            $table->json('capabilities')->nullable();
             $table->text('avatar')->nullable();
             $table->text('cover')->nullable();
             $table->rememberToken();

@@ -32,7 +32,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->is('settings/users') ? 'active' : '' }}" href="{{ route('settingsUsersIndexURL') }}">
+                <a class="nav-link menu-link {{ request()->is('settings.users') ? 'active' : '' }}" href="{{ route('settingsUsersIndexURL') }}">
                     <i class="ri-admin-fill"></i> <span>@lang('translation.users')</span>
                 </a>
             </li>

@@ -30,7 +30,10 @@ class ProfileController extends Controller
 
         $userId = $user->id;
 
-        $roleName = (new User)->getRoleName($user->role);
+        $roleName = \App\Models\User::getRoleName($user->role);
+
+        $currentUser = auth()->user();
+        $currentUserCapabilities = $currentUser->capabilities ? json_decode($currentUser->capabilities, true) : [];
 
         $assignmentData = SurveyAssignments::where(function ($query) use ($userId) {
             $query->where('surveyor_id', $userId)
@@ -50,11 +53,14 @@ class ProfileController extends Controller
 
         //$getActiveDepartments = getActiveDepartments();
 
+
+
         return view('profile.index', compact(
             'user',
             'roleName',
             'assignmentData',
             'filteredStatuses',
+            'currentUserCapabilities'
             //'getAuthorizedCompanies',
             //'getActiveDepartments',
         ));

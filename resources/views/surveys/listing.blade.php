@@ -2,7 +2,7 @@
     <div class="card-header">
         <div class="d-flex align-items-center">
             <h5 class="card-title mb-0 flex-grow-1"><i
-                    class="ri-survey-fill fs-16 align-bottom text-theme me-2"></i>Listagem</h5>
+                    class="ri-checkbox-line fs-16 align-bottom text-theme me-2"></i>Listagem</h5>
             <div class="flex-shrink-0">
                 <div class="d-flex flex-wrap gap-2">
                     <button class="btn btn-sm btn-label right btn-outline-theme float-end waves-effect"
@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <div class="card-body border border-dashed border-end-0 border-start-0 border-top-0">
+    <div class="card-body border border-dashed border-end-0 border-start-0 border-top-0" style="flex: inherit !important;">
         <form action="{{ route('surveysIndexURL') }}" method="get" autocomplete="off">
             <div class="row g-3">
 
@@ -125,18 +125,20 @@
                                         <div class="avatar-group-item">
                                             <a href="{{ route('profileShowURL', $authorId) }}" class="d-inline-block"
                                                 data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
-                                                title="{{ $name }} é o autor deste registro">
-                                                <img src="{{ $avatar }}" alt="{{ $name }}"
-                                                    class="rounded-circle avatar-xxs">
+                                                title="{{ $name }} foi o autor deste registro">
+                                                <img src="{{ $avatar }}" alt="{{ $name }}" class="rounded-circle avatar-xxs" loading="lazy">
                                             </a>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    {{ limitChars(ucfirst($title), 30) }}<br>
-                                    Modelo: <span data-bs-toggle="tooltip" data-bs-trigger="hover"
-                                        data-bs-placement="top"
-                                        title="{{ limitChars(ucfirst($getSurveyTemplateNameById), 200) }}"></span>{{ limitChars(ucfirst($getSurveyTemplateNameById), 300) }}
+                                    <span data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ucfirst($title)}}">
+                                        {{ limitChars(ucfirst($title), 30) }}
+                                    </span>
+
+                                    <div class="text-muted small" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ limitChars(ucfirst($getSurveyTemplateNameById), 200) }}">
+                                        Modelo: <span class="text-body"></span>{{ limitChars(ucfirst($getSurveyTemplateNameById), 30) }}
+                                    </div>
                                 </td>
                                 <td class="text-center">
                                     <span class="badge badge-border bg-dark-subtle text-body text-uppercase"

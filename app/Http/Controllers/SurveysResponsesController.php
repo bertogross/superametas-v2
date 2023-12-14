@@ -85,7 +85,7 @@ class SurveysResponsesController extends Controller
                 'success' => false,
                 'message' => 'Necessário enviar ao menos uma foto apontando o motivo da Não Conformidade',
                 'action' => 'changeToPending'
-                'action2' => 'blickPhotoButton'
+                'action2' => 'blinkPhotoButton'
             ]);
         }*/
         if( !$attachmentIds ){
@@ -93,7 +93,7 @@ class SurveysResponsesController extends Controller
                 'success' => false,
                 'message' => 'Necessário enviar ao menos uma foto',
                 'action' => 'changeToPending',
-                'action2' => 'blickPhotoButton'
+                'action2' => 'blinkPhotoButton'
             ]);
         }
         $attachmentIdsInt = $attachmentIds ? array_map('intval', $attachmentIds) : [];
@@ -234,7 +234,7 @@ class SurveysResponsesController extends Controller
                 'success' => false,
                 'message' => 'Se Não Conforme, necessário enviar ao menos uma foto comprovando o motivo de haver Indeferido',
                 'action' => 'changeToPending',
-                'action2' => 'blickPhotoButton'
+                'action2' => 'blinkPhotoButton'
             ]);
         }
 

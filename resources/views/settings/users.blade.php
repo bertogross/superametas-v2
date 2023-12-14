@@ -15,9 +15,6 @@
         @endslot
     @endcomponent
 
-    @php
-    use App\Models\User;
-    @endphp
     <div class="card">
         <div class="card-body">
             <div class="row g-2">
@@ -62,21 +59,23 @@
                         @endphp
 
                         @foreach ($users as $user)
-                            @component('settings/users-card')
-                                @slot('id') {{ $user['id'] }} @endslot
-                                @slot('status') {{ $user['status'] }} @endslot
-                                @slot('avatar') {{ $user['avatar'] }} @endslot
-                                @slot('cover') {{ $user['cover'] }} @endslot
-                                @slot('name') {{ $user['name'] }} @endslot
-                                @slot('role') {{ (new User)->getRoleName($user['role']) }} @endslot
-                            @endcomponent
+                            @php
+                                $id = $user['id'];
+                                $capabilities = $user['capabilities'] ? json_decode($user['capabilities'], true) : [];
+                                $status = $user['status'];
+                                $avatar = $user['avatar'];
+                                $cover = $user['cover'];
+                                $name = $user['name'];
+                                $role = \App\Models\User::getRoleName($user['role']);
+                            @endphp
+                            @include('settings.users-card')
                         @endforeach
                     </div>
                 </div>
 
                 <hr class="w-50 start-50 position-relative translate-middle-x clearfix mt-4 mb-5">
 
-                {!! User::generatePermissionsTable() !!}
+                {!! \App\Models\User::generatePermissionsTable() !!}
 
             </div>
         </div><!-- end col -->

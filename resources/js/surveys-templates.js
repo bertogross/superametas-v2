@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if(clickedElement){
 
             const clickedElementId = clickedElement.id;
-            console.log(clickedElementId);
+            //console.log(clickedElementId);
 
             // store/update surveyTemplateForm
             if ( clickedElementId === 'btn-survey-template-store-or-update' || clickedElementId === 'btn-survey-template-autosave' ) {

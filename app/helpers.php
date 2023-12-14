@@ -12,9 +12,11 @@ use App\Models\SurveyAssignments;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\SettingsStripeController;
 
-function appName(){
-    $host = $_SERVER['HTTP_HOST'] ?? 'default';
-    return str_contains($host, 'testing') ? 'Checklist' : env('APP_NAME');
+if (!function_exists('appName')) {
+    function appName(){
+        $host = $_SERVER['HTTP_HOST'] ?? 'default';
+        return str_contains($host, 'testing') ? 'Checklist' : env('APP_NAME');
+    }
 }
 
 // Get all users with status = 1, ordered by name

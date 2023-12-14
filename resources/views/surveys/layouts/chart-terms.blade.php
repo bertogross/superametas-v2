@@ -1,4 +1,4 @@
-<div class="row mt-3">
+<div class="row mt-3 mb-3">
     <div class="col-sm-6 col-md-4 col-lg-4 mb-3">
         <div id="barTermsChart" class="rounded rounded-2 bg-light p-3 h-100"></div>
     </div>
@@ -26,15 +26,22 @@ document.addEventListener('DOMContentLoaded', function() {
     for (var date in rawTermsData) {
         for (var termId in rawTermsData[date]) {
             var termData = rawTermsData[date][termId];
+
             var totalComplianceYes = termData.filter(item => item.compliance_survey === 'yes').length;
             var totalComplianceNo = termData.filter(item => item.compliance_survey === 'no').length;
 
+            // Format the numbers without decimals
+            //totalComplianceNo = totalComplianceYes.toLocaleString('en-US', { maximumFractionDigits: 0 });
+            //totalComplianceNo = totalComplianceNo.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
             seriesData.push({
-                x: terms[termId]['name'] + ' (' + date + ')',
+                //x: terms[termId]['name'] + ' (' + date + ')',
+                x: terms[termId]['name'] + ' ',
                 y: totalComplianceYes - totalComplianceNo
             });
 
-            categories.push(terms[termId]['name'] + ' (' + date + ')');
+            //categories.push(terms[termId]['name'] + ' (' + date + ')');
+            categories.push(terms[termId]['name'] + ' ');
         }
     }
 
@@ -92,12 +99,18 @@ document.addEventListener('DOMContentLoaded', function() {
     for (var date in rawTermsData) {
         for (var termId in rawTermsData[date]) {
             var termData = rawTermsData[date][termId];
+
             var totalComplianceYes = termData.filter(item => item.compliance_survey === 'yes').length;
             var totalComplianceNo = termData.filter(item => item.compliance_survey === 'no').length;
 
+            // Format the numbers without decimals
+            //totalComplianceNo = totalComplianceYes.toLocaleString('en-US', { maximumFractionDigits: 0 });
+            //totalComplianceNo = totalComplianceNo.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
             columnSeriesData.push(totalComplianceYes);
             lineSeriesData.push(totalComplianceNo);
-            categories.push(terms[termId]['name'] + ' (' + date + ')');
+            //categories.push(terms[termId]['name'] + ' (' + date + ')');
+            categories.push(terms[termId]['name'] + ' ');
         }
     }
 
@@ -189,7 +202,11 @@ document.addEventListener('DOMContentLoaded', function() {
             opacity: 0.8
         },
         legend: {
+            show: true,
             position: 'bottom'
+        },
+        yaxis: {
+            show: false // Disable Y-axis labels
         },
         responsive: [{
             breakpoint: 480,

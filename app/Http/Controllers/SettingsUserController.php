@@ -32,7 +32,7 @@ class SettingsUserController extends Controller
     {
         $users = User::all();
 
-        return view('settings/users', compact('users'));
+        return view('settings.users', compact('users'));
     }
 
     /**
@@ -72,12 +72,15 @@ class SettingsUserController extends Controller
             'email.required' => 'The email address is required.',
             'email.email' => 'Please provide a valid email address.',
             'email.max' => 'The email may not be greater than 100 characters.',
+            'email.max' => 'The email may not be greater than 100 characters.',
+            'capabilities.*.in' => 'Regra de usuário conflitante',
         ];
 
         // Validate the request data
         $request->validate([
             'name' => 'required|string|max:191',
             'email' => 'required|email|max:100',
+            'capabilities.*' => 'in:'.implode(',', array_keys(User::CAPABILITY_TRANSLATIONS)),
         ], $messages);
 
         // Check if email exist
@@ -143,10 +146,6 @@ class SettingsUserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        /*$request->validate([
-            'name' => ['required', 'string', 'max:191'],
-            'email' => ['required', 'string', 'email', 'max:191'],
-        ]);*/
         // Custom error messages
         $messages = [
             'name.required' => 'The company name is required.',
@@ -156,6 +155,7 @@ class SettingsUserController extends Controller
             'email.max' => 'The email may not be greater than 100 characters.',
             'new_password.min' => 'The password must be at least 8 characters.',
             'new_password.max' => 'The password may not be greater than 20 characters.',
+            'capabilities.*.in' => 'Regra de usuário conflitante',
         ];
 
         // Validate the request data
@@ -163,6 +163,7 @@ class SettingsUserController extends Controller
             'name' => 'required|string|max:191',
             'email' => 'required|email|max:100',
             'new_password' => 'nullable|string|min:8|max:20',
+            'capabilities.*' => 'in:'.implode(',', array_keys(User::CAPABILITY_TRANSLATIONS)),
         ], $messages);
 
         $user = User::find($id);
@@ -186,6 +187,7 @@ class SettingsUserController extends Controller
         $user->name = strip_tags( $request->get('name') );
         $user->email = strip_tags( $request->get('email') );
 
+        $user->capabilities = $request->get('capabilities', []);
 
         // After updating the user
         $companies = is_array($request->get('companies')) ? json_encode(array_map('intval', $request->get('companies'))) : $request->get('companies');
@@ -288,7 +290,7 @@ class SettingsUserController extends Controller
             $user = User::find($id);
         }
 
-        return view('settings/users-form', compact('user'));
+        return view('settings.users-form', compact('user'));
 
     }
 }

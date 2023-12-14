@@ -115,8 +115,6 @@
     <script src="{{ URL::asset('build/libs/flatpickr/plugins/confirmDate/confirmDate.js') }}"></script>
 
     <script>
-        var totalCompanies = {{ !empty($getAuthorizedCompanies) && is_array($getAuthorizedCompanies) ? count($getAuthorizedCompanies) : 1 }};
-
         var surveysIndexURL = "{{ route('surveysIndexURL') }}";
         var surveysCreateURL = "{{ route('surveysCreateURL') }}";
         var surveysEditURL = "{{ route('surveysEditURL') }}";

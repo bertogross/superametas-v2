@@ -24,7 +24,7 @@
         use App\Models\User;
         $authorId = $data->user_id;
         $getUserData = getUserData($authorId);
-        $roleName = (new User)->getRoleName($getUserData['role']);
+        $roleName = \App\Models\User::getRoleName($getUserData['role']);
         $description = trim($data->description) ? nl2br($data->description) : '';
     @endphp
     <div id="content" class="rounded rounded-2 mb-4" style="max-width: 700px; margin: 0 auto;">

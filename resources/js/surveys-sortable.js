@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const blockIndex = blocksContainer.children.length;
             const newBlock = document.createElement('div');
             newBlock.id = termId;
-            newBlock.className = 'accordion-item block-item mt-3 mb-0 border-dark border-1 rounded rounded-2 p-0';
+            newBlock.className = 'accordion-item block-item mt-3 mb-0 border-dark border-1 rounded rounded-2 p-0 bg-body';
 
             newBlock.innerHTML = `
                 <div class="input-group">

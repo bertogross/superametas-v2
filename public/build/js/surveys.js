@@ -48,38 +48,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 var surveyId = this.getAttribute("data-survey-id");
                 surveyId = parseInt(surveyId);
 
-                if( currentStatus && currentStatus == 'started' ){
-                    var isConfirmed = confirm('Certeza que deseja Interromper esta Tarefa?');
-                    if (!isConfirmed) {
-                        event.stopPropagation();
+                function attachSurveysChangeStatus(surveyId){
+                    fetch(surveysChangeStatusURL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                        },
+                        body: JSON.stringify({ id: surveyId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            toastAlert(data.message, 'success');
 
-                        return;
-                    }
+                            location.reload(true);
+                        } else {
+                            // Handle error
+                            console.error('Error start/stop survey:', data.message);
+
+                            toastAlert(data.message, 'danger', 5000);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
                 }
 
-                fetch(surveysChangeStatusURL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
-                    },
-                    body: JSON.stringify({ id: surveyId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        toastAlert(data.message, 'success');
-
-                        location.reload(true);
-                    } else {
-                        // Handle error
-                        console.error('Error start/stop survey:', data.message);
-
-                        toastAlert(data.message, 'danger', 5000);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-
+                if( currentStatus && currentStatus == 'started' ){
+                    Swal.fire({
+                        icon: 'warning',
+                        title: "Tem certeza que deseja Interromper esta Tarefa?",
+                        html: 'Tarefas em andamento terão suas respectivas atividades não completadas removidas. <br><br><span class="text-warning">Não será possível reverter remoções.</span>',
+                        showDenyButton: true,
+                        showCancelButton: false,
+                        confirmButtonText: "Sim, interromper",
+                        denyButtonText: `Deixar como está`,
+                        confirmButtonClass: 'btn btn-outline-warning w-xs me-2',
+                        cancelButtonClass: 'btn btn-sm btn-outline-info w-xs',
+                        denyButtonClass: 'btn btn-sm btn-outline-danger w-xs me-2',
+                        buttonsStyling: false,
+                        showCloseButton: false,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            attachSurveysChangeStatus(surveyId);
+                        } else if (result.isDenied) {
+                            return false;
+                        }
+                    });
+                }else{
+                    attachSurveysChangeStatus(surveyId);
+                }
             });
         });
     }
@@ -445,29 +462,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     if(data.success && data.activities){
                         data.activities.forEach(activity => {
                             const activityElement = document.createElement('div');
-                            activityElement.className = 'card';
+                            activityElement.className = 'card border border-dashed shadow-none mb-3';
                             activityElement.innerHTML = `
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-xs flex-shrink-0 me-1">
-                                        <a href="${activity.designatedUserProfileURL}" class="text-body d-block" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar todas as Tarefas delegadas a ${activity.designatedUserName}">
-                                            <img src="${activity.designatedUserAvatar}" alt="avatar" class="img-fluid rounded-circle">
-                                        </a>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <div class="fs-11 mb-0 fw-bold">
-                                            ${activity.designatedUserName}
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-xs flex-shrink-0 me-2">
+                                            <a href="${activity.designatedUserProfileURL}" class="text-body d-block" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Visualizar todas as Tarefas delegadas a ${activity.designatedUserName}">
+                                                <img src="${activity.designatedUserAvatar}" alt="avatar" class="img-fluid rounded-circle">
+                                            </a>
                                         </div>
-                                        <div class="fs-11 mb-0 text-muted">${activity.templateName}</div>
+                                        <div class="flex-grow-1">
+                                            <div class="fs-11 mb-0 fw-bold">
+                                                ${activity.designatedUserName}
+                                            </div>
+                                            <div class="fs-11 mb-0 text-muted">${activity.templateName}</div>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            ${activity.label}
+                                            <div class="fs-11 mb-0 text-muted text-end">${activity.companyName}</div>
+                                            <div class="fs-10 mb-0 text-muted d-none">${activity.createddAt}</div>
+                                            <div class="fs-10 mb-0 text-muted d-none">${activity.updatedAt}</div>
+                                        </div>
                                     </div>
-                                    <div class="flex-shrink-0">
-                                        ${activity.label}
-                                        <div class="fs-11 mb-0 text-muted text-end">${activity.companyName}</div>
-                                        <div class="fs-10 mb-0 text-muted d-none">${activity.createddAt}</div>
-                                        <div class="fs-10 mb-0 text-muted d-none">${activity.updatedAt}</div>
+                                    <div class="progress progress-sm mt-1 custom-progress" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="${activity.percentage}%">
+                                        <div class="progress-bar bg-${activity.progressBarClass}" role="progressbar" style="width: ${activity.percentage}%" aria-valuenow="${activity.percentage}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
-                                </div>
-                                <div class="progress progress-sm mt-1 custom-progress" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="${activity.percentage}%">
-                                    <div class="progress-bar bg-${activity.progressBarClass}" role="progressbar" style="width: ${activity.percentage}%" aria-valuenow="${activity.percentage}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             `;
                             container.appendChild(activityElement);

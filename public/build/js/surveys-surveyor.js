@@ -90,6 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
+                const textArea = responsesData.querySelector('textarea');
+                const btnPhoto = responsesData.querySelector('.btn-add-photo');
+
                 //const countTopics = document.querySelectorAll('.btn-response-update').length;
                 //console.log('countTopics', countTopics);
 
@@ -104,6 +107,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const compliance = responsesData.querySelector('input[name="compliance_survey"]:checked')?.value || '';
 
+                const comment = responsesData.querySelector('textarea[name="comment_survey"]')?.value || '';
+                const attachmentInputs = responsesData.querySelectorAll('input[name="attachment_id[]"]');
+                const attachmentIds = Array.from(attachmentInputs).map(input => input.value);
+
+                if (attachmentIds.length === 0) {
+                    // Select all radio buttons with the name 'compliance_survey'
+                    const complianceSurveyRadios = responsesData.querySelectorAll('input[name="compliance_survey"]');
+
+                    // Uncheck each radio button
+                    complianceSurveyRadios.forEach(radio => {
+                        radio.checked = false;
+                    });
+
+                    btnPhoto.classList.add('blink', 'bg-warning');
+                    setTimeout(() => {
+                        btnPhoto.classList.remove('blink', 'bg-warning');
+                    }, 5000);
+
+                    toastAlert('Primeiro envie uma foto', 'warning', 7000);
+
+                    return;
+                }
+
                 // Select the radio buttons
                 const radios = responsesData.querySelectorAll('input[type="radio"][name="compliance_survey"]');
                 radios.forEach(radio => {
@@ -112,13 +138,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         updateLabelClasses(radios);
                     });
                 });
-
-                const comment = responsesData.querySelector('textarea[name="comment_survey"]')?.value || '';
-                const attachmentInputs = responsesData.querySelectorAll('input[name="attachment_id[]"]');
-                const attachmentIds = Array.from(attachmentInputs).map(input => input.value);
-
-                const textArea = responsesData.querySelector('textarea');
-                const btnPhoto = responsesData.querySelector('.btn-add-photo');
 
                 var pendingIcon = responsesData.querySelector('.ri-time-line');
                 var completedIcon = responsesData.querySelector('.ri-check-double-fill');
@@ -207,10 +226,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             setTimeout(() => {
                                 textArea.classList.remove('blink', 'bg-warning-subtle');
                             }, 3000);
-                        }else if(data.action2 == 'blickPhotoButton'){
-                            btnPhoto.classList.add('blink', 'bg-warning-subtle');
+                        }else if(data.action2 == 'blinkPhotoButton'){
+                            btnPhoto.classList.add('blink', 'bg-warning');
                             setTimeout(() => {
-                                btnPhoto.classList.remove('blink', 'bg-warning-subtle');
+                                btnPhoto.classList.remove('blink', 'bg-warning');
                             }, 3000);
                         }
 
@@ -223,8 +242,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                             //document.querySelector('#btn-response-finalize').click();
 
-                            document.querySelector('#survey-progress-bar').remove();
+                            if(document.querySelector('#survey-progress-bar')){
+                                document.querySelector('#survey-progress-bar').remove();
+                            }
                         }, 1000);
+
                     }
                 })
                 .catch(error => console.error('Error:', error));

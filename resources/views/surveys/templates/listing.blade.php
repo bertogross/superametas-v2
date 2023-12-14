@@ -68,9 +68,9 @@
                                             $avatar = getUserData($template->user_id)['avatar'];
                                             $name = getUserData($template->user_id)['name'];
                                         @endphp
-                                        <a href="{{ route('profileShowURL', $template->user_id) }}" class="d-inline-block" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $name }} é o autor deste registro">
+                                        <a href="{{ route('profileShowURL', $template->user_id) }}" class="d-inline-block" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ $name }} foi o autor deste registro">
                                             <img src="{{ $avatar }}"
-                                            alt="{{ $name }}" class="rounded-circle avatar-xxs">
+                                            alt="{{ $name }}" class="rounded-circle avatar-xxs" loading="lazy">
                                         </a>
                                     </div>
                                     <div class="flex-grow-1 text-end">

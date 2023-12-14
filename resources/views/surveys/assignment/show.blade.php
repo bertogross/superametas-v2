@@ -20,8 +20,8 @@
 
     $companyName = $companyId ? getCompanyNameById($companyId) : '';
 
-    $surveyorName = getUserData($surveyorId)['name'];
-    $auditorName = getUserData($auditorId)['name'];
+    $surveyorName = getUserData($surveyorId)['name'] ?? '';
+    $auditorName = $auditorId ? getUserData($auditorId)['name'] : '';
 
     $responsesData = SurveyResponse::where('assignment_id', $assignmentId)
         ->get()
@@ -72,7 +72,7 @@
                         <div class="vr"></div>
 
                         <div class="text-muted">
-                            Checklist: {{$surveyorName}}
+                            Vistoria: {{$surveyorName}}
                         </div>
 
                         <div class="vr"></div>
@@ -88,8 +88,14 @@
         @if ($templateDescription)
             <h6 class="text-uppercase mb-3">Descrição</h6>
             <p class="text-muted">
-                {{ nl2br($templateDescription) }}
+                {!! nl2br($templateDescription) !!}
             </p>
+        @endif
+
+        @if( !$complianceSurveyorYesCount && !$complianceSurveyorNoCount)
+            <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show" role="alert">
+                <i class="ri-alert-line label-icon"></i> Vistoria não concluída
+            </div>
         @endif
 
         <div class="row mb-2">
@@ -110,9 +116,9 @@
             <div class="col-sm-6 col-md-4">
                 <div class="row">
                     <div class="col">
-                        <div class="card card-animate">
+                        <div class="card h-100 card-animate">
                             <div class="card-body">
-                                <h6 class="text-muted text-uppercase">Checklist</h6>
+                                <h6 class="text-muted text-uppercase mb-4">Vistoria</h6>
                                 <span class="text-success">Conforme</span>: {{$complianceSurveyorYesCount}}
                                 <br>
                                 <span class="text-danger">Não Conforme</span>: {{$complianceSurveyorNoCount}}
@@ -120,20 +126,39 @@
                         </div>
                     </div>
                     <div class="col">
-                        <div class="card card-animate">
+                        <div class="card h-100 card-animate">
                             <div class="card-body">
-                                @if( !$complianceAuditorYesCount && ! $complianceAuditorNoCount )
+                                @if( !$complianceAuditorYesCount && !$complianceAuditorNoCount)
                                     <span class="fs-5 ri-alert-fill text-warning float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"  title="Auditoria não foi realizada"></span>
                                 @endif
-                                <h6 class="text-muted text-uppercase">Auditoria</h6>
-                                <span class="text-success">De Acordo</span>: {{$complianceAuditorYesCount}}
-                                <br>
-                                <span class="text-danger">Indeferido</span>: {{$complianceAuditorNoCount}}
+
+                                <h6 class="text-muted text-uppercase mb-4">Auditoria</h6>
+
+                                @if( !$complianceAuditorYesCount && !$complianceAuditorNoCount)
+                                    @if ( in_array('audit', $currentUserCapabilities) && in_array($surveyorStatus, ['new','pending','in_progress','completed']) )
+                                        <button type="button"
+                                        data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
+                                        title="Requisitar esta tarefa para Auditoria"
+                                        class="btn btn-lg btn-label right waves-effect btn-soft-secondary btn-assignment-audit-request w-100"
+                                        data-assignment-id="{{$assignmentId}}">
+                                            <i class="ri-add-line label-icon align-middle fs-16"></i> Auditar
+                                        </button>
+                                    @endif
+                                @elseif($surveyorStatus != 'completed' || $auditorStatus == 'waiting')
+                                    Aguardando conclusão da Vistoria
+                                @elseif(in_array($auditorStatus, ['new', 'pending', 'in_progress']))
+                                    Em progresso
+                                @elseif($auditorStatus == 'completed')
+                                    <span class="text-success">De Acordo</span>: {{$complianceAuditorYesCount}}
+                                    <br>
+                                    <span class="text-danger">Indeferido</span>: {{$complianceAuditorNoCount}}
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="card">
+
+                <div class="card mt-4">
                     <div class="card-body">
                         <div id="polarTermsAreaChart"></div>
                     </div>
@@ -143,7 +168,7 @@
 
         @if ( $surveyorStatus == 'completed' && $auditorStatus == 'losted')
             <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                <i class="ri-alert-line label-icon blink"></i> A Checklist foi completada. Entretanto, o prazo da Auditoria expirou.
+                <i class="ri-alert-line label-icon blink"></i> A tarefa foi completada. Entretanto, o prazo da Auditoria expirou.
             </div>
         @elseif ( $surveyorStatus == 'losted' && $auditorStatus == 'losted')
             <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
@@ -152,7 +177,7 @@
         {{--
         @elseif ($surveyorStatus == 'losted')
             <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                <i class="ri-alert-line label-icon blink"></i> O prazo expirou e este Checklist foi perdida
+                <i class="ri-alert-line label-icon blink"></i> O prazo expirou e esta Vistoria foi perdido
             </div>
         @elseif ($auditorStatus == 'losted')
             <div class="alert alert-secondary alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
@@ -358,195 +383,208 @@
         const rawTermsData = @json($analyticTermsData);
         const terms = @json($terms);
     </script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // #barTermsChart
-        var seriesData = [];
-        var categories = [];
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // #barTermsChart
+            var seriesData = [];
+            var categories = [];
 
-        for (var date in rawTermsData) {
-            for (var termId in rawTermsData[date]) {
-                var termData = rawTermsData[date][termId];
-                var totalComplianceYes = termData.filter(item => item.compliance_survey === 'yes').length;
-                var totalComplianceNo = termData.filter(item => item.compliance_survey === 'no').length;
+            for (var date in rawTermsData) {
+                for (var termId in rawTermsData[date]) {
+                    var termData = rawTermsData[date][termId];
+                    var totalComplianceYes = termData.filter(item => item.compliance_survey === 'yes').length;
+                    var totalComplianceNo = termData.filter(item => item.compliance_survey === 'no').length;
 
-                seriesData.push({
-                    x: terms[termId]['name'],
-                    y: totalComplianceYes - totalComplianceNo
-                });
+                    seriesData.push({
+                        x: terms[termId]['name'],
+                        y: totalComplianceYes - totalComplianceNo
+                    });
 
-                categories.push(terms[termId]['name']);
-            }
-        }
-
-        var optionsTermsChart = {
-            series: [{
-                name: 'Score',
-                data: seriesData
-            }],
-            title: {
-                //text: 'Compliance Bars'
-            },
-            chart: {
-                type: 'bar',
-                height: 400,
-                toolbar: {
-                    show: false,
+                    categories.push(terms[termId]['name']);
                 }
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: '55%',
-                    colors: {
-                        ranges: [{
-                            from: -1000,
-                            to: 0,
-                            color: '#DF5253'
-                        }, {
-                            from: 1,
-                            to: 1000,
-                            color: '#1FDC01'
-                        }],
-                    },
-                    dataLabels: {
-                        position: 'top',
+            }
+
+            var optionsTermsChart = {
+                series: [{
+                    name: 'Score',
+                    data: seriesData
+                }],
+                title: {
+                    //text: 'Compliance Bars'
+                },
+                chart: {
+                    type: 'bar',
+                    height: 400,
+                    toolbar: {
+                        show: false,
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        colors: {
+                            ranges: [{
+                                from: -1000,
+                                to: 0,
+                                color: '#DF5253'
+                            }, {
+                                from: 1,
+                                to: 1000,
+                                color: '#1FDC01'
+                            }],
+                        },
+                        dataLabels: {
+                            position: 'top',
+                        },
                     },
                 },
-            },
-            xaxis: {
-                categories: categories
-            },
-            fill: {
-                opacity: 1
-            },
-        };
+                xaxis: {
+                    categories: categories
+                },
+                fill: {
+                    opacity: 1
+                },
+            };
 
-        var barTermsChart = new ApexCharts(document.querySelector("#barTermsChart"), optionsTermsChart);
-        barTermsChart.render();
+            var barTermsChart = new ApexCharts(document.querySelector("#barTermsChart"), optionsTermsChart);
+            barTermsChart.render();
 
-        // #mixedTermsChart
-        var columnSeriesData = [];
-        var lineSeriesData = [];
-        var categories = [];
+            // #mixedTermsChart
+            var columnSeriesData = [];
+            var lineSeriesData = [];
+            var categories = [];
 
-        for (var date in rawTermsData) {
-            for (var termId in rawTermsData[date]) {
-                var termData = rawTermsData[date][termId];
-                var totalComplianceYes = termData.filter(item => item.compliance_survey === 'yes').length;
-                var totalComplianceNo = termData.filter(item => item.compliance_survey === 'no').length;
+            for (var date in rawTermsData) {
+                for (var termId in rawTermsData[date]) {
+                    var termData = rawTermsData[date][termId];
+                    var totalComplianceYes = termData.filter(item => item.compliance_survey === 'yes').length;
+                    var totalComplianceNo = termData.filter(item => item.compliance_survey === 'no').length;
 
-                columnSeriesData.push(totalComplianceYes);
-                lineSeriesData.push(totalComplianceNo);
-                categories.push(terms[termId]['name'] + ' (' + date + ')');
+                    columnSeriesData.push(totalComplianceYes);
+                    lineSeriesData.push(totalComplianceNo);
+                    //categories.push(terms[termId]['name'] + ' (' + date + ')');
+                    categories.push(terms[termId]['name'] + ' ');
+                }
             }
-        }
 
-        var optionsMixedTermsChart = {
-            series: [{
-                name: 'Conforme',
-                type: 'column',
-                data: columnSeriesData
-            }, {
-                name: 'Não Conforme',
-                type: 'line',
-                data: lineSeriesData
-            }],
-            chart: {
-                height: 400,
-                type: 'line',
-                toolbar: {
-                    show: false,
-                }
-            },
-            stroke: {
-                width: [0, 4]
-            },
-            title: {
-                //text: 'Compliance Trends'
-            },
-            dataLabels: {
-                enabled: true,
-                enabledOnSeries: [1]
-            },
-            labels: categories,
-            xaxis: {
-                type: 'category'
-            },
-            yaxis: [{
-                title: {
-                    text: 'Conforme'
-                }
-            }, {
-                opposite: true,
-                title: {
-                    text: 'Não Conforme'
-                }
-            }],
-            colors: ['#1FDC01', '#DF5253']  // Assign custom colors to Compliance Yes and No
-        };
-
-        var mixedTermsChart = new ApexCharts(document.querySelector("#mixedTermsChart"), optionsMixedTermsChart);
-        mixedTermsChart.render();
-
-        // #polarTermsAreaChart
-        var seriesData = [];
-        var labels = [];
-
-        var termMetrics = {};
-
-        // Aggregate data for each term
-        for (var date in rawTermsData) {
-            for (var termId in rawTermsData[date]) {
-                var termData = rawTermsData[date][termId];
-                var totalCompliance = termData.filter(item => item.compliance_survey === 'yes').length;
-
-                if (!termMetrics[termId]) {
-                    termMetrics[termId] = 0;
-                }
-                termMetrics[termId] += totalCompliance;
-            }
-        }
-
-        // Prepare data for the chart
-        for (var termId in termMetrics) {
-            seriesData.push(termMetrics[termId]);
-            labels.push(terms[termId]['name']);
-        }
-
-        var optionsTermsAreaChart = {
-            series: seriesData,
-            chart: {
-                height: 327,
-                type: 'polarArea',
-                toolbar: {
-                    show: false,
-                }
-            },
-            labels: labels,
-            stroke: {
-                colors: ['#fff']
-            },
-            fill: {
-                opacity: 0.8
-            },
-            legend: {
-                position: 'bottom'
-            },
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 200
+            var optionsMixedTermsChart = {
+                series: [{
+                    name: 'Conforme',
+                    type: 'column',
+                    data: columnSeriesData
+                }, {
+                    name: 'Não Conforme',
+                    type: 'line',
+                    data: lineSeriesData
+                }],
+                chart: {
+                    height: 400,
+                    type: 'line',
+                    toolbar: {
+                        show: false,
                     }
-                }
-            }]
-        };
+                },
+                stroke: {
+                    width: [0, 4]
+                },
+                title: {
+                    //text: 'Compliance Trends'
+                },
+                dataLabels: {
+                    enabled: true,
+                    enabledOnSeries: [1]
+                },
+                labels: categories,
+                xaxis: {
+                    type: 'category'
+                },
+                yaxis: [{
+                    title: {
+                        text: 'Conforme'
+                    }
+                }, {
+                    opposite: true,
+                    title: {
+                        text: 'Não Conforme'
+                    }
+                }],
+                colors: ['#1FDC01', '#DF5253']  // Assign custom colors to Compliance Yes and No
+            };
 
-        var polarTermsAreaChart = new ApexCharts(document.querySelector("#polarTermsAreaChart"), optionsTermsAreaChart);
-        polarTermsAreaChart.render();
-    });
+            var mixedTermsChart = new ApexCharts(document.querySelector("#mixedTermsChart"), optionsMixedTermsChart);
+            mixedTermsChart.render();
+
+            // #polarTermsAreaChart
+            var seriesData = [];
+            var labels = [];
+
+            var termMetrics = {};
+
+            // Aggregate data for each term
+            for (var date in rawTermsData) {
+                for (var termId in rawTermsData[date]) {
+                    var termData = rawTermsData[date][termId];
+                    var totalCompliance = termData.filter(item => item.compliance_survey === 'yes').length;
+
+                    if (!termMetrics[termId]) {
+                        termMetrics[termId] = 0;
+                    }
+                    termMetrics[termId] += totalCompliance;
+                }
+            }
+
+            // Prepare data for the chart
+            for (var termId in termMetrics) {
+                seriesData.push(termMetrics[termId]);
+                labels.push(terms[termId]['name']);
+            }
+
+            var optionsTermsAreaChart = {
+                series: seriesData,
+                chart: {
+                    height: 278,
+                    type: 'polarArea',
+                    toolbar: {
+                        show: false,
+                    }
+                },
+                labels: labels,
+                stroke: {
+                    colors: ['#fff']
+                },
+                fill: {
+                    opacity: 0.8
+                },
+                legend: {
+                    show: true,
+                    position: 'bottom'
+                },
+                yaxis: {
+                    show: false // Disable Y-axis labels
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        }
+                    }
+                }]
+            };
+
+            var polarTermsAreaChart = new ApexCharts(document.querySelector("#polarTermsAreaChart"), optionsTermsAreaChart);
+            polarTermsAreaChart.render();
+        });
     </script>
 
+    <script>
+        var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
+        var responsesAuditorStoreOrUpdateURL = "{{ route('responsesAuditorStoreOrUpdateURL') }}";
+        var enterAssignmentAuditorURL = "{{ route('enterAssignmentAuditorURL') }}";
+        var requestAssignmentAuditorURL = "{{ route('requestAssignmentAuditorURL') }}";
+        var revokeAssignmentAuditorURL = "{{ route('revokeAssignmentAuditorURL') }}";
+    </script>
+    <script src="{{ URL::asset('build/js/surveys-auditor.js') }}" type="module"></script>
 
 @endsection

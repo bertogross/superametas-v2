@@ -161,6 +161,27 @@ button.text-dark:hover{
   opacity: 0.5 !important;
   z-index: 10000 !important;
 }
+#uploadProgress{
+    width: 50%;
+    z-index: 10001 !important;
+}
+.toast-border-theme .toast-body {
+    color: var(--vz-theme) !important;
+    border-bottom: 3px solid var(--vz-theme) !important;
+  }
+.toast-backdrop,
+#custom-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10002 !important;
+}
+.toast-container{
+    z-index: 10003 !important;
+}
 
 .invalid-feedback{
   display: block;
@@ -641,20 +662,7 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
 
 }
 
-.toast-border-theme .toast-body {
-  color: var(--vz-theme) !important;
-  border-bottom: 3px solid var(--vz-theme) !important;
-}
-.toast-backdrop,
-#custom-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
-    z-index: 1089; /* ensure it's on top of other content */
-}
+
 
 /**
 *Swipe Slide

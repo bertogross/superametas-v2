@@ -10,7 +10,7 @@
 
     $authorId = $templateData->user_id;
     $getAuthorData = getUserData($authorId);
-    $authorRoleName = (new User)->getRoleName($getAuthorData['role']);
+    $authorRoleName = \App\Models\User::getRoleName($getAuthorData['role']);
     $description = trim($templateData->description) ? nl2br($templateData->description) : '';
 
     $currentUserId = auth()->id();
@@ -100,12 +100,12 @@
         @else
             @if ($surveyorStatus == 'auditing')
                 <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                    <i class="ri-alert-line label-icon blink"></i> Este Checklist já foi enviada para Auditoria e não poderá ser editada
+                    <i class="ri-alert-line label-icon blink"></i> Esta tarefa já foi enviada para Auditoria e não poderá ser editada
                 </div>
             @endif
             @if ($surveyorStatus == 'losted')
                 <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
-                    <i class="ri-alert-line label-icon blink"></i> O prazo expirou e este Checklist foi perdida. Por isso não poderá mais ser editada
+                    <i class="ri-alert-line label-icon blink"></i> O prazo expirou e esta tarefa foi perdida. Por isso não poderá mais ser editada
                 </div>
             @endif
 
@@ -140,6 +140,8 @@
             </div>
         </div>
     </div>
+
+
 @endsection
 @section('script')
     <script src="{{ URL::asset('build/libs/glightbox/js/glightbox.min.js') }}"></script>
