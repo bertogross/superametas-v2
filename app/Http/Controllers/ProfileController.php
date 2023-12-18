@@ -28,6 +28,9 @@ class ProfileController extends Controller
             */
         }
 
+        // Usefull if crontab or Kernel schedule is losted
+        Survey::populateSurveys();
+
         $userId = $user->id;
 
         $roleName = \App\Models\User::getRoleName($user->role);
@@ -52,8 +55,6 @@ class ProfileController extends Controller
         //$getAuthorizedCompanies = getAuthorizedCompanies();
 
         //$getActiveDepartments = getActiveDepartments();
-
-
 
         return view('profile.index', compact(
             'user',

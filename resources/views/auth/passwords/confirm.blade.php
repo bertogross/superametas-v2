@@ -62,7 +62,7 @@
                         <div class="row justify-content-center align-items-center">
                             <div class="col-xl-8">
                                 <div class="mt-4">
-                                    <img src="{{URL::asset('build/images/login-img.png')}}" class="img-fluid" alt="">
+                                    <img src="{{URL::asset('build/images/login-img.png')}}" class="img-fluid" alt="" loading="lazy">
                                 </div>
                                 <div class="p-0 p-sm-4 px-xl-0 py-5">
                                     <div id="reviewcarouselIndicators" class="carousel slide auth-carousel" data-bs-ride="carousel">

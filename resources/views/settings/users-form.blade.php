@@ -1,7 +1,8 @@
 @php
     $getActiveCompanies = getActiveCompanies();
 
-    $capabilities = $user->capabilities ? json_decode($user->capabilities, true) : [];
+    $userCapabilities = $user->capabilities ?? null;
+    $capabilities = $userCapabilities ? json_decode($userCapabilities, true) : [];
 
     $getAuthorizedCompanies = $user ? getAuthorizedCompanies($user->id) : $getActiveCompanies;
 

@@ -59,30 +59,36 @@
                 <table class="table table-sm align-middle table-nowrap mb-0 table-striped" id="tasksTable">
                     <thead class="table-light text-muted text-uppercase">
                         <tr>
-                            <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
-                                title="Usuário autor deste registro" width="50"></th>
-                            <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
-                                title="Título do modelo que serviu de base para gerar os tópicos desta vistoria">Título
+                            <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Usuário autor deste registro" width="50"></th>
+                            <th data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Título do modelo que serviu de base para gerar os tópicos desta vistoria">
+                                Título
                             </th>
-                            <th class="text-center" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-html="true"
-                                data-bs-placement="top" data-bs-title="Recorrências Possíveis"
-                                data-bs-content="{{ implode('<br>', array_column($getSurveyRecurringTranslations, 'label')) }}">
-                                Recorrência</th>
-                            <th class="text-center" data-bs-toggle="tooltip" data-bs-trigger="hover"
-                                data-bs-placement="top"
-                                title="A Data de Registro não é necessáriamente a data de início das tarefas">Registrado em
+                            <th class="text-center d-none" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="A Data de Registro não é necessáriamente a data de início das tarefas">
+                                Registrado em
                             </th>
-                            <th class="text-center" data-bs-toggle="tooltip" data-bs-trigger="hover"
-                                data-bs-placement="top" title="A Data de início da rotina">Inicial</th>
-                            <th class="text-center" data-bs-toggle="tooltip" data-bs-trigger="hover"
-                                data-bs-placement="top" title="A Data final da rotina">Final</th>
-                            <th class="text-center">Status</th>
+                            <th class="text-left" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Usários que foram designados para tarefas de Vistoria e Auditoria">
+                                Designados
+                            </th>
+                            <th class="text-center" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="A Data de início da rotina">
+                                Inicial
+                            </th>
+                            <th class="text-center" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="A Data final da rotina">
+                                Final
+                            </th>
+                            <th class="text-center" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-html="true" data-bs-placement="top" data-bs-title="Recorrências Possíveis" data-bs-content="{{ implode('<br>', array_column($getSurveyRecurringTranslations, 'label')) }}">
+                                Recorrência
+                            </th>
+                            <th class="text-center">
+                                Status
+                            </th>
+                            <th class="text-center" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Quantidade de Tarefas Concluídas"></th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($data as $survey)
                             @php
+
                                 $authorId = $survey->user_id;
 
                                 $surveyId = $survey->id;
@@ -91,29 +97,26 @@
 
                                 $distributedData = $survey->distributed_data;
                                 $decodedData = json_decode($distributedData, true);
+                                $companies = $decodedData ? array_column($decodedData['surveyor_id'], 'company_id') : null;
+                                $companies = $companies ? array_unique($companies) : null;
+                                $companyNames = [];
+                                if($companies){
+                                    foreach ($companies as $company => $companyId){
+                                        $companyNames[] = getCompanyNameById($companyId);
+                                    }
+                                }
 
                                 $surveyStatus = $survey->status;
 
-                                /*
-                                $delegatedToIds = [];
-                                $delegatedTo = array_map(function ($item) {
-                                    return $item['user_id'];
-                                }, $decodedData['delegated_to']);
-                                $delegatedToIds = count($delegatedTo) > 1 ? array_unique($delegatedTo) : $delegatedTo;
-                                */
-
-                                /*
-                                $auditedByIds = [];
-                                $auditedBy = array_map(function ($item) {
-                                    return $item['user_id'];
-                                }, $decodedData['audited_by']);
-                                $auditedByIds = count($auditedBy) > 1 ? array_unique($auditedBy) : $auditedBy;
-                                */
 
                                 $recurring = $survey->recurring;
                                 $recurringLabel = $getSurveyRecurringTranslations[$recurring]['label'];
 
                                 $getSurveyTemplateNameById = getSurveyTemplateNameById($survey->template_id);
+
+                                $countSurveyAssignmentBySurveyId = \App\Models\SurveyAssignments::countSurveyAssignmentBySurveyId($surveyId);
+
+                                $delegation = \App\Models\SurveyAssignments::getAssignmentDelegatedsBySurveyId($surveyId);
                             @endphp
                             <tr class="main-row" data-id="{{ $surveyId }}">
                                 <td>
@@ -137,8 +140,58 @@
                                     </span>
 
                                     <div class="text-muted small" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ limitChars(ucfirst($getSurveyTemplateNameById), 200) }}">
-                                        Modelo: <span class="text-body"></span>{{ limitChars(ucfirst($getSurveyTemplateNameById), 30) }}
+                                        <strong>Modelo:</strong> <span class="text-body"></span>{{ limitChars(ucfirst($getSurveyTemplateNameById), 30) }}
                                     </div>
+
+                                    <div class="text-muted small" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Unidades relacionadas a este registro">
+                                        <strong>Unidades:</strong> <span class="text-body"> {{ $companyNames ? implode(', ', $companyNames) : 'Não Informado'}}</span>
+                                    </div>
+                                </td>
+                                <td class="text-center d-none">
+                                    {{ $survey->created_at ? date('d/m/Y H:i', strtotime($survey->created_at)) : '-' }}
+                                </td>
+                                <td>
+                                    @if ($delegation)
+                                        <div class="avatar-group flex-nowrap">
+                                            @if (isset($delegation['surveyors']) && !empty($delegation['surveyors']))
+                                                @foreach ($delegation['surveyors'] as $key => $value)
+                                                    @php
+                                                        $userId = $value['user_id'] ?? null;
+                                                        $getUserData = $userId ? getUserData($userId) : null;
+                                                        $companyId = $value['company_id'] ?? null;
+                                                        $companyName = $companyId ? getCompanyNameById($companyId) : '';
+                                                    @endphp
+                                                    @if($userId)
+                                                        <a href="{{ route('profileShowURL', $userId) }}" class="avatar-group-item" data-img="{{ $getUserData['avatar'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Vistoria: {{ $getUserData['name'] }} : {{ $companyName }}">
+                                                            <img src="{{ $getUserData['avatar'] }}" alt="" class="rounded-circle avatar-xxs">
+                                                        </a>
+                                                    @endif
+                                                @endforeach
+                                            @endif
+
+                                            @if (isset($delegation['auditors']) && !empty($delegation['auditors']))
+                                                @foreach ($delegation['auditors'] as $key => $value)
+                                                    @php
+                                                        $userId = $value['user_id'] ?? null;
+                                                        $getUserData = $userId ? getUserData($userId) : null;
+                                                        $companyId = $value['company_id'] ?? null;
+                                                        $companyName = $companyId ? getCompanyNameById($companyId) : '';
+                                                    @endphp
+                                                    @if($userId)
+                                                        <a href="{{ route('profileShowURL', $userId) }}" class="avatar-group-item" data-img="{{ $getUserData['avatar'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Auditoria: {{ $getUserData['name'] }} : {{ $companyName }}">
+                                                            <img src="{{ $getUserData['avatar'] }}" alt="" class="rounded-circle avatar-xxs">
+                                                        </a>
+                                                    @endif
+                                                @endforeach
+                                            @endif
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    {{ $survey->start_at ? date('d/m/Y', strtotime($survey->start_at)) : '-' }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $survey->end_in ? date('d/m/Y', strtotime($survey->end_in)) : '-' }}
                                 </td>
                                 <td class="text-center">
                                     <span class="badge badge-border bg-dark-subtle text-body text-uppercase"
@@ -146,15 +199,6 @@
                                         title="{{ $getSurveyRecurringTranslations[$recurring]['description'] }}">
                                         {{ $recurringLabel }}
                                     </span>
-                                </td>
-                                <td class="text-center">
-                                    {{ $survey->created_at ? date('d/m/Y H:i', strtotime($survey->created_at)) : '-' }}
-                                </td>
-                                <td class="text-center">
-                                    {{ $survey->start_at ? date('d/m/Y', strtotime($survey->start_at)) : '-' }}
-                                </td>
-                                <td class="text-center">
-                                    {{ $survey->end_in ? date('d/m/Y', strtotime($survey->end_in)) : '-' }}
                                 </td>
                                 <td class="text-center">
                                     <span
@@ -166,6 +210,9 @@
                                             <span class="spinner-border align-top ms-1"></span>
                                         @endif
                                     </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill bg-dark-subtle text-body" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Quantidade de Tarefas Concluídas">{{ $countSurveyAssignmentBySurveyId }}</span>
                                 </td>
                                 <td scope="row" class="text-end">
                                     @if (in_array($surveyStatus, ['new', 'started', 'stopped']))
@@ -191,8 +238,13 @@
                                     @endif
 
                                     @if ( !in_array($surveyStatus, ['scheduled', 'new']) )
-                                        <a href="{{ route('surveysShowURL', $surveyId) }}"
-                                            class="btn btn-sm btn-soft-dark waves-effect ri-line-chart-fill"
+                                        <a
+                                            @if ($countSurveyAssignmentBySurveyId > 0)
+                                                href="{{ route('surveysShowURL', $surveyId) }}"
+                                            @else
+                                                onclick="alert('Não há dados para relatório')"
+                                            @endif
+                                            class="btn btn-sm btn-soft-dark waves-effect ri-line-chart-fill {{ $countSurveyAssignmentBySurveyId == 0 ? 'cursor-not-allowed' : '' }}"
                                             data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left"
                                             title="Visualização Analítica"></a>
                                     @endif

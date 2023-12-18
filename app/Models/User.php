@@ -51,17 +51,17 @@ class User extends Authenticatable
 
     // Capabilities for each role
     const USER_ROLES = [
-        self::ROLE_ADMIN => ['manage', 'edit', 'controllership', 'view'],
+        self::ROLE_ADMIN => ['manager', 'edit', 'view'], //'controllership',
         self::ROLE_EDITOR => ['edit', 'view'],
-        self::ROLE_CONTROLLERSHIP => ['controllership', 'view'],
+        self::ROLE_CONTROLLERSHIP => ['edit', 'view', 'audit'],
         self::ROLE_OPERATIONAL => ['partial_view'],
         self::ROLE_PARTNER => ['view'],
     ];
 
     const CAPABILITY_TRANSLATIONS = [
-        'manage' => 'Configurações Gerais',
-        'edit' => 'Editar Metas',
-        'controllership' => 'Editar Checklists',
+        'manager' => 'Configurações Gerais',
+        'edit' => 'Editar',
+        //'controllership' => 'Editar Checklists',
         'audit' => 'Auditar Tarefas',
         'view' => 'Visualização Íntegral',
         'partial_view' => 'Visualização Limitada',
@@ -133,12 +133,12 @@ class User extends Authenticatable
     public static function generatePermissionsTable()
     {
         $roles = array_keys(self::USER_ROLES);
-        $capabilitiesList = ['manage', 'edit', 'controllership', 'view', 'partial_view'];
+        $capabilitiesList = array_keys(self::CAPABILITY_TRANSLATIONS);
 
         $caption = '<div class="row">';
-            $caption .= '<div class="col text-end fw-normal fs-12"><i class="ri-checkbox-circle-fill text-success me-1 align-bottom" title="Ok"></i> Acesso permitido</div>';
+            $caption .= '<div class="col text-end fw-normal fs-12"><i class="ri-checkbox-circle-fill text-success me-1 align-bottom" title="Ok"></i> Habilitado</div>';
             //$caption .= '<div class="col fw-normal fs-12"><i class="ri-error-warning-line text-warning me-1 align-bottom" title="Limitações Administrativas"></i> Limitado pela Atribuição</div>';
-            $caption .= '<div class="col text-start fw-normal fs-12"><i class="ri-close-circle-line text-danger me-1 align-bottom" title="Não permitido"></i> Não permitido</div>';
+            $caption .= '<div class="col text-start fw-normal fs-12"><i class="ri-close-circle-line text-danger me-1 align-bottom" title="Não permitido"></i> Desabilitado</div>';
             //$caption .= '<div class="col fw-normal fs-12"><i class="ri-forbid-2-line text-info me-1 align-bottom" title="Somente visualização"></i> Somente visualização</div>';
         $caption .= '</div>';
 
@@ -167,7 +167,7 @@ class User extends Authenticatable
                             foreach ($roles as $roleId) {
                                 $html .= '<td class="text-center">';
                                 if (in_array($capability, self::USER_ROLES[$roleId])) {
-                                    $html .= '<i class="ri-checkbox-circle-fill text-success" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Permitido" data-bs-original-title="Permitido"></i>';
+                                    $html .= '<i class="ri-checkbox-circle-fill text-success" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Habilitado" data-bs-original-title="Habilitado"></i>';
                                 }
                                 /*
                                 else if ($roleId == 4) {
@@ -175,7 +175,7 @@ class User extends Authenticatable
                                 }
                                 */
                                 else {
-                                    $html .= '<i class="ri-close-circle-line text-danger" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Não permitido" data-bs-original-title="Não permitido"></i>';
+                                    $html .= '<i class="ri-close-circle-line text-danger" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Desabilitado" data-bs-original-title="Desabilitado"></i>';
                                 }
                                 $html .= '</td>';
                             }

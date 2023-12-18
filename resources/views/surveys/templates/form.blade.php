@@ -38,7 +38,7 @@
                                 <button type="button" class="btn btn-ghost-danger btn-icon rounded-pill btn-remove-topic ri-delete-bin-3-line" data-target="{{ $termId . $topicIndex }}" title="Remover Tópico" tabindex="-1"></button>
                             </div>
                             <div class="col">
-                                <input type="text" class="form-control" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia? " placeholder="Tópico..." name="steps[{{$stepIndex}}]['topics']['question']" value="{{$question}}" maxlength="150" required>
+                                <input type="text" class="form-control input-topic" title="Exemplo: Organização do setor?... Abastecimento de produtos/insumos está em dia?" placeholder="Tópico..." name="steps[{{$stepIndex}}]['topics']['question']" value="{{$question}}" maxlength="150" required>
                             </div>
                             <div class="col-auto">
                                 <div class="btn btn-ghost-dark btn-icon rounded-pill cursor-n-resize handle-topic ri-arrow-up-down-line" title="Reordenar Tópico"></div>

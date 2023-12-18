@@ -175,10 +175,10 @@ class SettingsDatabase extends Model
         if ($database) {
             $databaseName = 'smApp' . $database;
 
-            $databaseExists = DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$databaseName]);
+            /*$databaseExists = DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$databaseName]);
             if (!$databaseExists) {
                 return null;
-            }
+            }*/
 
             config(['database.connections.smAppTemplate.database' => $databaseName]);
         }

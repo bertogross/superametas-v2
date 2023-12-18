@@ -90,7 +90,9 @@
                                             <button type="button" class="d-none" id="btn-survey-template-autosave" data-autosave="yes" tabindex="-1"></button>
                                         --}}
 
-                                        <button type="button" class="btn btn-label right btn-theme mt-5" id="btn-survey-template-store-or-update" tabindex="-1" data-autosave="no"><i class="ri-save-3-line label-icon align-middle fs-16 ms-1"></i>{{ $data ? 'Atualizar' : 'Salvar' }} Formulário</button>
+                                        <a href="{{route('surveysIndexURL')}}" onclick="return confirm('Deseja sair sem {{ $data ? 'Atualizar' : 'Salvar' }} o Modelo?');" class="btn btn-sm btn-label left btn-dark mt-5 float-start" tabindex="-1" data-autosave="no"><i class="ri-logout-box-line label-icon align-middle fs-16 me-1"></i>Sair</a>
+
+                                        <button type="button" class="btn btn-label right btn-theme mt-5" id="btn-survey-template-store-or-update" tabindex="-1" data-autosave="no"><i class="ri-save-3-line label-icon align-middle fs-16 ms-1"></i>{{ $data ? 'Atualizar' : 'Salvar' }} Modelo</button>
                                     </div>
                                 </div>
 

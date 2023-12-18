@@ -92,9 +92,9 @@
             <div class="col-auto layout-rightside-col d-block">
                 <div class="overlay"></div>
                 <div class="layout-rightside pb-2">
-                    <div class="card h-100 rounded-2 mb-0">
+                    <div class="card rounded-2 mb-0">
                         <div class="card-body p-3">
-                            <div class="tasks-wrapper overflow-auto" id="load-surveys-activities">
+                            <div class="tasks-wrapper-survey overflow-auto h-100" id="load-surveys-activities" data-subDays="7">
                                 <div class="text-center">
                                     <div class="spinner-border text-theme mt-3 mb-3" role="status">
                                         <span class="sr-only">Loading...</span>

@@ -9,18 +9,18 @@ class OnboardController extends Controller
 {
 
     // Get the password of a user from other smApp databases
-    protected function getPasswordFromOtherDatabases($email)
+    public static function getPasswordFromOtherDatabases($email)
     {
         // Get the list of other smApp databases from smOnboard
-        $otherDatabases = $this->getOtherDatabases($email);
+        $otherDatabases = OnboardController::getOtherDatabases($email);
 
-        foreach ($otherDatabases as $databaseName) {
+        foreach ($otherDatabases as $data) {
             // Skip the current database
-            if ($databaseName == config('database.connections.smAppTemplate.database')) {
+            if ($data['database'] == config('database.connections.smAppTemplate.database')) {
                 continue;
             }
 
-            $databaseExists = DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$databaseName]);
+            $databaseExists = DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$data['database']]);
             if (!$databaseExists) {
                 return null;
             }
@@ -31,7 +31,7 @@ class OnboardController extends Controller
                     'driver' => 'mysql',
                     'host' => env('DB_HOST'),
                     'port' => env('DB_PORT'),
-                    'database' => $databaseName,
+                    'database' => $data['database'],
                     'username' => env('DB_USERNAME'),
                     'password' => env('DB_PASSWORD'),
                     'charset' => 'utf8mb4',
@@ -50,9 +50,13 @@ class OnboardController extends Controller
                 ->first();
 
             if ($user) {
+                // Disconnect from the other database
+                DB::disconnect('otherDatabase');
+
                 // Return the user's password
                 return $user->password;
             }
+
             // Disconnect from the other database
             DB::disconnect('otherDatabase');
         }
@@ -62,7 +66,7 @@ class OnboardController extends Controller
     }
 
     // Update/Create subusers in smOnboard
-    protected function updateOrCreateSubUser($email)
+    public static function updateOrCreateSubUser($email)
     {
         $databaseConnection = config('database.connections.smAppTemplate.database');
 
@@ -71,22 +75,24 @@ class OnboardController extends Controller
 
         // Update or create a record in app_subusers
         $onboardConnection = DB::connection('smOnboard');
-        $subuser = $onboardConnection->table('app_subusers')
+
+        $subuserExist = $onboardConnection->table('app_subusers')
             ->where('sub_user_email', $email)
             ->first();
 
-        if ($subuser) {
+        if ($subuserExist) {
             // Update the app_IDs column to include the new app_ID
-            $appIds = json_decode($subuser->app_IDs, true);
+            $appIds = json_decode($subuserExist->app_IDs, true);
             if (!in_array($databaseId, $appIds)) {
                 $appIds[] = $databaseId;
+
                 $onboardConnection->table('app_subusers')
                     ->where('sub_user_email', $email)
                     ->update(['app_IDs' => json_encode($appIds)]);
             }
         } else {
             // Create a new record with the given email and app_ID
-            $appIds = array($databaseId);
+            $appIds = [$databaseId];
             $onboardConnection->table('app_subusers')
                 ->insert([
                     'sub_user_email' => $email,

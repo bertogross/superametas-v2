@@ -1,9 +1,11 @@
 import {
     toastAlert,
+    sweetWizardAlert,
     lightbox,
     debounce,
     updateProgressBar,
-    updateLabelClasses
+    updateLabelClasses,
+    uncheckRadiosAndUpdateLabels
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -78,20 +80,23 @@ document.addEventListener('DOMContentLoaded', function() {
             button.addEventListener('click', event => {
                 event.preventDefault();
 
+                button.blur();
+
                 const container = document.getElementById('assignment-container');
                 if (!container) {
                     console.error('Container not found');
                     return;
                 }
 
-                const responsesData = button.closest('.responses-data-container');
-                if (!responsesData) {
+                const responsesDataContainer = button.closest('.responses-data-container');
+                if (!responsesDataContainer) {
                     console.error('Responses data container not found');
                     return;
                 }
 
-                const textArea = responsesData.querySelector('textarea');
-                const btnPhoto = responsesData.querySelector('.btn-add-photo');
+                const textArea = responsesDataContainer.querySelector('textarea');
+                const btnPhoto = responsesDataContainer.querySelector('.btn-add-photo');
+                const btnsCompliance = responsesDataContainer.querySelectorAll('.btn-compliance');
 
                 //const countTopics = document.querySelectorAll('.btn-response-update').length;
                 //console.log('countTopics', countTopics);
@@ -102,36 +107,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const stepId = parseInt(button.getAttribute('data-step-id'));
                 const topicId = parseInt(button.getAttribute('data-topic-id'));
 
-                var responseId = responsesData.querySelector('input[name="response_id"]').value;
+                var responseId = responsesDataContainer.querySelector('input[name="response_id"]').value;
                 responseId = responseId ? parseInt(responseId) : null;
 
-                const compliance = responsesData.querySelector('input[name="compliance_survey"]:checked')?.value || '';
+                const compliance = responsesDataContainer.querySelector('input[type="radio"][name="compliance_survey"]:checked')?.value || '';
+                const radios = responsesDataContainer.querySelectorAll('input[type="radio"][name="compliance_survey"]');
 
-                const comment = responsesData.querySelector('textarea[name="comment_survey"]')?.value || '';
-                const attachmentInputs = responsesData.querySelectorAll('input[name="attachment_id[]"]');
+                const comment = responsesDataContainer.querySelector('textarea[name="comment_survey"]')?.value || '';
+                const attachmentInputs = responsesDataContainer.querySelectorAll('input[name="attachment_id[]"]');
                 const attachmentIds = Array.from(attachmentInputs).map(input => input.value);
 
-                if (attachmentIds.length === 0) {
-                    // Select all radio buttons with the name 'compliance_survey'
-                    const complianceSurveyRadios = responsesData.querySelectorAll('input[name="compliance_survey"]');
-
-                    // Uncheck each radio button
-                    complianceSurveyRadios.forEach(radio => {
-                        radio.checked = false;
-                    });
-
-                    btnPhoto.classList.add('blink', 'bg-warning');
-                    setTimeout(() => {
-                        btnPhoto.classList.remove('blink', 'bg-warning');
-                    }, 5000);
-
-                    toastAlert('Primeiro envie uma foto', 'warning', 7000);
-
-                    return;
-                }
-
                 // Select the radio buttons
-                const radios = responsesData.querySelectorAll('input[type="radio"][name="compliance_survey"]');
                 radios.forEach(radio => {
                     radio.addEventListener('change', function() {
                         // When a radio button changes, update the label classes
@@ -139,8 +125,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 });
 
-                var pendingIcon = responsesData.querySelector('.ri-time-line');
-                var completedIcon = responsesData.querySelector('.ri-check-double-fill');
+                var pendingIcon = responsesDataContainer.querySelector('.ri-time-line');
+                var completedIcon = responsesDataContainer.querySelector('.ri-check-double-fill');
+
+                /*
+                if ( compliance == 'no' && attachmentIds.length === 0 ) {
+
+                    btnPhoto.classList.add('blink', 'bg-warning');
+                    setTimeout(() => {
+                        btnPhoto.classList.remove('blink', 'bg-warning');
+                    }, 5000);
+
+                    // Uncheck each radio button
+                    uncheckRadiosAndUpdateLabels(radios);
+
+                    // If responseId is not set, show the pending icon and hide the completed icon
+                    if (pendingIcon) pendingIcon.classList.remove('d-none');
+                    if (completedIcon) completedIcon.classList.add('d-none');
+
+                    document.querySelector('#btn-response-finalize').classList.add('d-none');
+                }
+                */
 
                 const formData = {
                     assignment_id: assignmentId,
@@ -172,18 +177,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(data => {
+                    const countResponses = parseInt(data.countResponses || 0);
+                    const countTopics = parseInt(data.countTopics || 0);
+                    updateProgressBar(countResponses, countTopics, 'survey-progress-bar');
+
                     if (data.success) {
                         //toastAlert(data.message, 'success', 5000);
 
                         const responseId = data.id;
                         //const countFinishedTopics = parseInt(data.count || 0);
                         //console.log('countFinishedTopics', countFinishedTopics);
-
-                        const countResponses = parseInt(data.countResponses || 0);
-                        const countTopics = parseInt(data.countTopics || 0);
-                        updateProgressBar(countResponses, countTopics, 'survey-progress-bar');
-
-                        responsesData.querySelector('input[name="response_id"]').value = responseId;
 
                         if (responseId) {
                             // If responseId is set, show the completed icon and hide the pending icon
@@ -200,10 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (completedIcon) completedIcon.classList.add('d-none');
                         }
 
-                        /*if( countFinishedTopics >= countTopics ){
-                            // enable button to finish
-                            document.querySelector('#btn-response-finalize').classList.remove('d-none');
-                        }*/
                     } else {
                         //console.log('Erro:', data.message);
 
@@ -218,35 +217,46 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
 
                         if(data.action2 == 'showTextarea'){
+                            uncheckRadiosAndUpdateLabels(radios);
+
                             textArea.style.display = "block";
 
                             textArea.focus();
 
                             textArea.classList.add('blink', 'bg-warning-subtle');
+
                             setTimeout(() => {
                                 textArea.classList.remove('blink', 'bg-warning-subtle');
                             }, 3000);
                         }else if(data.action2 == 'blinkPhotoButton'){
                             btnPhoto.classList.add('blink', 'bg-warning');
+
                             setTimeout(() => {
                                 btnPhoto.classList.remove('blink', 'bg-warning');
                             }, 3000);
+
+                            uncheckRadiosAndUpdateLabels(radios);
+                        }else if(data.action2 == 'blinkComplianceButtons'){
+                            if(btnsCompliance){
+                                Array.from(btnsCompliance).forEach(function (btn) {
+                                    btn.classList.add('blink');
+
+                                    setTimeout(() => {
+                                        btn.classList.remove('blink');
+                                    }, 5000);
+                                });
+                            }
                         }
 
                         toastAlert(data.message, 'danger', 7000);
                     }
 
                     if(data.showFinalizeButton){
-                        setTimeout(() => {
+                        //setTimeout(() => {
                             document.querySelector('#btn-response-finalize').classList.remove('d-none');
 
-                            //document.querySelector('#btn-response-finalize').click();
-
-                            if(document.querySelector('#survey-progress-bar')){
-                                document.querySelector('#survey-progress-bar').remove();
-                            }
-                        }, 1000);
-
+                            sweetWizardAlert('Tarefa Concluída', false, 'success', 'Continuar Editando', 'Finalizar', '#btn-response-finalize');
+                        //}, 1000);
                     }
                 })
                 .catch(error => console.error('Error:', error));
@@ -254,21 +264,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
     // Attach event listeners to compliance survey radio buttons
-    const complianceSurveyRadios = document.querySelectorAll('input[name="compliance_survey"]');
-    if(complianceSurveyRadios){
-        complianceSurveyRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                const container = this.closest('.responses-data-container');
+    function attachComplianceSurveyRadios(){
+        const complianceSurveyRadios = document.querySelectorAll('input[name="compliance_survey"]');
+        if(complianceSurveyRadios){
+            complianceSurveyRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const container = this.closest('.responses-data-container');
 
-                const updateButton = container.querySelector('.btn-response-update');
-                if (updateButton) {
-                    updateButton.click();
-                }
-            }, 500);
-        });
+                    const updateButton = container.querySelector('.btn-response-update');
+                    if (updateButton) {
+                        updateButton.click();
+                    }
+                }, 1);
+            });
+        }
     }
+    attachComplianceSurveyRadios();
 
     // Attach event listener to the comment textarea
     const commentSurveyorTextareas = document.querySelectorAll('textarea[name="comment_survey"]');
@@ -276,14 +288,14 @@ document.addEventListener('DOMContentLoaded', function() {
         commentSurveyorTextareas.forEach(textarea => {
             textarea.addEventListener('input', debounce(function() {
                 const container = this.closest('.responses-data-container');
+
                 const updateButton = container.querySelector('.btn-response-update');
                 if (updateButton) {
                     updateButton.click();
                 }
-            }, 1000)); // 1000 milliseconds = 1 second
+            }, 3000)); // 3000 milliseconds = 3 second
         });
     }
-
 
     // When Surveyor finish your taks, transfer to Auditor make revision
     const responseSurveyorAssignmentFinalizedButton = document.getElementById('btn-response-finalize');
@@ -291,89 +303,45 @@ document.addEventListener('DOMContentLoaded', function() {
         responseSurveyorAssignmentFinalizedButton.addEventListener('click', async function(event) {
             event.preventDefault();
 
-            const container = document.getElementById('assignment-container');
-            if (!container) {
-                console.error('Container not found');
-                return;
-            }
-            const surveyId = parseInt(container.querySelector('input[name="survey_id"]')?.value || 0);
-
             const assignmentId = parseInt(this.getAttribute('data-assignment-id'));
 
-            Swal.fire({
-                title: 'A tarefa foi concluída!',
-                icon: 'success',
-                showDenyButton: false,
-                showCancelButton: true,
-                confirmButtonText: 'Finalizar',
-                confirmButtonClass: 'btn btn-outline-success w-xs me-2',
-                cancelButtonClass: 'btn btn-sm btn-outline-info w-xs',
-                denyButtonClass: 'btn btn-danger w-xs me-2',
-                buttonsStyling: false,
-                denyButtonText: 'Não',
-                cancelButtonText: 'Continuar Editando',
-                showCloseButton: false,
-                allowOutsideClick: false
-            }).then(function (result) {
-                if (result.isConfirmed) {
-                    //Ajax to change 'surveys' table column status to 'auditing' and if the response is success call Swal.fire to redirect
-                    fetch(changeAssignmentSurveyorStatusURL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
-                        },
-                        body: JSON.stringify({ assignment_id: assignmentId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            toastAlert(data.message, 'success');
+            const container = document.getElementById('assignment-container');
+            if (!container || !assignmentId) {
+                console.error('Container or assignmentId not found');
 
-                            var timerInterval;
+                toastAlert('Ocorreu um erro. Atualize a sessão ou retorne mais tarde.', 'danger', 20000);
 
-                            Swal.fire({
-                                title: 'Redirecionando...',
-                                html: '',
-                                timer: 3000,
-                                timerProgressBar: true,
-                                showCloseButton: false,
-                                didOpen: function () {
-                                    Swal.showLoading()
-                                    timerInterval = setInterval(function () {
-                                        var content = Swal.getHtmlContainer()
-                                        if (content) {
-                                            var b = content.querySelector('b')
-                                            if (b) {
-                                                b.textContent = Swal.getTimerLeft()
-                                            }
-                                        }
-                                    }, 100)
-                                },
-                                onClose: function () {
-                                    clearInterval(timerInterval)
-                                }
-                            }).then(function (result) {
-                                if (result.dismiss === Swal.DismissReason.timer) {
-                                    //console.log('I was closed by the timer')
-                                    window.location.href = profileShowURL;
-                                }
-                            });
-                        } else {
-                            // Handle error
-                            console.error('Survey status error:', data.message);
+                return;
+            }
 
-                            toastAlert(data.message, 'danger', 5000);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+            //Ajax to change 'surveys' table column status to 'auditing' and if the response is success call Swal.fire to redirect
+            fetch(changeAssignmentSurveyorStatusURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                },
+                body: JSON.stringify({ assignment_id: assignmentId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    toastAlert(data.message, 'success');
 
+                    window.location.href = profileShowURL;
+
+                } else {
+                    // Handle error
+                    console.error('Survey status error:', data.message);
+
+                    toastAlert(data.message, 'danger', 5000);
                 }
             })
+            .catch(error => console.error('Error:', error));
         });
     }
 
-
     lightbox();
+
 
 });

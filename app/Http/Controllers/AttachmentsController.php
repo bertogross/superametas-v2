@@ -76,12 +76,12 @@ class AttachmentsController extends Controller
         }
     }
 
-    public function deletePhoto(Request $request = null, $id)
+    public function deletePhoto(Request $request = null, $attachmentId)
     {
-        if($id){
+        if($attachmentId){
             try {
                 // Retrieve the attachment from the database
-                 $attachment = Attachments::find($id);
+                 $attachment = Attachments::find($attachmentId);
 
                 if (!$attachment) {
                     return response()->json(['success' => false, 'message' => 'Anexo não encontrado'], 404);
@@ -95,12 +95,29 @@ class AttachmentsController extends Controller
                 // Delete the attachment record from the database
                 $attachment->delete();
 
+                // Delete the attachment id from the survey_responses table collum attachments_survey/attachments_audit
+                AttachmentsController::deleteAttachmentIdFromJsonColumn('attachments_survey', $attachmentId);
+                AttachmentsController::deleteAttachmentIdFromJsonColumn('attachments_audit', $attachmentId);
+
                 return response()->json(['success' => true, 'message' => 'Anexo excluído com êxito'], 200);
 
             } catch (\Exception $e) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
         }
+    }
+
+    // Delete an attachment ID from a JSON column in the survey_responses table.
+    public static function deleteAttachmentIdFromJsonColumn($columnName, $attachmentId) {
+        DB::connection('smAppTemplate')->table('survey_responses')
+            ->whereNotNull($columnName) // Check if the column is not null
+            ->whereJsonContains($columnName, $attachmentId)
+            ->update([
+                $columnName => DB::raw("JSON_REMOVE(
+                    `$columnName`,
+                    REPLACE(JSON_SEARCH(`$columnName`, 'one', '{$attachmentId}'), '\"', '')
+                )")
+            ]);
     }
 
 

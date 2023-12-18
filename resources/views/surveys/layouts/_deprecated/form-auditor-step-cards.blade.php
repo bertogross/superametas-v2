@@ -115,7 +115,7 @@
                                                                     <div class="gallery-box card p-0 mb-0 mt-1">
                                                                         <div class="gallery-container">
                                                                             <a href="{{ $attachmentUrl }}" class="image-popup" title="Imagem capturada em {{$dateAttachment}}hs" data-gallery="gallery-{{$responseId}}">
-                                                                                <img class="rounded gallery-img" alt="image" height="70" src="{{ $attachmentUrl }}" loading="lazy">
+                                                                                <img class="rounded gallery-img" alt="image" height="70" src="{{ $attachmentUrl }}">
 
                                                                                 <div class="gallery-overlay">
                                                                                     <h5 class="overlay-caption fs-10">{{$dateAttachment}}</h5>

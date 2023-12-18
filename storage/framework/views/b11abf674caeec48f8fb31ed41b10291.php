@@ -14,7 +14,7 @@
     <meta http-equiv="expires" content="-1">
     <meta name="robots" content="noindex,nofollow,nopreview,nosnippet,notranslate,noimageindex,nomediaindex,novideoindex,noodp,noydir">
     <meta property="og:image" content="<?php echo e(URL::asset('build/images/logo-sm' . $logo2 . '.png')); ?>">
-    <meta content="Solução para ajudar sua equipe a atingir e Superar suas Metas de Vendas" name="description" />
+    <meta content="<?php echo e(appDescription()); ?>" name="description" />
     <meta name="author" content="<?php echo e(appName()); ?>" />
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <!-- App favicon -->

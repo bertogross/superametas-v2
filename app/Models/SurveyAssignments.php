@@ -23,8 +23,8 @@ class SurveyAssignments extends Model
     {
         $distributedData = $distributedData ? json_decode($distributedData, true) : null;
         $distributedDataMerged = [];
-        //foreach ($distributedData['audited_by'] as $audited) {
-            foreach ($distributedData['delegated_to'] as $delegated) {
+        //foreach ($distributedData['auditor_id'] as $audited) {
+            foreach ($distributedData['surveyor_id'] as $delegated) {
                 //if ($audited['company_id'] === $delegated['company_id']) {
                     $distributedDataMerged[] = [
                         'company_id' => $delegated['company_id'],
@@ -71,7 +71,8 @@ class SurveyAssignments extends Model
     }
 
     // Get the most recent date of assignment for the specific survey
-    public static function removeDistributingAssignments($surveyId) {
+    public static function removeDistributingAssignments($surveyId)
+    {
         $lastDate = DB::connection('smAppTemplate')->table('survey_assignments')
             ->where('survey_id', $surveyId)
             ->whereIn('surveyor_status', ['new', 'pending', 'in_progress', ''])
@@ -110,6 +111,67 @@ class SurveyAssignments extends Model
             SurveyResponse::whereIn('assignment_id', $assignmentIds)->delete();
         }
     }
+
+    public static function countSurveyAssignmentBySurveyId($surveyId)
+    {
+        return SurveyAssignments::where('survey_id', $surveyId)
+            ->whereIn('surveyor_status', ['completed'])
+            ->count();
+    }
+
+    public static function getAssignmentDelegatedsBySurveyId($surveyId)
+    {
+        $survey = Survey::findOrFail($surveyId);
+
+        $surveyorIds = $auditorIds = [];
+
+        // First, find on the distributedData because the survey can be not started yet
+        $distributedData = $survey->distributed_data ?? null;
+        if ($distributedData) {
+            $decodedData = json_decode($distributedData, true);
+
+            $surveyorData = $decodedData['surveyor_id'] ?? [];
+            $auditorData = $decodedData['auditor_id'] ?? [];
+        }
+
+        // Second, get from assignments
+        $surveyorQuery = SurveyAssignments::where('survey_id', $surveyId)
+            ->select('surveyor_id AS user_id','company_id')
+            ->get()
+            ->toArray();
+
+        $auditorQuery = SurveyAssignments::where('survey_id', $surveyId)
+            ->select('auditor_id AS user_id','company_id')
+            ->get()
+            ->toArray();
+
+        // Merge
+        $surveyorMerged = array_merge($surveyorData, $surveyorQuery);
+        $auditorMerged = array_merge($auditorData, $auditorQuery);
+
+        // Remove duplicates
+        $surveyorResult = array_values(array_intersect_key($surveyorMerged, array_unique(array_map(function($item) {
+            return $item['user_id'] . '-' . $item['company_id'];
+        }, $surveyorMerged))));
+
+        $auditorResult = array_values(array_intersect_key($auditorMerged, array_unique(array_map(function($item) {
+            return $item['user_id'] . '-' . $item['company_id'];
+        }, $auditorMerged))));
+
+        return [
+            'surveyors' => $surveyorResult ?? null,
+            'auditors' => $auditorResult ?? null
+        ];
+    }
+
+    /*public static function getSurveysDelegatedsByUserId($userId)
+    {
+        return SurveyAssignments::where('surveyor_id', $userId)
+            ->orWhere('auditor_id', $userId)
+            ->select('survey_id')
+            ->get()
+            ->toArray();
+    }*/
 
     public static function changeSurveyorAssignmentStatus($assignmentId, $status)
     {
@@ -187,8 +249,8 @@ class SurveyAssignments extends Model
         // Assuming you have a method to count the total number of topics/questions in a survey
         $totalTopics = SurveyTopic::countSurveyTopics($surveyId);
 
-        $countSurveyAuditor = SurveyResponse::countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId);
-        $countSurveySurveyor = SurveyResponse::countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId);
+        $countSurveyAuditor = SurveyResponse::countSurveyAuditorResponses($auditorId, $surveyId, $assignmentId);
+        $countSurveySurveyor = SurveyResponse::countSurveySurveyorResponses($surveyorId, $surveyId, $assignmentId);
 
         if($auditorId === $surveyId){
             $countResponses = ($countSurveySurveyor + $countSurveyAuditor) / 2;
@@ -260,18 +322,24 @@ class SurveyAssignments extends Model
                 'description' => 'Tarefas não concluídas no prazo',
                 'icon' => 'ri-skull-line',
                 'color' => 'danger'
+            ],
+            'bypass' => [
+                'label' => 'Ignorado',
+                'reverse' => '',
+                'description' => 'Tarefa ignorada',
+                'icon' => 'ri-skull-line',
+                'color' => 'danger'
             ]
         ];
     }
-
 
     // Get a descriptive label title based on the task status and roles involved
     public static function getSurveyAssignmentLabelTitle($surveyorStatus, $auditorStatus)
     {
         if ($surveyorStatus == 'completed' && $auditorStatus == 'completed') {
-            return 'A <u>Checklist</u> e a <u>Auditoria</u> foram efetuadas';
+            return 'A <u>Vistoria</u> e a <u>Auditoria</u> foram efetuadas';
         } elseif ($surveyorStatus == 'completed' && $auditorStatus != 'completed') {
-            return 'A <u>Checklist</u> foi concluída';
+            return 'A <u>Vistoria</u> foi concluída';
         } elseif ($surveyorStatus != 'completed' && $auditorStatus == 'completed') {
             return 'A <u>Auditoria</u> foi concluída';
         } else {
@@ -280,7 +348,8 @@ class SurveyAssignments extends Model
     }
 
     // Get a descriptive title for a date based on the task status
-    public static function getSurveyAssignmentDateTitleByKey($statusKey){
+    public static function getSurveyAssignmentDateTitleByKey($statusKey)
+    {
         switch ($statusKey) {
             case 'completed':
                 return 'A data em que esta tarefa foi desempenhada';
@@ -290,5 +359,6 @@ class SurveyAssignments extends Model
                 return 'A data em que esta tarefa deverá ser desempenhada';
         }
     }
+
 
 }

@@ -31,29 +31,27 @@ class SurveyResponse extends Model
     ];
 
     // Count the number of responses from surveyor
-    public static function countSurveySurveyorResponses($surveyorId, $surveyId, $companyId, $assignmentId) {
+    public static function countSurveySurveyorResponses($surveyorId, $surveyId, $assignmentId) {
         //$today = Carbon::today();
 
         return SurveyResponse::where('survey_id', $surveyId)
             ->where('surveyor_id', $surveyorId)
-            //->where('company_id', $companyId)
             ->where('assignment_id', $assignmentId)
             ->whereNotNull('compliance_survey')
-            ->whereNotNull('attachments_survey')
+            //->whereNotNull('attachments_survey')
             //->whereDate('created_at', '=', $today)
             ->count();
-
     }
 
     // Count the number of responses from auditor
-    public static function countSurveyAuditorResponses($auditorId, $surveyId, $companyId, $assignmentId) {
-        $today = Carbon::today();
+    public static function countSurveyAuditorResponses($auditorId, $surveyId, $assignmentId) {
+        //$today = Carbon::today();
 
         return SurveyResponse::where('survey_id', $surveyId)
             ->where('auditor_id', $auditorId)
-            //->where('company_id', $companyId)
             ->where('assignment_id', $assignmentId)
             ->whereNotNull('compliance_audit')
+            //->whereNotNull('attachments_audit')
             //->whereDate('created_at', '=', $today)
             ->count();
     }

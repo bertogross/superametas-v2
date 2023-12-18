@@ -1,6 +1,9 @@
 @php
     use App\Models\User;
 
+    $user = auth()->user();
+    $currentUserCapabilities = $user->capabilities ? json_decode($user->capabilities, true) : [];
+
     $getUserData = getUserData();
     $getCompanyLogo = getCompanyLogo();
     $getCompanyName = getCompanyName();
@@ -99,7 +102,7 @@
                             <div class="row g-0">
                                 @if (getERP())
                                     <div class="col">
-                                        <a class="dropdown-icon-item" href="{{ route('goalSalesIndexURL') }}" title="Meta de Vendas">
+                                        <a class="dropdown-icon-item" href="{{ route('goalSalesIndexURL') }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Meta de Vendas">
                                             <i class="ri-shopping-cart-2-fill text-theme fs-1"></i>
                                             {{--
                                             <img src="{{ URL::asset('build/images/svg/happy.png') }}" alt="Meta de Vendas" loading="lazy">
@@ -120,7 +123,7 @@
 
                                 @if(auth()->user()->hasRole(User::ROLE_ADMIN) || auth()->user()->hasRole(User::ROLE_CONTROLLERSHIP))
                                     <div class="col">
-                                        <a class="dropdown-icon-item" href="{{ route('surveysIndexURL') }}" title="Checklists">
+                                        <a class="dropdown-icon-item" href="{{ route('surveysIndexURL') }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom"  title="Acessar a sessão Checklists">
                                             <i class="ri-checkbox-line text-theme fs-1"></i>
                                             {{--
                                             <img src="{{ URL::asset('build/images/verification-img.png') }}" alt="Checklists" loading="lazy">
@@ -130,20 +133,31 @@
                                     </div>
 
                                     <div class="col">
-                                        <a class="dropdown-icon-item" href="{{ route('teamIndexURL') }}" title="Equipe">
+                                        <a class="dropdown-icon-item" href="{{ route('teamIndexURL') }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Listar membros da Equipe">
                                             <i class="ri-team-fill text-theme fs-1"></i>
                                             <span>Equipe</span>
                                         </a>
                                     </div>
                                 @endif
+                            </div>
 
+                            {{--
+                            <div class="row g-0">
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="{{ route('profileShowURL') }}" title="Tarefas">
+                                    <a class="dropdown-icon-item" href="{{ route('profileShowURL') }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Acessar minha lista de Tarefas">
                                         <i class="ri-todo-fill text-theme fs-1"></i>
                                         <span>Tarefas</span>
                                     </a>
                                 </div>
+
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="{{ route('surveysAuditIndexURL') }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Acessar a lista de Auditorias realizadas">
+                                        <i class="ri-fingerprint-2-line text-theme fs-1"></i>
+                                        <span>Auditorias</span>
+                                    </a>
+                                </div>
                             </div>
+                            --}}
                         </div>
                     </div>
                 </div>
@@ -206,11 +220,24 @@
                             </a>
                         @endif
 
+                        {{--
                         <a class="dropdown-item" href="{{ route('profileShowURL') }}">
                             <i class="ri-user-3-fill text-muted fs-16 align-middle me-1"></i>
                             <span class="align-middle">Meu Perfil</span>
                         </a>
+                        --}}
 
+                        <a class="dropdown-item" href="{{ route('profileShowURL') }}">
+                            <i class="ri-todo-fill text-muted fs-16 align-middle me-1"></i>
+                            <span class="align-middle">Minhas Tarefas</span>
+                        </a>
+
+                        @if(in_array('audit', $currentUserCapabilities))
+                            <a class="dropdown-item" href="{{ route('surveysAuditIndexURL', $user->id) }}">
+                                <i class="ri-fingerprint-2-line text-muted fs-16 align-middle me-1"></i>
+                                <span class="align-middle">Minhas Auditorias</span>
+                            </a>
+                        @endif
 
                         <!--
                         <a class="dropdown-item" href="auth-lockscreen-basic"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Lock screen</span></a>

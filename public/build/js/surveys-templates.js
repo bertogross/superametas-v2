@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if(clickedElement){
 
+
             const clickedElementId = clickedElement.id;
             //console.log(clickedElementId);
 
@@ -33,6 +34,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const form = document.getElementById('surveyTemplateForm');
                 if (!form) {
                     console.error('Form not found');
+                    return;
+                }
+
+
+                // Check if form has topic fields
+                const countTopics = form.querySelectorAll('.input-topic');
+                if(!countTopics){
+                    alert('Modelo deve conter Tópicos');
                     return;
                 }
 
@@ -78,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         choicesSearchTermsInput.disabled = true;
                     });
                 }*/
+
 
                 // Validate ID
                 const surveyTemplateId = form.querySelector('input[name="id"]').value;

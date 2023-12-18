@@ -1,11 +1,11 @@
-@extends('layouts.master')
-@section('title')
-    {{ $user->name }}
-@endsection
-@section('css')
-@endsection
-@section('content')
-    @php
+<?php $__env->startSection('title'); ?>
+    <?php echo e($user->name); ?>
+
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('css'); ?>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
+    <?php
         $profileUserId = $user->id;
         $phone = getUserMeta($profileUserId, 'phone');
         $phone = formatPhoneNumber($phone);
@@ -13,15 +13,15 @@
         //appPrintR($auditorData);
         //appPrintR($filteredStatuses);
         //appPrintR($assignmentData);
-    @endphp
+    ?>
     <div class="profile-foreground position-relative mx-n4 mt-n5">
         <div class="profile-wid-bg">
             <img
-            @if( empty(trim($user->cover)))
-                src="{{URL::asset('build/images/small/img-9.jpg')}}"
-            @else
-                src="{{ URL::asset('storage/' . $user->cover) }}"
-            @endif
+            <?php if( empty(trim($user->cover))): ?>
+                src="<?php echo e(URL::asset('build/images/small/img-9.jpg')); ?>"
+            <?php else: ?>
+                src="<?php echo e(URL::asset('storage/' . $user->cover)); ?>"
+            <?php endif; ?>
             alt="cover" class="profile-wid-img" loading="lazy"/>
         </div>
     </div>
@@ -31,13 +31,13 @@
             <div class="col-auto">
                 <div class="avatar-lg profile-user position-relative d-inline-block">
                     <img id="avatar-img"
-                    @if( empty(trim($user->avatar)) )
-                        src="{{URL::asset('build/images/users/user-dummy-img.jpg')}}"
-                    @else
-                        src="{{ URL::asset('storage/' . $user->avatar) }}"
-                    @endif
+                    <?php if( empty(trim($user->avatar)) ): ?>
+                        src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
+                    <?php else: ?>
+                        src="<?php echo e(URL::asset('storage/' . $user->avatar)); ?>"
+                    <?php endif; ?>
                     alt="avatar" class="img-thumbnail rounded-circle" loading="lazy" />
-                    @if($user->id == auth()->id())
+                    <?php if($user->id == auth()->id()): ?>
                         <div class="avatar-xs p-0 rounded-circle profile-photo-edit" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="right" title="Alterar Avatar">
                             <input class="d-none" name="avatar" id="member-image-input" type="file" accept="image/jpeg">
                             <label for="member-image-input" class="profile-photo-edit avatar-xs">
@@ -46,36 +46,24 @@
                                 </span>
                             </label>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="col">
                 <div class="p-2">
-                    <h3 class="text-white mb-1 text-shadow">{{ $user->name }}</h3>
-                    <p class="text-white mb-2 text-shadow">{{ $roleName }}</p>
+                    <h3 class="text-white mb-1 text-shadow"><?php echo e($user->name); ?></h3>
+                    <p class="text-white mb-2 text-shadow"><?php echo e($roleName); ?></p>
                     <div class="hstack text-white gap-1">
                         <div class="me-2 text-shadow">
-                            <i class="ri-mail-line text-white fs-16 align-middle me-2"></i>{{ $user->email }}
+                            <i class="ri-mail-line text-white fs-16 align-middle me-2"></i><?php echo e($user->email); ?>
+
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-lg-auto order-last order-lg-0">
                 <div class="row text text-white-50 text-center">
-                    {{--
-                    <div class="col-lg-6 col-4">
-                        <div class="p-2">
-                            <h4 class="text-white mb-1">24.3K</h4>
-                            <p class="fs-14 mb-0">Followers</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-4">
-                        <div class="p-2">
-                            <h4 class="text-white mb-1">1.3K</h4>
-                            <p class="fs-14 mb-0">Following</p>
-                        </div>
-                    </div>
-                    --}}
+                    
                 </div>
             </div>
         </div>
@@ -88,10 +76,10 @@
                     <h5 class="card-title mb-0 flex-grow-1"><i class="ri-todo-fill fs-16 align-bottom text-theme me-2"></i>Tarefas</h5>
                 </div>
                 <div class="card-body pb-0" style="min-height: 150px">
-                    @if ( $assignmentData && is_array($assignmentData) )
+                    <?php if( $assignmentData && is_array($assignmentData) ): ?>
                         <div class="tasks-board mb-0 position-relative" id="kanbanboard">
-                            @foreach ($filteredStatuses as $key => $status)
-                                @php
+                            <?php $__currentLoopData = $filteredStatuses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
                                     $filteredSurveyorData = [];
                                     $filteredAuditorData = [];
 
@@ -112,95 +100,79 @@
                                     $countFilteredAuditorData = is_array($filteredAuditorData) ? count($filteredAuditorData) : 0;
 
                                     $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
-                                @endphp
+                                ?>
 
-                                <div class="tasks-list p-2 {{-- in_array($key, ['waiting', 'auditing', 'pending', 'completed', 'in_progress', 'losted']) && $countTotal < 1 ? 'd-none' : '' --}} {{ in_array($key, ['waiting', 'waiting', 'pending', 'auditing', 'losted']) && $countTotal < 1 ? 'd-none' : '' }}">
+                                <div class="tasks-list p-2  <?php echo e(in_array($key, ['waiting', 'waiting', 'pending', 'auditing', 'losted']) && $countTotal < 1 ? 'd-none' : ''); ?>">
                                     <div class="d-flex mb-3">
                                         <div class="flex-grow-1">
                                             <h6 class="fs-14 text-uppercase fw-semibold mb-1">
-                                                <span data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="{{$status['label']}}" data-bs-content="{{$status['description']}}">
-                                                    {{$status['label']}}
+                                                <span data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="<?php echo e($status['label']); ?>" data-bs-content="<?php echo e($status['description']); ?>">
+                                                    <?php echo e($status['label']); ?>
+
                                                 </span>
-                                                <small class="badge bg-{{$status['color']}} align-bottom ms-1 totaltask-badge">
-                                                    {{ $countTotal }}
+                                                <small class="badge bg-<?php echo e($status['color']); ?> align-bottom ms-1 totaltask-badge">
+                                                    <?php echo e($countTotal); ?>
+
                                                 </small>
                                             </h6>
-                                            <p class="text-muted mb-2">{{$status['description']}}</p>
+                                            <p class="text-muted mb-2"><?php echo e($status['description']); ?></p>
                                         </div>
                                         <div class="flex-shrink-0">
-                                            {{--
-                                            <div class="dropdown card-header-dropdown">
-                                                <a class="text-reset dropdown-btn" href="#" data-bs-toggle="dropdown"
-                                                    aria-haspopup="true" aria-expanded="false">
-                                                    <span class="fw-medium text-muted fs-12">Priority<i
-                                                            class="mdi mdi-chevron-down ms-1"></i></span>
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end">
-                                                    <a class="dropdown-item" href="#">Priority</a>
-                                                    <a class="dropdown-item" href="#">Date Added</a>
-                                                </div>
-                                            </div>
-                                            --}}
+                                            
                                         </div>
                                     </div>
                                     <div data-simplebar class="tasks-wrapper">
-                                        <div id="{{$key}}-task" class="tasks mb-2 pb-3">
+                                        <div id="<?php echo e($key); ?>-task" class="tasks mb-2 pb-3">
 
-                                            @include('surveys.layouts.profile-task-card', [
+                                            <?php echo $__env->make('surveys.layouts.profile-task-card', [
                                                 'user' => $user,
                                                 'status' => $status,
                                                 'statusKey' => $key,
                                                 'designated' => 'surveyor',
                                                 'data' => $filteredSurveyorData
-                                            ])
+                                            ], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-                                            @include('surveys.layouts.profile-task-card', [
+                                            <?php echo $__env->make('surveys.layouts.profile-task-card', [
                                                 'user' => $user,
                                                 'status' => $status,
                                                 'statusKey' => $key,
                                                 'designated' => 'auditor',
                                                 'data' => $filteredAuditorData
-                                            ])
+                                            ], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
                                         </div>
                                     </div>
                                 </div>
                                 <!--end tasks-list-->
-                            @endforeach
-                            {{--
-                            @if ($countTasks === 0)
-                                <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show ms-auto me-auto" role="alert">
-                                    <i class="ri-alert-line label-icon"></i> Tarefas ainda não lhe foram atribuídas
-                                </div>
-                            @endif
-                            --}}
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            
                         </div>
-                    @else
+                    <?php else: ?>
                         <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show" role="alert">
                             <i class="ri-alert-line label-icon"></i> Tarefas ainda não foram delegadas
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
         <div class="col-sm-12 col-md-5 col-lg-3 col-xxl-2">
-            @php
+            <?php
                 $countAuditorTasks = \App\Models\User::countAuditorTasks($profileUserId);
                 $countSurveyorTasks = \App\Models\User::countSurveyorTasks($profileUserId);
-            @endphp
+            ?>
             <div class="card h-100">
                 <div class="card-header align-items-center d-flex">
                     <h5 class="card-title mb-0 flex-grow-1"><i class="ri-line-chart-fill fs-16 align-bottom text-theme me-2"></i>Síntese</h5>
                 </div>
                 <div class="card-body" style="min-height: 150px">
 
-                    @if($countSurveyorTasks > 0)
+                    <?php if($countSurveyorTasks > 0): ?>
                         <div class="text-center">
-                            <div class="text-muted"><span class="fw-medium">{{$countSurveyorTasks}}</span> {{ $countSurveyorTasks > 1 ? 'Vistorias' : 'Vistoria' }} {{ $countSurveyorTasks > 1 ? 'Atribuídas' : 'Atribuída' }}</div>
+                            <div class="text-muted"><span class="fw-medium"><?php echo e($countSurveyorTasks); ?></span> <?php echo e($countSurveyorTasks > 1 ? 'Vistorias' : 'Vistoria'); ?> <?php echo e($countSurveyorTasks > 1 ? 'Atribuídas' : 'Atribuída'); ?></div>
                         </div>
                         <div class="mt-2 mb-4">
-                            @foreach ($filteredStatuses as $key => $status)
-                                @php
+                            <?php $__currentLoopData = $filteredStatuses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
                                     $filteredSurveyorData = [];
                                     $filteredAuditorData = [];
 
@@ -224,41 +196,42 @@
 
                                     $percentage = $countSurveyorTasks > 0 && $countTotal > 0 ? ($countTotal / $countSurveyorTasks) * 100 : 0;
                                     $percentage = number_format($percentage, 0);
-                                @endphp
-                                @if($percentage > 0)
+                                ?>
+                                <?php if($percentage > 0): ?>
                                     <div class="row align-items-center g-2">
                                         <div class="col-auto">
                                             <div class="p-1" style="min-width: 100px;">
-                                                <h6 class="mb-0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="{{$status['label']}}" data-bs-content="{{$status['description']}}">
-                                                    {{$status['label']}}
+                                                <h6 class="mb-0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="<?php echo e($status['label']); ?>" data-bs-content="<?php echo e($status['description']); ?>">
+                                                    <?php echo e($status['label']); ?>
+
                                                 </h6>
                                             </div>
                                         </div>
                                         <div class="col">
                                             <div class="p-1">
-                                                <div class="progress animated-progress progress-sm" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Equivalente a {{ $percentage }}% de {{$countSurveyorTasks}} tarefas">
-                                                    <div class="progress-bar bg-{{getProgressBarClass($percentage)}}" role="progressbar" style="width: {{$percentage}}%" aria-valuenow="{{$percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                <div class="progress animated-progress progress-sm" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Equivalente a <?php echo e($percentage); ?>% de <?php echo e($countSurveyorTasks); ?> tarefas">
+                                                    <div class="progress-bar bg-<?php echo e(getProgressBarClass($percentage)); ?>" role="progressbar" style="width: <?php echo e($percentage); ?>%" aria-valuenow="<?php echo e($percentage); ?>" aria-valuemin="0" aria-valuemax="100"></div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-auto">
                                             <div class="p-1">
-                                                <h6 class="mb-0 text-{{$status['color']}}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Total de tarefas relacionadas ao status {{$status['label']}}">{{ $countTotal }}</h6>
+                                                <h6 class="mb-0 text-<?php echo e($status['color']); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Total de tarefas relacionadas ao status <?php echo e($status['label']); ?>"><?php echo e($countTotal); ?></h6>
                                             </div>
                                         </div>
                                     </div>
-                                @endif
-                            @endforeach
+                                <?php endif; ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    @if($countAuditorTasks > 0)
+                    <?php if($countAuditorTasks > 0): ?>
                         <div class="text-center">
-                            <div class="text-muted"><span class="fw-medium">{{$countAuditorTasks}}</span> {{ $countAuditorTasks > 1 ? 'Auditorias' : 'Auditoria' }} {{ $countAuditorTasks > 1 ? 'Requisitadas' : 'Requisitada' }}</div>
+                            <div class="text-muted"><span class="fw-medium"><?php echo e($countAuditorTasks); ?></span> <?php echo e($countAuditorTasks > 1 ? 'Auditorias' : 'Auditoria'); ?> <?php echo e($countAuditorTasks > 1 ? 'Requisitadas' : 'Requisitada'); ?></div>
                         </div>
                         <div class="mt-2 mb-4">
-                            @foreach ($filteredStatuses as $key => $status)
-                                @php
+                            <?php $__currentLoopData = $filteredStatuses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
                                     $filteredSurveyorData = [];
                                     $filteredAuditorData = [];
 
@@ -282,79 +255,78 @@
 
                                     $percentage = $countAuditorTasks > 0 && $countTotal > 0 ? ($countTotal / $countAuditorTasks) * 100 : 0;
                                     $percentage = number_format($percentage, 0);
-                                @endphp
-                                @if($percentage > 0)
+                                ?>
+                                <?php if($percentage > 0): ?>
                                     <div class="row align-items-center g-2">
                                         <div class="col-auto">
                                             <div class="p-1" style="min-width: 100px;">
-                                                <h6 class="mb-0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="{{$status['label']}}" data-bs-content="{{$status['description']}}">
-                                                    {{$status['label']}}
+                                                <h6 class="mb-0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="<?php echo e($status['label']); ?>" data-bs-content="<?php echo e($status['description']); ?>">
+                                                    <?php echo e($status['label']); ?>
+
                                                 </h6>
                                             </div>
                                         </div>
                                         <div class="col">
                                             <div class="p-1">
-                                                <div class="progress animated-progress progress-sm" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Equivalente a {{ $percentage }}% de {{$countSurveyorTasks}} tarefas">
-                                                    <div class="progress-bar bg-{{getProgressBarClass($percentage)}}" role="progressbar" style="width: {{$percentage}}%" aria-valuenow="{{$percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                <div class="progress animated-progress progress-sm" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Equivalente a <?php echo e($percentage); ?>% de <?php echo e($countSurveyorTasks); ?> tarefas">
+                                                    <div class="progress-bar bg-<?php echo e(getProgressBarClass($percentage)); ?>" role="progressbar" style="width: <?php echo e($percentage); ?>%" aria-valuenow="<?php echo e($percentage); ?>" aria-valuemin="0" aria-valuemax="100"></div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-auto">
                                             <div class="p-1">
-                                                <h6 class="mb-0 text-{{$status['color']}}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Total de tarefas relacionadas ao status {{$status['label']}}">{{ $countTotal }}</h6>
+                                                <h6 class="mb-0 text-<?php echo e($status['color']); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Total de tarefas relacionadas ao status <?php echo e($status['label']); ?>"><?php echo e($countTotal); ?></h6>
                                             </div>
                                         </div>
                                     </div>
-                                @endif
-                            @endforeach
+                                <?php endif; ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                 </div>
             </div>
         </div>
     </div>
 
-@endsection
-@section('script')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('script'); ?>
 <script>
-    var profileShowURL = "{{ route('profileShowURL') }}";
+    var profileShowURL = "<?php echo e(route('profileShowURL')); ?>";
 
-    var surveysIndexURL = "{{ route('surveysIndexURL') }}";
-    var surveysCreateURL = "{{ route('surveysCreateURL') }}";
-    var surveysEditURL = "{{ route('surveysEditURL') }}";
-    var surveysChangeStatusURL = "{{ route('surveysChangeStatusURL') }}";
-    var surveysShowURL = "{{ route('surveysShowURL') }}";
-    var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
-    var formSurveyorAssignmentURL = "{{ route('formSurveyorAssignmentURL') }}";
-    var formAuditorAssignmentURL = "{{ route('formAuditorAssignmentURL') }}";
-    var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";
-    var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
+    var surveysIndexURL = "<?php echo e(route('surveysIndexURL')); ?>";
+    var surveysCreateURL = "<?php echo e(route('surveysCreateURL')); ?>";
+    var surveysEditURL = "<?php echo e(route('surveysEditURL')); ?>";
+    var surveysChangeStatusURL = "<?php echo e(route('surveysChangeStatusURL')); ?>";
+    var surveysShowURL = "<?php echo e(route('surveysShowURL')); ?>";
+    var surveysStoreOrUpdateURL = "<?php echo e(route('surveysStoreOrUpdateURL')); ?>";
+    var formSurveyorAssignmentURL = "<?php echo e(route('formSurveyorAssignmentURL')); ?>";
+    var formAuditorAssignmentURL = "<?php echo e(route('formAuditorAssignmentURL')); ?>";
+    var changeAssignmentSurveyorStatusURL = "<?php echo e(route('changeAssignmentSurveyorStatusURL')); ?>";
+    var changeAssignmentAuditorStatusURL = "<?php echo e(route('changeAssignmentAuditorStatusURL')); ?>";
 </script>
-<script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
-
-<script>
-    var formSurveyorAssignmentURL = "{{ route('formSurveyorAssignmentURL') }}";
-    var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";
-    var responsesSurveyorStoreOrUpdateURL = "{{ route('responsesSurveyorStoreOrUpdateURL') }}";
-</script>
-<script src="{{ URL::asset('build/js/surveys-surveyor.js') }}" type="module"></script>
+<script src="<?php echo e(URL::asset('build/js/surveys.js')); ?>" type="module"></script>
 
 <script>
-    var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
-    var responsesAuditorStoreOrUpdateURL = "{{ route('responsesAuditorStoreOrUpdateURL') }}";
-    var enterAssignmentAuditorURL = "{{ route('enterAssignmentAuditorURL') }}";
-    {{--
-    var requestAssignmentAuditorURL = "{{ route('requestAssignmentAuditorURL') }}";
-    --}}
-    var revokeAssignmentAuditorURL = "{{ route('revokeAssignmentAuditorURL') }}";
+    var formSurveyorAssignmentURL = "<?php echo e(route('formSurveyorAssignmentURL')); ?>";
+    var changeAssignmentSurveyorStatusURL = "<?php echo e(route('changeAssignmentSurveyorStatusURL')); ?>";
+    var responsesSurveyorStoreOrUpdateURL = "<?php echo e(route('responsesSurveyorStoreOrUpdateURL')); ?>";
 </script>
-<script src="{{ URL::asset('build/js/surveys-auditor.js') }}" type="module"></script>
+<script src="<?php echo e(URL::asset('build/js/surveys-surveyor.js')); ?>" type="module"></script>
+
+<script>
+    var changeAssignmentAuditorStatusURL = "<?php echo e(route('changeAssignmentAuditorStatusURL')); ?>";
+    var responsesAuditorStoreOrUpdateURL = "<?php echo e(route('responsesAuditorStoreOrUpdateURL')); ?>";
+    var enterAssignmentAuditorURL = "<?php echo e(route('enterAssignmentAuditorURL')); ?>";
+    
+    var revokeAssignmentAuditorURL = "<?php echo e(route('revokeAssignmentAuditorURL')); ?>";
+</script>
+<script src="<?php echo e(URL::asset('build/js/surveys-auditor.js')); ?>" type="module"></script>
 
 <script type="module">
-    import { attachImage } from '{{ URL::asset('build/js/settings-attachments.js') }}';
+    import { attachImage } from '<?php echo e(URL::asset('build/js/settings-attachments.js')); ?>';
 
-    var uploadAvatarURL = "{{ route('uploadAvatarURL') }}";
+    var uploadAvatarURL = "<?php echo e(route('uploadAvatarURL')); ?>";
 
     attachImage("#member-image-input", "#avatar-img", uploadAvatarURL, false);
 </script>
@@ -365,4 +337,6 @@
         window.location.reload();// true to cleaning cache
     }, 600000); // 600000 milliseconds = 10 minutes
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/profile/index.blade.php ENDPATH**/ ?>

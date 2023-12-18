@@ -77,11 +77,11 @@
                 @if (in_array($statusKey, ['losted']))
                     @if ( $surveyorStatus == 'losted' && $auditorStatus == 'losted' )
                         <div class="text-danger small mt-2">
-                            Esta <u>Auditoria</u> foi perdida pois a <u>Checklist</u> não foi efetuada na data prevista.
+                            Esta <u>Auditoria</u> foi perdida pois a <u>Vistoria</u> não foi efetuada na data prevista.
                         </div>
                     @elseif ( $surveyorStatus == 'completed' && $auditorStatus == 'losted' )
                         <div class="text-warning small mt-2">
-                            A <u>Checklist</u> foi completada. Entretanto, a <u>Auditoria</u> não foi efetuada na data prevista.
+                            A <u>Vistoria</u> foi completada. Entretanto, a <u>Auditoria</u> não foi concluída em tempo.
                         </div>
                     @elseif ( $surveyorStatus != 'completed' && $surveyorStatus != 'losted' && $auditorStatus == 'losted' )
                         <div class="text-warning small mt-2">
@@ -96,38 +96,22 @@
                     <div class="col small">
                         <div class="avatar-group ps-0">
                             @if ($surveyorId === $auditorId)
-                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas de Checklist e Auditoria delegadas a <u>{{ $surveyorName }}</u>">
-                                    <img
-                                    @if( empty(trim($surveyorAvatar)) )
-                                        src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                    @else
-                                        src="{{ $surveyorAvatar }}"
-                                    @endif
+                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas de Vistoria e Auditoria delegadas a <u>{{ $surveyorName }}</u>">
+                                    <img src="{{ $surveyorAvatar }}"
                                     alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs" loading="lazy">
                                 </a>
                             @else
-                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Checklist delegada a <u>{{ $surveyorName }}</u>">
-                                    <img
-                                    @if( empty(trim($surveyorAvatar)) )
-                                        src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                    @else
-                                        src="{{ $surveyorAvatar }}"
-                                    @endif
+                                <a href="{{ route('profileShowURL', $surveyorId) }}" class="d-inline-block me-1" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Vistoria delegada a <u>{{ $surveyorName }}</u>">
+                                    <img src="{{ $surveyorAvatar }}"
                                     alt="{{ $surveyorName }}" class="rounded-circle avatar-xxs" loading="lazy">
                                 </a>
 
                                 @if($auditorId)
                                     <a href="{{ route('profileShowURL', $auditorId) }}" class="d-inline-block ms-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="Tarefa de Auditoria delegada a <u>{{ $auditorName }}</u>">
-                                        <img
-                                        @if( empty(trim($auditorAvatar)) )
-                                            src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                        @else
-                                            src="{{ $auditorAvatar }}"
-                                        @endif
+                                        <img src="{{ $auditorAvatar }}"
                                         alt="{{ $auditorName }}" class="rounded-circle avatar-xxs" loading="lazy">
                                     </a>
                                 @endif
-
                             @endif
                         </div>
                     </div>
@@ -137,7 +121,7 @@
                             <button type="button"
                             data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
                             title="Requisitar esta tarefa para Auditoria"
-                            class="btn btn-sm btn-label right waves-effect btn-soft-secondary btn-assignment-audit-request"
+                            class="btn btn-sm btn-label right waves-effect btn-soft-secondary btn-assignment-audit-enter"
                             data-assignment-id="{{$assignmentId}}">
                                 <i class="ri-add-line label-icon align-middle fs-16"></i> Auditar
                             </button>
@@ -146,9 +130,9 @@
                             @endif
                         @endif
                         --}}
-
-                        @if ($currentUserId === $designatedUserId && in_array($statusKey, ['new','pending','in_progress']) )
+                        @if ($currentUserId == $designatedUserId && in_array($statusKey, ['new','pending','in_progress']) )
                             <button type="button"
+                                data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
                                 title="{{$status['reverse']}}"
                                 class="btn btn-sm btn-label right waves-effect btn-soft-{{$status['color']}} {{ $designated == 'surveyor' ? 'btn-assignment-surveyor-action' : 'btn-assignment-auditor-action' }}"
                                 data-survey-id="{{$surveyId}}"
@@ -156,24 +140,36 @@
                                 data-current-status="{{$statusKey}}">
                                     <i class="{{$status['icon']}} label-icon align-middle fs-16"></i> {{$status['reverse']}}
                             </button>
+
+                            @if ( in_array('audit', $currentUserCapabilities) && in_array($statusKey, ['new','pending','in_progress','completed']) )
+                                <a href="{{ route('assignmentShowURL', $assignmentId) }}"
+                                    data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
+                                    title="Visualizar"
+                                    class="btn btn-sm waves-effect btn-soft-secondary ri-eye-line">
+                                </a>
+                            @endif
                         @elseif( ( ( $currentUserId === $surveyorId || $currentUserId === $auditorId ) && in_array($statusKey, ['completed']) ) || in_array('audit', $currentUserCapabilities) )
                             <a href="{{ route('assignmentShowURL', $assignmentId) }}"
+                                data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
                                 title="Visualizar"
-                                class="btn btn-sm btn-label right waves-effect btn-soft-success">
-                                    <i class="ri-eye-line label-icon align-middle fs-16"></i> Visualizar
+                                class="btn btn-sm btn-label right waves-effect btn-soft-secondary">
+                                    <i class="ri-eye-line label-icon align-middle"></i> Visualizar
                             </a>
                         @endif
 
+                        {{--
                         @if ( $surveyorStatus == 'completed' && $auditorStatus == 'losted' && in_array($statusKey, ['losted']) )
                             <a href="{{ route('assignmentShowURL', $assignmentId) }}"
+                                data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
                                 title="Visualizar"
-                                class="btn btn-sm btn-label right waves-effect btn-soft-dark">
+                                class="btn btn-sm btn-label right waves-effect btn-soft-secondary">
                                     <i class="ri-eye-line label-icon align-middle fs-16"></i> Visualizar
                             </a>
                         @endif
+                        --}}
 
                         @if ( $currentUserId === $designatedUserId && $designated === 'surveyor' && $surveyorId === $auditorId && in_array($statusKey, ['auditing']) )
-                            <i class="text-theme ri-questionnaire-fill" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Neste contexto a você foram delegadas tarefas de Checklist e Auditoria.<br>Procure na coluna <b>Nova</b> o card correspondente a <b>{{ $companyName }}</b> de <b>{{ $assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-' }}</b> e inicialize a tarefa "></i>
+                            <i class="text-theme ri-questionnaire-fill" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Neste contexto a você foram delegadas tarefas de Vistoria e Auditoria.<br>Procure na coluna <b>Nova</b> o card correspondente a <b>{{ $companyName }}</b> de <b>{{ $assignment['created_at'] ? date("d/m/Y", strtotime($assignment['created_at'])) : '-' }}</b> e inicialize a tarefa "></i>
                         @endif
                     </div>
                 </div>

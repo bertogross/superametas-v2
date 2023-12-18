@@ -26,6 +26,9 @@
         $getUserData = getUserData($authorId);
         $roleName = \App\Models\User::getRoleName($getUserData['role']);
         $description = trim($data->description) ? nl2br($data->description) : '';
+
+        $purpose = 'fakeForm';
+        $surveyorStatus = null
     @endphp
     <div id="content" class="rounded rounded-2 mb-4" style="max-width: 700px; margin: 0 auto;">
         <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show">
@@ -68,12 +71,15 @@
 
         {!! !empty($description) ? '<div class="blockquote custom-blockquote blockquote-outline blockquote-dark rounded mt-2 mb-2"><p class="text-body mb-2">'.$description.'</p><footer class="blockquote-footer mt-0">'.$getUserData['name'].' <cite title="'.$roleName.'">'.$roleName.'</cite></footer></div>' : '' !!}
 
-        @if ($result)
-            @component('surveys.layouts.form-surveyor-step-cards-v2')
-                @slot('data', $result)
+        @if ($stepsWithTopics)
+            @include('surveys.layouts.form-surveyor-step-cards')
+            {{--
+            @component('surveys.layouts.form-surveyor-step-cards')
+                @slot('stepsWithTopics', $stepsWithTopics)
                 @slot('purpose', 'fakeForm')
                 @slot('surveyorStatus', null)
             @endcomponent
+            --}}
         @endif
     </div>
 

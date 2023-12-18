@@ -378,31 +378,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 var data = {};
                 // Iterate over formData entries
                 for (let [key, value] of formData.entries()) {
-                    // Check if the key includes 'delegated_to'
-                    if (key.startsWith('delegated_to')) {
-                        // Extract the index - assuming the format is 'delegated_to[index]'
+                    // Check if the key includes 'surveyor_id'
+                    if (key.startsWith('surveyor_id')) {
+                        // Extract the index - assuming the format is 'surveyor_id[index]'
                         let index = key.match(/\[(\d+)\]/)[1]; // Get the number inside brackets
 
                         // Initialize the array if it doesn't exist
-                        if (!data.delegated_to) {
-                            data.delegated_to = [];
+                        if (!data.surveyor_id) {
+                            data.surveyor_id = [];
                         }
 
                         // Push the object with company_id as index and user_id as value
-                        data.delegated_to.push({ company_id: index, user_id: value });
+                        data.surveyor_id.push({ company_id: index, user_id: value });
                     }
 
-                    if (key.startsWith('audited_by')) {
-                        // Extract the index - assuming the format is 'delegated_to[index]'
+                    if (key.startsWith('auditor_id')) {
+                        // Extract the index - assuming the format is 'surveyor_id[index]'
                         let index = key.match(/\[(\d+)\]/)[1]; // Get the number inside brackets
 
                         // Initialize the array if it doesn't exist
-                        if (!data.audited_by) {
-                            data.audited_by = [];
+                        if (!data.auditor_id) {
+                            data.auditor_id = [];
                         }
 
                         // Push the object with company_id as index and user_id as value
-                        data.audited_by.push({ company_id: index, user_id: value });
+                        data.auditor_id.push({ company_id: index, user_id: value });
                     }
                 }
                 //console.log(data);
@@ -449,20 +449,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     }
 
+    var loadSurveyActivities = document.getElementById('load-surveys-activities');
     if( document.getElementById('load-surveys-activities') && getRecentActivitiesURL ){
         function getRecentActivities() {
-            fetch(getRecentActivitiesURL)
+            var subDays = loadSurveyActivities.getAttribute("data-subDays") ?? '';
+
+            fetch(getRecentActivitiesURL + '/' + subDays)
                 .then(response => response.json())
                 .then(data => {
                     //console.log(JSON.stringify(activities, null, 2));
 
-                    const container = document.getElementById('load-surveys-activities');
-                    container.innerHTML = '<h6 class="text-muted m-0 text-uppercase fw-semibold mb-4">Atividades Recentes</h6>';
+                    const container = loadSurveyActivities;
+
+                    container.innerHTML = '<h6 class="text-muted m-0 text-uppercase fw-semibold mb-1">Atividades Recentes</h6>';
 
                     if(data.success && data.activities){
                         data.activities.forEach(activity => {
                             const activityElement = document.createElement('div');
-                            activityElement.className = 'card border border-dashed shadow-none mb-3';
+                            activityElement.className = 'card border border-dashed shadow-none mt-3 mb-0 bg-body';
                             activityElement.innerHTML = `
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
@@ -474,16 +478,20 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <div class="flex-grow-1">
                                             <div class="fs-11 mb-0 fw-bold">
                                                 ${activity.designatedUserName}
+
+                                                <div class="fs-11 mb-0 text-info
+                                                text-opacity-75 fw-bold">${activity.companyName}</div>
                                             </div>
-                                            <div class="fs-11 mb-0 text-muted">${activity.templateName}</div>
                                         </div>
-                                        <div class="flex-shrink-0">
+                                        <div class="flex-shrink-0 text-end">
                                             ${activity.label}
-                                            <div class="fs-11 mb-0 text-muted text-end">${activity.companyName}</div>
-                                            <div class="fs-10 mb-0 text-muted d-none">${activity.createddAt}</div>
-                                            <div class="fs-10 mb-0 text-muted d-none">${activity.updatedAt}</div>
+
+                                            <div class="fs-10 mb-0 text-muted">${activity.createddAt}</div>
                                         </div>
                                     </div>
+
+                                    <div class="fs-12 mb-0 text-muted mb-1 mt-1">${activity.surveyTitle}</div>
+
                                     <div class="progress progress-sm mt-1 custom-progress" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="${activity.percentage}%">
                                         <div class="progress-bar bg-${activity.progressBarClass}" role="progressbar" style="width: ${activity.percentage}%" aria-valuenow="${activity.percentage}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>

@@ -7,7 +7,7 @@
             @else
                 src="{{ URL::asset('storage/' . $cover) }}"
             @endif
-            alt="@if(isset($name)){{ $name }}@endif" class="img-fluid" height="140" id="cover-img-@if(isset($id)){{ $id }}@endif">
+            alt="@if(isset($name)){{ $name }}@endif" class="img-fluid" height="140" id="cover-img-@if(isset($id)){{ $id }}@endif" loading="lazy">
         </div>
         <div class="card-body p-4">
 
@@ -40,7 +40,7 @@
                                 src="{{ URL::asset('storage/' . $avatar) }}"
                             @endif
                             alt="@if(isset($name)){{ $name }}@endif"
-                            class="member-img img-fluid d-block rounded-circle" id="avatar-img-@if(isset($id)){{ $id }}@endif">
+                            class="member-img img-fluid d-block rounded-circle" id="avatar-img-@if(isset($id)){{ $id }}@endif" loading="lazy">
                         </div>
                         <div class="team-content">
                             <h5 class="fs-16 mb-1">

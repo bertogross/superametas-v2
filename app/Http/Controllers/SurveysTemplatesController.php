@@ -24,7 +24,7 @@ class SurveysTemplatesController extends Controller
         $data = SurveyTemplates::findOrFail($id);
 
         $reorderingData = SurveyTemplates::reorderingData($data);
-        $result = $reorderingData ?? null;
+        $stepsWithTopics = $reorderingData ?? null;
 
         $preview = $request->query('preview', false);
 
@@ -32,7 +32,7 @@ class SurveysTemplatesController extends Controller
 
         return view('surveys.templates.preview', compact(
             'data',
-            'result',
+            'stepsWithTopics',
             'preview',
             'edition',
         ) );

@@ -192,6 +192,36 @@ class Survey extends Model
         ];
     }
 
+    public static function extractUserIds($analyticTermsData) {
+        $userIds = [];
+
+        foreach ($analyticTermsData as $termData) {
+            foreach ($termData as $dateData) {
+                foreach ($dateData as $data) {
+                    if (!empty($data['surveyor_id']) && !isset($userIds[$data['surveyor_id']])) {
+                        $getUserData = getUserData($data['surveyor_id']);
+
+                        $userIds[$data['surveyor_id']] = [
+                            'name' => $getUserData['name'],
+                            'avatar' => $getUserData['avatar']
+                        ];
+                    }
+                    if (!empty($data['auditor_id']) && !isset($userIds[$data['auditor_id']])) {
+                        $getUserData = getUserData($data['auditor_id']);
+
+                        $userIds[$data['auditor_id']] =  [
+                            'name' => $getUserData['name'],
+                            'avatar' => $getUserData['avatar']
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $userIds;
+    }
+
+
     // Check the 'survey_assignments' table to see which tasks were not completed by yesterday and change the status to 'losted'
     public static function checkSurveyAssignmentUntilYesterday($surveyId)
     {
@@ -553,11 +583,13 @@ class Survey extends Model
             $dateKey = Carbon::parse($item['created_at'])->format('d-m-Y');
             $termId = $item['term_id'];
 
-            $transformedArray[$dateKey][$termId][] = $item;
+            //$transformedArray[$dateKey][$termId][] = $item;
+            $transformedArray[$termId][$dateKey][] = $item;
         }
 
         return $transformedArray;
     }
+
 
     // START Used with crontab to start recurring tasks
     public static function populateSurveys($database = null)

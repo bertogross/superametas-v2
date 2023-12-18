@@ -240,6 +240,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const fileId = this.getAttribute('data-attachment-id');
         if (confirm('Tem certeza de que deseja excluir este arquivo?')) {
             deletePhoto(fileId);
+
+            const responsesData = this.closest('.responses-data-container');
+
+            const attachmentInputs = responsesData.querySelectorAll('input[name="attachment_id[]"]');
+            const attachmentIds = Array.from(attachmentInputs).map(input => input.value);
+            if (attachmentIds.length === 0) {
+
+                var pendingIcon = responsesData.querySelector('.ri-time-line');
+                var completedIcon = responsesData.querySelector('.ri-check-double-fill');
+
+                // If responseId is not set, show the pending icon and hide the completed icon
+                if (pendingIcon) pendingIcon.classList.remove('d-none');
+                if (completedIcon) completedIcon.classList.add('d-none');
+
+                document.querySelector('#btn-response-finalize').classList.add('d-none');
+
+            }
         }
     }
 

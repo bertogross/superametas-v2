@@ -97,18 +97,18 @@ based on apps-crm-deals.blade.php
                 aria-expanded="false" aria-controls="leadDiscovered" -->
                 <h5 class="card-title text-uppercase mb-1 fs-14">
                     @php
-                        $columns = array_column($distributedData['delegated_to'], 'user_id');
+                        $columns = array_column($distributedData['surveyor_id'], 'user_id');
                         $uniqued = count($columns) > 1 ? array_unique($columns) : $columns;
                         echo is_array($uniqued) ? count($uniqued) : 0;
                     @endphp
                      Vistoriador{{ count($uniqued) > 1 ? 'es' : '' }}
                 </h5>
-                <p class="text-muted mb-0"><span class="fw-medium">{{ is_array($distributedData['delegated_to']) ? count($distributedData['delegated_to']) : ''}} lojas</span></p>
+                <p class="text-muted mb-0"><span class="fw-medium">{{ is_array($distributedData['surveyor_id']) ? count($distributedData['surveyor_id']) : ''}} lojas</span></p>
             </a>
         </div>
         <!--end card-->
         <div class="collapse show" id="leadDiscovered">
-            @foreach ($distributedData['delegated_to'] as $index => $value)
+            @foreach ($distributedData['surveyor_id'] as $index => $value)
                 @php
                     $userId = $value['user_id'];
                     $companyName = getCompanyNameById($value['company_id']);
@@ -195,18 +195,18 @@ based on apps-crm-deals.blade.php
                 aria-expanded="false" aria-controls="contactInitiated" -->
                 <h5 class="card-title text-uppercase mb-1 fs-14">
                     @php
-                        $columns = array_column($distributedData['audited_by'], 'user_id');
+                        $columns = array_column($distributedData['auditor_id'], 'user_id');
                         $uniqued = count($columns) > 1 ? array_unique($columns) : $columns;
                         echo is_array($uniqued) ? count($uniqued) : 0;
                     @endphp
                      Auditor{{ count($uniqued) > 1 ? 'es' : '' }}
                 </h5>
-                <p class="text-muted mb-0"><span class="fw-medium">{{ is_array($distributedData['audited_by']) ? count($distributedData['audited_by']) : ''}} lojas</span></p>
+                <p class="text-muted mb-0"><span class="fw-medium">{{ is_array($distributedData['auditor_id']) ? count($distributedData['auditor_id']) : ''}} lojas</span></p>
             </a>
         </div>
         <!--end card-->
         <div class="collapse show" id="contactInitiated">
-            @foreach ($distributedData['audited_by'] as $index => $value)
+            @foreach ($distributedData['auditor_id'] as $index => $value)
                 @php
                     $userId = $value['user_id'];
                     $companyName = getCompanyNameById($value['company_id']);

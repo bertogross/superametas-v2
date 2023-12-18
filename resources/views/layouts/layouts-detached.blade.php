@@ -13,7 +13,7 @@
         <meta http-equiv="expires" content="-1">
         <meta name="robots" content="noindex,nofollow,nopreview,nosnippet,notranslate,noimageindex,nomediaindex,novideoindex,noodp,noydir">
         <meta property="og:image" content="{{ URL::asset('build/images/logo-sm' . $logo2 . '.png') }}">
-        <meta content="Solução para ajudar sua equipe a atingir e Superar suas Metas de Vendas" name="description" />
+        <meta content="{{ appDescription() }}" name="description" />
         <meta name="author" content="{{appName()}}" />
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <!-- App favicon -->

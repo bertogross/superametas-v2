@@ -53,7 +53,6 @@ class SurveysAssignmentsController extends Controller
             });
         $stepsWithTopics = $stepsWithTopics ? json_decode($stepsWithTopics, true) : null;
 
-
         $analyticTermsData = Survey::fetchAndTransformSurveyDataByTerms($surveyId, $assignmentId);
 
         /**
@@ -116,6 +115,9 @@ class SurveysAssignmentsController extends Controller
 
         $assignmentData = SurveyAssignments::findOrFail($assignmentId) ?? null;
 
+        $surveyorId = $assignmentData->surveyor_id;
+        $auditorId = $assignmentData->auditor_id;
+
         $surveyId = $assignmentData->survey_id;
 
         $companyId = $assignmentData->company_id;
@@ -150,7 +152,7 @@ class SurveysAssignmentsController extends Controller
 
         $countTopics = SurveyTopic::countSurveyTopics($surveyId);
 
-        $countResponses = SurveyResponse::countSurveySurveyorResponses($currentUserId, $surveyId, $companyId, $assignmentId);
+        $countResponses = SurveyResponse::countSurveySurveyorResponses($surveyorId, $surveyId, $assignmentId);
 
         $percentage = $countResponses > 0 ? ($countResponses / $countTopics) * 100 : 0;
         $percentage = number_format($percentage, 0);
@@ -175,8 +177,10 @@ class SurveysAssignmentsController extends Controller
         $assignmentData = SurveyAssignments::findOrFail($assignmentId) ?? null;
 
         $surveyId = $assignmentData->survey_id;
-
         $companyId = $assignmentData->company_id;
+
+        $surveyorId = $assignmentData->surveyor_id;
+        $auditorId = $assignmentData->auditor_id;
 
         $surveyData = Survey::findOrFail($surveyId);
 
@@ -208,7 +212,7 @@ class SurveysAssignmentsController extends Controller
 
         $countTopics = SurveyTopic::countSurveyTopics($surveyId);
 
-        $countResponses = SurveyResponse::countSurveySurveyorResponses($currentUserId, $surveyId, $companyId, $assignmentId);
+        $countResponses = SurveyResponse::countSurveyAuditorResponses($auditorId, $surveyId, $assignmentId);
 
         $percentage = $countResponses > 0 ? ($countResponses / $countTopics) * 100 : 0;
         $percentage = number_format($percentage, 0);
@@ -244,7 +248,7 @@ class SurveysAssignmentsController extends Controller
         if($currentStatus == 'losted' ){
             return response()->json([
                 'success' => false,
-                'message' => 'O prazo expirou e esta Tarefa foi perdida. Por isso não poderá mais ser editada.',
+                'message' => 'Esta Tarefa foi perdida pois o prazo expirou e por isso não poderá mais ser editada',
             ]);
         }
 
@@ -292,7 +296,7 @@ class SurveysAssignmentsController extends Controller
         if($currentStatus == 'losted' ){
             return response()->json([
                 'success' => false,
-                'message' => 'O prazo expirou, esta Tarefa foi perdida e por isso não poderá mais ser editada.',
+                'message' => 'Esta Auditoria foi perdida pois o prazo expirou e por isso não poderá mais ser editada',
             ]);
         }
 
@@ -323,10 +327,24 @@ class SurveysAssignmentsController extends Controller
     {
         $currentUserId = auth()->id();
 
+        $capabilities = getUserData($currentUserId)['capabilities'] ?? null;
+
+        if( !$capabilities || !in_array('audit', $capabilities) ){
+            return response()->json(['success' => false, 'message' => 'Você não possui em suas credenciais autorização para realizar Auditoria']);
+        }
+
         $assignmentId = $request->input('assignment_id');
         $data = SurveyAssignments::findOrFail($assignmentId);
 
+        $surveyorId = $data->surveyor_id;
         $surveyorStatus = $data->surveyor_status;
+
+        $host = $_SERVER['HTTP_HOST'] ?? 'default';
+        if(str_contains($host, 'app')){
+            if( $currentUserId == $surveyorId ){
+                return response()->json(['success' => false, 'message' => 'Você não poderá Auditar uma Vistoria outrora realizada por você.']);
+            }
+        }
 
         // Check if this assignment have another user audito
         if ($data->auditor_id && $currentUserId != $data->auditor_id) {
@@ -335,19 +353,25 @@ class SurveysAssignmentsController extends Controller
 
         // Check if this assignment user auditor is the current user
         if ($data->auditor_id && $currentUserId == $data->auditor_id) {
-            return response()->json(['success' => false, 'message' => 'A tarefa de Auditoria já foi a você delegada. Deseja revogar?', 'action' => 'revoke']);
+            $message = 'Esta tarefa de Auditoria é sua.<br><br>Qual ação deseja executar?';
+            $message .= '<div class="text-warning mt-2"><strong>ATENÇÃO</strong><br>Se você optar por <strong>Revogar</strong>, todas as ações já realizadas serão definitivamente deletadas sem a possibilidade de recuperação.</div>';
+
+            return response()->json(['success' => false, 'message' => $message, 'action' => 'choice', 'current_surveyor_status' => $surveyorStatus]);
         }
 
-        // Update auditor_id
-        $column['auditor_id'] = $currentUserId;
-        $data->update($column);
+        // Update auditor assignment
+        $columns['auditor_status'] = 'new';
+        $columns['auditor_id'] = $currentUserId;
+        $data->update($columns);
 
         $message = 'A Auditoria desta tarefa foi requisitada.';
 
         return response()->json(['success' => true, 'message' => $message, 'current_surveyor_status' => $surveyorStatus]);
     }
 
-    public function requestAssignmentAuditorURL(Request $request, $assignmentId)
+    /*
+    // TODO
+    public function requestAssignmentAuditor(Request $request, $assignmentId)
     {
         $currentUserId = auth()->id();
 
@@ -360,9 +384,12 @@ class SurveysAssignmentsController extends Controller
         }
 
         // TODO send message for $currentAuditorId to release this Assignment and transfer to antoher user
-    }
 
-    public function revokeAssignmentAuditorURL(Request $request, $assignmentId)
+        return response()->json(['success' => false, 'message' => 'Solicitação enviada']);
+    }
+    */
+
+    public function revokeAssignmentAuditor(Request $request, $assignmentId)
     {
         $currentUserId = auth()->id();
 
@@ -377,52 +404,49 @@ class SurveysAssignmentsController extends Controller
         return response()->json(['success' => true, 'message' => 'Solicitação enviada']);
     }
 
-    public function getRecentActivities()
+    public function getRecentActivities(Request $request)
     {
-        $today = Carbon::today();
+        $subDays = $request->subDays ? intval($request->subDays) : null;
 
-        $surveyorArrStatus = ['pending', 'in_progress', 'auditing', 'completed'];
+        if(!$subDays){
+            $days = Carbon::now()->subDays(7);
+        }else{
+            $days = Carbon::now()->subDays($subDays);
+        }
 
-        $auditorArrStatus = ['in_progress', 'completed']; //'waiting', 'pending',
+        $surveyorArrStatus = ['new', 'pending', 'in_progress', 'auditing', 'completed'];
 
-        // Fetching surveyor assignments
-        $surveyorAssignments = SurveyAssignments::whereIn('surveyor_status', $surveyorArrStatus)
-                                                ->whereDate('created_at', '=', $today)
-                                                ->orderBy('updated_at', 'desc')
-                                                ->limit(100)
-                                                ->get();
+        $auditorArrStatus = ['pending', 'in_progress', 'completed']; //'waiting',
 
-        // Fetching auditor assignments
-        $auditorAssignments = SurveyAssignments::whereIn('auditor_status', $auditorArrStatus)
-                                            ->whereDate('created_at', '=', $today)
-                                            ->orderBy('updated_at', 'desc')
-                                            ->limit(100)
-                                            ->get();
+        // Fetching surveyor and auditor assignments
+        $assignments = SurveyAssignments::whereIn('surveyor_status', $surveyorArrStatus)
+            ->orWhereIn('auditor_status', $auditorArrStatus)
+            ->whereDate('created_at', '>=', $days)
+            ->orderBy('updated_at', 'desc')
+            ->limit(100)
+            ->get();
 
-        if($surveyorAssignments){
+        if ($assignments->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'Ainda não há dados']);
+        }
 
-            $activities = [];
+        $activities = [];
 
-            // Process surveyor assignments
-            foreach ($surveyorAssignments as $assignment) {
+        // Process assignments
+        foreach ($assignments as $assignment) {
+            if (in_array($assignment->surveyor_status, $surveyorArrStatus)) {
                 $activities[] = $this->processAssignment($assignment, 'surveyor');
             }
-
-            // Process auditor assignments
-            foreach ($auditorAssignments as $assignment) {
+            if (in_array($assignment->auditor_status, $auditorArrStatus)) {
                 $activities[] = $this->processAssignment($assignment, 'auditor');
             }
+        }
 
-            $activities = array_filter($activities);
+        $activities = array_filter($activities);
 
-            //return response()->json($activities);
-            if(is_array($activities) && count($activities) > 0 ){
-                return response()->json(['success' => true, 'activities' => $activities]);
-            }else{
-                return response()->json(['success' => false, 'message' => 'Ainda não há dados']);
-
-            }
-        }else{
+        if (!empty($activities)) {
+            return response()->json(['success' => true, 'activities' => $activities]);
+        } else {
             return response()->json(['success' => false, 'message' => 'Ainda não há dados']);
         }
 
@@ -434,7 +458,10 @@ class SurveysAssignmentsController extends Controller
         $assignmentId = $assignment->id;
 
         $surveyId = $assignment->survey_id;
+
         $survey = Survey::findOrFail($surveyId);
+        $surveyTitle = $survey->title;
+
         $templateName = getSurveyTemplateNameById($survey->template_id);
 
         $companyId = $assignment->company_id;
@@ -448,7 +475,7 @@ class SurveysAssignmentsController extends Controller
         $percentage = SurveyAssignments::calculateSurveyPercentage($surveyId, $companyId, $assignmentId, $surveyorId, $auditorId, $designated);
         $progressBarClass = getProgressBarClass($percentage);
 
-        $label = $designated == 'surveyor' ? '<span class="badge bg-dark-subtle text-body badge-border">Vistoria</span>' : '<span class="badge bg-dark-subtle text-secondary badge-border">Auditoria</span>';
+        $label = $designated == 'surveyor' ? '<span class="badge bg-dark-subtle text-body badge-border mb-2 ms-2">Vistoria</span>' : '<span class="badge bg-dark-subtle text-secondary badge-border mb-2 ms-2">Auditoria</span>';
 
         if($designated == 'auditor'){
             $designatedUserId = $auditorId;
@@ -459,9 +486,10 @@ class SurveysAssignmentsController extends Controller
         return [
             'assignmentId' => $assignmentId,
             'surveyId' => $surveyId,
+            'surveyTitle' => limitChars($surveyTitle, 40),
             'companyId' => $companyId,
             'companyName' => limitChars($companyName, 20),
-            'templateName' => limitChars($templateName, 26),
+            'templateName' => limitChars($templateName, 40),
             'assignmentStatus' => $assignmentStatus,
             'designatedUserId' => $designatedUserId,
             'designatedUserName' => limitChars(getUserData($designatedUserId)['name'], 20),
@@ -470,8 +498,8 @@ class SurveysAssignmentsController extends Controller
             'label' => $label,
             'percentage' => $percentage,
             'progressBarClass' => $progressBarClass,
-            'createddAt' => $assignment->created_at->toDateTimeString(),
-            'updatedAt' => $assignment->updated_at->toDateTimeString()
+            'createddAt' => $assignment->created_at->format('d/m/Y'),
+            'updatedAt' => $assignment->updated_at->format('d/m/Y')
         ];
     }
 

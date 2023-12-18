@@ -32,7 +32,7 @@ class SetDynamicDatabase
         }
 
         // Get from the first account
-        $dynamicDatabaseName = $request->database ? $request->database : $getOtherDatabases[0];
+        $dynamicDatabaseName = $request->database ? $request->database : $getOtherDatabases[0]['database'];
 
         // Set the dynamic database connection
         Config::set('database.connections.smAppTemplate.database', $dynamicDatabaseName);

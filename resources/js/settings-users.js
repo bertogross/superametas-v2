@@ -141,10 +141,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        toastAlert(data.message, 'success', 10000);
+                        toastAlert(data.message, 'success', form.dataset.id ? 10000 : 200000);
+
                         setTimeout(() => {
                             location.reload();
-                        }, form.dataset.id ? 1000 : 120000);
+                        }, form.dataset.id ? 3000 : 200000);
+
+                        if(form.dataset.id){
+                            showPreloader();
+
+                        }
 
                         document.getElementById('btn-save-user').remove();
                     } else {

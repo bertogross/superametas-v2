@@ -2,7 +2,7 @@
 // Toast Notifications
 // Display a toast notification using Bootstrap's Toast API with a backdrop
 export function toastAlert(message, type = 'success', duration = 3000, backdrop = false) {
-    setTimeout(() => {
+    //setTimeout(() => {
         // Define the HTML template for the toast
         const icon = type === 'success' ? 'ri-checkbox-circle-fill text-success' : 'ri-alert-fill text-' + type;
         type = type === 'error' ? 'danger' : type;
@@ -84,32 +84,35 @@ export function toastAlert(message, type = 'success', duration = 3000, backdrop 
             });
         }, duration);
 
-    }, 100);
+    //}, 100);
 }
 
-export function sweetWizardAlert(message, urlToRedirect = false, icon = 'success', cancelButtonText = 'Continuar Editando', confirmButtonText = 'Prosseguir'){
+export function sweetWizardAlert(message, urlToRedirect = false, icon = 'success', cancelButtonText = 'Continuar Editando', confirmButtonText = 'Prosseguir', Trigger){
     Swal.fire({
         title: message,
         icon: icon,
-        showDenyButton: false,
-        showCancelButton: true,
         confirmButtonText: confirmButtonText,
-        confirmButtonClass: 'btn btn-outline-theme w-xs me-2',
-        cancelButtonClass: 'btn btn-sm btn-outline-info w-xs',
-        denyButtonClass: 'btn btn-sm btn-danger w-xs me-2',
-        buttonsStyling: false,
-        denyButtonText: 'Não',
+            confirmButtonClass: 'btn btn-outline-theme w-xs me-2',
         cancelButtonText: cancelButtonText,
+            cancelButtonClass: 'btn btn-sm btn-outline-info w-xs',
+                showCancelButton: true,
+        denyButtonText: 'Não',
+            denyButtonClass: 'btn btn-sm btn-danger w-xs me-2',
+                showDenyButton: false,
+        buttonsStyling: false,
         showCloseButton: false,
         allowOutsideClick: false
     }).then(function (result) {
         /* Read more about isConfirmed, isDenied below */
+
+        var btnTrigger = document.querySelector(''+Trigger+'');
+
         if (result.isConfirmed) {
             var timerInterval;
             Swal.fire({
                 title: 'Redirecionando...',
                 html: '',
-                timer: 3000,
+                timer: 2000,
                 timerProgressBar: true,
                 showCloseButton: false,
                 didOpen: function () {
@@ -131,13 +134,15 @@ export function sweetWizardAlert(message, urlToRedirect = false, icon = 'success
                 /* Read more about handling dismissals below */
                 if (result.dismiss === Swal.DismissReason.timer) {
                     //console.log('I was closed by the timer')
+                    if(Trigger && btnTrigger){
+                        btnTrigger.click();
+                    }
 
                     setTimeout(() => {
                         if(urlToRedirect){
                             window.location.href = urlToRedirect;
                         }
-                    }, 1000);
-
+                    }, 100);
                 }
             });
         }
@@ -151,7 +156,6 @@ export function showPreloader(show = true) {
         preloader.style.visibility = show ? "visible" : "hidden";
     }
 }
-
 
 // Multiple Modals
 // Maintain modal-open when close another modal
@@ -908,7 +912,9 @@ export function debounce(func, wait) {
     let timeout;
     return function() {
         const context = this, args = arguments;
+
         clearTimeout(timeout);
+
         timeout = setTimeout(() => func.apply(context, args), wait);
     };
 }
@@ -938,6 +944,14 @@ export function toggleElement() {
     }
 }
 
+export function autoReloadPage(intervalInSeconds) {
+    if(intervalInSeconds){
+        setTimeout(function() {
+            location.reload();
+        }, intervalInSeconds * 1000);
+    }
+}
+
 // Used on survey-surveyor.js and survey-auditor.js compliance radio labels
 export function updateLabelClasses(radios) {
     radios.forEach(radio => {
@@ -963,6 +977,26 @@ export function updateLabelClasses(radios) {
             } else if (radio.value === 'no') {
                 label.classList.add('btn-outline-danger');
             }
+        }
+    });
+}
+
+// Uncheck each radio button
+export function uncheckRadiosAndUpdateLabels(radios) {
+    radios.forEach(radio => {
+        // Uncheck the radio button
+        radio.checked = false;
+
+        const label = document.querySelector(`label[for="${radio.id}"]`);
+
+        // Reset classes
+        label.classList.remove('btn-success', 'btn-danger', 'btn-outline-success', 'btn-outline-danger');
+
+        // Add outline classes when radio is not checked
+        if (radio.value === 'yes') {
+            label.classList.add('btn-outline-success');
+        } else if (radio.value === 'no') {
+            label.classList.add('btn-outline-danger');
         }
     });
 }

@@ -19,6 +19,13 @@ if (!function_exists('appName')) {
     }
 }
 
+if (!function_exists('appDescription')) {
+    function appDescription(){
+        $host = $_SERVER['HTTP_HOST'] ?? 'default';
+        return str_contains($host, 'testing') ? 'Garantindo Excelência Operacional' : 'Solução para ajudar sua equipe a atingir e Superar suas Metas de Vendas';
+    }
+}
+
 // Get all users with status = 1, ordered by name
 if (!function_exists('getUsers')) {
     function getUsers() {
@@ -64,7 +71,8 @@ if( !function_exists('getUserData') ){
                 'avatar' => $user->avatar ? URL::asset('storage/' . $user->avatar) : URL::asset('build/images/users/user-dummy-img.jpg'),
                 'cover' => $user->cover ? URL::asset('storage/' . $user->cover) : URL::asset('build/images/small/img-9.jpg'),
                 'role' => $user->role,
-                'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                'capabilities' => $user->capabilities ? json_decode($user->capabilities, true) : null,
+                'created_at' => $user->created_at,
             );
         }
 
@@ -196,7 +204,7 @@ if (!function_exists('subscriptionLabel')) {
         $color = $status_translated['color'];
         $class = $status_translated['class'];
 
-        print Auth::user()->hasRole(User::ROLE_ADMIN) ? '<span class="badge bg-transparent border border-'.$color.' text-'.$color.' float-end text-decoration-none fw-normal small '.$class.'" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="'.$label.'" data-bs-content="'.$description.'">'.$label.'</span>' : '';
+        print Auth::user()->hasRole(User::ROLE_ADMIN) ? '<span class="badge bg-transparent border border-'.$color.' text-'.$color.' float-end text-decoration-none fw-normal small '.$class.'" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="'.strtoupper($label).'" data-bs-content="'.$description.'">'.$label.'</span>' : '';
     }
 }
 

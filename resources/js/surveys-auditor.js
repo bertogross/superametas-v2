@@ -1,9 +1,11 @@
 import {
     toastAlert,
+    sweetWizardAlert,
     lightbox,
     debounce,
     updateProgressBar,
-    updateLabelClasses
+    updateLabelClasses,
+    uncheckRadiosAndUpdateLabels
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -68,61 +70,172 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const assignmentActionAuditRequestButtons = document.querySelectorAll('.btn-assignment-audit-request');
-    if(assignmentActionAuditRequestButtons){
-        assignmentActionAuditRequestButtons.forEach(function(button) {
+    const assignmentAuditEnterButtons = document.querySelectorAll('.btn-assignment-audit-enter');
+    if(assignmentAuditEnterButtons){
+        assignmentAuditEnterButtons.forEach(function(button) {
             button.addEventListener('click', function(event) {
                 event.preventDefault();
 
                 this.blur();
 
-                alert('In the development stage');
-                return;
+                var assignmentId = this.getAttribute("data-assignment-id");
+                assignmentId = parseInt(assignmentId);
 
-                if (confirm('Deseja adicionar esta tarefa a sua lista de Auditorias?')) {
-                    var assignmentId = this.getAttribute("data-assignment-id");
-                    assignmentId = parseInt(assignmentId);
+                Swal.fire({
+                    title: 'Deseja realizar esta Auditoria?',
+                    icon: 'question',
+                    confirmButtonText: 'Sim',
+                        confirmButtonClass: 'btn btn-outline-secondary w-xs me-2',
+                    cancelButtonText: 'Não',
+                        cancelButtonClass: 'btn btn-sm btn-outline-danger w-xs',
+                            showCancelButton: true,
+                    denyButtonText: 'Nunca',
+                        denyButtonClass: 'btn btn-outline-danger w-xs me-2',
+                            showDenyButton: false,
+                    buttonsStyling: false,
+                    showCloseButton: false,
+                    allowOutsideClick: false
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        fetch(enterAssignmentAuditorURL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                            },
+                            body: JSON.stringify({ assignment_id: assignmentId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            var sweetMessage = data.message;
 
-                    fetch(enterAssignmentAuditorURL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
-                        },
-                        body: JSON.stringify({ assignment_id: assignmentId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        var sweetMessage = '';
+                            if (data.success) {
+                                //toastAlert(data.message, 'success', 10000);
 
-                        if (data.success) {
-                            toastAlert(data.message, 'success');
+                                if(data.current_surveyor_status != 'completed'){
+                                    sweetMessage += 'Esta tarefa ainda não foi concluída. Assim que disponível ela será exibida na sessão de seu Perfil.';
 
-                            if(data.current_surveyor_status != 'completed'){
-                                sweetMessage = 'Esta tarefa ainda não foi concluída. Assim que disponível ela será exibida na sessão de seu Perfil.';
-                            }else{
-                                sweetMessage = 'Esta tarefa está pronta para ser auditada e já está disponível na sessão de seu Perfil.';
+                                    sweetWizardAlert(sweetMessage, profileShowURL, 'warning', 'Ficar por aqui', 'Acessar meu Perfil');
+                                }else{
+                                    sweetMessage += '<br><br>Deseja acessar seu formulário agora?';
+
+                                    sweetWizardAlert(sweetMessage, formAuditorAssignmentURL + '/' + assignmentId, 'success', 'Não', 'Sim, acessar');
+                                }
+                            } else {
+                                // Handle error
+                                console.error('Error:', data.message);
+
+                                var currentSurveyorStatus = data.current_surveyor_status;
+
+                                sweetMessage = data.message;
+
+                                if(data.action == 'request'){
+                                    toastAlert(data.message, 'danger', 60000);
+
+                                    // TODO
+                                    //sweetWizardAlert(sweetMessage, requestAssignmentAuditorURL + '/' + assignmentId, 'info', 'Deixar como está', 'Solicitar esta Tarefa');
+                                }else if(data.action == 'choice'){
+                                    Swal.fire({
+                                        title: "Atenção",
+                                        html: sweetMessage,
+                                        icon: 'info',
+                                        confirmButtonText: 'Abrir formulário e Auditar',
+                                            confirmButtonClass: 'btn btn-outline-secondary w-xs me-2',
+                                        cancelButtonText: 'Deixar como está',
+                                            cancelButtonClass: 'btn btn-sm btn-outline-info w-xs',
+                                                showCancelButton: true,
+                                        denyButtonText: 'Revogar',
+                                            denyButtonClass: 'btn btn-sm btn-outline-danger w-xs me-2',
+                                                showDenyButton: true,
+                                        buttonsStyling: false,
+                                        showCloseButton: false,
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            if( currentSurveyorStatus == 'completed' ){
+                                                // redirect to form
+                                                var timerInterval;
+                                                Swal.fire({
+                                                    title: 'Redirecionando...',
+                                                    html: '',
+                                                    timer: 1000,
+                                                    timerProgressBar: true,
+                                                    showCloseButton: false,
+                                                    didOpen: function () {
+                                                        Swal.showLoading()
+                                                        timerInterval = setInterval(function () {
+                                                            var content = Swal.getHtmlContainer()
+                                                            if (content) {
+                                                                var b = content.querySelector('b')
+                                                                if (b) {
+                                                                    b.textContent = Swal.getTimerLeft()
+                                                                }
+                                                            }
+                                                        }, 100)
+                                                    },
+                                                    onClose: function () {
+                                                        clearInterval(timerInterval)
+                                                    }
+                                                }).then(function (result) {
+                                                    /* Read more about handling dismissals below */
+                                                    if (result.dismiss === Swal.DismissReason.timer) {
+                                                        //console.log('I was closed by the timer')
+
+                                                        setTimeout(() => {
+                                                            window.location.href = formAuditorAssignmentURL + '/' + assignmentId;
+                                                        }, 100);
+                                                    }
+                                                });
+                                            }else{
+                                                toastAlert('A Vistoria ainda não foi conluída e por isso não será possível acessar o formulário de Auditoria.<br>Tente novamente mais tarde!', 'danger', 60000);
+                                                Swal.fire({
+                                                    icon: "warning",
+                                                    title: "Atenção",
+                                                    html: 'A Vistoria ainda não foi conluída e por isso não será possível acessar o formulário de Auditoria.<br>Tente novamente mais tarde!',
+                                                    showConfirmButton: true,
+                                                        confirmButtonClass: 'btn btn-outline-secondary',
+                                                    showCloseButton: false,
+                                                    buttonsStyling: false,
+                                                    allowOutsideClick: false
+                                                });
+                                            }
+                                        } else if (result.isDenied) {
+                                            // do action to revogue
+                                            fetch(revokeAssignmentAuditorURL + '/' + assignmentId, {
+                                                method: 'POST',
+                                                body: formData,
+                                                headers: {
+                                                    'X-Requested-With': 'XMLHttpRequest',
+                                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                                }
+                                            })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                if (data.success) {
+                                                    toastAlert(data.message, 'success',5000);
+
+                                                    showPreloader();
+
+                                                    setTimeout(() => {
+                                                        location.reload();
+                                                    }, 2000);
+
+                                                } else {
+                                                    toastAlert(data.message, 'danger', 60000);
+                                                }
+                                            })
+                                            .catch(error => {
+                                                toastAlert('Error: ' + error, 'danger', 60000);
+                                                console.error('Error:', error);
+                                            });
+                                        }
+                                    });
+                                }
                             }
-
-                            sweetWizardAlert(sweetMessage, profileShowURL, 'success', 'Ficar por aqui', 'Acessar meu Perfil');
-
-                        } else {
-                            // Handle error
-                            console.error('Error:', data.message);
-
-                            sweetMessage = data.message;
-
-                            if(data.action == 'request'){
-                                //sweetWizardAlert(sweetMessage, requestAssignmentAuditorURL + '/' + assignmentId, 'info', 'Deixar como está', 'Solicitar esta Tarefa');
-                            }else if(data.action == 'revoke'){
-                                //sweetWizardAlert(sweetMessage, revokeAssignmentAuditorURL + '/' + assignmentId, 'info', 'Deixar como está', 'Revogar esta Tarefa');
-                            }else{
-                                toastAlert(data.message, 'danger', 5000);
-                            }
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-                }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+                })
             });
         });
     }
@@ -135,20 +248,23 @@ document.addEventListener('DOMContentLoaded', function() {
             button.addEventListener('click', event => {
                 event.preventDefault();
 
+                button.blur();
+
                 const container = document.getElementById('assignment-container');
                 if (!container) {
                     console.error('Container not found');
                     return;
                 }
 
-                const responsesData = button.closest('.responses-data-container');
-                if (!responsesData) {
+                const responsesDataContainer = button.closest('.responses-data-container');
+                if (!responsesDataContainer) {
                     console.error('Responses data container not found');
                     return;
                 }
 
-                const textArea = responsesData.querySelector('textarea');
-                const btnPhoto = responsesData.querySelector('.btn-add-photo');
+                const textArea = responsesDataContainer.querySelector('textarea');
+                const btnPhoto = responsesDataContainer.querySelector('.btn-add-photo');
+                const btnsCompliance = responsesDataContainer.querySelectorAll('.btn-compliance');
 
                 //const countTopics = document.querySelectorAll('.btn-response-update').length;
                 //console.log('countTopics', countTopics);
@@ -159,35 +275,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const stepId = parseInt(button.getAttribute('data-step-id'));
                 const topicId = parseInt(button.getAttribute('data-topic-id'));
 
-                var responseId = responsesData.querySelector('input[name="response_id"]').value;
+                var responseId = responsesDataContainer.querySelector('input[name="response_id"]').value;
 
-                const compliance = responsesData.querySelector('input[name="compliance_audit"]:checked')?.value || '';
+                const compliance = responsesDataContainer.querySelector('input[type="radio"][name="compliance_audit"]:checked')?.value || '';
+                const radios = responsesDataContainer.querySelectorAll('input[type="radio"][name="compliance_audit"]');
 
-                const comment = responsesData.querySelector('textarea[name="comment_audit"]')?.value || '';
-                const attachmentInputs = responsesData.querySelectorAll('input[name="attachment_id[]"]');
+                const comment = responsesDataContainer.querySelector('textarea[name="comment_audit"]')?.value || '';
+                const attachmentInputs = responsesDataContainer.querySelectorAll('input[name="attachment_id[]"]');
                 const attachmentIds = Array.from(attachmentInputs).map(input => input.value);
 
-                if (compliance && attachmentIds.length === 0) {
-                    // Select all radio buttons with the name 'compliance_survey'
-                    const complianceSurveyRadios = responsesData.querySelectorAll('input[name="compliance_survey"]');
-
-                    // Uncheck each radio button
-                    complianceSurveyRadios.forEach(radio => {
-                        radio.checked = false;
-                    });
-
-                    btnPhoto.classList.add('blink', 'bg-warning');
-                    setTimeout(() => {
-                        btnPhoto.classList.remove('blink', 'bg-warning');
-                    }, 5000);
-
-                    toastAlert('Primeiro envie uma foto', 'warning', 10000);
-
-                    return;
-                }
-
                 // Select the radio buttons
-                const radios = responsesData.querySelectorAll('input[type="radio"][name="compliance_audit"]');
                 radios.forEach(radio => {
                     radio.addEventListener('change', function() {
                         // When a radio button changes, update the label classes
@@ -195,8 +292,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 });
 
-                var pendingIcon = responsesData.querySelector('.ri-time-line');
-                var completedIcon = responsesData.querySelector('.ri-check-double-fill');
+                var pendingIcon = responsesDataContainer.querySelector('.ri-time-line');
+                var completedIcon = responsesDataContainer.querySelector('.ri-check-double-fill');
+
+                /*
+                if ( compliance == 'no' && attachmentIds.length === 0 ) {
+
+                    btnPhoto.classList.add('blink', 'bg-warning');
+                    setTimeout(() => {
+                        btnPhoto.classList.remove('blink', 'bg-warning');
+                    }, 5000);
+
+                    uncheckRadiosAndUpdateLabels(radios);
+
+                    // If responseId is not set, show the pending icon and hide the completed icon
+                    if (pendingIcon) pendingIcon.classList.remove('d-none');
+                    if (completedIcon) completedIcon.classList.add('d-none');
+
+                    document.querySelector('#btn-response-finalize').classList.add('d-none');
+                }
+                */
 
                 const formData = {
                     assignment_id: assignmentId,
@@ -224,16 +339,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(data => {
+                    const countResponses = parseInt(data.countResponses || 0);
+                    const countTopics = parseInt(data.countTopics || 0);
+                    updateProgressBar(countResponses, countTopics, 'survey-progress-bar');
+
                     if (data.success) {
                         //toastAlert(data.message, 'success', 5000);
 
                         const responseId = data.id;
                         //const countFinishedTopics = parseInt(data.count || 0);
                         //console.log('countFinishedTopics', countFinishedTopics);
-
-                        const countResponses = parseInt(data.countResponses || 0);
-                        const countTopics = parseInt(data.countTopics || 0);
-                        updateProgressBar(countResponses, countTopics, 'survey-progress-bar');
 
                         if (responseId) {
                             // If responseId is set, show the completed icon and hide the pending icon
@@ -268,32 +383,46 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
 
                         if(data.action2 == 'showTextarea'){
+                            uncheckRadiosAndUpdateLabels(radios);
+
                             textArea.style.display = "block";
 
                             textArea.focus();
 
                             textArea.classList.add('blink', 'bg-warning-subtle');
+
                             setTimeout(() => {
                                 textArea.classList.remove('blink', 'bg-warning-subtle');
                             }, 3000);
                         }else if(data.action2 == 'blinkPhotoButton'){
                             btnPhoto.classList.add('blink', 'bg-warning');
+
                             setTimeout(() => {
                                 btnPhoto.classList.remove('blink', 'bg-warning');
                             }, 3000);
+
+                            uncheckRadiosAndUpdateLabels(radios);
+                        }else if(data.action2 == 'blinkComplianceButtons'){
+                            if(btnsCompliance){
+                                Array.from(btnsCompliance).forEach(function (btn) {
+                                    btn.classList.add('blink');
+
+                                    setTimeout(() => {
+                                        btn.classList.remove('blink');
+                                    }, 5000);
+                                });
+                            }
                         }
 
                         toastAlert(data.message, 'danger', 7000);
                     }
 
                     if(data.showFinalizeButton){
-                        setTimeout(() => {
+                        //setTimeout(() => {
                             document.querySelector('#btn-response-finalize').classList.remove('d-none');
 
-                            //document.querySelector('#btn-response-finalize').click();
-
-                            document.querySelector('#survey-progress-bar').remove();
-                        }, 1000);
+                            sweetWizardAlert('Tarefa Concluída', false, 'success', 'Continuar Editando', 'Finalizar', '#btn-response-finalize');
+                        //}, 1000);
                     }
                 })
                 .catch(error => console.error('Error:', error));
@@ -301,6 +430,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Attach event listeners to compliance survey radio buttons
+    function attachComplianceAuditorRadios(){
+        const complianceAuditorRadios = document.querySelectorAll('input[name="compliance_audit"]');
+        if(complianceAuditorRadios){
+            complianceAuditorRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const container = this.closest('.responses-data-container');
+
+                    const updateButton = container.querySelector('.btn-response-update');
+                    if (updateButton) {
+                        updateButton.click();
+                    }
+                }, 1);
+            });
+        }
+    }
+    attachComplianceAuditorRadios();
 
     // Attach event listener to the comment textarea
     const commentAuditTextareas = document.querySelectorAll('textarea[name="comment_audit"]');
@@ -308,28 +454,14 @@ document.addEventListener('DOMContentLoaded', function() {
         commentAuditTextareas.forEach(textarea => {
             textarea.addEventListener('input', debounce(function() {
                 const container = this.closest('.responses-data-container');
+
                 const updateButton = container.querySelector('.btn-response-update');
                 if (updateButton) {
                     updateButton.click();
                 }
-            }, 1000)); // 1000 milliseconds = 1 second
+            }, 3000)); // 3000 milliseconds = 3 second
         });
     }
-
-    // Attach event listeners to compliance survey radio buttons
-    const complianceAuditorRadios = document.querySelectorAll('input[name="compliance_audit"]');
-    if(complianceAuditorRadios){
-        complianceAuditorRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                const container = this.closest('.responses-data-container');
-                const updateButton = container.querySelector('.btn-response-update');
-                if (updateButton) {
-                    updateButton.click();
-                }
-            }, 500);
-        });
-    }
-
 
     // When Surveyor finish your taks, transfer to Auditor make revision
     const responseAuditorAssignmentFinalizedButton = document.getElementById('btn-response-finalize');
@@ -337,88 +469,45 @@ document.addEventListener('DOMContentLoaded', function() {
         responseAuditorAssignmentFinalizedButton.addEventListener('click', async function(event) {
             event.preventDefault();
 
-            const container = document.getElementById('assignment-container');
-            if (!container) {
-                console.error('Container not found');
-                return;
-            }
-            const surveyId = parseInt(container.querySelector('input[name="survey_id"]')?.value || 0);
-
             const assignmentId = parseInt(this.getAttribute('data-assignment-id'));
 
-            Swal.fire({
-                title: 'A Auditoria foi concluída!',
-                icon: 'success',
-                showDenyButton: false,
-                showCancelButton: true,
-                confirmButtonText: 'Finalizar',
-                confirmButtonClass: 'btn btn-outline-success w-xs me-2',
-                cancelButtonClass: 'btn btn-sm btn-outline-info w-xs',
-                denyButtonClass: 'btn btn-danger w-xs me-2',
-                buttonsStyling: false,
-                denyButtonText: 'Não',
-                cancelButtonText: 'Continuar Editando',
-                showCloseButton: false,
-                allowOutsideClick: false
-            }).then(function (result) {
-                if (result.isConfirmed) {
-                    //Ajax to change 'surveys' table column status to 'auditing' and if the response is success call Swal.fire to redirect
-                    fetch(changeAssignmentAuditorStatusURL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
-                        },
-                        body: JSON.stringify({ assignment_id: assignmentId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            toastAlert(data.message, 'success');
+            const container = document.getElementById('assignment-container');
+            if (!container || !assignmentId) {
+                console.error('Container or assignmentId not found');
 
-                            var timerInterval;
+                toastAlert('Ocorreu um erro. Atualize a sessão ou retorne mais tarde.', 'danger', 20000);
 
-                            Swal.fire({
-                                title: 'Redirecionando...',
-                                html: '',
-                                timer: 3000,
-                                timerProgressBar: true,
-                                showCloseButton: false,
-                                didOpen: function () {
-                                    Swal.showLoading()
-                                    timerInterval = setInterval(function () {
-                                        var content = Swal.getHtmlContainer()
-                                        if (content) {
-                                            var b = content.querySelector('b')
-                                            if (b) {
-                                                b.textContent = Swal.getTimerLeft()
-                                            }
-                                        }
-                                    }, 100)
-                                },
-                                onClose: function () {
-                                    clearInterval(timerInterval)
-                                }
-                            }).then(function (result) {
-                                if (result.dismiss === Swal.DismissReason.timer) {
-                                    //console.log('I was closed by the timer')
-                                    window.location.href = profileShowURL;
-                                }
-                            });
-                        } else {
-                            // Handle error
-                            console.error('Survey status error:', data.message);
+                return;
+            }
 
-                            toastAlert(data.message, 'danger', 5000);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+            //Ajax to change 'surveys' table column status to 'auditing' and if the response is success call Swal.fire to redirect
+            fetch(changeAssignmentAuditorStatusURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Laravel CSRF token
+                },
+                body: JSON.stringify({ assignment_id: assignmentId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    toastAlert(data.message, 'success');
+
+                    window.location.href = assignmentShowURL + '/' + assignmentId;
+
+                } else {
+                    // Handle error
+                    console.error('Survey status error:', data.message);
+
+                    toastAlert(data.message, 'danger', 5000);
                 }
             })
+            .catch(error => console.error('Error:', error));
         });
     }
 
-
     lightbox();
+
 
 });

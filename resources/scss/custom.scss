@@ -909,10 +909,15 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
     visibility: visible;
 }
 
-
 .tasks-board .tasks-list {
     min-width: 300px !important;
 }
+.tasks-wrapper-survey {
+    max-height: calc(100vh - 340px);
+}
+
+
+
 
 
 

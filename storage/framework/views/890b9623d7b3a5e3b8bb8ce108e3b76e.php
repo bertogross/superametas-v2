@@ -1,4 +1,4 @@
-@php
+<?php
     use Carbon\Carbon;
     use App\Models\SurveyTopic;
     use App\Models\SurveyResponse;
@@ -43,46 +43,50 @@
         ->where('assignment_id', $assignmentId)
         ->get()
         ->toArray();
-@endphp
-@extends('layouts.master')
-@section('title')
+?>
+
+<?php $__env->startSection('title'); ?>
     Formulário de Auditoria
-@endsection
-@section('css')
-    <link rel="stylesheet" href="{{ URL::asset('build/libs/glightbox/css/glightbox.min.css') }}">
-@endsection
-@section('content')
-    @component('components.breadcrumb')
-        @slot('url')
-            {{ route('surveysIndexURL') }}
-        @endslot
-        @slot('li_1')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('css'); ?>
+    <link rel="stylesheet" href="<?php echo e(URL::asset('build/libs/glightbox/css/glightbox.min.css')); ?>">
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
+    <?php $__env->startComponent('components.breadcrumb'); ?>
+        <?php $__env->slot('url'); ?>
+            <?php echo e(route('surveysIndexURL')); ?>
+
+        <?php $__env->endSlot(); ?>
+        <?php $__env->slot('li_1'); ?>
             Checklists
-        @endslot
-        @slot('title')
-            Auditoria <small><i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i> #<span class="text-theme">{{$surveyId}}</span> {{ limitChars($templateName ?? '', 20) }}</small>
-        @endslot
-    @endcomponent
+        <?php $__env->endSlot(); ?>
+        <?php $__env->slot('title'); ?>
+            Auditoria <small><i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i> #<span class="text-theme"><?php echo e($surveyId); ?></span> <?php echo e(limitChars($templateName ?? '', 20)); ?></small>
+        <?php $__env->endSlot(); ?>
+    <?php echo $__env->renderComponent(); ?>
     <div id="content" class="rounded rounded-2 mb-4" style="max-width: 700px; margin: 0 auto;">
         <div class="bg-secondary-subtle position-relative">
             <div class="card-body p-5 text-center">
                 <h2 class="text-secondary">Auditoria</h2>
 
-                @if ($companyName )
-                    <h2 class="text-theme text-uppercase">{{ $companyName }}</h2>
-                @endif
+                <?php if($companyName ): ?>
+                    <h2 class="text-theme text-uppercase"><?php echo e($companyName); ?></h2>
+                <?php endif; ?>
 
-                <h3>{{ $title ? ucfirst($title) : 'NI' }}</h3>
+                <h3><?php echo e($title ? ucfirst($title) : 'NI'); ?></h3>
 
                 <div class="mb-0 text-muted">
-                    Vistoriador(a): {{ $surveyorName }}
+                    Vistoriador(a): <?php echo e($surveyorName); ?>
+
                 </div>
 
                 <div class="mb-0 text-muted">
-                    Auditor(a): {{ $auditorName }}
+                    Auditor(a): <?php echo e($auditorName); ?>
+
                 </div>
                 <div class="mb-0 text-muted">
-                    Executar até: {{ $assignmentCreatedAt ? \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}
+                    Executar até: <?php echo e($assignmentCreatedAt ? \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-'); ?>
+
                 </div>
             </div>
             <div class="shape">
@@ -99,103 +103,97 @@
             </div>
         </div>
 
-        @if ($currentUserId != $auditorId)
+        <?php if($currentUserId != $auditorId): ?>
             <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
                 <i class="ri-alert-line label-icon blink"></i> Você não possui autorização para prosseguir com a tarefa delegada a outra pessoa
             </div>
-        @elseif ($auditorStatus == 'completed')
+        <?php elseif($auditorStatus == 'completed'): ?>
             <div class="alert alert-success alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
                 <i class="ri-alert-line label-icon blink"></i> Esta Auditoria já foi finalizada e não poderá ser retificada.
                 <br>
-                <a href="{{ route('assignmentShowURL', $assignmentId) }}"
+                <a href="<?php echo e(route('assignmentShowURL', $assignmentId)); ?>"
                     data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
                     title="Visualizar" class="btn btn-sm waves-effect btn-soft-secondary mt-2">
                     Visualizar
                 </a>
             </div>
-        @else
-            @if ($auditorStatus == 'losted')
+        <?php else: ?>
+            <?php if($auditorStatus == 'losted'): ?>
                 <div class="alert alert-secondary alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
                     <i class="ri-alert-line label-icon blink"></i> Esta Auditoria foi perdida pois o prazo expirou e por isso não poderá mais ser editada
                     <br>
-                    <a href="{{ route('assignmentShowURL', $assignmentId) }}"
+                    <a href="<?php echo e(route('assignmentShowURL', $assignmentId)); ?>"
                         data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
                         title="Visualizar" class="btn btn-sm waves-effect btn-soft-success mt-2">
                         Visualizar
                     </a>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            {!! !empty($description) ? '<div class="blockquote custom-blockquote blockquote-outline blockquote-dark rounded mt-2 mb-2"><p class="text-body mb-2">'.$description.'</p><footer class="blockquote-footer mt-0">'.$getAuthorData['name'].' <cite title="'.$authorRoleName.'">'.$authorRoleName.'</cite></footer></div>' : '' !!}
+            <?php echo !empty($description) ? '<div class="blockquote custom-blockquote blockquote-outline blockquote-dark rounded mt-2 mb-2"><p class="text-body mb-2">'.$description.'</p><footer class="blockquote-footer mt-0">'.$getAuthorData['name'].' <cite title="'.$authorRoleName.'">'.$authorRoleName.'</cite></footer></div>' : ''; ?>
+
 
             <div id="assignment-container">
-                @csrf
-                <input type="hidden" name="survey_id" value="{{$surveyId}}">
-                <input type="hidden" name="company_id" value="{{$companyId}}">
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="survey_id" value="<?php echo e($surveyId); ?>">
+                <input type="hidden" name="company_id" value="<?php echo e($companyId); ?>">
 
-                @if ($surveyData && $responsesData)
-                    @include('surveys.layouts.form-auditor-step-cards')
-                    {{--
-                    @component('surveys.layouts.form-auditor-step-cards')
-                        @slot('stepsWithTopics', $stepsWithTopics)
-                        @slot('responsesData', $responsesData)
-                        @slot('auditorStatus', $auditorStatus)
-                        @slot('assignmentId', $assignmentId)
-                        @slot('countTopics', $countTopics)
-                        @slot('countResponses', $countResponses)
-                    @endcomponent
-                    --}}
-                @else
+                <?php if($surveyData && $responsesData): ?>
+                    <?php echo $__env->make('surveys.layouts.form-auditor-step-cards', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                    
+                <?php else: ?>
                     <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show" role="alert">
                         <i class="ri-alert-line label-icon"></i> Não há dados para gerar os campos deste formulário de Auditoria
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
-        @endif
+        <?php endif; ?>
     </div>
 
     <div id="survey-progress-bar" class="fixed-bottom mb-0 ms-auto me-auto w-100">
         <div class="flex-grow-1">
             <div class="progress animated-progress progress-label rounded-0">
-                <div class="progress-bar rounded-0 bg-{{getProgressBarClass($percentage)}}" role="progressbar" style="width: {{$percentage}}%" aria-valuenow="" aria-valuemin="0" aria-valuemax="100"><div class="label">{{ $percentage > 0 ? $percentage.'%' : ''}}</div></div>
+                <div class="progress-bar rounded-0 bg-<?php echo e(getProgressBarClass($percentage)); ?>" role="progressbar" style="width: <?php echo e($percentage); ?>%" aria-valuenow="" aria-valuemin="0" aria-valuemax="100"><div class="label"><?php echo e($percentage > 0 ? $percentage.'%' : ''); ?></div></div>
             </div>
         </div>
     </div>
-@endsection
-@section('script')
-    <script src="{{ URL::asset('build/libs/glightbox/js/glightbox.min.js') }}"></script>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('script'); ?>
+    <script src="<?php echo e(URL::asset('build/libs/glightbox/js/glightbox.min.js')); ?>"></script>
 
     <script>
-        var surveysIndexURL = "{{ route('surveysIndexURL') }}";
-        var surveysCreateURL = "{{ route('surveysCreateURL') }}";
-        var surveysEditURL = "{{ route('surveysEditURL') }}";
-        var surveysChangeStatusURL = "{{ route('surveysChangeStatusURL') }}";
-        var surveysShowURL = "{{ route('surveysShowURL') }}";
-        var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
+        var surveysIndexURL = "<?php echo e(route('surveysIndexURL')); ?>";
+        var surveysCreateURL = "<?php echo e(route('surveysCreateURL')); ?>";
+        var surveysEditURL = "<?php echo e(route('surveysEditURL')); ?>";
+        var surveysChangeStatusURL = "<?php echo e(route('surveysChangeStatusURL')); ?>";
+        var surveysShowURL = "<?php echo e(route('surveysShowURL')); ?>";
+        var surveysStoreOrUpdateURL = "<?php echo e(route('surveysStoreOrUpdateURL')); ?>";
     </script>
-    <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
+    <script src="<?php echo e(URL::asset('build/js/surveys.js')); ?>" type="module"></script>
 
     <script>
-        var profileShowURL = "{{ route('profileShowURL') }}";
-        var assignmentShowURL = "{{ route('assignmentShowURL') }}";
-        var formAuditorAssignmentURL = "{{ route('formAuditorAssignmentURL') }}";
-        var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
-        var responsesAuditorStoreOrUpdateURL = "{{ route('responsesAuditorStoreOrUpdateURL') }}";
+        var profileShowURL = "<?php echo e(route('profileShowURL')); ?>";
+        var assignmentShowURL = "<?php echo e(route('assignmentShowURL')); ?>";
+        var formAuditorAssignmentURL = "<?php echo e(route('formAuditorAssignmentURL')); ?>";
+        var changeAssignmentAuditorStatusURL = "<?php echo e(route('changeAssignmentAuditorStatusURL')); ?>";
+        var responsesAuditorStoreOrUpdateURL = "<?php echo e(route('responsesAuditorStoreOrUpdateURL')); ?>";
     </script>
-    <script src="{{ URL::asset('build/js/surveys-auditor.js') }}" type="module"></script>
+    <script src="<?php echo e(URL::asset('build/js/surveys-auditor.js')); ?>" type="module"></script>
 
     <script>
-        var uploadPhotoURL = "{{ route('uploadPhotoURL') }}";
-        var deletePhotoURL = "{{ route('deletePhotoURL') }}";
-        var assetUrl = "{{ URL::asset('/') }}";
+        var uploadPhotoURL = "<?php echo e(route('uploadPhotoURL')); ?>";
+        var deletePhotoURL = "<?php echo e(route('deletePhotoURL')); ?>";
+        var assetUrl = "<?php echo e(URL::asset('/')); ?>";
     </script>
-    <script src="{{ URL::asset('build/js/surveys-attachments.js') }}" type="module"></script>
+    <script src="<?php echo e(URL::asset('build/js/surveys-attachments.js')); ?>" type="module"></script>
 
     <script type="module">
         import {
             toggleElement,
-        } from '{{ URL::asset('build/js/helpers.js') }}';
+        } from '<?php echo e(URL::asset('build/js/helpers.js')); ?>';
 
         toggleElement();
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\www\superametas\applicationV2\development.superametas.com\public_html\resources\views/surveys/assignment/form-auditor.blade.php ENDPATH**/ ?>

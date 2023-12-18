@@ -1,6 +1,9 @@
 <?php
     use App\Models\User;
 
+    $user = auth()->user();
+    $currentUserCapabilities = $user->capabilities ? json_decode($user->capabilities, true) : [];
+
     $getUserData = getUserData();
     $getCompanyLogo = getCompanyLogo();
     $getCompanyName = getCompanyName();
@@ -99,7 +102,7 @@
                             <div class="row g-0">
                                 <?php if(getERP()): ?>
                                     <div class="col">
-                                        <a class="dropdown-icon-item" href="<?php echo e(route('goalSalesIndexURL')); ?>" title="Meta de Vendas">
+                                        <a class="dropdown-icon-item" href="<?php echo e(route('goalSalesIndexURL')); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Meta de Vendas">
                                             <i class="ri-shopping-cart-2-fill text-theme fs-1"></i>
                                             
                                             <span>Vendas</span>
@@ -118,7 +121,7 @@
 
                                 <?php if(auth()->user()->hasRole(User::ROLE_ADMIN) || auth()->user()->hasRole(User::ROLE_CONTROLLERSHIP)): ?>
                                     <div class="col">
-                                        <a class="dropdown-icon-item" href="<?php echo e(route('surveysIndexURL')); ?>" title="Checklists">
+                                        <a class="dropdown-icon-item" href="<?php echo e(route('surveysIndexURL')); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom"  title="Acessar a sessão Checklists">
                                             <i class="ri-checkbox-line text-theme fs-1"></i>
                                             
                                             <span>Checklists</span>
@@ -126,20 +129,15 @@
                                     </div>
 
                                     <div class="col">
-                                        <a class="dropdown-icon-item" href="<?php echo e(route('teamIndexURL')); ?>" title="Equipe">
+                                        <a class="dropdown-icon-item" href="<?php echo e(route('teamIndexURL')); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Listar membros da Equipe">
                                             <i class="ri-team-fill text-theme fs-1"></i>
                                             <span>Equipe</span>
                                         </a>
                                     </div>
                                 <?php endif; ?>
-
-                                <div class="col">
-                                    <a class="dropdown-icon-item" href="<?php echo e(route('profileShowURL')); ?>" title="Tarefas">
-                                        <i class="ri-todo-fill text-theme fs-1"></i>
-                                        <span>Tarefas</span>
-                                    </a>
-                                </div>
                             </div>
+
+                            
                         </div>
                     </div>
                 </div>
@@ -197,11 +195,19 @@
                             </a>
                         <?php endif; ?>
 
+                        
+
                         <a class="dropdown-item" href="<?php echo e(route('profileShowURL')); ?>">
-                            <i class="ri-user-3-fill text-muted fs-16 align-middle me-1"></i>
-                            <span class="align-middle">Meu Perfil</span>
+                            <i class="ri-todo-fill text-muted fs-16 align-middle me-1"></i>
+                            <span class="align-middle">Minhas Tarefas</span>
                         </a>
 
+                        <?php if(in_array('audit', $currentUserCapabilities)): ?>
+                            <a class="dropdown-item" href="<?php echo e(route('surveysAuditIndexURL', $user->id)); ?>">
+                                <i class="ri-fingerprint-2-line text-muted fs-16 align-middle me-1"></i>
+                                <span class="align-middle">Minhas Auditorias</span>
+                            </a>
+                        <?php endif; ?>
 
                         <!--
                         <a class="dropdown-item" href="auth-lockscreen-basic"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Lock screen</span></a>

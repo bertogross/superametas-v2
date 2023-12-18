@@ -203,20 +203,24 @@ class SurveysController extends Controller
 
         $data = null;
 
-        $users = getUsers()->filter(function ($user) {
-            // Check if capabilities is not null
-            if ($user->capabilities !== null) {
-                // Decode the JSON capabilities into an array
-                $userCapabilities = json_decode($user->capabilities, true);
+        $host = $_SERVER['HTTP_HOST'] ?? 'default';
+        if(str_contains($host, 'app')){
+            $users = getUsers()->filter(function ($user) {
+                // Check if capabilities is not null
+                if ($user->capabilities !== null) {
+                    // Decode the JSON capabilities into an array
+                    $userCapabilities = json_decode($user->capabilities, true);
 
-                // Check if 'audit' is not in the capabilities array
-                return !in_array('audit', $userCapabilities);
-            }
+                    // Check if 'audit' is not in the capabilities array
+                    return !in_array('audit', $userCapabilities);
+                }
 
-            // If capabilities is null, include the user
-            return true;
-        });
-
+                // If capabilities is null, include the user
+                return true;
+            });
+        }else{
+            $users = getUsers();
+        }
 
         $getActiveCompanies = getActiveCompanies();
         $getAuthorizedCompanies = getAuthorizedCompanies();
@@ -265,19 +269,24 @@ class SurveysController extends Controller
             return response()->json(['success' => false, 'message' => 'Você não possui autorização para editar um registro gerado por outra pessoa']);
         }
 
-        $users = getUsers()->filter(function ($user) {
-            // Check if capabilities is not null
-            if ($user->capabilities !== null) {
-                // Decode the JSON capabilities into an array
-                $userCapabilities = json_decode($user->capabilities, true);
+        $host = $_SERVER['HTTP_HOST'] ?? 'default';
+        if(str_contains($host, 'app')){
+            $users = getUsers()->filter(function ($user) {
+                // Check if capabilities is not null
+                if ($user->capabilities !== null) {
+                    // Decode the JSON capabilities into an array
+                    $userCapabilities = json_decode($user->capabilities, true);
 
-                // Check if 'audit' is not in the capabilities array
-                return !in_array('audit', $userCapabilities);
-            }
+                    // Check if 'audit' is not in the capabilities array
+                    return !in_array('audit', $userCapabilities);
+                }
 
-            // If capabilities is null, include the user
-            return true;
-        });
+                // If capabilities is null, include the user
+                return true;
+            });
+        }else{
+            $users = getUsers();
+        }
 
 
         $getActiveCompanies = getActiveCompanies();
@@ -423,8 +432,8 @@ class SurveysController extends Controller
             'distributed_data.required' => 'Necessário delegar usuários para Checklist e Auditoria',
             'recurring.required' => 'Escolha a recorrência',
             'companies.required' => 'Selecione uma ou mais unidades',
-            //'delegated_to.required' => 'Defina as atribuições',
-            //'audited_by.required' => 'Defina as atribuições de auditoria',
+            //'surveyor_id.required' => 'Defina as atribuições',
+            //'auditor_id.required' => 'Defina as atribuições de auditoria',
             //'start_at' => 'Defina a data de início',
             //'end_in' => 'Defina a data final'
         ];
@@ -435,15 +444,15 @@ class SurveysController extends Controller
                 //'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
                 //'description' => 'nullable|string|max:1000',
                 'template_id' => 'required',
-                //'audited_by' => 'required',
+                //'auditor_id' => 'required',
                 'distributed_data' => 'required',
                 'recurring' => 'required|in:once,daily,weekly,biweekly,monthly,annual',
                 //'companies' => 'required|in:'.implode(',', $companyIds).'',
                 'companies' => 'required|array',
                 'companies.*' => 'in:'.implode(',', $companyIds),
 
-                //'delegated_to' => 'required|in:'.implode(',', $userIds).'',
-                //'audited_by' => 'required|in:'.implode(',', $userIds).'',
+                //'surveyor_id' => 'required|in:'.implode(',', $userIds).'',
+                //'auditor_id' => 'required|in:'.implode(',', $userIds).'',
                 //'start_at' => 'required',
                 //'end_in' => 'nullable',
                 //'current_user_editor' => 'nullable',
@@ -543,9 +552,10 @@ class SurveysController extends Controller
 
             if ( in_array($surveyStatus, ['started', 'stopped', 'completed', 'filed']) ){
                 // Prevent user change existent start_at date from form
-                $validatedData['start_at'] = $survey->start_at ?? '';
+                $validatedData['start_at'] = $survey->start_at ?? $startAt;
+                $validatedData['end_in'] = $endIn ?? null;
             }else{
-                $validatedData['start_at'] = $startAt ?? '';
+                $validatedData['start_at'] = $startAt ?? null;
             }
 
             // Check if the current user is the creator
@@ -556,7 +566,7 @@ class SurveysController extends Controller
             $survey->update($validatedData);
 
             // Update from model if task is not started
-            if(in_array($surveyStatus, ['new', 'scheduled'])){
+            if(in_array($surveyStatus, ['new', 'scheduled', 'started'])){
                 SurveyStep::populateSurveySteps($templateId, $surveyId);
             }
 

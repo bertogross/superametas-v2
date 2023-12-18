@@ -98,6 +98,8 @@ class SettingsUserController extends Controller
             return response()->json(['success' => false, 'message' => "Selecione o Nível"], 200);
         }
 
+        $request['capabilities'] = $request->capabilities ? json_encode($request->capabilities) : null;
+
         // Check if email exists in another smApp database and copu
         $password = OnboardController::getPasswordFromOtherDatabases($request->email);
 
@@ -108,11 +110,11 @@ class SettingsUserController extends Controller
             // Hash the password
             $hashedPassword = bcrypt($password);
 
-            $message = "Usuario adicionado!<br> Login: ".$user->email."<br>Senha: ".$password."";
+            $message = "Usuário adicionado!<br> Login: ".$request->email."<br>Senha: ".$password."";
         }else{
             $hashedPassword = $password;
 
-            $message = "Usuario adicionado!<br> Login: ".$user->email."<br>Senha: A mesma que já possui originada de outra(s) conta(s).";
+            $message = "Usuário adicionado!<br> Login: ".$request->email."<br>Senha: A mesma que já possui originada de outra(s) conta(s).";
         }
 
         // Create a new user
@@ -120,7 +122,7 @@ class SettingsUserController extends Controller
 
         // After creating the user
         $companies = is_array($request->get('companies')) ? json_encode(array_map('intval', $request->get('companies'))) : $request->get('companies');
-        $this->updateUserMeta($user->id, 'companies', $companies);
+        SettingsUserController::updateUserMeta($user->id, 'companies', $companies);
 
         if ($user->save()) {
             // Call the new method to update or create a record in app_subusers
@@ -191,7 +193,7 @@ class SettingsUserController extends Controller
 
         // After updating the user
         $companies = is_array($request->get('companies')) ? json_encode(array_map('intval', $request->get('companies'))) : $request->get('companies');
-        $this->updateUserMeta($user->id, 'companies', $companies);
+        SettingsUserController::updateUserMeta($user->id, 'companies', $companies);
 
         // Check if the password is being updated
         if ($request->has('new_password') && !empty($request->new_password)) {
@@ -203,9 +205,8 @@ class SettingsUserController extends Controller
             $user->password = $hashedPassword;
 
             // Update the password in other smApp databases
-            $this->updatePasswordInOtherDatabases($user->email, $hashedPassword);
+            SettingsUserController::updatePasswordInOtherDatabases($user->email, $hashedPassword);
         }
-
 
         if ($user->update()) {
             return response()->json(['success' => true, 'message' => "Dados de usuário foram atualizados"], 200);
@@ -232,19 +233,19 @@ class SettingsUserController extends Controller
         );
     }
 
-    protected function updatePasswordInOtherDatabases($email, $hashedPassword)
+    public static function updatePasswordInOtherDatabases($email, $hashedPassword)
     {
         // Get the list of other smApp databases
         $otherDatabases = OnboardController::getOtherDatabases($email);
 
         // Update the password in each database
-        foreach ($otherDatabases as $databaseName) {
+        foreach ($otherDatabases as $data) {
             // Skip the current database
-            if ($databaseName == config('database.connections.smAppTemplate.database')) {
+            if ($data['database'] == config('database.connections.smAppTemplate.database')) {
                 continue;
             }
 
-            $databaseExists = DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$databaseName]);
+            $databaseExists = DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$data['database']]);
             if (!$databaseExists) {
                 return null;
             }
@@ -255,7 +256,7 @@ class SettingsUserController extends Controller
                     'driver' => 'mysql',
                     'host' => env('DB_HOST'),
                     'port' => env('DB_PORT'),
-                    'database' => $databaseName,
+                    'database' => $data['database'],
                     'username' => env('DB_USERNAME'),
                     'password' => env('DB_PASSWORD'),
                     'charset' => 'utf8mb4',

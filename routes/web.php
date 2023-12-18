@@ -13,6 +13,7 @@ use App\Http\Controllers\{
     TeamController,
     GoalSalesController,
     SurveysController,
+    SurveysAuditController,
     SurveysTemplatesController,
     SurveysTermsController,
     SurveysResponsesController,
@@ -73,18 +74,18 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/template/preview/{id?}', [SurveysTemplatesController::class, 'preview'])->name('surveysTemplatePreviewURL')->where('id', '[0-9]+');
             Route::post('/template/store/{id?}', [SurveysTemplatesController::class, 'storeOrUpdate'])->name('surveysTemplateStoreOrUpdateURL');
 
-            Route::get('/assignment/{id}', [SurveysAssignmentsController::class, 'show'])->name('assignmentShowURL')->where('id', '[0-9]+');
+            Route::get('/assignment/show/{id?}', [SurveysAssignmentsController::class, 'show'])->name('assignmentShowURL')->where('id', '[0-9]+');
 
             Route::get('/assignment/surveyor-form/{id?}', [SurveysAssignmentsController::class, 'formSurveyorAssignment'])->name('formSurveyorAssignmentURL')->where('id', '[0-9]+');
             Route::post('/assignment/surveyor-status', [SurveysAssignmentsController::class, 'changeAssignmentSurveyorStatus'])->name('changeAssignmentSurveyorStatusURL');
 
             Route::get('/assignment/auditor-form/{id?}', [SurveysAssignmentsController::class, 'formAuditorAssignment'])->name('formAuditorAssignmentURL')->where('id', '[0-9]+');
-            Route::post('/assignment/auditor-enter', [SurveysAssignmentsController::class, 'enterAssignmentAuditor'])->name('enterAssignmentAuditorURL');
-            Route::post('/assignment/auditor-request/{id?}', [SurveysAssignmentsController::class, 'requestAssignmentAuditor'])->name('requestAssignmentAuditorURL')->where('id', '[0-9]+');
-            Route::post('/assignment/auditor-revoke/{id?}', [SurveysAssignmentsController::class, 'revokeAssignmentAuditor'])->name('revokeAssignmentAuditorURL')->where('id', '[0-9]+');
             Route::post('/assignment/auditor-status', [SurveysAssignmentsController::class, 'changeAssignmentAuditorStatus'])->name('changeAssignmentAuditorStatusURL');
+            Route::post('/assignment/auditor-enter', [SurveysAssignmentsController::class, 'enterAssignmentAuditor'])->name('enterAssignmentAuditorURL');
+                // Route::post('/assignment/auditor-request/{id?}', [SurveysAssignmentsController::class, 'requestAssignmentAuditor'])->name('requestAssignmentAuditorURL')->where('id', '[0-9]+'); //TODO
+                Route::post('/assignment/auditor-revoke/{id?}', [SurveysAssignmentsController::class, 'revokeAssignmentAuditor'])->name('revokeAssignmentAuditorURL')->where('id', '[0-9]+');
 
-            Route::get('/assignment/activities', [SurveysAssignmentsController::class, 'getRecentActivities'])->name('getRecentActivitiesURL');
+            Route::get('/assignment/activities/{subDays?}', [SurveysAssignmentsController::class, 'getRecentActivities'])->name('getRecentActivitiesURL');
 
             Route::post('/responses/surveyor/store/{id?}', [SurveysResponsesController::class, 'responsesSurveyorStoreOrUpdate'])->name('responsesSurveyorStoreOrUpdateURL');
             Route::post('/responses/auditor/store/{id?}', [SurveysResponsesController::class, 'responsesAuditorStoreOrUpdate'])->name('responsesAuditorStoreOrUpdateURL');
@@ -97,13 +98,17 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/terms/store/{id?}', [SurveysTermsController::class, 'storeOrUpdate'])->name('surveysTermsStoreOrUpdateURL');
             Route::get('/terms/search', [SurveysTermsController::class, 'search'])->name('surveysTermsSearchURL');
 
+            // Audit Routes
+            Route::get('/audits/{id?}', [SurveysAuditController::class, 'index'])->name('surveysAuditIndexURL');
+
+
     });
 
     // Admin Settings
     Route::middleware(['admin'])->group(function () {
         Route::prefix('settings')->group(function () {
             Route::get('/', [SettingsAccountController::class, 'index'])->name('settingsIndexURL');
-            Route::get('/account', [SettingsAccountController::class, 'show'])->name('settingsAccountShowURL');
+            Route::get('/account/show', [SettingsAccountController::class, 'show'])->name('settingsAccountShowURL');
                 Route::post('/account/store', [SettingsAccountController::class, 'storeOrUpdate'])->name('settingsAccountStoreOrUpdateURL');
 
             Route::get('/api-keys', [SettingsApiKeysController::class, 'index'])->name('settingsApiKeysURL');

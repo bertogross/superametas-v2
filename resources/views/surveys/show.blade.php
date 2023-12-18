@@ -11,9 +11,30 @@
         //appPrintR($analyticCompaniesData);
         //appPrintR($analyticTermsData);
 
-        $filterCompanies = request('companies', []);
-
         $title = $data->title;
+        $surveyId = $data->id;
+        $companies = $data->companies ? json_decode($data->companies, true) : null;
+
+        // Format the output
+        $createdAt = request('created_at') ?? null;
+        $createdAt = request('created_at') ?? null;
+        $createdAt = !$createdAt && $firstDate && $lastDate ? date("d/m/Y", strtotime($firstDate)) . ' até ' . date("d/m/Y", strtotime($lastDate)) : $createdAt;
+
+        /*
+        $uniqueCompanyIds = [];
+        foreach ($analyticTermsData as $termId => $dates) {
+            foreach ($dates as $date => $items) {
+                foreach ($items as $item) {
+                    $companyId = $item['company_id'];
+                    // Use company_id as key to ensure uniqueness
+                    $uniqueCompanyIds[$companyId] = true;
+                }
+            }
+        }
+        $extractedCompanies = array_keys($uniqueCompanyIds);
+        */
+
+        $filterCompanies = request('companies') ?? $companies;
 
         $templateData = \App\Models\SurveyTemplates::findOrFail($data->template_id);
 
@@ -22,6 +43,7 @@
         $authorRoleName = \App\Models\User::getRoleName($getAuthorData['role']);
         $templateName = trim($templateData->title) ? nl2br($templateData->title) : '';
         $templateDescription = trim($templateData->description) ? nl2br($templateData->description) : '';
+
 
     @endphp
     @component('components.breadcrumb')
@@ -35,7 +57,7 @@
             Análise do Checklist
             <small>
                 <i class="ri-arrow-drop-right-fill text-theme ms-2 me-2 align-bottom"></i>
-                {{limitChars($title ?? '', 30) }} #<span class="text-theme me-2">{{$data->id}}</span>
+                {{limitChars($title ?? '', 30) }} #<span class="text-theme me-2">{{$surveyId}}</span>
             </small>
         @endslot
     @endcomponent
@@ -52,18 +74,18 @@
 
         @if ( $analyticTermsData || isset($_REQUEST['filter']) )
             <div id="filter" class="p-3 bg-light-subtle rounded position-relative mb-4" style="z-index: 3; display: block;">
-                <form action="{{ route('surveysShowURL', $data->id) }}" method="get" autocomplete="off">
+                <form action="{{ route('surveysShowURL', $surveyId) }}" method="get" autocomplete="off">
                     <div class="row g-2">
 
                         <div class="col-sm-12 col-md col-lg">
-                            <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="- Período -" data-min-date="{{ $firstDate ?? '' }}" data-max-date="{{ $lastDate ?? '' }}" value="{{ request('created_at') ?? '' }}">
+                            <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="- Período -" data-min-date="{{ $firstDate ?? '' }}" data-max-date="{{ $lastDate ?? '' }}" value="{{$createdAt}}">
                         </div>
 
                         @if (!empty($companies) && is_array($companies) && count($companies) > 1)
                             <div class="col-sm-12 col-md col-lg" title="Exibir somente Lojas selecionadas">
                                 <select class="form-control filter-companies" name="companies[]" multiple data-placeholder="- Loja -">
-                                    @foreach ($companies as $companyId => $company)
-                                        <option {{ in_array($companyId, $filterCompanies) ? 'selected' : '' }} value="{{ $companyId }}">{{ $company['name'] }}</option>
+                                    @foreach ($companies as $companyId)
+                                        <option {{ in_array($companyId, $filterCompanies) ? 'selected' : '' }} value="{{ $companyId }}">{{ getCompanyNameById($companyId) }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -121,10 +143,11 @@
         <div class="alert alert-danger">Acesso não autorizado</div>
     @endif
 @endsection
+
 @section('script')
     <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
-
     <script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
+    <script src="{{ URL::asset('build/libs/fullcalendar/index.global.min.js') }}"></script>
 
     <script src="{{ URL::asset('build/libs/flatpickr/flatpickr.min.js') }}"></script>
     <script src="{{ URL::asset('build/libs/flatpickr/l10n/pt.js') }}"></script>
