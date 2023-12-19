@@ -1,11 +1,7 @@
 @php
     $assignmentId = $assignmentData->id;
-    $assignmentCreatedAt = $assignmentData->created_at;
     $surveyId = $assignmentData->survey_id;
     $companyId = $assignmentData->company_id;
-
-    $now = \Carbon\Carbon::now()->startOfDay();
-    $timeLimit = $assignmentCreatedAt->endOfDay();
 
     $surveyorId = $assignmentData->surveyor_id;
     $getSurveyorUserData = getUserData($surveyorId);
@@ -21,7 +17,14 @@
     $auditorStatus = $assignmentData->auditor_status;
 
     $title = $surveyData->title;
+
+    $assignmentCreatedAt = $assignmentData->created_at;
+    $now = \Carbon\Carbon::now()->startOfDay();
+    $timeLimit = $assignmentCreatedAt->endOfDay();
+
     $recurring = $surveyData->recurring;
+
+    $deadline = \App\Models\SurveyAssignments::getSurveyAssignmentDeadline($recurring, $assignmentCreatedAt);
 
     $templateName = $surveyData ? getSurveyTemplateNameById($surveyData->template_id) : '';
     $templateDescription = $surveyData ? getTemplateDescriptionById($surveyData->template_id) : '';
@@ -82,7 +85,7 @@
                     <div class="hstack gap-3 flex-wrap">
 
                         <div class="text-muted" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">
-                            Prazo: {{ $assignmentCreatedAt ? \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}
+                            Prazo: {{ $deadline }}
                         </div>
 
                         <div class="vr"></div>
@@ -150,30 +153,12 @@
         @if ($countResponses )
             <div class="row mb-2 mt-4">
                 <div class="col-sm-6 col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div id="barTermsChart"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div id="mixedTermsChart"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-md-4">
                     <div class="row">
                         <div class="col">
                             <div class="card">
                                 <div class="card-body" style="height: 145px;">
                                     <img
-                                    @if( empty(trim($surveyorAvatar)) )
-                                        src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                    @else
-                                        src="{{ $surveyorAvatar }}"
-                                    @endif
+                                    src="{{ $surveyorAvatar }}"
                                     alt="{{$surveyorName}}"
                                     class="avatar-xs rounded-circle float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Vistoria realizada por {{$surveyorName}}" />
                                     <h6 class="text-muted text-uppercase mb-4">Vistoria</h6>
@@ -186,17 +171,13 @@
                         <div class="col {{-- !$auditorId || !in_array($auditorStatus, ['losted', 'bypass']) ? 'col' : 'd-none' --}}">
                             <div class="card">
                                 <div class="card-body" style="height: 145px;">
-                                    @if($auditorStatus == 'losted')
-                                        <span class="fs-5 float-end ri-alert-fill text-warning" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"  title="Auditoria não foi realizada"></span>
+                                    @if(!$auditorStatus || in_array($auditorStatus, ['losted', 'bypass']))
+                                        <span class="fs-5 float-end ri-alert-fill text-warning" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="bottom" title="Auditoria não foi realizada"></span>
                                     @elseif($timeLimit->gt($now) && $auditorStatus != 'completed')
-                                        <span class="fs-5 float-end ri-time-line text-secondary blink" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"  title="Dentro do prazo para realizar Auditoria"></span>
+                                        <span class="fs-5 float-end ri-time-line text-secondary blink" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="bottom" title="Dentro do prazo para realizar Auditoria"></span>
                                     @else
                                         <img
-                                        @if( empty(trim($auditorAvatar)) )
-                                            src="{{ URL::asset('build/images/users/user-dummy-img.jpg') }}"
-                                        @else
-                                            src="{{ $auditorAvatar }}"
-                                        @endif
+                                        src="{{$auditorAvatar}}"
                                         alt="{{$auditorName}}"
                                         class="avatar-xs rounded-circle float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Auditoria realizada por {{$auditorName}}" />
                                     @endif
@@ -214,7 +195,7 @@
                                             </button>
 
                                             <div class="form-text mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">
-                                                {{ $assignmentCreatedAt ? 'Prazo: ' . \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '' }}
+                                                {{ $deadline }}
                                             </div>
                                         @elseif ( in_array('audit', $currentUserCapabilities) && $auditorId == auth()->id() && $timeLimit->gt($now) )
                                             <div class="row mb-3">
@@ -240,25 +221,16 @@
                                                 </div>
                                             </div>
 
-                                            <div class="form-text mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">{{ $assignmentCreatedAt ? 'Prazo: ' . \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '' }}</div>
+                                            <div class="form-text mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">{{ $assignmentCreatedAt ? 'Prazo: ' . $deadline : '' }}</div>
                                         @else
-                                            {{--
-                                            <button type="button"
-                                            data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
-                                            title="O prazo para realização de uma Auditoria expirou em {{ $assignmentCreatedAt ? \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}"
-                                            class="btn btn-label right waves-effect btn-soft-dark w-100" onclick="alert('O prazo para realização de uma Auditoria expirou em {{ $assignmentCreatedAt ? \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-' }}');">
-                                                <i class="ri-fingerprint-2-line label-icon align-middle fs-16"></i> Auditar
-                                            </button>
-                                            --}}
-
                                             <div class="form-text text-warning text-opacity-75 mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">
-                                                {{ $assignmentCreatedAt ? 'Prazo: ' . \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '' }}
+                                                {{ $assignmentCreatedAt ? 'Prazo: ' . $deadline : '' }}
                                             </div>
                                         @endif
                                     @elseif($auditorStatus == 'completed')
                                         <span class="text-success">De Acordo</span>: {{$complianceAuditorYesCount}}
                                         <br><br>
-                                        <span class="text-danger">Indeferida</span>: {{$complianceAuditorNoCount}}
+                                        <span class="text-warning">Indeferida</span>: {{$complianceAuditorNoCount}}
                                     @endif
                                 </div>
                             </div>
@@ -268,6 +240,20 @@
                     <div class="card">
                         <div class="card-body h-100">
                             <div id="polarTermsAreaChart"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="barTermsChart"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="mixedTermsChart"></div>
                         </div>
                     </div>
                 </div>
@@ -354,15 +340,24 @@
                                     $bgSurveyor = $complianceSurvey == 'yes' ? 'bg-opacity-10 bg-success' : 'bg-opacity-10 bg-danger';
                                     $bgSurveyor = $complianceSurvey ? $bgSurveyor : 'bg-opacity-10 bg-warning';
 
-                                    $bgAuditor = $complianceAudit == 'yes' ? 'bg-opacity-10 bg-success' : 'bg-opacity-10 bg-danger';
-                                    $bgAuditor = $complianceAudit ? $bgAuditor : 'bg-opacity-10 bg-warning';
+                                    $bgAuditor = $complianceAudit == 'yes' ? 'bg-opacity-10 bg-success' : 'bg-opacity-10 bg-warning';
+                                    $bgAuditor = $complianceAudit ? $bgAuditor : 'bg-opacity-10 bg-secondary';
 
-                                    $topicBadgeColor = $complianceAudit == 'no' ? 'danger' : 'success'; // $complianceSurvey == 'no' ||
+                                    $topicBadgeColor = $complianceSurvey == 'no' && $complianceAudit == 'yes' ? 'warning' : 'success';
 
-                                    if($complianceSurvey && $complianceAudit){
-                                        $topicLabelColor = $complianceAudit == 'no' ? '<span class="ri-emotion-unhappy-fill text-danger float-end blink fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Conforme"></span>' : '<span class="ri-emotion-fill text-success float-end fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Em conformidade"></span>'; // $complianceSurvey == 'no' ||
-                                    }else{
-                                        $topicLabelColor = $auditorId ? '<span class="fs-4 ri-alert-fill text-warning float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Comparável"></span>' : '';
+                                    if($complianceSurvey == 'no' && $complianceAudit){
+                                        $topicLabelColor = $complianceSurvey == 'no' && $complianceAudit == 'yes' ? '<span class="ri-emotion-normal-fill text-warning float-end blink fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Vistoria Aprovada mas necessita de ações"></span>' : '<span class="ri-emotion-sad-fill text-warning float-end fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Vistoria Indeferida mesmo que com Status Não Conforme"></span>'; // $complianceSurvey == 'no' ||
+
+                                        $topicBadgeColor = 'warning';
+
+                                    } else if($complianceSurvey && $complianceAudit){
+                                        $topicLabelColor = $complianceAudit == 'no' ? '<span class="ri-emotion-unhappy-fill text-warning float-end blink fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Conforme"></span>' : '<span class="ri-emotion-fill text-success float-end fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Em conformidade"></span>';
+
+                                        $topicBadgeColor = $complianceAudit == 'no' ? 'warning' : 'success';
+                                    } else{
+                                        $topicLabelColor = $auditorId ? '<span class="fs-4 ri-alert-fill text-secondary float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Comparável"></span>' : '';
+
+                                        $topicBadgeColor = 'secondary';
                                     }
 
                                 @endphp
@@ -385,8 +380,7 @@
                                                         {!! !$complianceSurvey ? '<span class="text-warning">Não Informado</span>' : '' !!}
                                                     </h6>
                                                 </div>
-
-                                                <div class="card-body {{ $bgSurveyor }} pb-0">
+                                                <div class="card-body rounded-bottom-2 {{ $bgSurveyor }} pb-0">
                                                     {!! $commentSurvey ? '<p>'.nl2br($commentSurvey).'</p>' : '' !!}
 
                                                     @if ( !empty($surveyAttachmentIds) && is_array($surveyAttachmentIds) )
@@ -427,11 +421,11 @@
                                                     <h6 class="card-title mb-0">
                                                         Auditoria:
                                                         {!! $complianceAudit && $complianceAudit == 'yes' ? '<span class="text-theme">Aprovada</span>' : '' !!}
-                                                        {!! $complianceAudit && $complianceAudit == 'no' ? '<span class="text-danger">Indeferida</span>' : '' !!}
-                                                        {!! !$complianceAudit ? '<span class="text-warning">Não Informado</span>' : '' !!}
+                                                        {!! $complianceAudit && $complianceAudit == 'no' ? '<span class="text-warning">Indeferida</span>' : '' !!}
+                                                        {!! !$complianceAudit ? '<span class="text-secondary">Não Informado</span>' : '' !!}
                                                     </h6>
                                                 </div>
-                                                <div class="card-body {{ $bgAuditor }} pb-0">
+                                                <div class="card-body rounded-bottom-2 {{ $bgAuditor }} pb-0">
                                                     {!! $commentAudit ? '<p>'.nl2br($commentAudit).'</p>' : '' !!}
 
                                                     @if ( !empty($auditAttachmentIds) && is_array($auditAttachmentIds) )
@@ -505,7 +499,7 @@
 
     <script type="module">
         import {
-            autoReloadPage,
+            autoReloadPage
         } from '{{ URL::asset('build/js/helpers.js') }}';
 
         @if ($surveyorStatus == 'in_progress')
@@ -528,7 +522,7 @@
                 var seriesData = [];
                 var categories = [];
 
-                for (var termId in rawTermsData) {
+                /*for (var termId in rawTermsData) {
                     var totalComplianceYes = 0;
                     var totalComplianceNo = 0;
 
@@ -541,6 +535,26 @@
                     seriesData.push({
                         x: terms[termId]['name'],
                         y: totalComplianceYes - totalComplianceNo
+                    });
+
+                    categories.push(terms[termId]['name']);
+                }*/
+                for (var termId in rawTermsData) {
+                    var totalComplianceYes = 0;
+                    var totalComplianceNo = 0;
+
+                    for (var date in rawTermsData[termId]) {
+                        var termData = rawTermsData[termId][date];
+                        totalComplianceYes += termData.filter(item => item.compliance_survey === 'yes').length;
+                        totalComplianceNo += termData.filter(item => item.compliance_survey === 'no').length;
+                    }
+
+                    var totalResponses = totalComplianceYes + totalComplianceNo;
+                    var complianceScore = totalResponses > 0 ? (totalComplianceYes / totalResponses) * 100 : 0;
+
+                    seriesData.push({
+                        x: terms[termId]['name'],
+                        y: parseFloat(complianceScore.toFixed(0))
                     });
 
                     categories.push(terms[termId]['name']);
@@ -573,7 +587,7 @@
                                 }, {
                                     from: 1,
                                     to: 1000,
-                                    color: '#1FDC01'
+                                    color: '#13c56b'
                                 }],
                             },
                             dataLabels: {
@@ -600,7 +614,7 @@
                 var lineSeriesData = [];
                 var categories = [];
 
-                for (var termId in rawTermsData) {
+                /*for (var termId in rawTermsData) {
                     var totalComplianceYes = 0;
                     var totalComplianceNo = 0;
 
@@ -612,6 +626,24 @@
 
                     columnSeriesData.push(totalComplianceYes);
                     lineSeriesData.push(totalComplianceNo);
+                    categories.push(terms[termId]['name']);
+                }*/
+                for (var termId in rawTermsData) {
+                    var totalComplianceYes = 0;
+                    var totalComplianceNo = 0;
+
+                    for (var date in rawTermsData[termId]) {
+                        var termData = rawTermsData[termId][date];
+                        totalComplianceYes += termData.filter(item => item.compliance_survey === 'yes').length;
+                        totalComplianceNo += termData.filter(item => item.compliance_survey === 'no').length;
+                    }
+
+                    var totalResponses = totalComplianceYes + totalComplianceNo;
+                    var complianceYesPercentage = totalResponses > 0 ? parseFloat(((totalComplianceYes / totalResponses) * 100).toFixed(0)) : 0;
+                    var complianceNoPercentage = totalResponses > 0 ? parseFloat(((totalComplianceNo / totalResponses) * 100).toFixed(0)) : 0;
+
+                    columnSeriesData.push(complianceYesPercentage);
+                    lineSeriesData.push(complianceNoPercentage);
                     categories.push(terms[termId]['name']);
                 }
 
@@ -656,7 +688,7 @@
                             text: 'Não Conforme'
                         }
                     }],
-                    colors: ['#1FDC01', '#DF5253']  // Assign custom colors to Compliance Yes and No
+                    colors: ['#13c56b', '#DF5253']  // Assign custom colors to Compliance Yes and No
                 };
 
                 var mixedTermsChart = new ApexCharts(document.querySelector("#mixedTermsChart"), optionsMixedTermsChart);
@@ -671,6 +703,7 @@
 
                 var termMetrics = {};
 
+                /*
                 // Aggregate data for each term
                 for (var termId in rawTermsData) {
                     for (var date in rawTermsData[termId]) {
@@ -690,11 +723,36 @@
                     // Assuming 'terms' is an object where keys are term IDs and values contain term details
                     labels.push(terms[termId]['name']);
                 }
+                */
+
+                // Aggregate data for each term
+                for (var termId in rawTermsData) {
+                    var totalComplianceYes = 0;
+                    var totalComplianceNo = 0;
+
+                    for (var date in rawTermsData[termId]) {
+                        var termData = rawTermsData[termId][date];
+                        totalComplianceYes += termData.filter(item => item.compliance_survey === 'yes').length;
+                        totalComplianceNo += termData.filter(item => item.compliance_survey === 'no').length;
+                    }
+
+                    var totalResponses = totalComplianceYes + totalComplianceNo;
+                    var compliancePercentage = totalResponses > 0 ? parseFloat(((totalComplianceYes / totalResponses) * 100).toFixed(0)) : 0;
+
+                    termMetrics[termId] = compliancePercentage;
+                }
+
+                // Prepare data for the chart
+                for (var termId in termMetrics) {
+                    seriesData.push(termMetrics[termId]);
+                    labels.push(terms[termId]['name']);
+                }
+
 
                 var optionsTermsAreaChart = {
                     series: seriesData,
                     chart: {
-                        height: 279,
+                        height: 280,
                         type: 'polarArea',
                         toolbar: {
                             show: false,
@@ -731,7 +789,6 @@
                 polarTermsAreaChart.render();
                 // END #polarTermsAreaChart
                 ///////////////////////////////////////////////////////////////
-
             });
         </script>
     @endif

@@ -1,11 +1,7 @@
 <?php
     $assignmentId = $assignmentData->id;
-    $assignmentCreatedAt = $assignmentData->created_at;
     $surveyId = $assignmentData->survey_id;
     $companyId = $assignmentData->company_id;
-
-    $now = \Carbon\Carbon::now()->startOfDay();
-    $timeLimit = $assignmentCreatedAt->endOfDay();
 
     $surveyorId = $assignmentData->surveyor_id;
     $getSurveyorUserData = getUserData($surveyorId);
@@ -21,7 +17,14 @@
     $auditorStatus = $assignmentData->auditor_status;
 
     $title = $surveyData->title;
+
+    $assignmentCreatedAt = $assignmentData->created_at;
+    $now = \Carbon\Carbon::now()->startOfDay();
+    $timeLimit = $assignmentCreatedAt->endOfDay();
+
     $recurring = $surveyData->recurring;
+
+    $deadline = \App\Models\SurveyAssignments::getSurveyAssignmentDeadline($recurring, $assignmentCreatedAt);
 
     $templateName = $surveyData ? getSurveyTemplateNameById($surveyData->template_id) : '';
     $templateDescription = $surveyData ? getTemplateDescriptionById($surveyData->template_id) : '';
@@ -83,7 +86,7 @@
                     <div class="hstack gap-3 flex-wrap">
 
                         <div class="text-muted" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">
-                            Prazo: <?php echo e($assignmentCreatedAt ? \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-'); ?>
+                            Prazo: <?php echo e($deadline); ?>
 
                         </div>
 
@@ -143,30 +146,12 @@
         <?php if($countResponses ): ?>
             <div class="row mb-2 mt-4">
                 <div class="col-sm-6 col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div id="barTermsChart"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div id="mixedTermsChart"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-md-4">
                     <div class="row">
                         <div class="col">
                             <div class="card">
                                 <div class="card-body" style="height: 145px;">
                                     <img
-                                    <?php if( empty(trim($surveyorAvatar)) ): ?>
-                                        src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
-                                    <?php else: ?>
-                                        src="<?php echo e($surveyorAvatar); ?>"
-                                    <?php endif; ?>
+                                    src="<?php echo e($surveyorAvatar); ?>"
                                     alt="<?php echo e($surveyorName); ?>"
                                     class="avatar-xs rounded-circle float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Vistoria realizada por <?php echo e($surveyorName); ?>" />
                                     <h6 class="text-muted text-uppercase mb-4">Vistoria</h6>
@@ -181,17 +166,13 @@
                         <div class="col ">
                             <div class="card">
                                 <div class="card-body" style="height: 145px;">
-                                    <?php if($auditorStatus == 'losted'): ?>
-                                        <span class="fs-5 float-end ri-alert-fill text-warning" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"  title="Auditoria não foi realizada"></span>
+                                    <?php if(!$auditorStatus || in_array($auditorStatus, ['losted', 'bypass'])): ?>
+                                        <span class="fs-5 float-end ri-alert-fill text-warning" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="bottom" title="Auditoria não foi realizada"></span>
                                     <?php elseif($timeLimit->gt($now) && $auditorStatus != 'completed'): ?>
-                                        <span class="fs-5 float-end ri-time-line text-secondary blink" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left"  title="Dentro do prazo para realizar Auditoria"></span>
+                                        <span class="fs-5 float-end ri-time-line text-secondary blink" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="bottom" title="Dentro do prazo para realizar Auditoria"></span>
                                     <?php else: ?>
                                         <img
-                                        <?php if( empty(trim($auditorAvatar)) ): ?>
-                                            src="<?php echo e(URL::asset('build/images/users/user-dummy-img.jpg')); ?>"
-                                        <?php else: ?>
-                                            src="<?php echo e($auditorAvatar); ?>"
-                                        <?php endif; ?>
+                                        src="<?php echo e($auditorAvatar); ?>"
                                         alt="<?php echo e($auditorName); ?>"
                                         class="avatar-xs rounded-circle float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Auditoria realizada por <?php echo e($auditorName); ?>" />
                                     <?php endif; ?>
@@ -209,7 +190,7 @@
                                             </button>
 
                                             <div class="form-text mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">
-                                                <?php echo e($assignmentCreatedAt ? 'Prazo: ' . \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : ''); ?>
+                                                <?php echo e($deadline); ?>
 
                                             </div>
                                         <?php elseif( in_array('audit', $currentUserCapabilities) && $auditorId == auth()->id() && $timeLimit->gt($now) ): ?>
@@ -236,12 +217,10 @@
                                                 </div>
                                             </div>
 
-                                            <div class="form-text mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa"><?php echo e($assignmentCreatedAt ? 'Prazo: ' . \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : ''); ?></div>
+                                            <div class="form-text mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa"><?php echo e($assignmentCreatedAt ? 'Prazo: ' . $deadline : ''); ?></div>
                                         <?php else: ?>
-                                            
-
                                             <div class="form-text text-warning text-opacity-75 mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">
-                                                <?php echo e($assignmentCreatedAt ? 'Prazo: ' . \Carbon\Carbon::parse($assignmentCreatedAt)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : ''); ?>
+                                                <?php echo e($assignmentCreatedAt ? 'Prazo: ' . $deadline : ''); ?>
 
                                             </div>
                                         <?php endif; ?>
@@ -249,7 +228,7 @@
                                         <span class="text-success">De Acordo</span>: <?php echo e($complianceAuditorYesCount); ?>
 
                                         <br><br>
-                                        <span class="text-danger">Indeferido</span>: <?php echo e($complianceAuditorNoCount); ?>
+                                        <span class="text-warning">Indeferida</span>: <?php echo e($complianceAuditorNoCount); ?>
 
                                     <?php endif; ?>
                                 </div>
@@ -260,6 +239,20 @@
                     <div class="card">
                         <div class="card-body h-100">
                             <div id="polarTermsAreaChart"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="barTermsChart"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="mixedTermsChart"></div>
                         </div>
                     </div>
                 </div>
@@ -328,15 +321,24 @@
                                     $bgSurveyor = $complianceSurvey == 'yes' ? 'bg-opacity-10 bg-success' : 'bg-opacity-10 bg-danger';
                                     $bgSurveyor = $complianceSurvey ? $bgSurveyor : 'bg-opacity-10 bg-warning';
 
-                                    $bgAuditor = $complianceAudit == 'yes' ? 'bg-opacity-10 bg-success' : 'bg-opacity-10 bg-danger';
-                                    $bgAuditor = $complianceAudit ? $bgAuditor : 'bg-opacity-10 bg-warning';
+                                    $bgAuditor = $complianceAudit == 'yes' ? 'bg-opacity-10 bg-success' : 'bg-opacity-10 bg-warning';
+                                    $bgAuditor = $complianceAudit ? $bgAuditor : 'bg-opacity-10 bg-secondary';
 
-                                    $topicBadgeColor = $complianceAudit == 'no' ? 'danger' : 'success'; // $complianceSurvey == 'no' ||
+                                    $topicBadgeColor = $complianceSurvey == 'no' && $complianceAudit == 'yes' ? 'warning' : 'success';
 
-                                    if($complianceSurvey && $complianceAudit){
-                                        $topicLabelColor = $complianceAudit == 'no' ? '<span class="ri-emotion-unhappy-fill text-danger float-end blink fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Conforme"></span>' : '<span class="ri-emotion-fill text-success float-end fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Em conformidade"></span>'; // $complianceSurvey == 'no' ||
-                                    }else{
-                                        $topicLabelColor = $auditorId ? '<span class="fs-4 ri-alert-fill text-warning float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Comparável"></span>' : '';
+                                    if($complianceSurvey == 'no' && $complianceAudit){
+                                        $topicLabelColor = $complianceSurvey == 'no' && $complianceAudit == 'yes' ? '<span class="ri-emotion-normal-fill text-warning float-end blink fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Vistoria Aprovada mas necessita de ações"></span>' : '<span class="ri-emotion-sad-fill text-warning float-end fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Vistoria Indeferida mesmo que com Status Não Conforme"></span>'; // $complianceSurvey == 'no' ||
+
+                                        $topicBadgeColor = 'warning';
+
+                                    } else if($complianceSurvey && $complianceAudit){
+                                        $topicLabelColor = $complianceAudit == 'no' ? '<span class="ri-emotion-unhappy-fill text-warning float-end blink fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Conforme"></span>' : '<span class="ri-emotion-fill text-success float-end fs-3 mt-n2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Em conformidade"></span>';
+
+                                        $topicBadgeColor = $complianceAudit == 'no' ? 'warning' : 'success';
+                                    } else{
+                                        $topicLabelColor = $auditorId ? '<span class="fs-4 ri-alert-fill text-secondary float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não Comparável"></span>' : '';
+
+                                        $topicBadgeColor = 'secondary';
                                     }
 
                                 ?>
@@ -364,8 +366,7 @@
 
                                                     </h6>
                                                 </div>
-
-                                                <div class="card-body <?php echo e($bgSurveyor); ?> pb-0">
+                                                <div class="card-body rounded-bottom-2 <?php echo e($bgSurveyor); ?> pb-0">
                                                     <?php echo $commentSurvey ? '<p>'.nl2br($commentSurvey).'</p>' : ''; ?>
 
 
@@ -408,13 +409,13 @@
                                                         Auditoria:
                                                         <?php echo $complianceAudit && $complianceAudit == 'yes' ? '<span class="text-theme">Aprovada</span>' : ''; ?>
 
-                                                        <?php echo $complianceAudit && $complianceAudit == 'no' ? '<span class="text-danger">Indeferida</span>' : ''; ?>
+                                                        <?php echo $complianceAudit && $complianceAudit == 'no' ? '<span class="text-warning">Indeferida</span>' : ''; ?>
 
-                                                        <?php echo !$complianceAudit ? '<span class="text-warning">Não Informado</span>' : ''; ?>
+                                                        <?php echo !$complianceAudit ? '<span class="text-secondary">Não Informado</span>' : ''; ?>
 
                                                     </h6>
                                                 </div>
-                                                <div class="card-body <?php echo e($bgAuditor); ?> pb-0">
+                                                <div class="card-body rounded-bottom-2 <?php echo e($bgAuditor); ?> pb-0">
                                                     <?php echo $commentAudit ? '<p>'.nl2br($commentAudit).'</p>' : ''; ?>
 
 
@@ -487,7 +488,7 @@
 
     <script type="module">
         import {
-            autoReloadPage,
+            autoReloadPage
         } from '<?php echo e(URL::asset('build/js/helpers.js')); ?>';
 
         <?php if($surveyorStatus == 'in_progress'): ?>
@@ -510,7 +511,7 @@
                 var seriesData = [];
                 var categories = [];
 
-                for (var termId in rawTermsData) {
+                /*for (var termId in rawTermsData) {
                     var totalComplianceYes = 0;
                     var totalComplianceNo = 0;
 
@@ -523,6 +524,26 @@
                     seriesData.push({
                         x: terms[termId]['name'],
                         y: totalComplianceYes - totalComplianceNo
+                    });
+
+                    categories.push(terms[termId]['name']);
+                }*/
+                for (var termId in rawTermsData) {
+                    var totalComplianceYes = 0;
+                    var totalComplianceNo = 0;
+
+                    for (var date in rawTermsData[termId]) {
+                        var termData = rawTermsData[termId][date];
+                        totalComplianceYes += termData.filter(item => item.compliance_survey === 'yes').length;
+                        totalComplianceNo += termData.filter(item => item.compliance_survey === 'no').length;
+                    }
+
+                    var totalResponses = totalComplianceYes + totalComplianceNo;
+                    var complianceScore = totalResponses > 0 ? (totalComplianceYes / totalResponses) * 100 : 0;
+
+                    seriesData.push({
+                        x: terms[termId]['name'],
+                        y: parseFloat(complianceScore.toFixed(0))
                     });
 
                     categories.push(terms[termId]['name']);
@@ -555,7 +576,7 @@
                                 }, {
                                     from: 1,
                                     to: 1000,
-                                    color: '#1FDC01'
+                                    color: '#13c56b'
                                 }],
                             },
                             dataLabels: {
@@ -582,7 +603,7 @@
                 var lineSeriesData = [];
                 var categories = [];
 
-                for (var termId in rawTermsData) {
+                /*for (var termId in rawTermsData) {
                     var totalComplianceYes = 0;
                     var totalComplianceNo = 0;
 
@@ -594,6 +615,24 @@
 
                     columnSeriesData.push(totalComplianceYes);
                     lineSeriesData.push(totalComplianceNo);
+                    categories.push(terms[termId]['name']);
+                }*/
+                for (var termId in rawTermsData) {
+                    var totalComplianceYes = 0;
+                    var totalComplianceNo = 0;
+
+                    for (var date in rawTermsData[termId]) {
+                        var termData = rawTermsData[termId][date];
+                        totalComplianceYes += termData.filter(item => item.compliance_survey === 'yes').length;
+                        totalComplianceNo += termData.filter(item => item.compliance_survey === 'no').length;
+                    }
+
+                    var totalResponses = totalComplianceYes + totalComplianceNo;
+                    var complianceYesPercentage = totalResponses > 0 ? parseFloat(((totalComplianceYes / totalResponses) * 100).toFixed(0)) : 0;
+                    var complianceNoPercentage = totalResponses > 0 ? parseFloat(((totalComplianceNo / totalResponses) * 100).toFixed(0)) : 0;
+
+                    columnSeriesData.push(complianceYesPercentage);
+                    lineSeriesData.push(complianceNoPercentage);
                     categories.push(terms[termId]['name']);
                 }
 
@@ -638,7 +677,7 @@
                             text: 'Não Conforme'
                         }
                     }],
-                    colors: ['#1FDC01', '#DF5253']  // Assign custom colors to Compliance Yes and No
+                    colors: ['#13c56b', '#DF5253']  // Assign custom colors to Compliance Yes and No
                 };
 
                 var mixedTermsChart = new ApexCharts(document.querySelector("#mixedTermsChart"), optionsMixedTermsChart);
@@ -653,6 +692,7 @@
 
                 var termMetrics = {};
 
+                /*
                 // Aggregate data for each term
                 for (var termId in rawTermsData) {
                     for (var date in rawTermsData[termId]) {
@@ -672,11 +712,36 @@
                     // Assuming 'terms' is an object where keys are term IDs and values contain term details
                     labels.push(terms[termId]['name']);
                 }
+                */
+
+                // Aggregate data for each term
+                for (var termId in rawTermsData) {
+                    var totalComplianceYes = 0;
+                    var totalComplianceNo = 0;
+
+                    for (var date in rawTermsData[termId]) {
+                        var termData = rawTermsData[termId][date];
+                        totalComplianceYes += termData.filter(item => item.compliance_survey === 'yes').length;
+                        totalComplianceNo += termData.filter(item => item.compliance_survey === 'no').length;
+                    }
+
+                    var totalResponses = totalComplianceYes + totalComplianceNo;
+                    var compliancePercentage = totalResponses > 0 ? parseFloat(((totalComplianceYes / totalResponses) * 100).toFixed(0)) : 0;
+
+                    termMetrics[termId] = compliancePercentage;
+                }
+
+                // Prepare data for the chart
+                for (var termId in termMetrics) {
+                    seriesData.push(termMetrics[termId]);
+                    labels.push(terms[termId]['name']);
+                }
+
 
                 var optionsTermsAreaChart = {
                     series: seriesData,
                     chart: {
-                        height: 279,
+                        height: 280,
                         type: 'polarArea',
                         toolbar: {
                             show: false,
@@ -713,7 +778,6 @@
                 polarTermsAreaChart.render();
                 // END #polarTermsAreaChart
                 ///////////////////////////////////////////////////////////////
-
             });
         </script>
     <?php endif; ?>

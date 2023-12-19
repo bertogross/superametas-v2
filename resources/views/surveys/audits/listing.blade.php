@@ -118,7 +118,7 @@
                                         @php
                                             $getUserData = getUserData($surveyorId);
                                         @endphp
-                                        <a href="{{ route('profileShowURL', $surveyorId) }}" class="avatar-group-item" data-img="{{ $getUserData['avatar'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Vistoria: {{ $getUserData['name'] }} : {{ $companyName }}">
+                                        <a href="{{ route('profileShowURL', $surveyorId) }}" class="avatar-group-item border-1 border-info" data-img="{{ $getUserData['avatar'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Vistoria: {{ $getUserData['name'] }} : {{ $companyName }}">
                                             <img src="{{ $getUserData['avatar'] }}" alt="" class="rounded-circle avatar-xxs">
                                         </a> {{ $getUserData['name'] }}
                                     </div>
@@ -134,7 +134,7 @@
                                             $getUserData = getUserData($auditorId);
                                         @endphp
                                         <div class="avatar-group flex-nowrap d-inline-block align-middle">
-                                            <a href="{{ route('profileShowURL', $auditorId) }}" class="avatar-group-item" data-img="{{ $getUserData['avatar'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Vistoria: {{ $getUserData['name'] }} : {{ $companyName }}">
+                                            <a href="{{ route('profileShowURL', $auditorId) }}" class="avatar-group-item border-1 border-secondary" data-img="{{ $getUserData['avatar'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Vistoria: {{ $getUserData['name'] }} : {{ $companyName }}">
                                                 <img src="{{ $getUserData['avatar'] }}" alt="" class="rounded-circle avatar-xxs">
                                             </a> {{ $getUserData['name'] }}
                                         </div>

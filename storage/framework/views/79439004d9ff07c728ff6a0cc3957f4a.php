@@ -9,6 +9,10 @@
         $profileUserId = $user->id;
         $phone = getUserMeta($profileUserId, 'phone');
         $phone = formatPhoneNumber($phone);
+
+        $countSurveyorTasks = \App\Models\SurveyAssignments::countSurveyAssignmentSurveyorTasks($profileUserId, $filteredStatuses);
+        $countAuditorTasks = \App\Models\SurveyAssignments::countSurveyAssignmentAuditorTasks($profileUserId, $filteredStatuses);
+
         //appPrintR($assignmentData);
         //appPrintR($auditorData);
         //appPrintR($filteredStatuses);
@@ -102,7 +106,12 @@
                                     $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
                                 ?>
 
-                                <div class="tasks-list p-2  <?php echo e(in_array($key, ['waiting', 'waiting', 'pending', 'auditing', 'losted']) && $countTotal < 1 ? 'd-none' : ''); ?>">
+                                <div class="tasks-list
+                                
+                                <?php echo e(in_array($key, ['waiting', 'pending', 'auditing', 'losted']) && $countTotal < 1 ? 'd-none' : ''); ?>
+
+                                
+                                p-2">
                                     <div class="d-flex mb-3">
                                         <div class="flex-grow-1">
                                             <h6 class="fs-14 text-uppercase fw-semibold mb-1">
@@ -156,10 +165,6 @@
             </div>
         </div>
         <div class="col-sm-12 col-md-5 col-lg-3 col-xxl-2">
-            <?php
-                $countAuditorTasks = \App\Models\User::countAuditorTasks($profileUserId);
-                $countSurveyorTasks = \App\Models\User::countSurveyorTasks($profileUserId);
-            ?>
             <div class="card h-100">
                 <div class="card-header align-items-center d-flex">
                     <h5 class="card-title mb-0 flex-grow-1"><i class="ri-line-chart-fill fs-16 align-bottom text-theme me-2"></i>Síntese</h5>
@@ -174,7 +179,6 @@
                             <?php $__currentLoopData = $filteredStatuses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <?php
                                     $filteredSurveyorData = [];
-                                    $filteredAuditorData = [];
 
                                     array_walk($assignmentData, function ($item) use (&$filteredSurveyorData, $key, $profileUserId) {
                                         if ($item['surveyor_status'] == $key && $item['surveyor_id'] == $profileUserId) {
@@ -182,17 +186,9 @@
                                         }
                                     });
 
-                                    array_walk($assignmentData, function ($item) use (&$filteredAuditorData, $key, $profileUserId) {
-                                        if ($item['auditor_status'] == $key && $item['auditor_id'] == $profileUserId) {
-                                            $filteredAuditorData[] = $item;
-                                        }
-                                    });
-
                                     $countFilteredSurveyorData = is_array($filteredSurveyorData) ? count($filteredSurveyorData) : 0;
 
-                                    $countFilteredAuditorData = is_array($filteredAuditorData) ? count($filteredAuditorData) : 0;
-
-                                    $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
+                                    $countTotal = $countFilteredSurveyorData;
 
                                     $percentage = $countSurveyorTasks > 0 && $countTotal > 0 ? ($countTotal / $countSurveyorTasks) * 100 : 0;
                                     $percentage = number_format($percentage, 0);
@@ -232,14 +228,7 @@
                         <div class="mt-2 mb-4">
                             <?php $__currentLoopData = $filteredStatuses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <?php
-                                    $filteredSurveyorData = [];
                                     $filteredAuditorData = [];
-
-                                    array_walk($assignmentData, function ($item) use (&$filteredSurveyorData, $key, $profileUserId) {
-                                        if ($item['surveyor_status'] == $key && $item['surveyor_id'] == $profileUserId) {
-                                            $filteredSurveyorData[] = $item;
-                                        }
-                                    });
 
                                     array_walk($assignmentData, function ($item) use (&$filteredAuditorData, $key, $profileUserId) {
                                         if ($item['auditor_status'] == $key && $item['auditor_id'] == $profileUserId) {
@@ -247,11 +236,9 @@
                                         }
                                     });
 
-                                    $countFilteredSurveyorData = is_array($filteredSurveyorData) ? count($filteredSurveyorData) : 0;
-
                                     $countFilteredAuditorData = is_array($filteredAuditorData) ? count($filteredAuditorData) : 0;
 
-                                    $countTotal = $countFilteredSurveyorData + $countFilteredAuditorData;
+                                    $countTotal = $countFilteredAuditorData;
 
                                     $percentage = $countAuditorTasks > 0 && $countTotal > 0 ? ($countTotal / $countAuditorTasks) * 100 : 0;
                                     $percentage = number_format($percentage, 0);

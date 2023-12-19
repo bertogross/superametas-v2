@@ -69,5 +69,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'set-dynamic-database' => \App\Http\Middleware\SetDynamicDatabase::class,
         'admin' => \App\Http\Middleware\CheckAdminRole::class,
+        'role.redirect' => \App\Http\Middleware\RedirectBasedOnRole::class,
     ];
 }

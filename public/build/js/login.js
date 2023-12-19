@@ -104,14 +104,20 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         });
                     } else {
-                        //let databaseName = data.databases[0];
-                        let databaseName = data.databases[0].database;
-                        document.getElementById('database').value = databaseName;
+                        //console.log(data.databases);
 
-                        setTimeout(function() {
-                            document.getElementById('loginForm').submit();
-                        }, 100);
-                    }
+                        if(data.databases[0]){
+                            let databaseName = data.databases[0].database;
+                            document.getElementById('database').value = databaseName;
+
+                            setTimeout(function() {
+                                document.getElementById('loginForm').submit();
+                            }, 100);
+
+                        }else{
+                            toastAlert('Usuário não localizado em nossa base de dados', 'danger', 10000);
+                        }
+                     }
                     return;
                 });
             } catch (error) {

@@ -4,7 +4,7 @@ import {
     lightbox,
     debounce,
     updateProgressBar,
-    updateLabelClasses,
+    updateLabelClassesSurveyor,
     uncheckRadiosAndUpdateLabels
 } from './helpers.js';
 
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 radios.forEach(radio => {
                     radio.addEventListener('change', function() {
                         // When a radio button changes, update the label classes
-                        updateLabelClasses(radios);
+                        updateLabelClassesSurveyor(radios);
                     });
                 });
 
@@ -328,7 +328,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     toastAlert(data.message, 'success');
 
-                    window.location.href = profileShowURL;
+                    //window.location.href = profileShowURL;
+                    window.location.href = assignmentShowURL + '/' + assignmentId;
 
                 } else {
                     // Handle error

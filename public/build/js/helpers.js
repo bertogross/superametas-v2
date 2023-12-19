@@ -298,9 +298,12 @@ export function onlyNumbers(number){
 }
 
 export function formatNumber(number, decimalPlaces = 0){
-    number = parseFloat(number.replace(',', '.'));
+    number = number ? parseFloat(number.replace(',', '.')) : null;
 
-    return Number(number).toLocaleString('pt-BR', { minimumFractionDigits: decimalPlaces, maximumFractionDigits: decimalPlaces });
+    if(number){
+        return Number(number).toLocaleString('pt-BR', { minimumFractionDigits: decimalPlaces, maximumFractionDigits: decimalPlaces });
+    }
+    return null;
 }
 
 export function sumInputNumbers(from, to, decimal = 0) {
@@ -953,7 +956,7 @@ export function autoReloadPage(intervalInSeconds) {
 }
 
 // Used on survey-surveyor.js and survey-auditor.js compliance radio labels
-export function updateLabelClasses(radios) {
+export function updateLabelClassesSurveyor(radios) {
     radios.forEach(radio => {
         const label = document.querySelector(`label[for="${radio.id}"]`);
 
@@ -976,6 +979,34 @@ export function updateLabelClasses(radios) {
                 label.classList.add('btn-outline-success');
             } else if (radio.value === 'no') {
                 label.classList.add('btn-outline-danger');
+            }
+        }
+    });
+}
+
+export function updateLabelClassesAuditor(radios) {
+    radios.forEach(radio => {
+        const label = document.querySelector(`label[for="${radio.id}"]`);
+
+        // Reset classes
+        label.classList.remove('btn-success', 'btn-warning', 'btn-outline-success', 'btn-outline-warning');
+
+        if (radio.checked) {
+            if (radio.value === 'yes') {
+                // Add and remove classes as needed when 'yes' radio is checked
+                label.classList.add('btn-success');
+                label.classList.remove('btn-outline-success');
+            } else if (radio.value === 'no') {
+                // Add and remove classes as needed when 'no' radio is checked
+                label.classList.add('btn-warning');
+                label.classList.remove('btn-outline-warning');
+            }
+        } else {
+            // Add outline classes when radio is not checked
+            if (radio.value === 'yes') {
+                label.classList.add('btn-outline-success');
+            } else if (radio.value === 'no') {
+                label.classList.add('btn-outline-warning');
             }
         }
     });

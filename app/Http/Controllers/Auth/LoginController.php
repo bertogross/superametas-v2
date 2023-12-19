@@ -111,7 +111,7 @@ class LoginController extends Controller
         $email = e($request->input('email'));
 
         if (empty($email)) {
-            return response()->json(['error' => 'Email is required']);
+            return response()->json(['error' => 'Informe o E-mail utilizado para Login']);
         }
 
         $databases = OnboardController::getOtherDatabases($email);

@@ -192,14 +192,5 @@ class User extends Authenticatable
         return $html;
     }
 
-    public static function countSurveyorTasks($userId){
-
-        return SurveyAssignments::where('surveyor_id', $userId)->count();
-    }
-
-    public static function countAuditorTasks($userId){
-
-        return SurveyAssignments::where('auditor_id', $userId)->count();
-    }
 
 }

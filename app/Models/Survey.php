@@ -133,7 +133,7 @@ class Survey extends Model
                 'reverse' => '',
                 'description' => 'Rotina concluída',
                 'icon' => 'ri-check-double-fill',
-                'color' => 'theme'
+                'color' => 'success'
             ],
            'filed' => [
                 'label' => 'Arquivado',

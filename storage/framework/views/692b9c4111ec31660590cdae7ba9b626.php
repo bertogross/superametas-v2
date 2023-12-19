@@ -1,5 +1,6 @@
 <?php
     use App\Models\User;
+    use App\Models\SurveyAssignments;
 
     $user = auth()->user();
     $currentUserCapabilities = $user->capabilities ? json_decode($user->capabilities, true) : [];
@@ -19,7 +20,7 @@
                 <div class="navbar-brand-box horizontal-logo">
                     <a href="<?php echo e(url('/')); ?>" class="logo logo-dark" title="Ir para inicial do <?php echo e(appName()); ?>">
                         <span class="logo-sm">
-                            <img src="<?php echo e(URL::asset('build/images/logo-sm' . $logo2 . '.png')); ?>" alt="<?php echo e(appName()); ?>" height="22" class="logo-image" loading="lazy">
+                            <img src="<?php echo e(URL::asset('build/images/logo-sm' . $logo2 . '.png')); ?>" alt="<?php echo e(appName()); ?>" height="31" loading="lazy">
                         </span>
                         <span class="logo-lg">
                             <img
@@ -34,7 +35,7 @@
 
                     <a href="<?php echo e(url('/')); ?>" class="logo logo-light" title="Ir para inicial do <?php echo e(appName()); ?>">
                         <span class="logo-sm">
-                            <img src="<?php echo e(URL::asset('build/images/logo-sm' . $logo2 . '.png')); ?>" alt="<?php echo e(appName()); ?>" height="22" loading="lazy">
+                            <img src="<?php echo e(URL::asset('build/images/logo-sm' . $logo2 . '.png')); ?>" alt="<?php echo e(appName()); ?>" height="31" loading="lazy">
                         </span>
                         <span class="logo-lg">
                             <img
@@ -84,19 +85,7 @@
                         <i class='bx bx-category-alt fs-22'></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-lg p-0 dropdown-menu-end">
-                        <!--
-                        <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <h6 class="m-0 fw-semibold fs-15"> Web Apps </h6>
-                                </div>
-                                <div class="col-auto">
-                                    <a href="#!" class="btn btn-sm btn-soft-info"> View All Apps
-                                        <i class="ri-arrow-right-s-line align-middle"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        -->
+                        
 
                         <div class="p-2">
                             <div class="row g-0">
@@ -127,14 +116,25 @@
                                             <span>Checklists</span>
                                         </a>
                                     </div>
-
+                                <?php else: ?>
                                     <div class="col">
-                                        <a class="dropdown-icon-item" href="<?php echo e(route('teamIndexURL')); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Listar membros da Equipe">
-                                            <i class="ri-team-fill text-theme fs-1"></i>
-                                            <span>Equipe</span>
+                                        <a class="dropdown-icon-item" href="<?php echo e(route('profileShowURL')); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Acessar minha lista de Tarefas">
+
+                                            <span class="position-absolute ms-4 mt-1 translate-middle badge rounded-pill bg-warning" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas por executar"><?php echo e(SurveyAssignments::countSurveyAssignmentSurveyorTasks($user->id, ['new', 'pending', 'in_progress'])); ?><span class="visually-hidden">tasks</span></span>
+
+                                            <i class="ri-todo-fill text-theme fs-1"></i>
+
+                                            <span>Tarefas</span>
                                         </a>
                                     </div>
                                 <?php endif; ?>
+
+                                <div class="col">
+                                    <a class="dropdown-icon-item" href="<?php echo e(route('teamIndexURL')); ?>" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Listar membros da Equipe">
+                                        <i class="ri-team-fill text-theme fs-1"></i>
+                                        <span>Equipe</span>
+                                    </a>
+                                </div>
                             </div>
 
                             
@@ -199,13 +199,19 @@
 
                         <a class="dropdown-item" href="<?php echo e(route('profileShowURL')); ?>">
                             <i class="ri-todo-fill text-muted fs-16 align-middle me-1"></i>
-                            <span class="align-middle">Minhas Tarefas</span>
+                            <span class="align-middle">
+                                Minhas Tarefas
+                                <span class="position-relative ms-3 mt-2 translate-middle badge rounded-pill bg-warning" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas por executar"><?php echo e(SurveyAssignments::countSurveyAssignmentSurveyorTasks($user->id, ['new', 'pending', 'in_progress'])); ?><span class="visually-hidden">tasks</span></span>
+                        </span>
                         </a>
 
                         <?php if(in_array('audit', $currentUserCapabilities)): ?>
                             <a class="dropdown-item" href="<?php echo e(route('surveysAuditIndexURL', $user->id)); ?>">
                                 <i class="ri-fingerprint-2-line text-muted fs-16 align-middle me-1"></i>
-                                <span class="align-middle">Minhas Auditorias</span>
+                                <span class="align-middle">
+                                    Minhas Auditorias
+                                    <span class="position-relative ms-3 mt-2 translate-middle badge rounded-pill bg-secondary" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Auditorias por executar"><?php echo e(SurveyAssignments::countSurveyAssignmentAuditorTasks($user->id, ['new', 'pending', 'in_progress'])); ?><span class="visually-hidden">tasks</span></span>
+                                </span>
                             </a>
                         <?php endif; ?>
 

@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
 use App\Http\Controllers\AttachmentsController;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SurveyAssignments extends Model
 {
@@ -347,18 +348,53 @@ class SurveyAssignments extends Model
         }
     }
 
-    // Get a descriptive title for a date based on the task status
-    public static function getSurveyAssignmentDateTitleByKey($statusKey)
+    public static function getSurveyAssignmentDeadline($recurring, $assignmentCreatedAt)
     {
-        switch ($statusKey) {
-            case 'completed':
-                return 'A data em que esta tarefa foi desempenhada';
-            case 'losted':
-                return 'A data em que esta tarefa deveria ter sido desempenhada';
+        // Ensure that $assignmentCreatedAt is a Carbon instance
+        if (!$assignmentCreatedAt instanceof \Carbon\Carbon) {
+            $assignmentCreatedAt = Carbon::parse($assignmentCreatedAt);
+        }
+
+        switch ($recurring) {
+            case 'once':
+            case 'daily':
+                return $assignmentCreatedAt ? $assignmentCreatedAt->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-';
+                break;
+            case 'weekly':
+                return $assignmentCreatedAt->addWeek()->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY');
+                break;
+            case 'biweekly':
+                return $assignmentCreatedAt->addWeeks(2)->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY');
+                break;
+            case 'monthly':
+                return $assignmentCreatedAt->addMonthNoOverflow()->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY');
+                break;
+            case 'annual':
+                return $assignmentCreatedAt->addYear()->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY');
+                break;
             default:
-                return 'A data em que esta tarefa deverá ser desempenhada';
+                return '-';
+                break;
         }
     }
+
+    public static function countSurveyAssignmentSurveyorTasks($profileUserId, $filteredStatuses){
+        $filteredStatuses = array_keys($filteredStatuses);
+
+        return SurveyAssignments::where('surveyor_id', $profileUserId)
+            ->whereIn('surveyor_status', $filteredStatuses)
+            ->count();
+    }
+
+    public static function countSurveyAssignmentAuditorTasks($profileUserId, $filteredStatuses){
+        $filteredStatuses = array_keys($filteredStatuses);
+
+        return SurveyAssignments::where('auditor_id', $profileUserId)
+            ->whereIn('auditor_status', $filteredStatuses)
+            ->count();
+    }
+
+
 
 
 }

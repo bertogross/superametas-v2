@@ -78,11 +78,12 @@ class OnboardController extends Controller
 
         $subuserExist = $onboardConnection->table('app_subusers')
             ->where('sub_user_email', $email)
+            ->select('app_IDs')
             ->first();
 
-        if ($subuserExist) {
-            // Update the app_IDs column to include the new app_ID
+        if ($subuserExist && !empty($subuserExist->app_IDs)) {
             $appIds = json_decode($subuserExist->app_IDs, true);
+
             if (!in_array($databaseId, $appIds)) {
                 $appIds[] = $databaseId;
 
@@ -122,11 +123,11 @@ class OnboardController extends Controller
         if($appUsersTable){
             foreach ($appUsersTable as $appId) {
                 $databaseId = $appId->ID;
-                $customerName = OnboardController::getCustomerNameByDatabaseId($databaseId);
+                $environmentName = $appId->user_display_name;
 
                 $otherDatabases[] = [
                     'database' => 'smApp' . $databaseId,
-                    'customer' => $customerName
+                    'customer' => $environmentName ?? ''
                 ];
             }
         }
@@ -134,27 +135,25 @@ class OnboardController extends Controller
         // Get the list of app_IDs from app_subusers where sub_user_email is the given email
         $appSubusersTable = $OnboardConnection->table('app_subusers')
             ->where('sub_user_email', $email)
-            ->get()
-            ->toArray();
+            ->select('app_IDs')
+            ->first();
 
-        if($appSubusersTable){
-            foreach ($appSubusersTable as $appId) {
-                $decoded = json_decode($appId->app_IDs, true);
-                foreach($decoded as $id){
-                    $databaseId = $id;
-                    $customerName = OnboardController::getCustomerNameByDatabaseId($id);
+        if ($appSubusersTable && !empty($appSubusersTable->app_IDs)) {
+            $appIDs = json_decode($appSubusersTable->app_IDs, true);
+
+            if (is_array($appIDs)) {
+                foreach ($appIDs as $key => $databaseId) {
+                    $environmentName = OnboardController::getCustomerNameByDatabaseId($databaseId);
 
                     $otherDatabases[] = [
                         'database' => 'smApp' . $databaseId,
-                        'customer' => $customerName
+                        'customer' => $environmentName ?? ''
                     ];
                 }
             }
         }
 
-        $allDatabaseNames = array_filter($otherDatabases);
-
-        return $allDatabaseNames;
+        return array_filter($otherDatabases);
     }
 
 
@@ -165,6 +164,7 @@ class OnboardController extends Controller
         }
 
         $databaseId = onlyNumber($databaseId);
+        $databaseId = intval($databaseId);
 
         $OnboardConnection = DB::connection('smOnboard');
 

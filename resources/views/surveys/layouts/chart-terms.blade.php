@@ -41,6 +41,7 @@
         var seriesData = [];
         var categories = [];
 
+        /*
         for (var termId in rawTermsData) {
             var termData = rawTermsData[termId];
             var totalComplianceYes = 0;
@@ -62,7 +63,33 @@
             });
 
             categories.push(terms[termId] && terms[termId]['name'] ? terms[termId]['name'] : "Term " + termId);
+        }*/
+        for (var termId in rawTermsData) {
+            var termData = rawTermsData[termId];
+            var totalComplianceYes = 0;
+            var totalComplianceNo = 0;
+
+            for (var date in termData) {
+                termData[date].forEach(function(item) {
+                    if (item.compliance_survey === 'yes') {
+                        totalComplianceYes++;
+                    } else if (item.compliance_survey === 'no') {
+                        totalComplianceNo++;
+                    }
+                });
+            }
+
+            var totalResponses = totalComplianceYes + totalComplianceNo;
+            var complianceScore = totalResponses > 0 ? parseFloat(((totalComplianceYes / totalResponses) * 100).toFixed(0)) : 0;
+
+            seriesData.push({
+                x: terms[termId] && terms[termId]['name'] ? terms[termId]['name'] : "Term " + termId,
+                y: complianceScore
+            });
+
+            categories.push(terms[termId] && terms[termId]['name'] ? terms[termId]['name'] : "Term " + termId);
         }
+
 
         var optionsTermsChart = {
             series: [{
@@ -91,7 +118,7 @@
                         }, {
                             from: 1,
                             to: 1000,
-                            color: '#1FDC01'
+                            color: '#13c56b'
                         }],
                     },
                     dataLabels: {
@@ -121,7 +148,7 @@
         var termMetrics = {};
 
         // Aggregate data for each term
-        for (var termId in rawTermsData) {
+        /*for (var termId in rawTermsData) {
             var termData = rawTermsData[termId];
             var totalComplianceYes = 0;
             var totalComplianceNo = 0;
@@ -142,11 +169,39 @@
             };
         }
 
+
         // Prepare data for the chart
         for (var termId in termMetrics) {
             columnSeriesData.push(termMetrics[termId]['yes']);
             lineSeriesData.push(termMetrics[termId]['no']);
             categories.push(terms[termId]['name']); // Assuming terms is an object with term names
+        }
+        */
+
+        for (var termId in rawTermsData) {
+            var termData = rawTermsData[termId];
+            var totalComplianceYes = 0;
+            var totalComplianceNo = 0;
+
+            for (var date in termData) {
+                termData[date].forEach(function(item) {
+                    if (item.compliance_survey === 'yes') {
+                        totalComplianceYes++;
+                    } else if (item.compliance_survey === 'no') {
+                        totalComplianceNo++;
+                    }
+                });
+            }
+
+            var totalResponses = totalComplianceYes + totalComplianceNo;
+            var complianceYesPercentage = totalResponses > 0 ? parseFloat(((totalComplianceYes / totalResponses) * 100).toFixed(0)) : 0;
+            var complianceNoPercentage = totalResponses > 0 ? parseFloat(((totalComplianceNo / totalResponses) * 100).toFixed(0)) : 0;
+
+            columnSeriesData.push(complianceYesPercentage);
+
+            lineSeriesData.push(complianceNoPercentage);
+
+            categories.push(terms[termId]['name']);
         }
 
         var optionsMixedTermsChart = {
@@ -190,7 +245,7 @@
                     text: 'Não Conforme'
                 }
             }],
-            colors: ['#1FDC01', '#DF5253']  // Assign custom colors to Compliance Yes and No
+            colors: ['#13c56b', '#DF5253']  // Assign custom colors to Compliance Yes and No
         };
 
         var mixedTermsChart = new ApexCharts(document.querySelector("#mixedTermsChart"), optionsMixedTermsChart);
@@ -206,7 +261,7 @@
         var termMetrics = {};
 
         // Aggregate data for each term
-        for (var termId in rawTermsData) {
+        /*for (var termId in rawTermsData) {
             var termData = rawTermsData[termId];
             var totalCompliance = 0;
 
@@ -219,7 +274,29 @@
             }
 
             termMetrics[termId] = totalCompliance;
+        }*/
+        for (var termId in rawTermsData) {
+            var termData = rawTermsData[termId];
+            var totalComplianceYes = 0;
+            var totalComplianceNo = 0;
+
+            for (var date in termData) {
+                termData[date].forEach(function(item) {
+                    if (item.compliance_survey === 'yes') {
+                        totalComplianceYes++;
+                    } else if (item.compliance_survey === 'no') {
+                        totalComplianceNo++;
+                    }
+                });
+            }
+
+            var totalResponses = totalComplianceYes + totalComplianceNo;
+            var compliancePercentage = totalResponses > 0 ? parseFloat(((totalComplianceYes / totalResponses) * 100).toFixed(0)) : 0;
+
+            seriesData.push(compliancePercentage);
+            labels.push(terms[termId] && terms[termId]['name'] ? terms[termId]['name'] : "Term " + termId);
         }
+
 
         // Prepare data for the chart
         for (var termId in termMetrics) {
@@ -471,7 +548,7 @@
                 //color: '#87DF01',
                 textColor: '#000000',
                 url: '{{ route('surveysShowURL', $surveyId) }}?created_at='+convertDateFormatWithBar(date),
-                className: 'cursor-pointer text-dark bg-theme'
+                className: 'cursor-pointer text-dark bg-success'
             });
         }
         */
@@ -488,7 +565,7 @@
                 display: 'background',
                 textColor: '#000000',
                 url: '{{ route('surveysShowURL', $surveyId) }}?created_at=' + convertDateFormatWithBar(date),
-                className: 'cursor-pointer text-dark bg-theme'
+                className: 'cursor-pointer text-dark bg-success'
             });
         }
 

@@ -401,7 +401,11 @@ class SurveysAssignmentsController extends Controller
             return response()->json(['success' => false, 'message' => 'Você não pode revogar a tarefa de outro usuário']);
         }
 
-        return response()->json(['success' => true, 'message' => 'Solicitação enviada']);
+        $columns['auditor_status'] = null;
+        $columns['auditor_id'] = null;
+        $data->update($columns);
+
+        return response()->json(['success' => true, 'message' => 'Auditoria Revogada']);
     }
 
     public function getRecentActivities(Request $request)

@@ -34,10 +34,13 @@ Route::get('index/{locale}', [HomeController::class, 'lang']);
 
 //
 Route::middleware(['auth'])->group(function () {
-    // Root
-    //Route::get('/', [HomeController::class, 'root'])->name('root');
+
     //Route::get('/', [GoalSalesController::class, 'index'])->name('root');
-    Route::get('/', [SurveysController::class, 'index'])->name('root');
+    //Route::get('/', [SurveysController::class, 'index'])->name('root');
+    Route::get('/dashboard', [HomeController::class, 'root'])->name('root');
+    Route::get('/', function () {
+        return view('index');
+    })->middleware('role.redirect');
 
     // User Profile & Password Update
     Route::prefix('user')->group(function () {

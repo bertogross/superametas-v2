@@ -2,9 +2,10 @@ import {
     toastAlert,
     sweetWizardAlert,
     lightbox,
+    showPreloader,
     debounce,
     updateProgressBar,
-    updateLabelClasses,
+    updateLabelClassesAuditor,
     uncheckRadiosAndUpdateLabels
 } from './helpers.js';
 
@@ -123,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 }
                             } else {
                                 // Handle error
-                                console.error('Error:', data.message);
+                                //console.error('Error:', data.message);
 
                                 var currentSurveyorStatus = data.current_surveyor_status;
 
@@ -187,11 +188,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                                     }
                                                 });
                                             }else{
-                                                toastAlert('A Vistoria ainda não foi conluída e por isso não será possível acessar o formulário de Auditoria.<br>Tente novamente mais tarde!', 'danger', 60000);
+                                                toastAlert('A Vistoria ainda não foi concluída e por isso não será possível acessar o formulário de Auditoria.<br>Tente novamente mais tarde!', 'danger', 60000);
                                                 Swal.fire({
                                                     icon: "warning",
                                                     title: "Atenção",
-                                                    html: 'A Vistoria ainda não foi conluída e por isso não será possível acessar o formulário de Auditoria.<br>Tente novamente mais tarde!',
+                                                    html: 'A Vistoria ainda não foi concluída e por isso não será possível acessar o formulário de Auditoria.<br>Tente novamente mais tarde!',
                                                     showConfirmButton: true,
                                                         confirmButtonClass: 'btn btn-outline-secondary',
                                                     showCloseButton: false,
@@ -203,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                             // do action to revogue
                                             fetch(revokeAssignmentAuditorURL + '/' + assignmentId, {
                                                 method: 'POST',
-                                                body: formData,
                                                 headers: {
                                                     'X-Requested-With': 'XMLHttpRequest',
                                                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 radios.forEach(radio => {
                     radio.addEventListener('change', function() {
                         // When a radio button changes, update the label classes
-                        updateLabelClasses(radios);
+                        updateLabelClassesAuditor(radios);
                     });
                 });
 
