@@ -1,4 +1,12 @@
 @php
+    use Carbon\Carbon;
+    use App\Models\Survey;
+    use App\Models\SurveyTopic;
+    use App\Models\SurveyResponse;
+    use App\Models\SurveyAssignments;
+
+    $getSurveyRecurringTranslations = Survey::getSurveyRecurringTranslations();
+
     $assignmentId = $assignmentData->id;
     $surveyId = $assignmentData->survey_id;
     $companyId = $assignmentData->company_id;
@@ -19,12 +27,14 @@
     $title = $surveyData->title;
 
     $assignmentCreatedAt = $assignmentData->created_at;
-    $now = \Carbon\Carbon::now()->startOfDay();
+    $now = Carbon::now()->startOfDay();
     $timeLimit = $assignmentCreatedAt->endOfDay();
 
     $recurring = $surveyData->recurring;
+    $recurringLabel = $getSurveyRecurringTranslations[$recurring]['label'];
 
-    $deadline = \App\Models\SurveyAssignments::getSurveyAssignmentDeadline($recurring, $assignmentCreatedAt);
+    $deadline = SurveyAssignments::getSurveyAssignmentDeadline($recurring, $assignmentCreatedAt);
+    $deadline = $deadline ? $deadline->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY') : '-';
 
     $templateName = $surveyData ? getSurveyTemplateNameById($surveyData->template_id) : '';
     $templateDescription = $surveyData ? getTemplateDescriptionById($surveyData->template_id) : '';
@@ -32,9 +42,9 @@
     $companyName = $companyId ? getCompanyNameById($companyId) : '';
 
 
-    $countSurveyAssignmentBySurveyId = \App\Models\SurveyAssignments::countSurveyAssignmentBySurveyId($surveyId);
+    $countSurveyAssignmentBySurveyId = SurveyAssignments::countSurveyAssignmentBySurveyId($surveyId);
 
-    $responsesData = \App\Models\SurveyResponse::where('assignment_id', $assignmentId)
+    $responsesData = SurveyResponse::where('assignment_id', $assignmentId)
         ->get()
         ->toArray();
 
@@ -57,9 +67,9 @@
         }
     }
 
-    $countTopics = \App\Models\SurveyTopic::countSurveyTopics($surveyId);
+    $countTopics = SurveyTopic::countSurveyTopics($surveyId);
 
-    $countResponses = \App\Models\SurveyResponse::countSurveySurveyorResponses($surveyorId, $surveyId, $assignmentId);
+    $countResponses = SurveyResponse::countSurveySurveyorResponses($surveyorId, $surveyId, $assignmentId);
 
     $percentage = $countResponses > 0 ? ($countResponses / $countTopics) * 100 : 0;
     $percentage = number_format($percentage, 0);
@@ -86,6 +96,12 @@
 
                         <div class="text-muted" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">
                             Prazo: {{ $deadline }}
+                        </div>
+
+                        <div class="vr"></div>
+
+                        <div class="text-muted" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">
+                            Recorrência: {{ $recurringLabel }}
                         </div>
 
                         <div class="vr"></div>
@@ -171,7 +187,7 @@
                         <div class="col {{-- !$auditorId || !in_array($auditorStatus, ['losted', 'bypass']) ? 'col' : 'd-none' --}}">
                             <div class="card">
                                 <div class="card-body" style="height: 145px;">
-                                    @if(!$auditorStatus || in_array($auditorStatus, ['losted', 'bypass']))
+                                    @if(in_array($auditorStatus, ['losted', 'bypass']))
                                         <span class="fs-5 float-end ri-alert-fill text-warning" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="bottom" title="Auditoria não foi realizada"></span>
                                     @elseif($timeLimit->gt($now) && $auditorStatus != 'completed')
                                         <span class="fs-5 float-end ri-time-line text-secondary blink" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="bottom" title="Dentro do prazo para realizar Auditoria"></span>
@@ -227,6 +243,13 @@
                                                 {{ $assignmentCreatedAt ? 'Prazo: ' . $deadline : '' }}
                                             </div>
                                         @endif
+
+                                    @elseif($auditorStatus == 'in_progress')
+                                        <p class="blink">E progresso...</p>
+
+                                        <span class="text-success">De Acordo</span>: {{$complianceAuditorYesCount}}
+                                        <br>
+                                        <span class="text-warning">Indeferida</span>: {{$complianceAuditorNoCount}}
                                     @elseif($auditorStatus == 'completed')
                                         <span class="text-success">De Acordo</span>: {{$complianceAuditorYesCount}}
                                         <br><br>
@@ -243,14 +266,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-md-4">
+                <div class="col-sm-6 col-md-8">
                     <div class="card">
                         <div class="card-body">
                             <div id="barTermsChart"></div>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-md-4">
+                <div class="col-sm-6 col-md-12">
                     <div class="card">
                         <div class="card-body">
                             <div id="mixedTermsChart"></div>

@@ -1,39 +1,30 @@
 @php
-    $avatars = \App\Models\Survey::extractUserIds($analyticTermsData);
-    $avatarsJson = json_encode($avatars);
+    $companyId = $companyId ?? '';
+    $tabMode = $tabMode ?? false;
+    $companiesAnalyticTermsData = $companiesAnalyticTermsData ?? null;
 
-    //appPrintR($analyticTermsData);
-    //appPrintR($terms);
-    //appPrintR($avatars);
+    $classCols = $swapData && $companiesAnalyticTermsData && count($companiesAnalyticTermsData) == 2 ? 'col-12' : 'col-sm-12 col-md-6 col-lg-6';
+    $classCols = $tabMode && $swapData ? 'col-sm-12 col-md-6 col-lg-6e' : $classCols;
+    //$classCols = count($filterCompanies) == 1 ? 'col-sm-12 col-md-6 col-lg-6' : $classCols;
 @endphp
-<div class="row mt-3 mb-3">
 
-    <div class="col-sm-12 col-md-6 col-lg-6 mb-3">
-        <div id="barTermsChart" class="rounded rounded-2 bg-light p-3 h-100"></div>
-    </div>
 
-    <div class="col-sm-12 col-md-6 col-lg-6 mb-3">
-        <div id="mixedTermsChart" class="rounded rounded-2 bg-light p-3 h-100"></div>
-    </div>
-
-    <div class="col-sm-12 col-md-6 col-lg-6 mb-3">
-        <div id="calendar" class="rounded rounded-2 bg-light p-3 h-100"></div>
-    </div>
-
-    <div class="col-sm-12 col-md-6 col-lg-6 mb-3">
-        <div id="polarTermsAreaChart" class="rounded rounded-2 bg-light p-3 h-100"></div>
-    </div>
-
-    <div class="col-sm-12 col-md-12 col-lg-12 mb-3 d-none">
-        <div id="usersChart" class="rounded rounded-2 bg-light p-3 h-100"></div>
-    </div>
+<div class="{{ $classCols }} mb-3">
+    <div id="barTermsChart{{$companyId}}" class="rounded rounded-2 bg-light p-3 h-100"></div>
 </div>
 
+<div class="{{ $classCols }} mb-3">
+    <div id="mixedTermsChart{{$companyId}}" class="rounded rounded-2 bg-light p-3 h-100"></div>
+</div>
+
+<div class="{{ $classCols }} mb-3">
+    <div id="polarTermsAreaChart{{$companyId}}" class="rounded rounded-2 bg-light p-3 h-100"></div>
+</div>
+
+
 <script>
-    const rawTermsData = @json($analyticTermsData);
-    const terms = @json($terms);
-    const avatars = @json($avatarsJson);
-    //console.log(avatars);
+    const rawTermsData{{$companyId}} = @json($analyticTermsData);
+    const terms{{$companyId}} = @json($terms);
 
     document.addEventListener('DOMContentLoaded', function() {
         ///////////////////////////////////////////////////////////////
@@ -41,31 +32,8 @@
         var seriesData = [];
         var categories = [];
 
-        /*
-        for (var termId in rawTermsData) {
-            var termData = rawTermsData[termId];
-            var totalComplianceYes = 0;
-            var totalComplianceNo = 0;
-
-            for (var date in termData) {
-                termData[date].forEach(function(item) {
-                    if (item.compliance_survey === 'yes') {
-                        totalComplianceYes++;
-                    } else if (item.compliance_survey === 'no') {
-                        totalComplianceNo++;
-                    }
-                });
-            }
-
-            seriesData.push({
-                x: terms[termId] && terms[termId]['name'] ? terms[termId]['name'] : "Term " + termId,
-                y: totalComplianceYes - totalComplianceNo
-            });
-
-            categories.push(terms[termId] && terms[termId]['name'] ? terms[termId]['name'] : "Term " + termId);
-        }*/
-        for (var termId in rawTermsData) {
-            var termData = rawTermsData[termId];
+        for (var termId in rawTermsData{{$companyId}}) {
+            var termData = rawTermsData{{$companyId}}[termId];
             var totalComplianceYes = 0;
             var totalComplianceNo = 0;
 
@@ -83,11 +51,11 @@
             var complianceScore = totalResponses > 0 ? parseFloat(((totalComplianceYes / totalResponses) * 100).toFixed(0)) : 0;
 
             seriesData.push({
-                x: terms[termId] && terms[termId]['name'] ? terms[termId]['name'] : "Term " + termId,
+                x: terms{{$companyId}}[termId] && terms{{$companyId}}[termId]['name'] ? terms{{$companyId}}[termId]['name'] : "Term " + termId,
                 y: complianceScore
             });
 
-            categories.push(terms[termId] && terms[termId]['name'] ? terms[termId]['name'] : "Term " + termId);
+            categories.push(terms{{$companyId}}[termId] && terms{{$companyId}}[termId]['name'] ? terms{{$companyId}}[termId]['name'] : "Term " + termId);
         }
 
 
@@ -134,7 +102,7 @@
             },
         };
 
-        var barTermsChart = new ApexCharts(document.querySelector("#barTermsChart"), optionsTermsChart);
+        var barTermsChart = new ApexCharts(document.querySelector("#barTermsChart{{$companyId}}"), optionsTermsChart);
         barTermsChart.render();
 
         // END #barTermsChart
@@ -147,39 +115,8 @@
 
         var termMetrics = {};
 
-        // Aggregate data for each term
-        /*for (var termId in rawTermsData) {
-            var termData = rawTermsData[termId];
-            var totalComplianceYes = 0;
-            var totalComplianceNo = 0;
-
-            for (var date in termData) {
-                termData[date].forEach(function(item) {
-                    if (item.compliance_survey === 'yes') {
-                        totalComplianceYes++;
-                    } else if (item.compliance_survey === 'no') {
-                        totalComplianceNo++;
-                    }
-                });
-            }
-
-            termMetrics[termId] = {
-                'yes': totalComplianceYes,
-                'no': totalComplianceNo
-            };
-        }
-
-
-        // Prepare data for the chart
-        for (var termId in termMetrics) {
-            columnSeriesData.push(termMetrics[termId]['yes']);
-            lineSeriesData.push(termMetrics[termId]['no']);
-            categories.push(terms[termId]['name']); // Assuming terms is an object with term names
-        }
-        */
-
-        for (var termId in rawTermsData) {
-            var termData = rawTermsData[termId];
+        for (var termId in rawTermsData{{$companyId}}) {
+            var termData = rawTermsData{{$companyId}}[termId];
             var totalComplianceYes = 0;
             var totalComplianceNo = 0;
 
@@ -201,7 +138,7 @@
 
             lineSeriesData.push(complianceNoPercentage);
 
-            categories.push(terms[termId]['name']);
+            categories.push(terms{{$companyId}}[termId]['name']);
         }
 
         var optionsMixedTermsChart = {
@@ -248,7 +185,7 @@
             colors: ['#13c56b', '#DF5253']  // Assign custom colors to Compliance Yes and No
         };
 
-        var mixedTermsChart = new ApexCharts(document.querySelector("#mixedTermsChart"), optionsMixedTermsChart);
+        var mixedTermsChart = new ApexCharts(document.querySelector("#mixedTermsChart{{$companyId}}"), optionsMixedTermsChart);
         mixedTermsChart.render();
         // END #mixedTermsChart
         ///////////////////////////////////////////////////////////////
@@ -261,22 +198,8 @@
         var termMetrics = {};
 
         // Aggregate data for each term
-        /*for (var termId in rawTermsData) {
-            var termData = rawTermsData[termId];
-            var totalCompliance = 0;
-
-            for (var date in termData) {
-                termData[date].forEach(function(item) {
-                    if (item.compliance_survey === 'yes') {
-                        totalCompliance++;
-                    }
-                });
-            }
-
-            termMetrics[termId] = totalCompliance;
-        }*/
-        for (var termId in rawTermsData) {
-            var termData = rawTermsData[termId];
+        for (var termId in rawTermsData{{$companyId}}) {
+            var termData = rawTermsData{{$companyId}}[termId];
             var totalComplianceYes = 0;
             var totalComplianceNo = 0;
 
@@ -294,7 +217,7 @@
             var compliancePercentage = totalResponses > 0 ? parseFloat(((totalComplianceYes / totalResponses) * 100).toFixed(0)) : 0;
 
             seriesData.push(compliancePercentage);
-            labels.push(terms[termId] && terms[termId]['name'] ? terms[termId]['name'] : "Term " + termId);
+            labels.push(terms{{$companyId}}[termId] && terms{{$companyId}}[termId]['name'] ? terms{{$companyId}}[termId]['name'] : "Term " + termId);
         }
 
 
@@ -303,8 +226,8 @@
             seriesData.push(termMetrics[termId]);
 
             // Check if termId exists in terms object
-            if (terms[termId] && terms[termId]['name']) {
-                labels.push(terms[termId]['name']);
+            if (terms{{$companyId}}[termId] && terms{{$companyId}}[termId]['name']) {
+                labels.push(terms{{$companyId}}[termId]['name']);
             } else {
                 // Fallback if term name is not found
                 labels.push("Term " + termId);
@@ -347,276 +270,10 @@
 
         };
 
-        var polarTermsAreaChart = new ApexCharts(document.querySelector("#polarTermsAreaChart"), optionsTermsAreaChart);
+        var polarTermsAreaChart = new ApexCharts(document.querySelector("#polarTermsAreaChart{{$companyId}}"), optionsTermsAreaChart);
         polarTermsAreaChart.render();
-
         // END #polarTermsAreaChart
         ///////////////////////////////////////////////////////////////
-
-        ///////////////////////////////////////////////////////////////
-
-        // START #usersChart
-        function getAvatarUrl(userId) {
-            avatarsObj = JSON.parse(avatars);
-            return avatarsObj[userId].avatar;
-        }
-
-        function getUserName(userId) {
-            avatarsObj = JSON.parse(avatars);
-            return avatarsObj[userId].name;
-        }
-
-        var scatterData = [];
-        var avatarUrls = {};
-        var legendNames = [];
-
-        /*for (var termId in rawTermsData) {
-            for (var date in rawTermsData[termId]) {
-                rawTermsData[termId][date].forEach(function(item) {
-                    var x = item.surveyor_id;
-                    var y = item.auditor_id || x;
-
-                    scatterData.push([x, y]);
-
-                    // Fetch and store avatar URLs and names for each user
-                    avatarUrls[item.surveyor_id] = getAvatarUrl(item.surveyor_id);
-                    if (!legendNames.includes(getUserName(item.surveyor_id))) {
-                        legendNames.push(getUserName(item.surveyor_id));
-                    }
-                    if (item.auditor_id) {
-                        avatarUrls[item.auditor_id] = getAvatarUrl(item.auditor_id);
-                        if (!legendNames.includes(getUserName(item.auditor_id))) {
-                            legendNames.push(getUserName(item.auditor_id));
-                        }
-                    }
-                });
-            }
-        }*/
-        for (var termId in rawTermsData) {
-            for (var date in rawTermsData[termId]) {
-                rawTermsData[termId][date].forEach(function(item) {
-                    var x = item.surveyor_id;
-                    var y = item.auditor_id || x;
-
-                    // Avoid duplicate entries for the same user
-                    if (!scatterData.some(point => point[0] === x && point[1] === y)) {
-                        scatterData.push([x, y]);
-                    }
-
-                    // Fetch and store avatar URLs for each user
-                    if (avatars[x]) {
-                        avatarUrls[x] = getAvatarUrl(x);
-                    }
-                    if (avatars[y] && y !== x) {
-                        avatarUrls[y] = getAvatarUrl(y);
-                    }
-                });
-            }
-        }
-
-        //console.log("Scatter Data:", scatterData);
-        //console.log("Avatar URLs:", avatarUrls);
-
-        var options = {
-            series: [{
-                name: 'Users',
-                data: scatterData
-            }],
-            chart: {
-                height: 350,
-                type: 'scatter',
-                animations: {
-                    enabled: false,
-                },
-                zoom: {
-                    enabled: false,
-                },
-                toolbar: {
-                    show: false
-                }
-            },
-            title: {
-                text: 'Usuários Envolvidos'
-            },
-            colors: ['#056BF6'],
-            xaxis: {
-                tickAmount: 10,
-                min: 0,
-                max: 40
-            },
-            yaxis: {
-                tickAmount: 7
-            },
-            /*
-            markers: {
-                size: 20,
-                customHTML: function({ seriesIndex, dataPointIndex, w }) {
-                    var id = w.config.series[seriesIndex].data[dataPointIndex][0];
-                    if (avatarUrls[id]) {
-                        return `<img src="${avatarUrls[id]}" width="40" height="40">`;
-                    }
-                    return ''; // Return an empty string if avatar URL is not found
-                }
-            },
-            fill: {
-                type: 'image',
-                opacity: 1,
-                image: {
-                    src: Object.values(avatarUrls),
-                    width: 40,
-                    height: 40
-                }
-            },*/
-            markers: {
-                size: 20,
-                customHTML: function({ seriesIndex, dataPointIndex, w }) {
-                    var id = w.config.series[seriesIndex].data[dataPointIndex][0];
-                    if (avatarUrls[id]) {
-                        return `<img src="${avatarUrls[id]}" width="40" height="40">`;
-                    }
-                    return ''; // Return an empty string if avatar URL is not found
-                }
-            },
-            fill: {
-                type: 'image',
-                opacity: 1,
-                image: {
-                    src: Object.values(avatarUrls),
-                    width: 40,
-                    height: 40
-                }
-            },
-
-
-        };
-
-        var usersChart = new ApexCharts(document.querySelector("#usersChart"), options);
-        usersChart.render();
-        // END #usersChart
-        ///////////////////////////////////////////////////////////////
-
-        ///////////////////////////////////////////////////////////////
-        // START #calendar
-        var calendarEl = document.getElementById('calendar');
-
-        // Function to convert date format from DD-MM-YYYY to YYYY-MM-DD
-        function convertDateFormat(dateStr) {
-            var parts = dateStr.split('-');
-            return parts[2] + '-' + parts[1] + '-' + parts[0];
-        }
-        function convertDateFormatWithBar(dateStr) {
-            var parts = dateStr.split('-');
-            return parts[2] + '/' + parts[1] + '/' + parts[0];
-        }
-
-        /*
-        var taskCounts = {};
-        for (var termId in rawTermsData) {
-            for (var date in rawTermsData[termId]) {
-                var formattedDate = convertDateFormat(date); // Convert date format
-                if (!taskCounts[formattedDate]) {
-                    taskCounts[formattedDate] = 0;
-                }
-                taskCounts[formattedDate] += rawTermsData[termId][date].length;
-            }
-        }
-        */
-        var uniqueCompaniesByDate = {};
-        for (var termId in rawTermsData) {
-            for (var date in rawTermsData[termId]) {
-                var formattedDate = convertDateFormat(date); // Convert date format
-                rawTermsData[termId][date].forEach(function(item) {
-                    var companyId = item.company_id;
-                    if (!uniqueCompaniesByDate[formattedDate]) {
-                        uniqueCompaniesByDate[formattedDate] = new Set();
-                    }
-                    uniqueCompaniesByDate[formattedDate].add(companyId);
-                });
-            }
-        }
-
-        /*
-        // Transform grouped data into FullCalendar event format
-        var calendarEvents = [];
-        for (var date in taskCounts) {
-            var eventTitle = taskCounts[date];
-            calendarEvents.push({
-                title: eventTitle,
-                start: date,
-                overlap: false,
-                display: 'background',
-                //color: '#87DF01',
-                textColor: '#000000',
-                url: '{{ route('surveysShowURL', $surveyId) }}?created_at='+convertDateFormatWithBar(date),
-                className: 'cursor-pointer text-dark bg-success'
-            });
-        }
-        */
-        // Transform grouped data into FullCalendar event format
-        var calendarEvents = [];
-        for (var date in uniqueCompaniesByDate) {
-            var companyCount = uniqueCompaniesByDate[date].size;
-            //var eventTitle = 'Tasks: ' + companyCount;
-            var eventTitle = companyCount;
-            calendarEvents.push({
-                title: eventTitle,
-                start: date,
-                overlap: false,
-                display: 'background',
-                textColor: '#000000',
-                url: '{{ route('surveysShowURL', $surveyId) }}?created_at=' + convertDateFormatWithBar(date),
-                className: 'cursor-pointer text-dark bg-success'
-            });
-        }
-
-        // Initialize FullCalendar
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            locale: 'pt-BR',
-            defaultView: 'month',
-            initialView: 'dayGridMonth',
-            events: calendarEvents,
-            selectable: false,
-            eventClick: function(info) {
-                info.jsEvent.preventDefault();
-
-                if (info.event.url) {
-                    window.location.href = info.event.url
-                }
-            },
-            eventDidMount: function(info) {
-                if (info.event.url) {
-                    info.el.title = 'Clique para mais detalhes desta data';
-                }
-            },
-            /*
-            customButtons: {
-                monthViewButton: {
-                    text: 'Mês',
-                    click: function() {
-                        calendar.changeView('dayGridMonth');
-                    }
-                },
-                listViewButton: {
-                    text: 'Lista',
-                    click: function() {
-                        calendar.changeView('listMonth'); // You can choose 'listDay', 'listWeek', 'listMonth', or 'listYear'
-                    }
-                }
-            },
-            */
-            headerToolbar: {
-                left: 'title',
-                center: '',// monthViewButton,listViewButton
-                right: 'prev,next'
-            }
-
-        });
-
-        console.log(calendarEvents);
-        calendar.render();
-        // END #calendar
-        ///////////////////////////////////////////////////////////////
-
 
     });
 </script>

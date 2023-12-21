@@ -7,6 +7,9 @@
         {{--
         <p class="text-muted mb-4 d-none">Você deverá registrar informações!</p>
         --}}
+        @if (isset($text))
+            <p class="text-muted mb-4">{!! $text !!}</p>
+        @endif
         @if (isset($url))
             <a class="btn btn-outline-theme" href="{{ $url }}"><i class="ri-add-line"></i></a>
         @endif

@@ -277,8 +277,8 @@
                                                                     $isDelegated = false;
 
                                                                     // Loop through the distributed data to find if this user has been delegated to this company
-                                                                    if( $data && isset($distributedData) && is_array($distributedData['surveyor_id']) ){
-                                                                        foreach ($distributedData['surveyor_id'] as $delegation) {
+                                                                    if( $data && isset($distributedData) && is_array($distributedData['surveyor']) ){
+                                                                        foreach ($distributedData['surveyor'] as $delegation) {
                                                                             if ($delegation['company_id'] == $company->company_id && $delegation['user_id'] == $userId) {
                                                                                 $isDelegated = true;
                                                                                 break;
@@ -289,10 +289,10 @@
                                                                 @if ( is_array($userCompanies) && in_array($company->company_id, $userCompanies) )
                                                                     <li>
                                                                         <div class="form-check form-check-success d-flex align-items-center">
-                                                                            <input class="form-check-input form-check-input-users me-3 wizard-switch-control" type="radio" name="surveyor_id[{{$company->company_id}}]"
-                                                                                value="{{ $userId }}" id="surveyor_id-user-{{ $company->company_id.$userId }}" {{ $isDelegated ? 'checked' : '' }}>
+                                                                            <input class="form-check-input form-check-input-users me-3 wizard-switch-control" type="radio" name="surveyor[{{$company->company_id}}]"
+                                                                                value="{{ $userId }}" id="surveyor-user-{{ $company->company_id.$userId }}" {{ $isDelegated ? 'checked' : '' }}>
                                                                             <label class="form-check-label d-flex align-items-center"
-                                                                                for="surveyor_id-user-{{ $company->company_id.$userId }}">
+                                                                                for="surveyor-user-{{ $company->company_id.$userId }}">
                                                                                 <span class="flex-shrink-0">
                                                                                     <img
                                                                                     @if(empty(trim($userAvatar)))

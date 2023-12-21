@@ -241,7 +241,7 @@
     @if ( $auditorStatus != 'completed' && $auditorStatus != 'losted' )
         <button tabindex="-1"
             type="button"
-            class="btn btn-lg btn-theme waves-effect w-100 {{ $countResponses < $countTopics ? 'd-none' : '' }}"
+            class="btn btn-lg btn-theme waves-effect w-100 {{ $countResponses < $countTopics ? 'd-none' : '' }} mb-3"
             id="btn-response-finalize"
             data-assignment-id="{{$assignmentId}}"
             title="Finalizar Auditoria">

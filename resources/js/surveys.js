@@ -8,7 +8,9 @@ import {
     multipleModal,
     bsPopoverTooltip,
     layouRightSide,
-    toggleTableRows
+    toggleTableRows,
+    getCookie,
+    setCookie
 } from './helpers.js';
 
 
@@ -78,15 +80,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         icon: 'warning',
                         title: "Tem certeza que deseja Interromper esta Tarefa?",
                         html: 'Tarefas em andamento terão suas respectivas atividades não completadas removidas. <br><br><span class="text-warning">Não será possível reverter remoções.</span>',
-                        showDenyButton: true,
-                        showCancelButton: false,
                         confirmButtonText: "Sim, interromper",
+                            confirmButtonClass: 'btn btn-outline-danger w-xs me-2',
+                                showCloseButton: false,
                         denyButtonText: `Deixar como está`,
-                        confirmButtonClass: 'btn btn-outline-warning w-xs me-2',
-                        cancelButtonClass: 'btn btn-sm btn-outline-info w-xs',
-                        denyButtonClass: 'btn btn-sm btn-outline-danger w-xs me-2',
+                            denyButtonClass: 'btn btn-sm btn-outline-info w-xs me-2',
+                                showDenyButton: true,
+                        cancelButtonClass: 'btn btn-sm btn-outline-primary w-xs',
+                            showCancelButton: false,
                         buttonsStyling: false,
-                        showCloseButton: false,
                     }).then((result) => {
                         if (result.isConfirmed) {
                             attachSurveysChangeStatus(surveyId);
@@ -378,31 +380,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 var data = {};
                 // Iterate over formData entries
                 for (let [key, value] of formData.entries()) {
-                    // Check if the key includes 'surveyor_id'
-                    if (key.startsWith('surveyor_id')) {
-                        // Extract the index - assuming the format is 'surveyor_id[index]'
+                    // Check if the key includes 'surveyor'
+                    if (key.startsWith('surveyor')) {
+                        // Extract the index - assuming the format is 'surveyor[index]'
                         let index = key.match(/\[(\d+)\]/)[1]; // Get the number inside brackets
 
                         // Initialize the array if it doesn't exist
-                        if (!data.surveyor_id) {
-                            data.surveyor_id = [];
+                        if (!data.surveyor) {
+                            data.surveyor = [];
                         }
 
                         // Push the object with company_id as index and user_id as value
-                        data.surveyor_id.push({ company_id: index, user_id: value });
+                        data.surveyor.push({ company_id: index, user_id: value });
                     }
 
-                    if (key.startsWith('auditor_id')) {
-                        // Extract the index - assuming the format is 'surveyor_id[index]'
+                    if (key.startsWith('auditor')) {
+                        // Extract the index - assuming the format is 'surveyor[index]'
                         let index = key.match(/\[(\d+)\]/)[1]; // Get the number inside brackets
 
                         // Initialize the array if it doesn't exist
-                        if (!data.auditor_id) {
-                            data.auditor_id = [];
+                        if (!data.auditor) {
+                            data.auditor = [];
                         }
 
                         // Push the object with company_id as index and user_id as value
-                        data.auditor_id.push({ company_id: index, user_id: value });
+                        data.auditor.push({ company_id: index, user_id: value });
                     }
                 }
                 //console.log(data);
@@ -512,6 +514,21 @@ document.addEventListener('DOMContentLoaded', function() {
         setInterval(function () {
             getRecentActivities();
         }, 60000);// 60000 = 1 minute
+    }
+
+    const swapButton = document.getElementById('btn-surveys-swap-toggle');
+    if(swapButton){
+        swapButton.addEventListener('click', async function(event) {
+            event.preventDefault;
+
+            if(getCookie('surveys-swap')){
+                setCookie('surveys-swap', false, -1);
+            }else{
+                setCookie('surveys-swap', true);
+            }
+
+            location.reload(true);
+        });
     }
 
 

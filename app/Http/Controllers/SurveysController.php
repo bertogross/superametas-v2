@@ -15,6 +15,7 @@ use App\Models\SurveyResponse;
 use App\Models\SurveyTemplates;
 use App\Models\SurveyAssignments;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -180,6 +181,8 @@ class SurveysController extends Controller
         $firstDate = $dateRange['first_date'] ?? null;
         $lastDate = $dateRange['last_date'] ?? null;
 
+        $swapData = Cookie::get('surveys-swap');
+
         return view('surveys.show', compact(
             'data',
             //'analyticCompaniesData',
@@ -190,6 +193,7 @@ class SurveysController extends Controller
             'userAvatars',
             'firstDate',
             'lastDate',
+            'swapData'
         ) );
     }
 
@@ -348,8 +352,6 @@ class SurveysController extends Controller
             //return response()->json(['success' => false, 'message' => 'Não será possível interromper esta tarefa pois dados já estão sendo coletados.']);
         }
 
-        $distributedData = $survey->distributed_data ?? null;
-
         //$oldStatus = $survey->old_status ?? $currentStatus;
 
         //$message = 'Status da tarefa foi atualizado com sucesso';
@@ -366,7 +368,7 @@ class SurveysController extends Controller
                 $message = 'Rotina inicializada com sucesso';
 
                 // Start the task by distributing to each party
-                SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                SurveyAssignments::distributingAssignments($surveyId);
                 break;
             case 'stopped':
                 $newStatus = 'started';
@@ -378,7 +380,7 @@ class SurveysController extends Controller
                 $message = 'Rotina reinicializada com sucesso';
 
                 // Restart the task by distributing to each party
-                SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+                SurveyAssignments::distributingAssignments($surveyId);
                 break;
             case 'started':
                 $newStatus = 'stopped';
@@ -432,10 +434,6 @@ class SurveysController extends Controller
             'distributed_data.required' => 'Necessário delegar usuários para Checklist e Auditoria',
             'recurring.required' => 'Escolha a recorrência',
             'companies.required' => 'Selecione uma ou mais unidades',
-            //'surveyor_id.required' => 'Defina as atribuições',
-            //'auditor_id.required' => 'Defina as atribuições de auditoria',
-            //'start_at' => 'Defina a data de início',
-            //'end_in' => 'Defina a data final'
         ];
 
         try {
@@ -450,13 +448,6 @@ class SurveysController extends Controller
                 //'companies' => 'required|in:'.implode(',', $companyIds).'',
                 'companies' => 'required|array',
                 'companies.*' => 'in:'.implode(',', $companyIds),
-
-                //'surveyor_id' => 'required|in:'.implode(',', $userIds).'',
-                //'auditor_id' => 'required|in:'.implode(',', $userIds).'',
-                //'start_at' => 'required',
-                //'end_in' => 'nullable',
-                //'current_user_editor' => 'nullable',
-                //'status' => 'required|in:new,stopped,trash,pending,in_progress,completed,auditing',
             ], $messages)->validate();
         } catch (ValidationException $e) {
             $errors = $e->errors();
@@ -570,16 +561,14 @@ class SurveysController extends Controller
                 SurveyStep::populateSurveySteps($templateId, $surveyId);
             }
 
-            $distributedData = $survey->distributed_data ?? null;
 
             // Start the task by distributing to each party
-            SurveyAssignments::distributingAssignments($surveyId, $distributedData);
+            SurveyAssignments::distributingAssignments($surveyId);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Dados atualizados!',
-                'id' => $surveyId,
-                'json' => $distributedData
+                'id' => $surveyId
             ]);
         } else {
             // Store operation
@@ -600,8 +589,7 @@ class SurveysController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Dados adicionados com sucesso!',
-                'id' => $surveyId,
-                'json' => $distributedData
+                'id' => $surveyId
             ]);
         }
     }

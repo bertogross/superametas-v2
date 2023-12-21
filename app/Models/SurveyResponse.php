@@ -43,6 +43,18 @@ class SurveyResponse extends Model
             ->count();
     }
 
+    // Count the number of responses from surveyor
+    public static function countSurveySurveyorResponsesByCompliance($surveyorId, $surveyId, $assignmentId, $choice) {
+        //$today = Carbon::today();
+
+        return SurveyResponse::where('survey_id', $surveyId)
+            ->where('surveyor_id', $surveyorId)
+            ->where('assignment_id', $assignmentId)
+            //->whereNotNull('compliance_survey')
+            ->where('compliance_survey', $choice)
+            ->count();
+    }
+
     // Count the number of responses from auditor
     public static function countSurveyAuditorResponses($auditorId, $surveyId, $assignmentId) {
         //$today = Carbon::today();

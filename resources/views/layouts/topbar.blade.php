@@ -243,7 +243,12 @@
                             <i class="ri-todo-fill text-muted fs-16 align-middle me-1"></i>
                             <span class="align-middle">
                                 Minhas Tarefas
-                                <span class="position-relative ms-3 mt-2 translate-middle badge rounded-pill bg-warning" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas por executar">{{SurveyAssignments::countSurveyAssignmentSurveyorTasks($user->id, ['new', 'pending', 'in_progress'])}}<span class="visually-hidden">tasks</span></span>
+                                @php
+                                    $countSurveyAssignmentSurveyorTasks = SurveyAssignments::countSurveyAssignmentSurveyorTasks($user->id, ['new', 'pending', 'in_progress']);
+                                @endphp
+                                @if($countSurveyAssignmentSurveyorTasks > 0)
+                                    <span class="badge border border-theme text-body ms-2" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas por executar">{{$countSurveyAssignmentSurveyorTasks}}<span class="visually-hidden">tasks</span></span>
+                                @endif
                         </span>
                         </a>
 
@@ -252,7 +257,12 @@
                                 <i class="ri-fingerprint-2-line text-muted fs-16 align-middle me-1"></i>
                                 <span class="align-middle">
                                     Minhas Auditorias
-                                    <span class="position-relative ms-3 mt-2 translate-middle badge rounded-pill bg-secondary" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Auditorias por executar">{{SurveyAssignments::countSurveyAssignmentAuditorTasks($user->id, ['new', 'pending', 'in_progress'])}}<span class="visually-hidden">tasks</span></span>
+                                    @php
+                                        $countSurveyAssignmentAuditorTasks = SurveyAssignments::countSurveyAssignmentAuditorTasks($user->id, ['new', 'pending', 'in_progress']);
+                                    @endphp
+                                    @if($countSurveyAssignmentAuditorTasks > 0)
+                                        <span class="badge border border-theme text-body ms-2" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Auditorias por executar">{{$countSurveyAssignmentAuditorTasks}}<span class="visually-hidden">tasks</span></span>
+                                    @endif
                                 </span>
                             </a>
                         @endif

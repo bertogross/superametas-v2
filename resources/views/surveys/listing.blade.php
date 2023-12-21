@@ -1,19 +1,26 @@
 <div id="surveysList" class="card h-100">
     <div class="card-header">
         <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1"><i
-                    class="ri-checkbox-line fs-16 align-bottom text-theme me-2"></i>Listagem</h5>
+            <h5 class="card-title mb-0 flex-grow-1">
+                <i class="ri-checkbox-line fs-16 align-bottom text-theme me-2"></i>Listagem
+            </h5>
             <div class="flex-shrink-0">
                 <div class="d-flex flex-wrap gap-2">
-                    <button class="btn btn-sm btn-label right btn-outline-theme float-end waves-effect"
-                        @if (is_object($templates) && count($templates) > 0) id="btn-surveys-create"
-                    @else
-                        onclick="alert('Você deverá primeiramente registrar um Modelo');" @endif
-                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left"
-                        title="Adicionar Tarefa de Checklist">
-                        <i class="ri-add-line label-icon align-middle fs-16 ms-2"></i>Checklist
-                    </button>
-                </div>
+                    @if (!$templates->isEmpty())
+
+                        @if (!$data->isEmpty())
+                            <button class="btn btn-sm btn-label right btn-outline-theme float-end waves-effect"
+                                @if (is_object($templates) && count($templates) > 0)
+                                    id="btn-surveys-create"
+                                @else
+                                    onclick="alert('Você deverá primeiramente registrar um Modelo');"
+                                @endif
+                                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left"
+                                title="Adicionar Checklist">
+                                <i class="ri-add-line label-icon align-middle fs-16 ms-2"></i>Checklist</button>
+                        @endif
+                    @endif
+                 </div>
             </div>
         </div>
     </div>
@@ -49,11 +56,32 @@
 
     <div class="card-body">
         @if (!$data || $data->isEmpty())
-            @component('components.nothing')
-                {{--
-                @slot('url', route('surveysCreateURL'))
-                --}}
-            @endcomponent
+            @if ($templates->isEmpty())
+                <div class="text-center">
+                    <p class="fs-5">
+                        Você deverá primeiramente compor um formulário <br>
+                        que servirá de modelo para posterior <br>
+                        configração dos Checklists
+                    </p>
+                    <a class="btn btn-label right btn-outline-theme waves-effect mt-3" href="{{ route('surveysTemplateCreateURL') }}" title="Compor Modelo">
+                        <i class="ri-add-line label-icon align-middle fs-16 ms-2"></i>Componha seu Primeiro Modelo
+                    </a>
+                </div>
+            @else
+                @if ($data->isEmpty())
+                     @component('components.nothing')
+                    @endcomponent
+                @else
+                    <div class="text-center">
+                        <p class="fs-5">
+                            Está em tempo de registrar seu Checklist
+                        </p>
+                        <button class="btn btn-label right btn-outline-theme waves-effect mt-3" id="btn-surveys-create" title="Adicionar Checklist">
+                            <i class="ri-add-line label-icon align-middle fs-16 ms-2"></i>Registrar meu Primeiro Checklist
+                        </button>
+                    </div>
+                @endif
+            @endif
         @else
             <div class="table-responsive table-card mb-4">
                 <table class="table table-sm align-middle table-nowrap mb-0 table-striped" id="tasksTable">
@@ -97,7 +125,7 @@
 
                                 $distributedData = $survey->distributed_data;
                                 $decodedData = json_decode($distributedData, true);
-                                $companies = $decodedData ? array_column($decodedData['surveyor_id'], 'company_id') : null;
+                                $companies = $decodedData ? array_column($decodedData['surveyor'], 'company_id') : null;
                                 $companies = $companies ? array_unique($companies) : null;
                                 $companyNames = [];
                                 if($companies){
@@ -135,7 +163,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ucfirst($title)}}">
+                                    <span class="text-body" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="{{ucfirst($title)}}">
                                         {{ limitChars(ucfirst($title), 30) }}
                                     </span>
 
@@ -162,7 +190,7 @@
                                                         $companyName = $companyId ? getCompanyNameById($companyId) : '';
                                                     @endphp
                                                     @if($userId)
-                                                        <a href="{{ route('profileShowURL', $userId) }}" class="avatar-group-item border-1 border-white" data-img="{{ $getUserData['avatar'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Vistoria: {{ $getUserData['name'] }} : {{ $companyName }}">
+                                                        <a href="{{ route('profileShowURL', $userId) }}" class="avatar-group-item border-1 border-info" data-img="{{ $getUserData['avatar'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Vistoria: {{ $getUserData['name'] }} : {{ $companyName }}">
                                                             <img src="{{ $getUserData['avatar'] }}" alt="" class="rounded-circle avatar-xxs">
                                                         </a>
                                                     @endif
@@ -222,19 +250,25 @@
                                             class="btn btn-sm btn-label right waves-effect btn-soft-{{ $getSurveyStatusTranslations[$surveyStatus]['color'] }} btn-surveys-change-status"
                                             data-current-status="{{ $surveyStatus }}"
                                             title="{{ $getSurveyStatusTranslations[$surveyStatus]['reverse'] }}">
-                                            <i
-                                                class="{{ $getSurveyStatusTranslations[$surveyStatus]['icon'] }} label-icon align-middle fs-16"></i>{{ $getSurveyStatusTranslations[$surveyStatus]['reverse'] }}
-                                        </button>
+                                            <i class="{{ $getSurveyStatusTranslations[$surveyStatus]['icon'] }} label-icon align-middle fs-16"></i>{{ $getSurveyStatusTranslations[$surveyStatus]['reverse'] }}
+                                            </button>
                                     @endif
+
+                                    <button type="button" onclick="alert('In development stage')"
+                                    class="btn btn-sm btn-soft-dark waves-effect ri-survey-line btn-survey-form-preview"
+                                    data-survey-id="{{ $surveyId }}"
+                                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pré-visualizar Formulário"></button>
 
                                     @if (!in_array($surveyStatus, ['completed', 'filed']))
                                         <button type="button"
-                                            @if ($authorId != auth()->id()) class="btn btn-sm btn-soft-dark waves-effect ri-edit-line"
-                                            onclick="alert('Você não possui autorização para editar um registro gerado por outra pessoa');"
-                                        @else
-                                            class="btn btn-sm btn-soft-dark waves-effect btn-surveys-edit ri-edit-line"
-                                            data-survey-id="{{ $surveyId }}" @endif
-                                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left"
+                                            @if ($authorId != auth()->id())
+                                                class="btn btn-sm btn-soft-dark waves-effect ri-edit-line"
+                                                onclick="alert('Você não possui autorização para editar um registro gerado por outra pessoa');"
+                                            @else
+                                                class="btn btn-sm btn-soft-dark waves-effect btn-surveys-edit ri-edit-line"
+                                                data-survey-id="{{ $surveyId }}"
+                                            @endif
+                                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
                                             title="Editar"></button>
                                     @endif
 
@@ -246,7 +280,7 @@
                                                 onclick="alert('Não há dados para relatório')"
                                             @endif
                                             class="btn btn-sm btn-soft-dark waves-effect ri-line-chart-fill {{ $countSurveyAssignmentBySurveyId == 0 ? 'cursor-not-allowed' : '' }}"
-                                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left"
+                                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
                                             title="Visualização Analítica"></a>
                                     @endif
                                 </td>

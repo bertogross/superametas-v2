@@ -204,7 +204,7 @@ if (!function_exists('subscriptionLabel')) {
         $color = $status_translated['color'];
         $class = $status_translated['class'];
 
-        print Auth::user()->hasRole(User::ROLE_ADMIN) ? '<span class="badge bg-transparent border border-'.$color.' text-'.$color.' float-end text-decoration-none fw-normal small '.$class.'" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="'.strtoupper($label).'" data-bs-content="'.$description.'">'.$label.'</span>' : '';
+        print Auth::user()->hasRole(User::ROLE_ADMIN) ? '<span class="badge bg-transparent border border-'.$color.' text-'.$color.' float-end text-decoration-none fw-normal small '.$class.'" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-content="'.$description.'" data-bs-title="'.strtoupper($label).'">'.$label.'</span>' : '';
     }
 }
 

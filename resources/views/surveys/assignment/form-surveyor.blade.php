@@ -185,6 +185,7 @@
     <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
 
     <script>
+        var assignmentShowURL = "{{ route('assignmentShowURL') }}";
         var profileShowURL = "{{ route('profileShowURL') }}";
         var formSurveyorAssignmentURL = "{{ route('formSurveyorAssignmentURL') }}";
         var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";

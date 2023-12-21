@@ -45,7 +45,6 @@ class SurveysTemplatesController extends Controller
 
         session()->forget('success');
 
-
         $terms = SurveyTerms::all();
 
         $data = [];
@@ -76,9 +75,9 @@ class SurveysTemplatesController extends Controller
 
         $data = SurveyTemplates::findOrFail($id);
 
-        $surveys = Survey::where('template_id', $id)
+        $surveysCount = Survey::where('template_id', $id)
             //->where('user_id', $currentUserId)
-            ->get();
+            ->count();
 
         $terms = SurveyTerms::all();
 
@@ -102,7 +101,7 @@ class SurveysTemplatesController extends Controller
 
         return view('surveys.templates.edit', compact(
                 'data',
-                'surveys',
+                'surveysCount',
                 'result',
                 'terms',
             )
@@ -132,7 +131,7 @@ class SurveysTemplatesController extends Controller
             return is_array($value) ? json_encode($value) : $value;
         }, $validatedData);
 
-        $template_data = $validatedData['template_data'];
+        $templateData = $validatedData['template_data'];
 
         $validatedData['user_id'] = $currentUserId;
 
@@ -151,7 +150,7 @@ class SurveysTemplatesController extends Controller
                 'success' => true,
                 'message' => 'Modelo atualizado!',
                 'id' => $templates->id,
-                'json' => $template_data
+                'json' => $templateData
             ]);
         } else {
             // Store operation
@@ -163,7 +162,7 @@ class SurveysTemplatesController extends Controller
                 'success' => true,
                 'message' => 'Modelo salvo!',
                 'id' => $templates->id,
-                'json' => $template_data
+                'json' => $templateData
             ]);
         }
     }

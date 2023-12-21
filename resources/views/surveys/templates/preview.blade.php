@@ -31,8 +31,8 @@
         $surveyorStatus = null
     @endphp
     <div id="content" class="rounded rounded-2 mb-4" style="max-width: 700px; margin: 0 auto;">
-        <div class="alert alert-warning alert-dismissible alert-label-icon label-arrow fade show">
-            <i class="ri-alert-line label-icon"></i> <strong class="text-uppercase">Demonstrativo</strong><br>Esta é uma demonstração do formulário que será preenchido pelo(a) Vistoriador(a).
+        <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show">
+            <i class="ri-information-line label-icon"></i> <strong class="text-uppercase">Demonstrativo</strong><br>Esta é uma demonstração do formulário que será preenchido pelo(a) Vistoriador(a)
         </div>
 
         <div class="bg-primary-subtle position-relative">
@@ -45,7 +45,9 @@
             @endif
 
             <div class="card-body p-5 text-center">
-                <h2 class="text-theme text-uppercase">Modelo</h2>
+                <h2 class="text-theme text-uppercase">
+                    {{ limitChars($data->title ?? 'Modelo', 20) }}
+                </h2>
                 {{--
                 <h3>{{ $data ? ucfirst($data->title) : '' }}</h3>
                 --}}

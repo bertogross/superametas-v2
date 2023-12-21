@@ -13,11 +13,14 @@ class SurveysAuditController extends Controller
     {
         $currentUser = auth()->user();
 
+        $userId = request('user') ?? null;
+        $status = request('status') ?? null;
+        $filterCompanies = request('companies', []);
+        $filterCreatedAt = request('created_at', '');
+
         $currentUserCapabilities = $currentUser->capabilities ? json_decode($currentUser->capabilities, true) : [];
 
-        $filterCreatedAt = request('created_at', '');
         $createdAtRange = [];
-
         if (!empty($filterCreatedAt)) {
             $dateRange = explode(' até ', $filterCreatedAt);
 
@@ -32,8 +35,6 @@ class SurveysAuditController extends Controller
             }
             $createdAtRange = [$startDate, $endDate];
         }
-
-        $filterCompanies = request('companies', []);
 
         $query = SurveyAssignments::whereNotNull('survey_assignments.auditor_status')
         ->whereNotNull('survey_assignments.auditor_id')
@@ -54,7 +55,7 @@ class SurveysAuditController extends Controller
             'survey_assignments.updated_at',
         )
         ->when(!empty($filterCompanies), function ($query) use ($filterCompanies) {
-            return $query->whereIn('survey_assignments.company_id', $filterCompanies);
+            $query->whereIn('survey_assignments.company_id', $filterCompanies);
         })
         ->when(!empty($createdAtRange), function ($query) use ($createdAtRange) {
             $query->whereBetween('survey_assignments.created_at', $createdAtRange);
@@ -64,7 +65,11 @@ class SurveysAuditController extends Controller
             $query->where('survey_assignments.auditor_id', $userId);
         }
 
-        $data = $query->orderBy('updated_at', 'desc')->paginate(10);
+        if($status){
+            $query->where('auditor_status', $status);
+        }
+
+        $dataDone = $query->orderBy('updated_at', 'desc')->paginate(10);
 
         $getSurveyAssignmentStatusTranslations = SurveyAssignments::getSurveyAssignmentStatusTranslations();
 
@@ -72,8 +77,16 @@ class SurveysAuditController extends Controller
         $firstDate = $dateRange['first_date'] ?? null;
         $lastDate = $dateRange['last_date'] ?? null;
 
+        $dataAvailable = SurveyAssignments::where('surveyor_status', 'completed')
+            ->whereNull('auditor_status')
+            ->orderBy('updated_at', 'desc')
+            ->limit(100)
+            ->get()
+            ->toArray();
+
         return view('surveys.audits.index', compact(
-            'data',
+            'dataDone',
+            'dataAvailable',
             'getSurveyAssignmentStatusTranslations',
             'firstDate',
             'lastDate',

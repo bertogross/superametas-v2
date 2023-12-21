@@ -13,7 +13,9 @@ import {
     formatNumber,
     percentageResult,
     getChartColorsArray,
-    initFlatpickr
+    initFlatpickr,
+    getCookie,
+    setCookie
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -226,7 +228,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Check if the element with class 'analytic-mode' exists
     if (document.querySelector('.analytic-mode')) {
-        document.querySelector('.analytic-mode').addEventListener('click', function () {
+        document.querySelector('.analytic-mode').addEventListener('click', function (event) {
+            event.preventDefault;
 
             // Send AJAX request to toggle analytics mode in the database
             var xhr = new XMLHttpRequest();
@@ -243,9 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     setSessionStorage('slide-mode', false)
 
-                    //setTimeout(function () {
-                        location.reload(true);
-                    //}, 300);
+                    location.reload(true);
                 }
             };
             xhr.send('_token=' + encodeURIComponent(document.querySelector('meta[name="csrf-token"]').content));
@@ -254,7 +255,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Check if the element with class 'slide-mode' exists
     if (document.querySelector('.slide-mode')) {
-        document.querySelector('.slide-mode').addEventListener('click', function () {
+        document.querySelector('.slide-mode').addEventListener('click', function (event) {
+            event.preventDefault;
 
             // Send AJAX request to toggle analytics mode in the database
             var xhr = new XMLHttpRequest();
@@ -301,9 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     setSessionStorage('analytic-mode', false);
 
-                    //setTimeout(function () {
-                        location.reload(true);
-                    //}, 300);
+                    location.reload(true);
                 }
             };
             xhr.send('_token=' + encodeURIComponent(document.querySelector('meta[name="csrf-token"]').content));

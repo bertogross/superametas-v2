@@ -818,10 +818,12 @@ table.dataTable.fixedHeader-floating, table.dataTable.fixedHeader-locked {
     cursor: default;
 }
 
-.sticky-top-85 {
+.sticky-top.sticky-top-70 {
+    top: 70px !important;
+}
+.sticky-top.sticky-top-85 {
     top: 85px !important;
 }
-
 
 /**
 * Modal
