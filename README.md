@@ -1,6 +1,6 @@
 # SuperaMetas
 
-This repository contains the source code for an application developed with Laravel, PHP 8.2, and MySQL 8.0.
+This repository contains the source code for an application developed with Laravel, PHP 8.1, and MySQL 8.0.
 This software is provided solely for portfolio and demonstration purposes.
 
 ## License and Usage Restrictions
