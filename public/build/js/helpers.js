@@ -155,6 +155,10 @@ export function showPreloader(show = true) {
         preloader.style.opacity = show ? "0.5" : "0";
         preloader.style.visibility = show ? "visible" : "hidden";
     }
+
+    setTimeout(function () {
+        preloader.style.visibility = "hidden";
+    }, 60000);
 }
 
 // Multiple Modals
@@ -989,13 +993,13 @@ export function updateLabelClassesAuditor(radios) {
         const label = document.querySelector(`label[for="${radio.id}"]`);
 
         // Reset classes
-        label.classList.remove('btn-success', 'btn-warning', 'btn-outline-success', 'btn-outline-warning');
+        label.classList.remove('btn-secondary', 'btn-warning', 'btn-outline-secondary', 'btn-outline-warning');
 
         if (radio.checked) {
             if (radio.value === 'yes') {
                 // Add and remove classes as needed when 'yes' radio is checked
-                label.classList.add('btn-success');
-                label.classList.remove('btn-outline-success');
+                label.classList.add('btn-secondary');
+                label.classList.remove('btn-outline-secondary');
             } else if (radio.value === 'no') {
                 // Add and remove classes as needed when 'no' radio is checked
                 label.classList.add('btn-warning');
@@ -1004,7 +1008,7 @@ export function updateLabelClassesAuditor(radios) {
         } else {
             // Add outline classes when radio is not checked
             if (radio.value === 'yes') {
-                label.classList.add('btn-outline-success');
+                label.classList.add('btn-outline-secondary');
             } else if (radio.value === 'no') {
                 label.classList.add('btn-outline-warning');
             }

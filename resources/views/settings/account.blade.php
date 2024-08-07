@@ -73,14 +73,14 @@
     <script>
         var uploadLogoURL = "{{ route('uploadLogoURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/settings-account.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/settings-account.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
     <script>
         var stripeSubscriptionURL = "{{ route('stripeSubscriptionURL') }}";
         var stripeSubscriptionDetailsURL = "{{ route('stripeSubscriptionDetailsURL') }}";
         var stripeCartAddonURL = "{{ route('stripeCartAddonURL') }}";
 
-        var assetUrl = "{{ URL::asset('/') }}";
+        var assetURL = "{{ URL::asset('/') }}";
     </script>
-    <script src="{{ URL::asset('build/js/settings-stripe.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/settings-stripe.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 @endsection

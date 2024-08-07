@@ -12,11 +12,14 @@ use App\Models\SurveyResponse;
 use App\Models\SurveyTemplates;
 use App\Models\SurveyAssignments;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class SurveysAssignmentsController extends Controller
 {
     public function show(Request $request, $assignmentId = null)
     {
+        //Cache::flush();
+
         if (!$assignmentId) {
             abort(404);
         }
@@ -401,6 +404,7 @@ class SurveysAssignmentsController extends Controller
             return response()->json(['success' => false, 'message' => 'Você não pode revogar a tarefa de outro usuário']);
         }
 
+        $columns['surveyor_status'] = 'completed';
         $columns['auditor_status'] = null;
         $columns['auditor_id'] = null;
         $data->update($columns);

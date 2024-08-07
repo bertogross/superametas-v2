@@ -8,7 +8,7 @@ https://laravel-news.com/openai-for-laravel
 
 
 
-Version 2.0.36 - [19/12/2023 - 20/12/2023]
+Version 2.0.36 - [19/12/2023 - 22/12/2023]
 - [Updated] Audits view
 
 

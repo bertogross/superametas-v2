@@ -1,9 +1,10 @@
 @php
     $companyId = $companyId ?? '';
     $tabMode = $tabMode ?? false;
-    $companiesAnalyticTermsData = $companiesAnalyticTermsData ?? null;
+    //$companiesAnalyticTermsData = $companiesAnalyticTermsData ?? null;
 
-    $classCols = $swapData && $companiesAnalyticTermsData && count($companiesAnalyticTermsData) == 2 ? 'col-12' : 'col-sm-12 col-md-6 col-lg-6';
+    //$classCols = $swapData && $companiesAnalyticTermsData && count($companiesAnalyticTermsData) == 2 ? 'col-12' : 'col-sm-12 col-md-6 col-lg-6';
+    $classCols = $swapData ? 'col-12' : 'col-sm-12 col-md-6 col-lg-6';
     $classCols = $tabMode && $swapData ? 'col-sm-12 col-md-6 col-lg-6e' : $classCols;
     //$classCols = count($filterCompanies) == 1 ? 'col-sm-12 col-md-6 col-lg-6' : $classCols;
 @endphp

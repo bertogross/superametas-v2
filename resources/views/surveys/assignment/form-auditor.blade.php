@@ -173,7 +173,7 @@
         var surveysShowURL = "{{ route('surveysShowURL') }}";
         var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
     <script>
         var profileShowURL = "{{ route('profileShowURL') }}";
@@ -182,14 +182,14 @@
         var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
         var responsesAuditorStoreOrUpdateURL = "{{ route('responsesAuditorStoreOrUpdateURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/surveys-auditor.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys-auditor.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
     <script>
         var uploadPhotoURL = "{{ route('uploadPhotoURL') }}";
         var deletePhotoURL = "{{ route('deletePhotoURL') }}";
-        var assetUrl = "{{ URL::asset('/') }}";
+        var assetURL = "{{ URL::asset('/') }}";
     </script>
-    <script src="{{ URL::asset('build/js/surveys-attachments.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys-attachments.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
     <script type="module">
         import {

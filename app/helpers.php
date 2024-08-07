@@ -12,6 +12,9 @@ use App\Models\SurveyAssignments;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\SettingsStripeController;
 
+// Set the locale to Brazilian Portuguese
+Carbon::setLocale('pt_BR');
+
 if (!function_exists('appName')) {
     function appName(){
         $host = $_SERVER['HTTP_HOST'] ?? 'default';

@@ -52,9 +52,11 @@
                                         <div class="mb-3">
                                             <label for="useremail" class="form-label">E-mail</label>
                                             <input type="email"
-                                                class="form-control @error('email') is-invalid @enderror" id="useremail"
-                                                name="email" placeholder="E-mail aqui" value="{{ old('email') }}"
-                                                id="email">
+                                            class="form-control @error('email') is-invalid @enderror"
+                                            id="useremail" name="email" p
+                                            laceholder="E-mail aqui"
+                                            value="{ old('email') }}"
+                                            id="email">
                                             @error('email')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -63,10 +65,8 @@
                                         </div>
 
                                         <div class="text-end">
-                                            <button class="btn btn-theme w-md waves-effect waves-light"
-                                                type="button">Enviar</button>
+                                            <button class="btn btn-theme w-md waves-effect waves-light"  type="button">Enviar</button>
                                         </div>
-
                                     </form>
                                 </div>
                             </div>
@@ -75,8 +75,9 @@
                         <!-- end card -->
 
                         <div class="mt-4 text-center">
-                            <p class="mb-0">Espere, eu lembrei qual minha senha... <a href="{{ route('login') }}"
-                                    class="fw-semibold text-theme text-decoration-underline"> Clique aqui </a> </p>
+                            <p class="mb-0">
+                                Espere, eu lembrei qual minha senha... <a href="{{ route('login') }}" class="fw-semibold text-theme text-decoration-underline" title="clique aqui">clique aqui</a>
+                            </p>
                         </div>
 
                     </div>
@@ -93,7 +94,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="text-center">
-                            <p class="mb-0 text-muted">&copy; <script>document.write(new Date().getFullYear())</script> {{appName()}}</p>
+                            <p class="mb-0 text-muted">&copy; {{date('Y')}} {{appName()}}</p>
                         </div>
                     </div>
                 </div>

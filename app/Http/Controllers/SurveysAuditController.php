@@ -2,19 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Survey;
-use App\Models\SurveyAssignments;
 use App\Models\SurveyAudit;
 use Illuminate\Http\Request;
+use App\Models\SurveyAssignments;
+use Illuminate\Support\Facades\Cache;
 
 class SurveysAuditController extends Controller
 {
     public function index(Request $request, $userId = null)
     {
+        Cache::flush();
+
         $currentUser = auth()->user();
 
         $userId = request('user') ?? null;
-        $status = request('status') ?? null;
+
+        $filterStatus = request('status', null);
         $filterCompanies = request('companies', []);
         $filterCreatedAt = request('created_at', '');
 
@@ -65,17 +70,11 @@ class SurveysAuditController extends Controller
             $query->where('survey_assignments.auditor_id', $userId);
         }
 
-        if($status){
-            $query->where('auditor_status', $status);
+        if($filterStatus){
+            $query->where('auditor_status', $filterStatus);
         }
 
         $dataDone = $query->orderBy('updated_at', 'desc')->paginate(10);
-
-        $getSurveyAssignmentStatusTranslations = SurveyAssignments::getSurveyAssignmentStatusTranslations();
-
-        $dateRange = SurveyAssignments::getAssignmentDateRange();
-        $firstDate = $dateRange['first_date'] ?? null;
-        $lastDate = $dateRange['last_date'] ?? null;
 
         $dataAvailable = SurveyAssignments::where('surveyor_status', 'completed')
             ->whereNull('auditor_status')
@@ -83,6 +82,12 @@ class SurveysAuditController extends Controller
             ->limit(100)
             ->get()
             ->toArray();
+
+        $getSurveyAssignmentStatusTranslations = SurveyAssignments::getSurveyAssignmentStatusTranslations();
+
+        $dateRange = SurveyAssignments::getAssignmentDateRange();
+        $firstDate = $dateRange['first_date'] ?? null;
+        $lastDate = $dateRange['last_date'] ?? null;
 
         return view('surveys.audits.index', compact(
             'dataDone',

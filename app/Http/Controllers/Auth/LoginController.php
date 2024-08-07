@@ -66,8 +66,7 @@ class LoginController extends Controller
 
         // Debugging: Log the current database connection
         // \Log::info('Current Database Connection: ' . config('database.connections.smAppTemplate.database'));
-        //dd(session()->all());
-
+        // dd(session()->all());
 
         // Authenticate using the dynamic database connection
         if (Auth::guard('web')->attempt($credentials, $request->filled('remember'))) {
@@ -80,8 +79,15 @@ class LoginController extends Controller
                 return redirect()->back()->withErrors(['email' => 'Your account is inactive. Please contact support.']);
             }
 
+            // Update the last_login time for the user
+            $user = Auth::user();
+            $user->last_login = now();
+            $user->save();
+
             // Authentication passed
-            return redirect()->intended('/');
+            //return redirect()->intended('/');
+            return redirect()->away(''.env('APP_URL').'');
+
         }
 
         // Handle failed authentication

@@ -9,22 +9,19 @@
 @yield('script-bottom')
 
 <script>
-window.App = {!! json_encode([
-    'url' => URL::asset('/'),
-]) !!};
-</script>
-<script src="{{ URL::asset('build/js/app.js') }}"></script>
-
-<script>
+    var assetURL = "{{ URL::asset('/') }}";
+    var appVersion = "{{ env('APP_VERSION') }}";
     var profileChangeLayoutModeURL = "{{ route('profileChangeLayoutModeURL') }}";
 </script>
-<script src="{{ URL::asset('build/js/app-custom.js') }}" type="module"></script>
+
+<script src="{{ URL::asset('build/js/app.js') }}?v={{env('APP_VERSION')}}"></script>
+<script src="{{ URL::asset('build/js/app-custom.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
 @php
     $HTTP_HOST = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
     $SUBDOMAIN = $HTTP_HOST ? strtok($HTTP_HOST, '.') : '';
 @endphp
-@if ( $SUBDOMAIN && $SUBDOMAIN != 'app' )
+@if ( $SUBDOMAIN && ( $SUBDOMAIN != 'app' && $SUBDOMAIN != 'checklist' ) )
     @php
         $replacements = [
             'localhost:8000' => 'local',

@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\File;
 use App\Http\Controllers\{
     Auth\LoginController,
     HomeController,
@@ -32,9 +34,8 @@ Auth::routes();
 // Language Translation
 Route::get('index/{locale}', [HomeController::class, 'lang']);
 
-//
+// Auth group
 Route::middleware(['auth'])->group(function () {
-
     //Route::get('/', [GoalSalesController::class, 'index'])->name('root');
     //Route::get('/', [SurveysController::class, 'index'])->name('root');
     Route::get('/dashboard', [HomeController::class, 'root'])->name('root');
@@ -48,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/update-password/{id}', [ProfileController::class, 'updatePassword'])->name('updatePasswordURL');
     });
     Route::get('/profile/{id?}', [ProfileController::class, 'index'])->name('profileShowURL');
+
     Route::post('/profile/layout-mode', [ProfileController::class, 'ChangeLayoutMode'])->name('profileChangeLayoutModeURL');
 
     // Goal Sales Routes
@@ -155,10 +157,10 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware([SetDynamicDatabase::class])->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
     // Route::post('/onboard', [OnboardController::class, 'onboard']);
+    Route::post('/login/check-databases', [LoginController::class, 'checkDatabases'])->name('checkDatabasesURL');
 });
 
 // Logout Route
-Route::post('/login/check-databases', [LoginController::class, 'checkDatabases'])->name('checkDatabasesURL');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::fallback(function () {

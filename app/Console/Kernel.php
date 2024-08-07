@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
+
     protected function schedule(Schedule $schedule)
     {
         /****************************************
@@ -37,6 +38,7 @@ class Kernel extends ConsoleKernel
         /****************************************
          * START routine for Customer databases
          ****************************************/
+        // https://laravel.com/docs/10.x/scheduling
         // Update surveys and tasks to each smApp(ID) database
         // to test in linux server terminal: php artisan fetch:surveys
         $schedule->command('fetch:surveys')
@@ -49,6 +51,7 @@ class Kernel extends ConsoleKernel
             //->everyThirtyMinutes()
             //->between('7:00', '23:30');
             ->everyFifteenMinutes()
+            ->hourly()
             ->timezone('America/Sao_Paulo')
             ->between('7:00', '23:45');
         $schedule->command('fetch:sysmo-sales')

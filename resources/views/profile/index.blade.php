@@ -10,8 +10,9 @@
         $phone = getUserMeta($profileUserId, 'phone');
         $phone = formatPhoneNumber($phone);
 
-        $countSurveyorTasks = \App\Models\SurveyAssignments::countSurveyAssignmentSurveyorTasks($profileUserId, $filteredStatuses);
-        $countAuditorTasks = \App\Models\SurveyAssignments::countSurveyAssignmentAuditorTasks($profileUserId, $filteredStatuses);
+        $countSurveyorTasks = \App\Models\SurveyAssignments::countSurveyAssignmentSurveyorTasks($profileUserId);
+
+        $countAuditorTasks = \App\Models\SurveyAssignments::countSurveyAssignmentAuditorTasks($profileUserId);
 
         //appPrintR($assignmentData);
         //appPrintR($auditorData);
@@ -317,7 +318,7 @@
     var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";
     var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
 </script>
-<script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
+<script src="{{ URL::asset('build/js/surveys.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
 <script>
     var assignmentShowURL = "{{ route('assignmentShowURL') }}";
@@ -325,7 +326,7 @@
     var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";
     var responsesSurveyorStoreOrUpdateURL = "{{ route('responsesSurveyorStoreOrUpdateURL') }}";
 </script>
-<script src="{{ URL::asset('build/js/surveys-surveyor.js') }}" type="module"></script>
+<script src="{{ URL::asset('build/js/surveys-surveyor.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
 <script>
     var changeAssignmentAuditorStatusURL = "{{ route('changeAssignmentAuditorStatusURL') }}";
@@ -336,7 +337,7 @@
     --}}
     var revokeAssignmentAuditorURL = "{{ route('revokeAssignmentAuditorURL') }}";
 </script>
-<script src="{{ URL::asset('build/js/surveys-auditor.js') }}" type="module"></script>
+<script src="{{ URL::asset('build/js/surveys-auditor.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
 <script type="module">
     import { attachImage } from '{{ URL::asset('build/js/settings-attachments.js') }}';

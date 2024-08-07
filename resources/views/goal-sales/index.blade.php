@@ -63,7 +63,8 @@
         <form action="{{ route('goalSalesIndexURL') }}" class="row g-2" autocomplete="off">
 
             <div class="col-sm-12 col-md-2 col-lg-auto">
-                <select class="form-control form-select" name="meantime" title="Selecione o período">
+                <label for="select-meantime" class="d-none">"Período</label>
+                <select class="form-control form-select" name="meantime" title="Selecione o período" id="select-meantime">
                     <option {{ $getMeantime == 'today' ? 'selected' : '' }} value="today">HOJE</option>
 
                     <option {{ $getMeantime == $currentMonth || $getMeantime == date('Y-m') || ( $getMeantime == 'custom' && empty($getCustomMeantime) )  ? 'selected' : '' }} value="{{ $currentMonth }}">MÊS ATUAL</option>
@@ -143,6 +144,7 @@
     <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
 
     <script>
+        var assetURL = "{{ URL::asset('/') }}";
         var goalSalesStoreOrUpdateURL = "{{ route('goalSalesStoreOrUpdateURL') }}";
         var goalSalesEditURL = "{{ route('goalSalesEditURL') }}";
         var goalSalesSettingsEditURL = "{{ route('goalSalesSettingsEditURL') }}";
@@ -150,7 +152,7 @@
         var goalSalesSlideModeURL = "{{ route('goalSalesSlideModeURL') }}";
         var goalSalesDefaultModeURL = "{{ route('goalSalesDefaultModeURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/goal-sales.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/goal-sales.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
     @if (auth()->user()->hasAnyRole(User::ROLE_OPERATIONAL))
         <script>

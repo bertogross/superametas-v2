@@ -30,14 +30,15 @@
             <div class="row g-3">
 
                 <div class="col-sm-12 col-md col-lg">
-                    <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="- Período -" data-min-date="{{ $firstDate ?? '' }}" data-max-date="{{ $lastDate ?? '' }}" value="{{ request('created_at') ?? '' }}">
+                    <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="- Período -" data-min-date="{{ $firstDate ?? '' }}" data-max-date="{{ $lastDate ?? '' }}" value="{{ request('created_at', '') ?? '' }}">
                 </div>
 
                 <div class="col-sm-12 col-md col-lg">
-                    <select class="form-control form-select" name="status">
+                    <label for="select-status" class="d-none">"Status</label>
+                    <select class="form-control form-select" name="status" id="select-status">
                         <option value="">- Status -</option>
                         @foreach ($getSurveyStatusTranslations as $key => $value)
-                            <option {{ $key == request('status') ? 'selected' : '' }} value="{{ $key }}" title="{{ $value['description'] }}">
+                            <option {{ $key == request('status', null) ? 'selected' : '' }} value="{{ $key }}" title="{{ $value['description'] }}">
                                 {{ $value['label'] }}
                             </option>
                         @endforeach
@@ -180,7 +181,7 @@
                                 </td>
                                 <td>
                                     @if ($delegation)
-                                        <div class="avatar-group float-start">
+                                        <div class="avatar-group float-start me-1 mt-1 mb-1">
                                             @if (isset($delegation['surveyors']) && !empty($delegation['surveyors']))
                                                 @foreach ($delegation['surveyors'] as $key => $value)
                                                     @php
@@ -197,7 +198,7 @@
                                                 @endforeach
                                             @endif
                                         </div>
-                                        <div class="avatar-group float-start ms-1">
+                                        <div class="avatar-group float-start me-1 mt-1 mb-1">
                                             @if (isset($delegation['auditors']) && !empty($delegation['auditors']))
                                                 @foreach ($delegation['auditors'] as $key => $value)
                                                     @php

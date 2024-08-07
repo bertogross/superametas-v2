@@ -4,18 +4,18 @@
     @csrf
     <div class="mb-3">
         <label class="form-label" for="name">Nome da Empresa:</label>
-        <input type="text" name="name" id="name" class="form-control" maxlength="190" value="{{ old('name', $settings['name'] ?? '') }}" required>
+        <input type="text" name="name" id="name" class="form-control" maxlength="190" value="{{ isset($settings['name']) ? old('name', $settings['name'] ?? '') : '' }}" required>
     </div>
 
     <div class="mb-3">
         <label class="form-label" for="user_name">Seu Nome Completo:</label>
-        <input type="text" name="user_name" id="user_name" class="form-control" value="{{ old('user_name', $settings['user_name'] ?? '') }}" maxlength="100" required>
+        <input type="text" name="user_name" id="user_name" class="form-control" value="{{ isset($settings['user_name']) ? old('user_name', $settings['user_name'] ?? '') : '' }}" maxlength="100" required>
         <div class="form-text">O responsável pela administração das configurações deste software</div>
     </div>
 
     <div class="mb-3">
         <label class="form-label" for="phone">Número do telefone móvel:</label>
-        <input type="tel" name="phone" id="phone" class="form-control phone-mask" value="{{ old('phone', formatPhoneNumber($settings['phone']) ?? '') }}" maxlength="16" required>
+        <input type="tel" name="phone" id="phone" class="form-control phone-mask" value="{{ isset($settings['phone']) ? old('phone', formatPhoneNumber($settings['phone']) ?? '') : '' }}" maxlength="16" required>
     </div>
 
     <div class="card mb-3">

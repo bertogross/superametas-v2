@@ -42,7 +42,7 @@
                                                     </div>
                                                 </div>
                                             </label>
-                                            <input class="d-none" name="cover" id="cover-image-input" type="file" accept="image/png, image/gif, image/jpeg">
+                                            <input class="d-none" name="cover" id="cover-image-input" type="file" accept="image/jpeg">
                                         </div>
                                         <button type="button" class="btn-close btn-close-white" id="createMemberBtn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
@@ -121,8 +121,8 @@
                             @if( !isset($user) || $user->role !=1 )
                                 <!-- Save data in 'users' table collumn 'role'-->
                                 <div class="form-group mb-4">
-                                    <label class="form-label">Nível <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Níveis e Permissões" data-bs-content="<ul class='list-unstyled mb-0'><li>Saiba mais visualizando ao final desta página a tabela contendo o grid de Níveis e Permissões</li></ul>"></i></label>
-                                    <select class="form-control form-select" name="role">
+                                    <label for="select-role" class="form-label">Nível <i class="ri-question-line text-primary non-printable align-top" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" data-bs-title="Níveis e Permissões" data-bs-content="<ul class='list-unstyled mb-0'><li>Saiba mais visualizando ao final desta página a tabela contendo o grid de Níveis e Permissões</li></ul>"></i></label>
+                                    <select class="form-control form-select" name="role" id="select-role">
                                         <option class="text-body" disabled selected>- Selecione -</option>
                                         @foreach(\App\Models\User::USER_ROLES as $roleId => $capabilities)
                                             @if($roleId != 1)

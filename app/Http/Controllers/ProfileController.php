@@ -6,13 +6,16 @@ use App\Models\User;
 use App\Models\Survey;
 use App\Models\UserMeta;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\SurveyAssignments;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class ProfileController extends Controller
 {
     public function index($id = null)
     {
+        //Cache::flush();
+
         if (!$id && auth()->check()) {
             $user = auth()->user();
         } else {

@@ -198,5 +198,5 @@
     <script>
         var updateSalesFromSysmoURL = "{{ route('updateSalesFromSysmoURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/settings-database.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/settings-database.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 @endsection

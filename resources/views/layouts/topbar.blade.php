@@ -11,6 +11,11 @@
 
     $host = $_SERVER['HTTP_HOST'] ?? 'default';
     $logo2 = str_contains($host, 'testing') ? '-2' : '';
+
+    $countSurveyAssignmentSurveyorTasks = SurveyAssignments::countSurveyAssignmentSurveyorTasks($user->id, ['new', 'pending', 'in_progress']);
+    $countSurveyAssignmentAuditorTasks = SurveyAssignments::countSurveyAssignmentAuditorTasks($user->id, ['new', 'pending', 'in_progress']);
+
+    $profileUrl = route('profileShowURL', ['id' => $user->id]) . '?d=' . now()->timestamp;
 @endphp
 <header id="page-topbar">
     <div class="layout-width">
@@ -81,7 +86,7 @@
                 -->
 
                 <div class="dropdown topbar-head-dropdown ms-1 header-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="left" title="Módulos">
-                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Módulos">
                         <i class='bx bx-category-alt fs-22'></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-lg p-0 dropdown-menu-end">
@@ -132,9 +137,11 @@
                                             <span>Checklists</span>
                                         </a>
                                     </div>
+
+                                    {{--
                                 @else
                                     <div class="col">
-                                        <a class="dropdown-icon-item" href="{{ route('profileShowURL') }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Acessar minha lista de Tarefas">
+                                        <a class="dropdown-icon-item" href="{{ $profileUrl }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Acessar minha lista de Tarefas">
 
                                             <span class="position-absolute ms-4 mt-1 translate-middle badge rounded-pill bg-warning" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas por executar">{{SurveyAssignments::countSurveyAssignmentSurveyorTasks($user->id, ['new', 'pending', 'in_progress'])}}<span class="visually-hidden">tasks</span></span>
 
@@ -143,6 +150,8 @@
                                             <span>Tarefas</span>
                                         </a>
                                     </div>
+                                    --}}
+
                                 @endif
 
                                 <div class="col">
@@ -156,7 +165,7 @@
                             {{--
                             <div class="row g-0">
                                 <div class="col">
-                                    <a class="dropdown-icon-item" href="{{ route('profileShowURL') }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Acessar minha lista de Tarefas">
+                                    <a class="dropdown-icon-item" href="{{ $profileUrl }}" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Acessar minha lista de Tarefas">
                                         <i class="ri-todo-fill text-theme fs-1"></i>
                                         <span>Tarefas</span>
                                     </a>
@@ -197,6 +206,7 @@
                 <div class="dropdown ms-sm-3 header-item topbar-user">
                     <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="d-flex align-items-center">
+                            <span class="position-absolute translate-middle badge border border-light rounded-circle bg-theme p-1 {{ $countSurveyAssignmentSurveyorTasks+$countSurveyAssignmentAuditorTasks > 0 ? 'blink' : 'd-none' }}" style="margin-left: 30px;margin-top: 15px;" title="Tarefas Pendentes"><span class="visually-hidden">{{$countSurveyAssignmentSurveyorTasks+$countSurveyAssignmentAuditorTasks}} Tarefas Pendentes</span></span>
                             <img class="rounded-circle header-profile-user" src="{{ $getUserData['avatar'] ? $getUserData['avatar'] :  URL::asset('build/images/users/user-dummy-img.jpg') }}" alt="{{$getUserData['name']}}" loading="lazy">
                             <span class="text-start ms-xl-2">
                                 <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{$getUserData['name']}}</span>
@@ -225,6 +235,7 @@
                         <div class="dropdown-divider"></div>
                         -->
 
+
                         @if(auth()->user()->hasRole(User::ROLE_ADMIN))
                             <a class="dropdown-item" href="{{ route('settingsUsersIndexURL') }}">
                                 <i class="ri-settings-4-fill text-muted fs-16 align-middle me-1"></i>
@@ -233,23 +244,20 @@
                         @endif
 
                         {{--
-                        <a class="dropdown-item" href="{{ route('profileShowURL') }}">
+                        <a class="dropdown-item" href="{{ $profileUrl }}">
                             <i class="ri-user-3-fill text-muted fs-16 align-middle me-1"></i>
                             <span class="align-middle">Meu Perfil</span>
                         </a>
                         --}}
 
-                        <a class="dropdown-item" href="{{ route('profileShowURL') }}">
+                        <a class="dropdown-item" href="{{ $profileUrl }}">
                             <i class="ri-todo-fill text-muted fs-16 align-middle me-1"></i>
                             <span class="align-middle">
                                 Minhas Tarefas
-                                @php
-                                    $countSurveyAssignmentSurveyorTasks = SurveyAssignments::countSurveyAssignmentSurveyorTasks($user->id, ['new', 'pending', 'in_progress']);
-                                @endphp
-                                @if($countSurveyAssignmentSurveyorTasks > 0)
-                                    <span class="badge border border-theme text-body ms-2" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas por executar">{{$countSurveyAssignmentSurveyorTasks}}<span class="visually-hidden">tasks</span></span>
+                                @if($countSurveyAssignmentSurveyorTasks+$countSurveyAssignmentAuditorTasks > 0)
+                                    <span class="badge border border-theme text-body ms-2" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Tarefas por executar">{{$countSurveyAssignmentSurveyorTasks+$countSurveyAssignmentAuditorTasks}}<span class="visually-hidden">tasks</span></span>
                                 @endif
-                        </span>
+                            </span>
                         </a>
 
                         @if(in_array('audit', $currentUserCapabilities))
@@ -257,9 +265,6 @@
                                 <i class="ri-fingerprint-2-line text-muted fs-16 align-middle me-1"></i>
                                 <span class="align-middle">
                                     Minhas Auditorias
-                                    @php
-                                        $countSurveyAssignmentAuditorTasks = SurveyAssignments::countSurveyAssignmentAuditorTasks($user->id, ['new', 'pending', 'in_progress']);
-                                    @endphp
                                     @if($countSurveyAssignmentAuditorTasks > 0)
                                         <span class="badge border border-theme text-body ms-2" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Auditorias por executar">{{$countSurveyAssignmentAuditorTasks}}<span class="visually-hidden">tasks</span></span>
                                     @endif
@@ -270,6 +275,11 @@
                         <!--
                         <a class="dropdown-item" href="auth-lockscreen-basic"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Lock screen</span></a>
                         -->
+
+                        <button class="dropdown-item" id="pwa_install_button" hidden>
+                            <i class="ri-smartphone-fill text-muted fs-16 align-middle me-1"></i>
+                            <span class="align-middle" title="Instalar PWA">Instalar App</span>
+                        </button>
 
                         <div class="dropdown-divider"></div>
 

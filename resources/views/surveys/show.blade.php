@@ -87,8 +87,8 @@
         @endif
 
         @if ( $analyticTermsData || isset($_REQUEST['filter']) )
-            <div class="row mb-4">
-                <div class="col">
+            <div class="row">
+                <div class="col-sm-12 col-md mb-4">
                     <div id="filter" class="p-3 bg-light-subtle rounded position-relative" style="z-index: 3; display: block;">
                         <form action="{{ route('surveysShowURL', $surveyId) }}" method="get" autocomplete="off" class="mb-0">
                             <div class="row g-2">
@@ -108,14 +108,16 @@
                                 @endif
 
                                 <div class="col-sm-12 col-md-auto col-lg-auto wrap-form-btn">  {{-- d-none --}}
-                                    <button type="submit" name="filter" value="true" class="btn btn-theme waves-effect init-loader"> <i class="ri-equalizer-fill me-1 align-bottom"></i> Filtrar</button>
+                                    <button type="submit" name="filter" value="true" class="btn btn-theme waves-effect w-100 init-loader">
+                                        <i class="ri-equalizer-fill me-1 align-bottom"></i> Filtrar
+                                    </button>
                                 </div>
 
                             </div>
                         </form>
                     </div>
                 </div>
-                <div class="col-auto">
+                <div class="col-sm-12 col-md-auto mb-4">
                     <div class="p-3 bg-light-subtle rounded position-relative">
                         <button type="button"
                             @if(count($filterCompanies) > 1)
@@ -123,21 +125,23 @@
                             @else
                                 onclick="alert('Esta ação requer dados de duas ou mais Unidades')"
                             @endif
-                            class="btn btn-{{!$swapData ? 'soft-' : ''}}theme waves-effect ri-swap-box-line"
+                            class="btn btn-{{!$swapData ? 'soft-' : ''}}theme waves-effect w-100"
                             data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="left" data-bs-title="Ativar/Desativar o Secionamento" data-bs-content="O <strong>Secionamento</strong> quando ativo permite visualizar os dados independentementes de cada das Unidades.
-                            <br><br>{{$swapData ? '<span class="text-success">Secionamento Ativo</span>' : '<span class="text-danger">Secionamento Inativo</span>'}}"> </button>
+                            <br><br>{{$swapData ? '<span class="text-success">Secionamento Ativo</span>' : '<span class="text-danger">Secionamento Inativo</span>'}}">
+                            <i class="ri-swap-box-line me-1 align-bottom"></i> Secionamento
+                        </button>
                     </div>
                 </div>
             </div>
         @endif
 
         <div class="row">
-            <div class="col">
+            <div class="col-sm-12 col-md-6">
                 <div class="card mb-3">
                     <div class="card-header">
                         <h4 class="card-title text-uppercase mb-0 flex-grow-1">Aspectos</h4>
                     </div>
-                    <div class="card-body h-100 fs-17">
+                    <div class="card-body h-100">
                         <div class="hstack gap-3 flex-wrap">
                             <div data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="O tipo de repetição">
                                 Recorrência: {{$recurringLabel}}
@@ -156,14 +160,14 @@
                     </div>
                 </div>
             </div>
-            <div class="col">
+            <div class="col-sm-12 col-md-6">
                 <div class="card mb-3">
                     <div class="card-header">
                         <h4 class="card-title text-uppercase mb-0 flex-grow-1">Atribuições</h4>
                     </div>
-                    <div class="card-body h-100 fs-16">
+                    <div class="card-body h-100 pb-0">
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-sm-12 col-md-6 mb-3">
                                 Vistoria:
                                 @if (isset($delegation['surveyors']) && !empty($delegation['surveyors']))
                                     @foreach ($delegation['surveyors'] as $key => $value)
@@ -182,7 +186,7 @@
                                 @endif
                             </div>
 
-                            <div class="col-6">
+                            <div class="col-sm-12 col-md-6 mb-3">
                                 Auditoria:
                                 @if (isset($delegation['auditors']) && !empty($delegation['auditors']))
                                     @foreach ($delegation['auditors'] as $key => $value)
@@ -209,9 +213,14 @@
         <div class="row mb-3">
             @if ( $swapData && count($filterCompanies) > 1 )
                 <div class="fs-6 text-uppercase text-center mb-3">
-                    Dados <span class="text-theme">Secionados</span> Unidades:
+                    Dados <span class="text-theme">Secionados</span> :
                     @foreach ($filterCompanies as $companyId)
-                        <span class="badge bg-dark-subtle text-body badge-border ms-2">{{getCompanyNameById($companyId)}}</span>
+                    @php
+                        $exists = $companiesAnalyticTermsData[$companyId] ?? null;
+                    @endphp
+                    <span class="badge bg-dark-subtle {{ !$exists ? 'text-danger' : 'text-body'}} badge-border ms-2" {!! !$exists ? 'data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não há dados"' : '' !!}>
+                        {{getCompanyNameById($companyId)}}
+                    </span>
                     @endforeach
                 </div>
 
@@ -220,10 +229,14 @@
                         @php
                             $index = 0;
                         @endphp
-                        @foreach ($companiesAnalyticTermsData as $companyId => $analyticTermsData)
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link {{ $index == 0 ? 'active' : ''}}" data-bs-toggle="tab" href="#nav-border-justified-{{$companyId}}" role="tab" {{ $index > 0 ?? 'aria-selected="true"' }}>
+                        @foreach ($filterCompanies as $companyId)
+                            @php
+                                $exists = $companiesAnalyticTermsData[$companyId] ?? null;
+                            @endphp
+                            <li class="nav-item" role="presentation" {!! !$exists ? 'data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Não há dados"' : '' !!}>
+                                <a class="nav-link {{ $index == 0 ? 'active' : ''}} {{ !$exists ? 'no-data' : '' }}" data-bs-toggle="tab" href="#nav-border-justified-{{$companyId}}" role="tab" {{ $index > 0 ?? 'aria-selected="true"' }}>
                                     {{getCompanyNameById($companyId)}}
+                                    {!! !$exists ? '<i class="ri-close-circle-line text-danger align-top fs-14 ms-2"></i>' : '' !!}
                                 </a>
                             </li>
                             @php
@@ -235,6 +248,7 @@
                         @php
                             $index = 0;
                         @endphp
+                        {{--
                         @foreach ($companiesAnalyticTermsData as $companyId => $analyticTermsData)
                             <div class="tab-pane {{ $index == 0 ? 'active' : ''}}" id="nav-border-justified-{{$companyId}}" role="tabpanel">
                                 <div class="row">
@@ -247,13 +261,33 @@
                                 $index++;
                             @endphp
                         @endforeach
+                        --}}
+                        @foreach ($filterCompanies as $companyId)
+                            <div class="tab-pane {{ $index == 0 ? 'active' : ''}}" id="nav-border-justified-{{$companyId}}" role="tabpanel">
+                                @if (isset($companiesAnalyticTermsData[$companyId]))
+                                    <div class="row">
+                                        @include('surveys.layouts.chart-terms', ['analyticTermsData' => $companiesAnalyticTermsData[$companyId], 'companyId' => $companyId, 'tabMode' => true])
+
+                                        @include('surveys.layouts.chart-calendar', ['analyticTermsData' => $companiesAnalyticTermsData[$companyId], 'companyId' => $companyId, 'tabMode' => true])
+                                    </div>
+                                @else
+                                    @component('components.nothing')
+                                        @slot('text', 'Não foram realizadas Vistorias no período selecionado')
+                                    @endcomponent
+                                @endif
+                            </div>
+
+                            @php
+                                $index++;
+                            @endphp
+                        @endforeach
                     </div>
                 </div>
             @else
                 @if ($analyticTermsData)
                     @if (count($filterCompanies) > 1)
                         <div class="fs-6 text-uppercase text-center mb-3">
-                            Dados <span class="text-theme">Globais</span> Unidades:
+                            Dados <span class="text-theme">Globais</span> :
                             @foreach ($filterCompanies as $companyId)
                                 <span class="badge bg-dark-subtle text-body badge-border ms-2">{{getCompanyNameById($companyId)}}</span>
                             @endforeach
@@ -272,12 +306,12 @@
         </div>
 
     @else
-        <div class="alert alert-danger">Acesso autorizado somente aos usuários de Nível Controladora ou Auditoria</div>
+        <div class="alert alert-danger">Acesso autorizado somente aos usuários de Nível Controladoria ou Auditoria</div>
     @endif
 @endsection
 
 @section('script')
-    <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
     <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
     <script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>

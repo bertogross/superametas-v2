@@ -15,7 +15,8 @@ import {
     getChartColorsArray,
     initFlatpickr,
     getCookie,
-    setCookie
+    setCookie,
+    showPreloader
 } from './helpers.js';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -137,6 +138,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Fetching modal content:', error);
             toastAlert('Não foi possível carregar o conteúdo', 'danger', 10000);
         }
+
+        showPreloader(false);
     }
 
     // Event listeners for each 'Edit Goal Sales' button
@@ -146,6 +149,8 @@ document.addEventListener('DOMContentLoaded', function() {
             editButtons.forEach(function(button) {
                 button.addEventListener('click', function(event) {
                     event.preventDefault();
+
+                    showPreloader();
 
                     const meantime = this.getAttribute("data-meantime");
                     const companyId = this.getAttribute("data-company-id");
@@ -164,6 +169,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // store/update goalSalesForm
         document.getElementById('btn-goal-sales-update').addEventListener('click', async function(event) {
             event.preventDefault();
+
+            showPreloader();
 
             const form = document.getElementById('goalSalesForm');
 
@@ -219,9 +226,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     toastAlert(data.message, 'danger', 60000);
                 }
+
+                showPreloader(false);
             } catch (error) {
-                toastAlert('Error: ' + error, 'danger', 60000);
                 console.error('Error:', error);
+
+                toastAlert('Error: ' + error, 'danger', 60000);
+
+                showPreloader(false);
             }
         });
     }
@@ -376,14 +388,14 @@ document.addEventListener('DOMContentLoaded', function() {
             var chartPercentAccrued = parseInt(element.getAttribute('data-percent-from-metric')) || 0;
 
             // Define emoji icons
-            var iconSleep = App.url + 'build/images/svg/sleep.png';
-            var iconCrying = App.url + 'build/images/svg/crying.png';
-            var iconSad = App.url + 'build/images/svg/sad.png';
-            var iconWow = App.url + 'build/images/svg/wow.png';
-            var iconSmile = App.url + 'build/images/svg/smile.png';
-            var iconHappy = App.url + 'build/images/svg/happy.png';
-            var iconBoss = App.url + 'build/images/svg/boss.png';
-            var iconCongratulations = App.url + 'build/images/svg/congratulations.png';
+            var iconSleep = assetURL + 'build/images/svg/sleep.png';
+            var iconCrying = assetURL + 'build/images/svg/crying.png';
+            var iconSad = assetURL + 'build/images/svg/sad.png';
+            var iconWow = assetURL + 'build/images/svg/wow.png';
+            var iconSmile = assetURL + 'build/images/svg/smile.png';
+            var iconHappy = assetURL + 'build/images/svg/happy.png';
+            var iconBoss = assetURL + 'build/images/svg/boss.png';
+            var iconCongratulations = assetURL + 'build/images/svg/congratulations.png';
 
             // Define chart dimensions and styles based on chartStyle attribute
             var chartWidth, chartHeight, imageWH, vOffsetY, cFontSize;
@@ -757,7 +769,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Get the new IPCA percentage value
                     var newPercentage = onlyNumbers(result.value);
-                    console.log('newPercentage' + newPercentage);
+                    //console.log('newPercentage', newPercentage);
 
                     // Initialize the sum of prices
                     var sumPrice = 0;

@@ -25,6 +25,7 @@ class FetchSurveys extends Command
 
         // Get the list of database names from app_users
         $appUsersTable = $OnboardConnection->table('app_users')
+            ->whereNotNull('user_erp')
             ->get()
             ->toArray();
 

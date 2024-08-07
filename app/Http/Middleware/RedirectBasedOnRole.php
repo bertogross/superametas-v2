@@ -25,7 +25,9 @@ class RedirectBasedOnRole
             } elseif ($user->role == User::ROLE_CONTROLLERSHIP) {
                 return redirect()->route('surveysIndexURL');
             } else {
-                return redirect()->route('root');
+                //return redirect()->route('root');
+                //return redirect()->route('goalSalesIndexURL');
+                return redirect()->route('surveysIndexURL');
             }
         }
 

@@ -47,5 +47,5 @@
         var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
         var getRecentActivitiesURL = "{{ route('getRecentActivitiesURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 @endsection

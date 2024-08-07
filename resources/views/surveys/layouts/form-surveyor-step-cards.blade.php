@@ -95,11 +95,11 @@
                                         </h6>
                                     </div>
                                     <div class="col-auto">
-                                        <i class="fs-5 ri-time-line text-warning-emphasis {{ !$complianceSurvey || !$attachmentIds ? '' : 'd-none'}}"
+                                        <i class="fs-5 ri-time-line text-warning-emphasis {{ !$complianceSurvey ? '' : 'd-none'}}"
                                         data-bs-toggle="tooltip" data-bs-trigger="hover"
                                         data-bs-placement="top" title="Status: Pendente"></i>
 
-                                        <i class="fs-5 ri-check-double-fill text-theme {{ $complianceSurvey && $attachmentIds ? '' : 'd-none'}}"
+                                        <i class="fs-5 ri-check-double-fill text-theme {{ $complianceSurvey ? '' : 'd-none'}}"
                                         data-bs-toggle="tooltip" data-bs-trigger="hover"
                                         data-bs-placement="top" title="Status: Concluído"></i>
                                     </div>

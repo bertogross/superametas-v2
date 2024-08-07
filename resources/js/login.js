@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     //console.log(data.databases);
                     //console.log(JSON.stringify(data.databases, null, 2));
-                    if (data.databases.length > 1) {
+                    if (data.databases && data.databases.length > 1) {
                         // Create an array of database names from the 'data' object
                         const selectElement = document.createElement('select');
                         selectElement.id = 'database';

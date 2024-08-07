@@ -4,6 +4,8 @@ use Illuminate\Support\Str;
 
 return [
 
+    'cache' => false,
+
     /*
     |--------------------------------------------------------------------------
     | Default Cache Store

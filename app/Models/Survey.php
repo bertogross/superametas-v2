@@ -368,21 +368,6 @@ class Survey extends Model
                 SurveyAssignments::startSurveyAssignments($survey->id);
             }
         });
-        /*try {
-            $surveys = Survey::where('status', 'scheduled')
-                ->orderBy('created_at')
-                ->get();
-
-            foreach ($surveys as $survey) {
-                if ( $survey->start_at && $survey->start_at == $today ) {
-                    $survey->update(['status' => 'started']);
-
-                    SurveyAssignments::startSurveyAssignments($survey->id);
-                }
-            }
-        } catch (\Exception $e) {
-            \Log::error("Error in populateSurveys with status {$status}: " . $e->getMessage());
-        }*/
 
         Survey::processSurveysWithStatus('new', function ($survey) {
             $today = Carbon::now()->startOfDay();
@@ -393,55 +378,29 @@ class Survey extends Model
                 SurveyAssignments::startSurveyAssignments($survey->id);
             }
         });
-        /*try {
-            $surveys = Survey::where('status', 'new')
-                ->orderBy('created_at')
-                ->get();
-
-            foreach ($surveys as $survey) {
-                if ( $survey->start_at && $survey->start_at <= $today ) {
-                    $survey->update(['status' => 'started']);
-
-                    SurveyAssignments::startSurveyAssignments($survey->id);
-                }
-            }
-        } catch (\Exception $e) {
-            \Log::error("Error in populateSurveys with status {$status}: " . $e->getMessage());
-        }*/
 
         Survey::processSurveysWithStatus('started', function ($survey) {
             $today = Carbon::now()->startOfDay();
 
             if ( $survey->end_in && $today > $survey->end_in ) {
                 $survey->update(['status' => 'completed']);
-            } else {
-                SurveyAssignments::startSurveyAssignments($survey->id);
             }
-        });
-        /*try {
-            $surveys = Survey::where('status', 'started')
-                ->orderBy('created_at')
-                ->get();
 
-            foreach ($surveys as $survey) {
-                if ( $survey->end_in && $today > $survey->end_in ) {
-                    $survey->update(['status' => 'completed']);
-                } else {
-                    SurveyAssignments::startSurveyAssignments($survey->id);
-                }
-            }
-        } catch (\Exception $e) {
-            \Log::error("Error in populateSurveys with status {$status}: " . $e->getMessage());
-        }*/
+            SurveyAssignments::startSurveyAssignments($survey->id);
+        });
+
+        Survey::processSurveysWithStatus('completed', function ($survey) {
+            SurveyAssignments::checkSurveyAssignmentUntilYesterday($survey->id);
+        });
     }
     public static function setDatabaseConnection($databaseId)
     {
         if ($databaseId) {
             $databaseName = 'smApp' . $databaseId;
 
-            /*if (!DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$databaseName])) {
+            if (!DB::select("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?", [$databaseName])) {
                 return;
-            }*/
+            }
 
             config(['database.connections.smAppTemplate.database' => $databaseName]);
         }

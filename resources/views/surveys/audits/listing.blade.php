@@ -30,14 +30,45 @@
             <li class="nav-item" role="presentation">
                 <a class="nav-link" data-bs-toggle="tab" href="#nav-border-justified-available" role="tab" aria-selected="false" tabindex="-1">
                     Vistorias Disponíveis
-                    {{--
-                    {!! $dataAvailable ? '<span class="badge border border-dark text-body ms-2">'.count($dataAvailable).'</span>' : '' !!}
-                    --}}
+                    <span class="badge border border-dark text-body ms-2" id="count-available-surveyors"></span>
                 </a>
             </li>
         </ul>
         <div class="tab-content text-muted">
             <div class="tab-pane active border border-1 border-light" id="nav-border-justified-done" role="tabpanel">
+                <div class="card-body border border-dashed border-end-0 border-start-0 border-top-0" style="flex: inherit !important;">
+                    <form action="{{ route('surveysAuditIndexURL') }}" method="get" autocomplete="off">
+                        <div class="row g-3">
+
+                            <div class="col-sm-12 col-md col-lg">
+                                <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="- Período -" data-min-date="{{ $firstDate ?? '' }}" data-max-date="{{ $lastDate ?? '' }}" value="{{ request('created_at', '') }}">
+                            </div>
+
+                            <div class="col-sm-12 col-md col-lg">
+                                <label for="select-status" class="d-none">"Status</label>
+                                <select class="form-control form-select" name="status" id="select-status">
+                                    <option value="">- Status -</option>
+                                    @foreach ( ['pending', 'in_progress', 'completed', 'losted'] as $key)
+                                        <option
+                                        {{ $key == request('status', null) ? 'selected' : '' }}
+                                        title="{{ $getSurveyAssignmentStatusTranslations[$key]['description'] }}"
+                                        value="{{ $key }}">
+                                            {{ $getSurveyAssignmentStatusTranslations[$key]['label'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-sm-12 col-md-auto col-lg-auto wrap-form-btn">{{-- d-none --}}
+                                <button type="submit" name="filter" value="true" class="btn btn-theme waves-effect w-100 init-loader">
+                                    <i class="ri-equalizer-fill me-1 align-bottom"></i> Filtrar
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
                 @if (!$dataDone || $dataDone->isEmpty())
                     @component('components.nothing')
                         {{--
@@ -45,35 +76,6 @@
                         --}}
                     @endcomponent
                 @else
-                    <div class="card-body border border-dashed border-end-0 border-start-0 border-top-0" style="flex: inherit !important;">
-                        <form action="{{ route('surveysAuditIndexURL') }}" method="get" autocomplete="off">
-                            <div class="row g-3">
-
-                                <div class="col-sm-12 col-md col-lg">
-                                    <input type="text" class="form-control flatpickr-range" name="created_at" placeholder="- Período -" data-min-date="{{ $firstDate ?? '' }}" data-max-date="{{ $lastDate ?? '' }}" value="{{ request('created_at') ?? '' }}">
-                                </div>
-
-                                <div class="col-sm-12 col-md col-lg">
-                                    <select class="form-control form-select" name="status">
-                                        <option value="">- Status -</option>
-                                        @foreach ( ['pending', 'in_progress', 'completed', 'losted'] as $key)
-                                            <option {{ $getSurveyAssignmentStatusTranslations[$key] == request('status') ? 'selected' : '' }} value="{{ $key }}" title="{{ $getSurveyAssignmentStatusTranslations[$key]['description'] }}">
-                                                {{ $getSurveyAssignmentStatusTranslations[$key]['label'] }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="col-sm-12 col-md-auto col-lg-auto wrap-form-btn">{{-- d-none --}}
-                                    <button type="submit" name="filter" value="true" class="btn btn-theme waves-effect w-100 init-loader">
-                                        <i class="ri-equalizer-fill me-1 align-bottom"></i> Filtrar
-                                    </button>
-                                </div>
-
-                            </div>
-                        </form>
-                    </div>
-
                     <div class="table-responsive">
                         <table class="table table-sm align-middle table-nowrap mb-0 table-striped" id="tasksTable">
                             <thead class="table-light text-muted text-uppercase">
@@ -182,7 +184,7 @@
                                         <td scope="row" class="text-end">
                                             @if (in_array($auditorStatus, ['new', 'pending', 'in_progress']))
                                                 <a
-                                                @if ($surveyorStatus == 'completed')
+                                                @if (in_array($surveyorStatus, ['completed', 'auditing']))
                                                     href="{{route('formAuditorAssignmentURL', $assignmentId)}}"
                                                 @else
                                                     onclick="alert('Necessário aguardar finalização da Vistoria')"
@@ -222,9 +224,9 @@
                         ])
                     </div>
                 @else
-                    @component('components.nothing')
-                        @slot('text', 'Não há tarefas disponíveis para uma Auditoria')
-                    @endcomponent
+                    <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show mb-0" role="alert">
+                        <i class="ri-alert-line label-icon"></i> Não há tarefas disponíveis para uma Auditoria
+                    </div>
                 @endif
             </div>
         </div>

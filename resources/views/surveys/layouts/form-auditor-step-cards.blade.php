@@ -134,16 +134,8 @@
 
                                 <div class="row mb-2">
                                     <div class="col-12">
-                                        Você <span class="text-warning">discorda</span> ou <span class="text-success">concorda</span> desta avaliação?
+                                        Você <span class="text-warning">discorda</span> ou <span class="text-secondary">concorda</span> desta avaliação?
                                     </div>
-                                    {{--
-                                    <div class="col text-end">
-                                        <i class="ri-emotion-unhappy-line text-danger align-middle"></i> = Não
-                                    </div>
-                                    <div class="col text-start">
-                                        <i class="ri-emotion-happy-line text-success align-middle"></i> = Sim
-                                    </div>
-                                    --}}
                                 </div>
 
                                 <div class="row">
@@ -175,12 +167,12 @@
                                         </label>
 
                                         <input tabindex="-1" class="d-none" type="radio" name="compliance_audit" role="switch" id="NoSwitchCheck{{ $topicIndex.$radioIndex }}" {{$auditorStatus == 'losted' ? 'disabled' : ''}} value="no" {{$complianceAudit && $complianceAudit == 'no' ? 'checked' : ''}}>
-                                        <label for="NoSwitchCheck{{ $topicIndex.$radioIndex }}" class="btn btn-{{$complianceAudit && $complianceAudit == 'no' ? '' : 'outline-'}}warning waves-effect waves-light d-flex align-content-center flex-wrap ms-1 me-1 mb-0 rounded-2 border-1 border-warning border-opacity-10 btn-compliance" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Discordo">
+                                        <label for="NoSwitchCheck{{ $topicIndex.$radioIndex }}" class="btn btn-{{$complianceAudit && $complianceAudit == 'no' ? '' : 'outline-'}}warning waves-effect waves-light d-flex align-content-center flex-wrap ms-1 me-1 mb-0 rounded-2 border-1 border-warning border-opacity-10 btn-compliance" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Discordo">
                                             <i class="ri-emotion-unhappy-line label-icon align-middle rounded-pill fs-1 m-auto text-white"></i>
                                         </label>
 
                                         <input tabindex="-1" class="d-none" type="radio" name="compliance_audit" role="switch" id="YesSwitchCheck{{ $topicIndex.$radioIndex }}" {{$auditorStatus == 'losted' ? 'disabled' : ''}} value="yes" {{$complianceAudit && $complianceAudit == 'yes' ? 'checked' : ''}}>
-                                        <label for="YesSwitchCheck{{ $topicIndex.$radioIndex }}" class="btn btn-{{$complianceAudit && $complianceAudit == 'yes' ? '' : 'outline-'}}success waves-effect waves-light d-flex align-content-center flex-wrap ms-1 me-0 mb-0 rounded-2 border-1 border-success border-opacity-10 btn-compliance" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="bottom" title="Concordo">
+                                        <label for="YesSwitchCheck{{ $topicIndex.$radioIndex }}" class="btn btn-{{$complianceAudit && $complianceAudit == 'yes' ? '' : 'outline-'}}secondary waves-effect waves-light d-flex align-content-center flex-wrap ms-1 me-0 mb-0 rounded-2 border-1 border-secondary border-opacity-10 btn-compliance" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Concordo">
                                             <i class="ri-emotion-happy-line label-icon align-middle rounded-pill fs-1 m-auto text-white"></i>
                                         </label>
                                     </div>

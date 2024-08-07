@@ -29,7 +29,7 @@
             $recurring = $survey->recurring;
             $recurringLabel = $getSurveyRecurringTranslations[$recurring]['label'];
 
-            $deadline = \App\Models\SurveyAssignments::getSurveyAssignmentDeadline($recurring, $createdAt);
+            $deadline = SurveyAssignments::getSurveyAssignmentDeadline($recurring, $createdAt);
             $deadlineFormated = $deadline->format('Ymd');
             $deadline = $deadline->locale('pt_BR')->isoFormat('D [de] MMMM, YYYY');
 
@@ -71,7 +71,7 @@
             $percentNo = $countResponsesNo > 0 ? ($countResponsesNo / $totalTopics) * 100 : 0;
             $percentNo = number_format($percentNo, 0);
 
-            if( $origin == 'auditListing' && onlyNumber($deadlineFormated) < onlyNumber($today->format('Ymd'))){
+            if( $origin == 'auditListing' && $deadlineFormated < $today->format('Ymd') ){
                 break;
             }
             $countAvaliables++;
@@ -128,10 +128,11 @@
                         <li class="list-group-item">
                             <i class="ri-checkbox-line align-top me-2 text-info"></i> {{ $totalTopics }} Tópicos
                             @if (in_array($statusKey, ['completed']))
-                                <div class="progress progress-sm rounded-2 mt-3" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="{{$percentYes}}% de Conformidades relatadas por {{$surveyorName}}">
+                                <div class="progress progress-sm bg-success-subtle rounded-2 mt-3" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="top" title="{{$percentYes}}% de Conformidades relatadas por {{$surveyorName}}">
                                     <div class="progress-bar bg-success" role="progressbar" style="width: {{$percentYes}}%;" aria-valuenow="{{$percentYes}}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
-                                <div class="progress progress-sm rounded-2 mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="bottom" title="{{$percentNo}}% de Inconformidades relatadas por {{$surveyorName}}">
+
+                                <div class="progress progress-sm bg-danger-subtle rounded-2 mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-trigger="hover" data-bs-placement="bottom" title="{{$percentNo}}% de Inconformidades relatadas por {{$surveyorName}}">
                                     <div class="progress-bar bg-danger" role="progressbar" style="width: {{$percentNo}}%;" aria-valuenow="{{$percentNo}}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             @endif
@@ -256,3 +257,11 @@
         @endif
     @endforeach
 @endif
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if(document.getElementById('count-available-surveyors')){
+            document.getElementById('count-available-surveyors').innerHTML = '{{$countAvaliables > 0 ? $countAvaliables : ''}}';
+        }
+    });
+</script>

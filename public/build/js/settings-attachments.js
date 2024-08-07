@@ -65,8 +65,8 @@ export function attachImage(inputSelector, imageSelector, uploadUrl, withPreview
                         ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
                     }else if (imageSelector == '#logo-img') {
                         // Set maximum dimensions for logo
-                        const maxLogoWidth = 361;
-                        const maxLogoHeight = 80;
+                        const maxLogoWidth = 200;
+                        const maxLogoHeight = 200;
                         //console.log("Canvas dimensions:", canvas.width, "x", canvas.height);
 
                         // Calculate aspect ratio for scaling
@@ -98,13 +98,13 @@ export function attachImage(inputSelector, imageSelector, uploadUrl, withPreview
                         let targetWidth = img.width;
                         let targetHeight = img.height;
 
-                        if (targetWidth > 1920 || targetHeight > 1920) {
+                        if (targetWidth > 1919 || targetHeight > 1919) {
                             const aspectRatio = targetWidth / targetHeight;
                             if (targetWidth > targetHeight) {
-                                targetWidth = 1920;
+                                targetWidth = 1731;
                                 targetHeight = targetWidth / aspectRatio;
                             } else {
-                                targetHeight = 1920;
+                                targetHeight = 1731;
                                 targetWidth = targetHeight * aspectRatio;
                             }
                         }

@@ -20,7 +20,7 @@
                         <div class="text-center mt-sm-5 mb-4 text-white-50">
                             <div>
                                 <a href="{{ url('/') }}" class="d-inline-block auth-logo">
-                                    <img src="{{ URL::asset('build/images/logo-light' . $logo2 . '.png')}}" alt="{{appName()}}" height="49" loading="lazy">
+                                    <img src="{{ URL::asset('build/images/logo-light' . $logo2 . '.png')}}" alt="{{appName()}}" height="39" loading="lazy">
                                 </a>
                             </div>
                         </div>
@@ -39,7 +39,7 @@
                                         <input type="hidden" name="database" id="database" autocomplete="off">
 
                                         <div class="mb-3">
-                                            <label for="username" class="form-label">E-mail <span class="text-danger">*</span></label>
+                                            <label for="username" class="form-label">E-mail </label>
                                             <input type="email" class="form-control @error('email') is-invalid @enderror" id="username" name="email" placeholder="Informe o e-mail" required>
                                             @error('email')
                                                 <span class="invalid-feedback" role="alert">
@@ -52,7 +52,7 @@
                                             <div class="float-end">
                                                 <a href="{{ route('password.update') }}" class="text-muted small">Esqueceu a senha?</a>
                                             </div>
-                                            <label class="form-label" for="password-input">Senha <span class="text-danger">*</span></label>
+                                            <label class="form-label" for="password-input">Senha </label>
                                             <div class="position-relative auth-pass-inputgroup mb-3">
                                                 <input type="password" class="form-control pe-5 password-input @error('password') is-invalid @enderror" name="password" placeholder="Senha aqui" id="password-input" required maxlength="20">
                                                 <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle text-body"></i></button>
@@ -98,7 +98,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="text-center">
-                            <p class="mb-0 text-muted">&copy; <script>document.write(new Date().getFullYear())</script> {{appName()}}</p>
+                            <p class="mb-0 text-muted">&copy; {{date('Y')}} {{appName()}}</p>
                         </div>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
     var checkDatabasesURL = "{{ route('checkDatabasesURL') }}";
 </script>
 
-<script src="{{ URL::asset('build/js/login.js') }}" type="module"></script>
+<script src="{{ URL::asset('build/js/login.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
 <script src="{{ URL::asset('build/js/pages/password-addon.init.js') }}"></script>
 @endsection

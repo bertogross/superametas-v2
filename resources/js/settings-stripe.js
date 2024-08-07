@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         buttonsStyling: false,
                         icon: '',
                         title: '',
-                        html: '<img src="' + assetUrl + 'build/images/stripe/white-small.png" title="Stripe" width="100" class="mb-3"><br>Redirecionado para a página de pagamento...'
+                        html: '<img src="' + assetURL + 'build/images/stripe/white-small.png" title="Stripe" width="100" class="mb-3"><br>Redirecionado para a página de pagamento...'
                     });*/
 
                     toastAlert('Redirecionado para a página de pagamento...', 'success', 10000);
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         buttonsStyling: false,
                         icon: '',
                         title: '',
-                        html: '<img src="' + assetUrl + 'build/images/stripe/white-small.png" title="Stripe" width="100" class="mb-3"><br>Redirecionado para a página de pagamento...'
+                        html: '<img src="' + assetURL + 'build/images/stripe/white-small.png" title="Stripe" width="100" class="mb-3"><br>Redirecionado para a página de pagamento...'
                     });*/
 
                     clickedElement.aetAttribute('disabled');

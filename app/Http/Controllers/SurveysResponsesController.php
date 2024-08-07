@@ -434,7 +434,7 @@ class SurveysResponsesController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'message' => 'Escolha entre Conforme e Não Conforme',
+                    'message' => 'Escolha entre Concordo e Não Concordo',
                     'action' => 'changeToPending',
                     'countResponses' => $countResponses,
                     'countTopics' => $countTopics,

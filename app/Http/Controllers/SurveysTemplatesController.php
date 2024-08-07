@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Survey;
-use App\Models\SurveyTemplates;
 use App\Models\SurveyStep;
 use App\Models\SurveyTerms;
 use Illuminate\Http\Request;
+use App\Models\SurveyTemplates;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class SurveysTemplatesController extends Controller
 {
@@ -17,6 +18,8 @@ class SurveysTemplatesController extends Controller
 
     public function preview(Request $request, $id = null)
     {
+        //Cache::flush();
+
         if (!$id) {
             abort(404);
         }
@@ -49,6 +52,8 @@ class SurveysTemplatesController extends Controller
 
         $data = [];
 
+        $surveysCount = 0;
+
         $defaultOriginal = getWarehouseTerms();
 
         $result = array_filter($defaultOriginal);
@@ -57,13 +62,14 @@ class SurveysTemplatesController extends Controller
                 'data',
                 'result',
                 'terms',
+                'surveysCount'
             )
         );
     }
 
     public function edit(Request $request, $id = null)
     {
-        // Cache::flush();
+        //Cache::flush();
 
         if (!$id) {
             abort(404);

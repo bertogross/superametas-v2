@@ -60,12 +60,13 @@
 
                         @foreach ($users as $user)
                             @php
-                                $id = $user['id'];
+                                $userId = $user['id'];
                                 $capabilities = $user['capabilities'] ? json_decode($user['capabilities'], true) : [];
                                 $status = $user['status'];
                                 $avatar = $user['avatar'];
                                 $cover = $user['cover'];
                                 $name = $user['name'];
+                                $lastLogin = $user['last_login'];
                                 $role = \App\Models\User::getRoleName($user['role']);
                             @endphp
                             @include('settings.users-card')
@@ -91,5 +92,5 @@
         var settingsUsersStoreURL = "{{ route('settingsUsersStoreURL') }}";
         var settingsUsersUpdateURL = "{{ route('settingsUsersUpdateURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/settings-users.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/settings-users.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 @endsection

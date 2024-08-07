@@ -32,7 +32,7 @@
                             <form action="javascript:void(0);">
                                 <div class="row g-3 mb-0 align-items-center">
                                     <div class="col-auto">
-                                        <button type="button" class="btn btn-soft-theme btn-icon waves-effect waves-light layout-rightside-btn"><i class="ri-pulse-line"></i></button>
+                                        <button type="button" class="btn btn-soft-theme btn-icon waves-effect waves-light layout-rightside-btn" title="Exibir/Ocultar"><i class="ri-pulse-line"></i></button>
                                     </div>
                                 </div>
                             </form>
@@ -96,7 +96,7 @@
                 <div class="layout-rightside pb-2">
                     <div class="card rounded-2 mb-0">
                         <div class="card-body p-3">
-                            <div class="tasks-wrapper-survey overflow-auto h-100" id="load-surveys-activities" data-subDays="7">
+                            <div class="tasks-wrapper-survey overflow-auto h-100" id="load-surveys-activities" data-subDays="1">
                                 <div class="text-center">
                                     <div class="spinner-border text-theme mt-3 mb-3" role="status">
                                         <span class="sr-only">Loading...</span>
@@ -125,5 +125,5 @@
         var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
         var getRecentActivitiesURL = "{{ route('getRecentActivitiesURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 @endsection

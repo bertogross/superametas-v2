@@ -188,6 +188,7 @@ button.text-dark:hover{
 }
 
 
+.badge:empty,
 .gallery-wrapper:empty,
 .progress-bar .label:empty,
 .nested-sortable-account-plans-featured .wrap-form-switch,
@@ -445,6 +446,9 @@ pre:empty{
   background: linear-gradient(to top, #171e32, #87df0138);
 }
 
+.active.no-data{
+    border-top-color: var(--vz-danger) !important;
+}
 .nav-theme.nav-custom-outline .nav-link.active,
 .nav-theme.nav-tabs-custom .nav-link.active,
 .nav-border-top-success .nav-link.active{

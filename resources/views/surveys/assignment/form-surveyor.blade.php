@@ -15,7 +15,7 @@
 
     $authorId = $templateData->user_id;
     $getAuthorData = getUserData($authorId);
-    $authorRoleName = \App\Models\User::getRoleName($getAuthorData['role']);
+    $authorRoleName = User::getRoleName($getAuthorData['role']);
     $description = trim($templateData->description) ? nl2br($templateData->description) : '';
 
     $templateName = $surveyData ? getSurveyTemplateNameById($surveyData->template_id) : '';
@@ -111,9 +111,10 @@
         @elseif ($surveyorStatus == 'completed')
             <div class="alert alert-info alert-dismissible alert-label-icon label-arrow fade show mt-4" role="alert">
                 <i class="ri-alert-line label-icon blink"></i> Esta tarefa foi finalizada e não poderá mais ser editada.
+                <br>
                 <a href="{{ route('assignmentShowURL', $assignmentId) }}"
                     data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
-                    title="Visualizar" class="btn btn-sm waves-effect btn-soft-success mt-2">
+                    title="Visualizar" class="btn btn-sm waves-effect btn-soft-dark mt-2">
                     Visualizar
                 </a>
             </div>
@@ -182,7 +183,7 @@
         var surveysShowURL = "{{ route('surveysShowURL') }}";
         var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
     <script>
         var assignmentShowURL = "{{ route('assignmentShowURL') }}";
@@ -191,14 +192,14 @@
         var changeAssignmentSurveyorStatusURL = "{{ route('changeAssignmentSurveyorStatusURL') }}";
         var responsesSurveyorStoreOrUpdateURL = "{{ route('responsesSurveyorStoreOrUpdateURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/surveys-surveyor.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys-surveyor.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
     <script>
         var uploadPhotoURL = "{{ route('uploadPhotoURL') }}";
         var deletePhotoURL = "{{ route('deletePhotoURL') }}";
-        var assetUrl = "{{ URL::asset('/') }}";
+        var assetURL = "{{ URL::asset('/') }}";
     </script>
-    <script src="{{ URL::asset('build/js/surveys-attachments.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys-attachments.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
     <script type="module">
         import {

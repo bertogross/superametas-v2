@@ -23,12 +23,12 @@ class ZohoController extends Controller
         $code = $request->input('code');
 
         // Exchange the authorization code for an access token
-        $accessToken = $this->exchangeCodeForAccessToken($code);
+        $accessToken = ZohoController::exchangeCodeForAccessToken($code);
 
         return "Authorization successful! Access Token: {$accessToken}";
     }
 
-    private function exchangeCodeForAccessToken($code)
+    public static function exchangeCodeForAccessToken($code)
     {
         $clientId = env('ZOHO_CLIENT_ID');
         $clientSecret = env('ZOHO_CLIENT_SECRET');
@@ -51,7 +51,7 @@ class ZohoController extends Controller
 
             if (isset($responseData['access_token'])) {
                 // Store the access token as needed
-                $this->updateToken($responseData, $code);
+                ZohoController::updateToken($responseData, $code);
 
                 return $responseData['access_token'];
             } else {
@@ -66,7 +66,7 @@ class ZohoController extends Controller
         }
     }
 
-    private function updateToken($zohoJson, $code)
+    public static function updateToken($zohoJson, $code)
     {
         if (!empty($zohoJson)) {
             $existingRecord = DB::connection('smOnboard')->table('app_api')
@@ -99,12 +99,12 @@ class ZohoController extends Controller
     }
 
     /*
-    private function getZohoAccessToken()
+    public static function getZohoAccessToken()
     {
         $clientId = env('ZOHO_CLIENT_ID');
         $clientSecret = env('ZOHO_CLIENT_SECRET');
         $redirectUri = env('ZOHO_REDIRECT_URI');
-        $authorizationCode = $this->getAuthorizationCode();
+        $authorizationCode = ZohoController::getAuthorizationCode();
 
         if(!$authorizationCode){
             \Log::error('authorizationCode Error:', 'Empty code');
@@ -131,7 +131,7 @@ class ZohoController extends Controller
             $responseData = $response->json();
 
             if (isset($responseData['access_token'])) {
-                $this->updateToken($responseData, $code);
+                ZohoController::updateToken($responseData, $code);
 
                 return $responseData['access_token'];
             } else {
@@ -146,12 +146,12 @@ class ZohoController extends Controller
         }
     }
     */
-    private function getZohoAccessToken()
+    public static function getZohoAccessToken()
     {
         $clientId = env('ZOHO_CLIENT_ID');
         $clientSecret = env('ZOHO_CLIENT_SECRET');
         $redirectUri = env('ZOHO_REDIRECT_URI');
-        $authorizationCode = $this->getAuthorizationCode();
+        $authorizationCode = ZohoController::getAuthorizationCode();
 
         if (!$authorizationCode) {
             \Log::error('authorizationCode Error: Empty code');
@@ -178,7 +178,7 @@ class ZohoController extends Controller
             $responseData = json_decode($response->getBody(), true);
 
             if ($statusCode === 200 && isset($responseData['access_token'])) {
-                $this->updateToken($responseData, $authorizationCode);
+                ZohoController::updateToken($responseData, $authorizationCode);
                 return $responseData['access_token'];
             } else {
                 \Log::error('getZohoAccessToken responseData Error:', $responseData);
@@ -190,7 +190,7 @@ class ZohoController extends Controller
         }
     }
 
-    private function getAuthorizationCode()
+    public static function getAuthorizationCode()
     {
         try {
             $OnboardConnection = DB::connection('smOnboard');
@@ -214,7 +214,7 @@ class ZohoController extends Controller
         return null;
     }
 
-    private function getZohoAccountData($accessToken)
+    public static function getZohoAccountData($accessToken)
     {
         // Make an authenticated API request to fetch account details
         try {
@@ -279,14 +279,14 @@ class ZohoController extends Controller
         config(['database.connections.smAppTemplate.database' => $databaseName]);
 
         // Get the Zoho OAuth token through your own authentication process
-        $accessToken = $this->getZohoAccessToken();
+        $accessToken = ZohoController::getZohoAccessToken();
 
         if(!$accessToken){
             return 'Failed to accessToken.';
         }
 
         // Make an authenticated API request to fetch account details
-        $accountData = $this->getZohoAccountData($accessToken);
+        $accountData = ZohoController::getZohoAccountData($accessToken);
 
         if (!$accountData) {
             \Log::error('Failed to fetch Zoho account data');
@@ -345,6 +345,63 @@ class ZohoController extends Controller
     }
     */
 
+    public function sendEmail()
+    {
+
+        // Get the Zoho OAuth token through your own authentication process
+        $accessToken = ZohoController::getZohoAccessToken();
+
+        if(!$accessToken){
+            return 'Failed to accessToken.';
+        }
+
+        // Make an authenticated API request to fetch account details
+        $accountData = ZohoController::getZohoAccountData($accessToken);
+
+        if (!$accountData) {
+            \Log::error('Failed to fetch Zoho account data');
+
+            return 'Failed to fetch Zoho account data.';
+        }
+
+        // Extract the account_id from the response
+        $accountId = $accountData['data'][0]['account_id'];
+
+        $zohoApiUrl = "https://mail.zoho.com/api/accounts/{$accountId}/messages";
+        $clientId = env('ZOHO_CLIENT_ID');
+        $clientSecret = env('ZOHO_CLIENT_SECRET');
+
+        $client = new Client();
+
+        $authHeader = [
+            'Authorization' => "Zoho-oauthtoken {$clientId}:{$clientSecret}",
+        ];
+
+        // Define your email data here
+        $emailData = [
+            'fromAddress' => env('ZOHO_CURRENT_USER_EMAIL'),
+            'toAddress' => 'bertogross@gmail.com',
+            'subject' => 'Test Email',
+            'content' => 'Your test email content here.',
+        ];
+
+        try {
+            $response = $client->post($zohoApiUrl, [
+                'headers' => $authHeader,
+                'json' => $emailData,
+            ]);
+
+            if ($response->getStatusCode() === 200) {
+                return 'Email sent successfully!';
+            } else {
+                return 'Failed to send email.';
+                \Log::error('sendGoalsEmail Error: ' . $response);
+            }
+        } catch (\Exception $e) {
+            \Log::error('sendGoalsEmail Error: ' . $e->getMessage());
+            return 'Error: ' . $e->getMessage();
+        }
+    }
 
 }
 

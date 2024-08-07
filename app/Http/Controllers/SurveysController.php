@@ -15,6 +15,7 @@ use App\Models\SurveyResponse;
 use App\Models\SurveyTemplates;
 use App\Models\SurveyAssignments;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -23,6 +24,8 @@ class SurveysController extends Controller
 {
     public function index(Request $request)
     {
+        Cache::flush();
+
         $currentUserId = auth()->id();
 
         // Usefull if crontab or Kernel schedule is losted
@@ -105,6 +108,8 @@ class SurveysController extends Controller
 
     public function show(Request $request, $id = null)
     {
+        Cache::flush();
+        
         if (!$id) {
             abort(404);
         }

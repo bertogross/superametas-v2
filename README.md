@@ -1,92 +1,16 @@
-# A Fullstack Supera Metas
-### Sales and Goals 
+# SuperaMetas
 
+This repository contains the source code for an application developed with Laravel, PHP 8.2, and MySQL 8.0.
+This software is provided solely for portfolio and demonstration purposes.
 
-## Environment Requirements
+## License and Usage Restrictions
 
-`Apache 2`
-`MySQL 5.7`
-`PHP ^8.1`
-`PHP extension php_zip enabled`
-`PHP extension php_xml enabled`
-`PHP extension php_gd2 enabled`
-`PHP extension php_iconv enabled`
-`PHP extension php_simplexml enabled`
-`PHP extension php_xmlreader enabled`
-`PHP extension php_zlib enabled`
+This software is provided under a **Private License**. The source code is available for viewing, but the following restrictions apply:
 
-## Tech Stack
+- **Commercial Use**: Using this software for commercial purposes is prohibited without the express permission of the author.
+- **Redistribution**: Redistribution, sharing, or publishing of this source code, in whole or in part, is prohibited without authorization.
+- **Modification**: Any modification of the source code is not permitted without the author's consent.
 
-Laravel Version 10
+## About
 
-
-## HTTP-based API
-
-Sysmo
-
-
-## Installation
-
-To get started with the project, follow the steps below:
-
-1) Clone the project
-##### In your working directory, open the terminal of your IDE and run the following command:
-```bash
-  git clone https://github.com/bertogross/superametas-v2.git
-```
-```bash
-  cd superametas-v2
-```
-
-2) Run Docker
-##### Make sure you have Docker installed on your system. In your IDE, open the terminal and execute the following commands: 
-```bash
-  docker compose build
-```
-```bash
-  docker compose up
-```
-
-3) Install dependencies
-##### Navigate to the root project directory "superametas-v2", rename ".env.example" to ".env" and execute the following commands:
-```bash
-  npm install
-```
-```bash
-  composer install
-```
-
-4) Deploy the database
-##### Ensure that a web server is running, and execute the following command:
-```bash 
-  php artisan migrate
-```
-
-5) Compile assets
-##### Compile the assets by running the command:
-```bash 
-  npm run dev
-```
-
-6) Start the server
-##### Launch the server with the following command:
-```bash 
-  php artisan serve
-```
-
-7) Access the application
-##### Once the server is running, open your web browser and visit http://localhost:8000
-
-8) Create an account
-##### To begin using the application, you need to create an account. At the top right corner of the page, you will find a menu. Click on "Register" (Registrar) to create a new account.
-
-That's it! You have successfully installed and set up the "incomplete" project. Enjoy it!
-
-
-## Demo
-
-[demo.superametas.com](https://demo.superametas.com)
-
-## Documentation [Unreleased]
-
-[superametas.com/documentation](https://superametas.com/documentation)
+https://superametas.com

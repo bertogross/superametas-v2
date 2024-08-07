@@ -33,27 +33,28 @@
             <div id="teamlist">
                 <div class="team-list grid-view-filter row" id="team-member-list">
                     @php
-                    // Sort the users by name in descending order and send with status 0 to the end
-                    $users = $users->toArray();
+                        // Sort the users by name in descending order and send with status 0 to the end
+                        $users = $users->toArray();
 
-                    usort($users, function ($a, $b) {
-                        if ($a['status'] == $b['status']) {
-                            return strcmp($a['name'], $b['name']);
-                        }
-                        return $b['status'] - $a['status'];
-                    });
+                        usort($users, function ($a, $b) {
+                            if ($a['status'] == $b['status']) {
+                                return strcmp($a['name'], $b['name']);
+                            }
+                            return $b['status'] - $a['status'];
+                        });
 
-                    $users = collect($users);
+                        $users = collect($users);
                     @endphp
 
                     @foreach ($users as $user)
                         @php
-                            $id = $user['id'];
+                            $userId = $user['id'];
                             $capabilities = $user['capabilities'] ? json_decode($user['capabilities'], true) : [];
                             $status = $user['status'];
                             $avatar = $user['avatar'];
                             $cover = $user['cover'];
                             $name = $user['name'];
+                            $lastLogin = $user['last_login'];
                             $role = \App\Models\User::getRoleName($user['role']);
                         @endphp
                         @include('settings.users-card')
@@ -84,7 +85,7 @@
         var settingsUsersStoreURL = "{{ route('settingsUsersStoreURL') }}";
         var settingsUsersUpdateURL = "{{ route('settingsUsersUpdateURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/settings-users.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/settings-users.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
     <script>
         var surveysIndexURL = "{{ route('surveysIndexURL') }}";
@@ -95,5 +96,5 @@
         var surveysStoreOrUpdateURL = "{{ route('surveysStoreOrUpdateURL') }}";
         var getRecentActivitiesURL = "{{ route('getRecentActivitiesURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/surveys.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 @endsection

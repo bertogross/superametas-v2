@@ -100,7 +100,7 @@
 
                         <div class="vr"></div>
 
-                        <div class="text-muted" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">
+                        <div class="text-muted" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="O tipo de recorrência">
                             Recorrência: {{ $recurringLabel }}
                         </div>
 
@@ -190,7 +190,7 @@
                                     @if(in_array($auditorStatus, ['losted', 'bypass']))
                                         <span class="fs-5 float-end ri-alert-fill text-warning" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="bottom" title="Auditoria não foi realizada"></span>
                                     @elseif($timeLimit->gt($now) && $auditorStatus != 'completed')
-                                        <span class="fs-5 float-end ri-time-line text-secondary blink" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="bottom" title="Dentro do prazo para realizar Auditoria"></span>
+                                        <span class="fs-5 float-end ri-time-line text-secondary" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="bottom" title="Dentro do prazo para realizar Auditoria"></span>
                                     @else
                                         <img
                                         src="{{$auditorAvatar}}"
@@ -210,8 +210,8 @@
                                                 <i class="ri-fingerprint-2-line label-icon align-middle fs-16"></i> Auditar
                                             </button>
 
-                                            <div class="form-text mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">
-                                                {{ $deadline }}
+                                            <div class="form-text mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="A data limite para realizar esta tarefa">
+                                                Prazo: {{ $deadline }}
                                             </div>
                                         @elseif ( in_array('audit', $currentUserCapabilities) && $auditorId == auth()->id() && $timeLimit->gt($now) )
                                             <div class="row mb-3">
@@ -226,7 +226,7 @@
                                                 </div>
                                                 <div class="col-6 ps-1">
                                                     <a
-                                                    @if ($surveyorStatus == 'completed')
+                                                    @if (in_array($surveyorStatus, ['completed', 'auditing']))
                                                         href="{{route('formAuditorAssignmentURL', $assignmentId)}}"
                                                     @else
                                                         onclick="alert('Necessário aguardar finalização da Vistoria')"
@@ -237,21 +237,29 @@
                                                 </div>
                                             </div>
 
-                                            <div class="form-text mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">{{ $assignmentCreatedAt ? 'Prazo: ' . $deadline : '' }}</div>
+                                            <div class="form-text mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="A data limite para realizar esta tarefa">
+                                                Prazo: {{ $assignmentCreatedAt ? $deadline : 'Indefinido' }}
+                                            </div>
                                         @else
                                             <div class="form-text text-warning text-opacity-75 mt-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="left" title="A data limite para realizar esta tarefa">
-                                                {{ $assignmentCreatedAt ? 'Prazo: ' . $deadline : '' }}
+                                                Prazo: {{ $assignmentCreatedAt ? $deadline : 'Indefinido' }}
                                             </div>
                                         @endif
 
                                     @elseif($auditorStatus == 'in_progress')
-                                        <p class="blink">E progresso...</p>
-
-                                        <span class="text-success">De Acordo</span>: {{$complianceAuditorYesCount}}
-                                        <br>
-                                        <span class="text-warning">Indeferida</span>: {{$complianceAuditorNoCount}}
+                                        @if(in_array('audit', $currentUserCapabilities))
+                                            <a href="{{route('formAuditorAssignmentURL', $assignmentId)}}"
+                                            class="btn btn-label right waves-effect btn-soft-secondary mb-2" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="Abrir formulário">
+                                                <i class="ri-fingerprint-2-line label-icon align-middle fs-16 blink"></i> Prosseguir com a Auditoria
+                                            </a>
+                                        @else
+                                            <p class="blink mb-1">Em progresso...</p>
+                                            <span class="text-secondary">De Acordo</span>: {{$complianceAuditorYesCount}}
+                                            <br>
+                                            <span class="text-warning">Indeferida</span>: {{$complianceAuditorNoCount}}
+                                        @endif
                                     @elseif($auditorStatus == 'completed')
-                                        <span class="text-success">De Acordo</span>: {{$complianceAuditorYesCount}}
+                                        <span class="text-secondary">De Acordo</span>: {{$complianceAuditorYesCount}}
                                         <br><br>
                                         <span class="text-warning">Indeferida</span>: {{$complianceAuditorNoCount}}
                                     @endif
@@ -363,7 +371,7 @@
                                     $bgSurveyor = $complianceSurvey == 'yes' ? 'bg-opacity-10 bg-success' : 'bg-opacity-10 bg-danger';
                                     $bgSurveyor = $complianceSurvey ? $bgSurveyor : 'bg-opacity-10 bg-warning';
 
-                                    $bgAuditor = $complianceAudit == 'yes' ? 'bg-opacity-10 bg-success' : 'bg-opacity-10 bg-warning';
+                                    $bgAuditor = $complianceAudit == 'yes' ? 'bg-opacity-10 bg-secondary' : 'bg-opacity-10 bg-warning';
                                     $bgAuditor = $complianceAudit ? $bgAuditor : 'bg-opacity-10 bg-secondary';
 
                                     $topicBadgeColor = $complianceSurvey == 'no' && $complianceAudit == 'yes' ? 'warning' : 'success';
@@ -443,7 +451,7 @@
                                                 <div class="card-header border-1 border-bottom-dashed {{ $bgAuditor }}">
                                                     <h6 class="card-title mb-0">
                                                         Auditoria:
-                                                        {!! $complianceAudit && $complianceAudit == 'yes' ? '<span class="text-theme">Aprovada</span>' : '' !!}
+                                                        {!! $complianceAudit && $complianceAudit == 'yes' ? '<span class="text-secondary">Aprovada</span>' : '' !!}
                                                         {!! $complianceAudit && $complianceAudit == 'no' ? '<span class="text-warning">Indeferida</span>' : '' !!}
                                                         {!! !$complianceAudit ? '<span class="text-secondary">Não Informado</span>' : '' !!}
                                                     </h6>
@@ -518,7 +526,7 @@
         --}}
         var revokeAssignmentAuditorURL = "{{ route('revokeAssignmentAuditorURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/surveys-auditor.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys-auditor.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
     <script type="module">
         import {

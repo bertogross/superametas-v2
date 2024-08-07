@@ -31,7 +31,7 @@
         $title = $data->title ?? '';
         $description = $data->description ?? '';
 
-        $countSurveys = $surveysCount && $surveysCount > 0 ? $surveysCount : 0;
+        $countSurveys = isset($surveysCount) && $surveysCount > 0 ? $surveysCount : 0;
         $countSurveysText = $surveysCount > 1 ? 'Este modelo está sendo utilizado por '.$countSurveys.' Checklists. A edição deste não influênciará nos dados das rotinas que estão em andamento.' : 'Este modelo está sendo utilizado em 1 Checklist. A edição deste não influênciará nos dados da rotina que está em andamento.';
         $countSurveysText .= '<br><br>Se a intenção for a de modificar tópicos dos processos em andamento, não será possível devido ao armazenamento de informações para comparativo. Portanto, o caminho ideal será encerrar determinado Checklist e gerar um novo registro. Se este for o caso, prossiga com a edição deste modelo e reutilize-o gerando um novo Checklist.'
     @endphp
@@ -142,7 +142,7 @@
         var surveysTermsStoreOrUpdateURL = "{{ route('surveysTermsStoreOrUpdateURL') }}";
         var surveysTermsFormURL = "{{ route('surveysTermsFormURL') }}";
     </script>
-    <script src="{{ URL::asset('build/js/surveys-templates.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys-templates.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 
-    <script src="{{ URL::asset('build/js/surveys-sortable.js') }}" type="module"></script>
+    <script src="{{ URL::asset('build/js/surveys-sortable.js') }}?v={{env('APP_VERSION')}}" type="module"></script>
 @endsection

@@ -23,7 +23,6 @@ services:
             APP_ENV_FILE: .env.dev
         volumes:
             - '.:/var/www/html'
-            - '.:/var/www/html/development-superametas'
             - './custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini'
             - './cacert.pem:/etc/ssl/certs/cacert.pem'
         networks:

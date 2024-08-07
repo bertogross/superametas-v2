@@ -42,7 +42,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="mt-4 text-center">
-                                                        <p class="mb-0">© <script>document.write(new Date().getFullYear())</script> {{appName()}}s</p>
+                                                        <p class="mb-0">© {{date('Y')}} {{appName()}}s</p>
                                                     </div>
                                                 </div>
                                             </div>
