@@ -1,0 +1,63 @@
+{
+    "name": "superametas.com",
+    "short_name": "Supera Metas",
+    "description": "Funcionalidades que vão ajudar sua equipe a atingir metas",
+    "background_color": "#1a1d21",
+    "theme_color": "#1a1d21",
+    "display": "standalone",
+    "orientation": "portrait",
+    "start_url": "https://checklist.superametas.com/",
+    "id": "/",
+    "scope": "/",
+    "categories": [
+        "business"
+    ],
+    "icons": [
+        {
+            "src": "https://checklist.superametas.com/build/images/favicons/192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://checklist.superametas.com/build/images/favicons/512x512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        },
+        {
+            "src": "https://checklist.superametas.com/build/images/favicons/512x512.png",
+            "type": "image/png",
+            "sizes": "any"
+        },
+        {
+            "src": "https://checklist.superametas.com/build/images/splash-screen.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "https://checklist.superametas.com/build/images/favicons/192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "https://checklist.superametas.com/build/images/desktop-screenshot.png",
+            "type": "image/png",
+            "sizes": "1024x768",
+            "form_factor": "wide"
+        },
+        {
+            "src": "https://checklist.superametas.com/build/images/screenshot-1280x800.png",
+            "sizes": "1280x800",
+            "type": "image/png",
+            "platform": "wide"
+        },
+        {
+            "src": "https://checklist.superametas.com/build/images/screenshot-750x1334.png",
+            "sizes": "750x1334",
+            "type": "image/png",
+            "platform": "wide"
+        }
+    ]
+}

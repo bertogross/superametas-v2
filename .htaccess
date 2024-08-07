@@ -1,0 +1,5 @@
+# Prevent access to env file
+<FilesMatch "\.(env)$">
+  Order Allow,Deny
+  Deny from all
+</FilesMatch>
